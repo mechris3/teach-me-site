@@ -1,8 +1,8 @@
-# Teach Me
+# Teach Me Skills
 
-> Curated, in-depth frontend lessons for developers and designers.
+> Curated, in-depth frontend lessons for developers and designers. Free, no sign-up required.
 
-## Site
+## Site Info
 
 - URL: https://teachmeskills.dev
 - Author: Chris
@@ -10,25 +10,25 @@
 
 ## Courses
 
-### SVG - From Coordinates to Animation
+- [SVG - From Coordinates to Animation](https://teachmeskills.dev/svg/): A 13-lesson course covering SVG from first principles through to complex animation.
 
-A 13-lesson course covering SVG from first principles through to complex animation.
+## SVG Lessons
 
-Lessons:
-1. The Coordinate System - viewport, viewBox, preserveAspectRatio, user vs viewport units
-2. Transforms and Grouping - translate, rotate, scale, skew, the g element, nested coordinate systems
-3. Basic Shapes and Paths - rect, circle, ellipse, line, polyline, polygon, path d attribute, Bezier curves
-4. Styling: Presentation Attributes vs CSS - cascade specificity, inline styles, external CSS, inheritance in SVG
-5. Gradients, Patterns, and Paint Servers - linearGradient, radialGradient, pattern, objectBoundingBox vs userSpaceOnUse
-6. Clipping and Masking - clipPath, mask, luminance vs alpha masking
-7. Filters - filter primitives pipeline, feGaussianBlur, feColorMatrix, feComposite, filter regions
-8. Text and TextPath - text positioning model, tspan, textPath, baseline alignment, text on curves
-9. SMIL Animation Fundamentals - animate, animateTransform, set, timing model, from/to/values, calcMode
-10. SMIL Advanced - animateMotion, motion paths, syncbase timing, event-based triggers, additive animation
-11. CSS Animation of SVG - animatable properties, keyframes on SVG elements, transform-origin differences
-12. JavaScript and SVG - DOM manipulation, createElementNS, event handling, programmatic animation
-13. Putting It Together - capstone combining coordinate systems, animation, interactivity
+- [The Coordinate System](https://teachmeskills.dev/svg/01-coordinate-system.html): viewport, viewBox, preserveAspectRatio, user vs viewport units
+- [Transforms and Grouping](https://teachmeskills.dev/svg/02-transforms-and-grouping.html): translate, rotate, scale, skew, the g element, nested coordinate systems
+- [Basic Shapes and Paths](https://teachmeskills.dev/svg/03-basic-shapes-and-paths.html): rect, circle, ellipse, line, polyline, polygon, path d attribute, Bezier curves
+- [Styling: Presentation Attributes vs CSS](https://teachmeskills.dev/svg/04-styling-presentation-attributes-vs-css.html): cascade specificity, inline styles, external CSS, inheritance in SVG
+- [Gradients, Patterns, and Paint Servers](https://teachmeskills.dev/svg/05-gradients-patterns-paint-servers.html): linearGradient, radialGradient, pattern, objectBoundingBox vs userSpaceOnUse
+- [Clipping and Masking](https://teachmeskills.dev/svg/06-clipping-and-masking.html): clipPath, mask, luminance vs alpha masking
+- [Filters](https://teachmeskills.dev/svg/07-filters.html): filter primitives pipeline, feGaussianBlur, feColorMatrix, feComposite, filter regions
+- [Text and TextPath](https://teachmeskills.dev/svg/08-text-and-textpath.html): text positioning model, tspan, textPath, baseline alignment, text on curves
+- [SMIL Animation Fundamentals](https://teachmeskills.dev/svg/09-smil-animation-fundamentals.html): animate, animateTransform, set, timing model, from/to/values, calcMode
+- [SMIL Advanced](https://teachmeskills.dev/svg/10-smil-advanced.html): animateMotion, motion paths, syncbase timing, event-based triggers, additive animation
+- [CSS Animation of SVG](https://teachmeskills.dev/svg/11-css-animation-of-svg.html): animatable properties, keyframes on SVG elements, transform-origin differences
+- [JavaScript and SVG](https://teachmeskills.dev/svg/12-javascript-and-svg.html): DOM manipulation, createElementNS, event handling, programmatic animation
+- [Putting It Together](https://teachmeskills.dev/svg/13-putting-it-together.html): capstone combining coordinate systems, animation, interactivity
 
-Reference:
-- SVG Elements and Attributes - comprehensive reference of all SVG elements and their attributes
-- SVG DOM Methods - JavaScript API reference for SVG manipulation
+## SVG Reference
+
+- [SVG Elements and Attributes](https://teachmeskills.dev/svg/svg-elements-and-attributes.html): comprehensive reference of all SVG elements and their attributes
+- [SVG DOM Methods](https://teachmeskills.dev/svg/svg-dom-methods.html): JavaScript API reference for SVG manipulation
