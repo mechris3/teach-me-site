@@ -5,7 +5,7 @@
 ## Site
 
 - URL: https://teachmeskills.dev
-- Author: Christopher
+- Author: Chris
 - Format: Static HTML, no frameworks
 
 ## Courses
