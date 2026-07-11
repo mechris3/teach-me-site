@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>SVG Filters - Lesson 7 | Teach Me</title>
+  <meta name="description" content="The SVG filter pipeline model. All 17 filter primitives, wiring inputs and outputs, drop shadows, blur, colour manipulation, lighting, and noise.">
+  <link rel="canonical" href="https://teachmeskills.dev/svg/07-filters.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/svg/07-filters.html">
+  <meta property="og:title" content="SVG Filters - Lesson 7 | Teach Me">
+  <meta property="og:description" content="The SVG filter pipeline model. All 17 filter primitives, wiring inputs and outputs, drop shadows, blur, colour manipulation, lighting, and noise.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="SVG Filters - Lesson 7 | Teach Me">
+  <meta name="twitter:description" content="The SVG filter pipeline model. All 17 filter primitives, wiring inputs and outputs, drop shadows, blur, colour manipulation, lighting, and noise.">
+  <link rel="stylesheet" href="/styles.css">
+ <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header">
+        <a href="index.html">SVG Course</a>
+      </div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-coordinate-system.html">1. Coordinate System</a></li>
+        <li><a href="02-transforms-and-grouping.html">2. Transforms &amp; Grouping</a></li>
+        <li><a href="03-basic-shapes-and-paths.html">3. Shapes &amp; Paths</a></li>
+        <li><a href="04-styling-presentation-attributes-vs-css.html">4. Styling &amp; CSS</a></li>
+        <li><a href="05-gradients-patterns-paint-servers.html">5. Gradients &amp; Patterns</a></li>
+        <li><a href="06-clipping-and-masking.html">6. Clipping &amp; Masking</a></li>
+        <li class="current"><a href="07-filters.html">7. Filters</a></li>
+        <li><a href="08-text-and-textpath.html">8. Text &amp; textPath</a></li>
+        <li><a href="09-smil-animation-fundamentals.html">9. SMIL Fundamentals</a></li>
+        <li><a href="10-smil-advanced.html">10. SMIL Advanced</a></li>
+        <li><a href="11-css-animation-of-svg.html">11. CSS Animation</a></li>
+        <li><a href="12-javascript-and-svg.html">12. JavaScript + SVG</a></li>
+        <li><a href="13-putting-it-together.html">13. Capstone Project</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="svg-elements-and-attributes.html">Elements &amp; Attributes</a></li>
+        <li><a href="svg-dom-methods.html">DOM Methods &amp; Interfaces</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 7</p>
+  <h1>SVG Filters</h1>
+  <p>Filters are SVG's pixel-manipulation layer. Everything covered so far  -  shapes, paths, gradients, clips, masks  -  operates on <em>geometry</em> and <em>paint</em>. Filters operate on the <strong>rendered pixels</strong> after all that geometry and paint has been rasterised. They let you blur, distort, recolour, composite, and light your graphics in ways that geometry alone can't achieve.</p>
+
+  <h2>1. The Filter Model</h2>
+  <p>A filter is a <strong>pipeline</strong> of one or more <em>filter primitives</em>  -  small, single-purpose image operations chained together. Each primitive takes one or two inputs, processes them, and produces an output. You wire these primitives together by naming their inputs and outputs.</p>
+
+  <div class="key-concept">
+    <strong>Filters are raster operations on vector sources</strong>
+    <p>The browser first renders your SVG element to pixels (rasterises it), then feeds those pixels through the filter pipeline. The output is a new pixel buffer that replaces the original rendering. This means filters are resolution-dependent  -  they operate on actual screen pixels, not on the abstract geometry. That's why blurs look different at different zoom levels (unlike clipping, which is always crisp).</p>
+  </div>
+
+  <h3>Basic structure</h3>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;svg viewBox="0 0 300 200"&gt;
+  &lt;defs&gt;
+    &lt;filter id="my-filter"&gt;
+      &lt;!-- Filter primitives go here --&gt;
+      &lt;feGaussianBlur stdDeviation="3"/&gt;
+    &lt;/filter&gt;
+  &lt;/defs&gt;
+
+  &lt;!-- Apply the filter --&gt;
+  &lt;rect width="200" height="100" fill="coral"
+        filter="url(#my-filter)"/&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="300" height="150" viewBox="0 0 300 150">
+      <defs>
+        <filter id="demo-basic-blur">
+          <feGaussianBlur stdDeviation="3"/>
+        </filter>
+      </defs>
+      <rect width="300" height="150" fill="var(--demo-svg-bg)"/>
+      <rect x="30" y="25" width="100" height="100" rx="6" fill="coral"/>
+      <text x="80" y="145" font-size="9" fill="var(--muted)" text-anchor="middle">No filter</text>
+      <rect x="170" y="25" width="100" height="100" rx="6" fill="coral" filter="url(#demo-basic-blur)"/>
+      <text x="220" y="145" font-size="9" fill="var(--muted)" text-anchor="middle">feGaussianBlur (3)</text>
+    </svg>
+    <p class="demo-caption">Left: unfiltered rect. Right: same rect with a 3px Gaussian blur applied.</p>
+  </div>
+
+  <h3>The filter region</h3>
+  <p>Every filter has a <strong>filter region</strong>  -  the rectangular area in which the filter operates. By default, it extends 10% beyond the element's bounding box in each direction (same as masks):</p>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;filter id="my-filter" x="-10%" y="-10%" width="120%" height="120%"&gt;
+  &lt;!-- primitives here --&gt;
+&lt;/filter&gt;</code></pre>
+  </div>
+  <p>These four values define a rectangle, not a symmetric padding. The <code>x</code>/<code>y</code> set where the region <em>starts</em> (relative to the bounding box origin), and <code>width</code>/<code>height</code> set how far it extends. The right edge is at <code>x + width</code> = -10% + 120% = 110%, i.e. 10% beyond the right edge of the bounding box. Same logic vertically. The result is 10% extra on all four sides  -  but you can make it asymmetric if needed (e.g. more room below for a downward shadow):</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;!-- Asymmetric: 5% extra left/right/top, 25% extra at the bottom --&gt;
+&lt;filter x="-5%" y="-5%" width="110%" height="130%"&gt;
+  &lt;feDropShadow dx="0" dy="10" stdDeviation="4"/&gt;
+&lt;/filter&gt;</code></pre>
+  </div>
+
+  <p>This padding is necessary because many filter effects (like blur) expand the visual footprint of an element. If the filter region were exactly the bounding box, blurred edges would get clipped. You can override these values when you need more (or less) space.</p>
+
+  <div class="warning">
+    <strong>Gotcha: filter output clipped unexpectedly?</strong>
+    <p>If your filter produces output larger than the default 120% region (e.g. a very large blur, or a displacement that moves pixels far from the source), increase the filter region: <code>&lt;filter x="-25%" y="-25%" width="150%" height="150%"&gt;</code>. A common debugging step when a filter looks "cut off" at the edges.</p>
+  </div>
+
+  <h3>&lt;filter&gt; element attributes</h3>
+  <table class="comparison-table">
+    <thead><tr><th>Attribute</th><th>Values</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>id</code></td><td>string</td><td>Unique identifier for referencing via <code>filter="url(#id)"</code></td></tr>
+      <tr><td><code>x</code></td><td>length (default <code>-10%</code>)</td><td>Left edge of filter region</td></tr>
+      <tr><td><code>y</code></td><td>length (default <code>-10%</code>)</td><td>Top edge of filter region</td></tr>
+      <tr><td><code>width</code></td><td>length (default <code>120%</code>)</td><td>Width of filter region</td></tr>
+      <tr><td><code>height</code></td><td>length (default <code>120%</code>)</td><td>Height of filter region</td></tr>
+      <tr><td><code>filterUnits</code></td><td><code>objectBoundingBox</code> | <code>userSpaceOnUse</code></td><td>Coordinate system for x/y/width/height (default: objectBoundingBox)</td></tr>
+      <tr><td><code>primitiveUnits</code></td><td><code>userSpaceOnUse</code> | <code>objectBoundingBox</code></td><td>Coordinate system for primitive attributes like stdDeviation (default: userSpaceOnUse)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Inputs and outputs: the wiring model</h3>
+  <p>Each filter primitive can take named inputs (<code>in</code>) and produce named outputs (<code>result</code>). This is how you chain primitives into a pipeline:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;filter id="drop-shadow"&gt;
+  &lt;!-- Step 1: blur the source graphic --&gt;
+  &lt;feGaussianBlur in="SourceAlpha" stdDeviation="4" result="blurred"/&gt;
+
+  &lt;!-- Step 2: offset the blurred result --&gt;
+  &lt;feOffset in="blurred" dx="3" dy="3" result="shadow"/&gt;
+
+  &lt;!-- Step 3: composite the original on top of the shadow --&gt;
+  &lt;feMerge&gt;
+    &lt;feMergeNode in="shadow"/&gt;
+    &lt;feMergeNode in="SourceGraphic"/&gt;
+  &lt;/feMerge&gt;
+&lt;/filter&gt;</code></pre>
+  </div>
+
+  <div class="pipeline">
+    <span class="pipeline-node">SourceAlpha</span>
+    <span class="pipeline-arrow">&rarr;</span>
+    <span class="pipeline-node">feGaussianBlur</span>
+    <span class="pipeline-arrow">&rarr;</span>
+    <span class="pipeline-node">feOffset</span>
+    <span class="pipeline-arrow">&rarr;</span>
+    <span class="pipeline-node">feMerge</span>
+    <span class="pipeline-arrow">&rarr;</span>
+    <span class="pipeline-node">Output</span>
+  </div>
+
+  <h3>Built-in input keywords (implicit  -  you never define these)</h3>
+  <p>When a filter runs, the browser automatically creates these named images and makes them available as inputs. They're reserved names, not something you declare:</p>
+  <ul>
+    <li><code>SourceGraphic</code>  -  the full rendered element (colour + alpha) before any filter processing</li>
+    <li><code>SourceAlpha</code>  -  only the alpha channel of the source (a silhouette  -  opaque where the element exists, transparent elsewhere). Perfect for generating shadows.</li>
+    <li><code>BackgroundImage</code> / <code>BackgroundAlpha</code>  -  the rendered content <em>behind</em> the filtered element (rarely used; requires <code>enable-background</code> and has poor browser support)</li>
+    <li><code>FillPaint</code> / <code>StrokePaint</code>  -  the element's fill or stroke colour as a flat pixel buffer (useful for lighting effects)</li>
+  </ul>
+
+  <div class="key-concept">
+    <strong>Default wiring: implicit chaining</strong>
+    <p>If you omit <code>in</code>, a primitive uses the output of the previous primitive. If it's the first primitive, it uses <code>SourceGraphic</code>. If you omit <code>result</code>, the output is unnamed but still available as the implicit input to the next primitive. This means simple linear chains don't need explicit <code>in</code>/<code>result</code> attributes at all:</p>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;!-- Explicit wiring (verbose but clear) --&gt;
+&lt;filter id="a"&gt;
+  &lt;feGaussianBlur in="SourceAlpha" stdDeviation="4" result="blurred"/&gt;
+  &lt;feOffset in="blurred" dx="3" dy="3" result="shadow"/&gt;
+&lt;/filter&gt;
+
+&lt;!-- Implicit wiring (identical behaviour) --&gt;
+&lt;filter id="b"&gt;
+  &lt;feGaussianBlur in="SourceAlpha" stdDeviation="4"/&gt;
+  &lt;feOffset dx="3" dy="3"/&gt;
+&lt;/filter&gt;</code></pre>
+  </div>
+
+  <p>You only need explicit <code>in</code>/<code>result</code> names when the pipeline <strong>branches</strong>  -  when a primitive needs to reference something other than "the previous output." Without names, implicit chaining gives you a straight line (A&rarr;B&rarr;C). But real filter pipelines often aren't straight lines:</p>
+
+  <div class="code-wrapper">
+    <pre><code>SourceAlpha → feGaussianBlur → feOffset → ┐
+                                            ├→ feMerge → output
+SourceGraphic ─────────────────────────────┘</code></pre>
+  </div>
+
+  <p>Here <code>feMerge</code> needs <em>two</em> inputs: the offset blur (the thing above it) <em>and</em> the original <code>SourceGraphic</code> (which is not "the previous output"  -  it's a completely different stream). Without explicit names, there's no way to express this.</p>
+
+  <p>Concretely, you need <code>in</code>/<code>result</code> when:</p>
+
+  <h3>Case 1: Reaching back (not "the one above me")</h3>
+  <p>The drop shadow: <code>feMerge</code> needs the original <code>SourceGraphic</code>, which isn't the previous output  -  the previous output is the offset shadow.</p>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;filter id="shadow"&gt;
+  &lt;feGaussianBlur in="SourceAlpha" stdDeviation="4" result="blur"/&gt;
+  &lt;feOffset in="blur" dx="3" dy="3" result="shadow"/&gt;
+  &lt;feMerge&gt;
+    &lt;feMergeNode in="shadow"/&gt;        &lt;!-- previous output ✓ --&gt;
+    &lt;feMergeNode in="SourceGraphic"/&gt;  &lt;!-- reaches BACK to the original --&gt;
+  &lt;/feMerge&gt;
+&lt;/filter&gt;</code></pre>
+  </div>
+  <div class="code-wrapper">
+    <pre><code>SourceAlpha → feGaussianBlur → feOffset ──→ ┐
+                                             ├→ feMerge → output
+SourceGraphic ───────────────────────────────┘
+                              (reaches back)</code></pre>
+  </div>
+
+  <h3>Case 2: Fan-out (two primitives consume the same result)</h3>
+  <p>Suppose you want both a blurred shadow <em>and</em> a colour-shifted copy from the same blur operation:</p>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;filter id="fan-out"&gt;
+  &lt;feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blurred"/&gt;
+
+  &lt;!-- Branch A: offset the blur --&gt;
+  &lt;feOffset in="blurred" dx="4" dy="4" result="shadow"/&gt;
+
+  &lt;!-- Branch B: hue-rotate the SAME blur --&gt;
+  &lt;feColorMatrix in="blurred" type="hueRotate" values="90" result="tinted"/&gt;
+
+  &lt;!-- Merge both branches + original --&gt;
+  &lt;feMerge&gt;
+    &lt;feMergeNode in="shadow"/&gt;
+    &lt;feMergeNode in="tinted"/&gt;
+    &lt;feMergeNode in="SourceGraphic"/&gt;
+  &lt;/feMerge&gt;
+&lt;/filter&gt;</code></pre>
+  </div>
+  <div class="code-wrapper">
+    <pre><code>                        ┌→ feOffset ────────→ ┐
+SourceGraphic → feBlur ─┤                      ├→ feMerge → output
+                        └→ feColorMatrix ──────┤
+SourceGraphic ─────────────────────────────────┘
+                (fan-out: both read "blurred")</code></pre>
+  </div>
+
+  <h3>Case 3: Two-input primitives (in + in2)</h3>
+  <p>Primitives like <code>feComposite</code>, <code>feBlend</code>, and <code>feDisplacementMap</code> require <em>two</em> explicit inputs. Implicit chaining can only provide one (the previous output), so you must name the other:</p>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;filter id="two-inputs"&gt;
+  &lt;!-- Generate noise --&gt;
+  &lt;feTurbulence baseFrequency="0.03" result="noise"/&gt;
+
+  &lt;!-- Displace SourceGraphic USING the noise --&gt;
+  &lt;feDisplacementMap in="SourceGraphic" in2="noise"
+    scale="15" xChannelSelector="R" yChannelSelector="G"/&gt;
+&lt;/filter&gt;</code></pre>
+  </div>
+  <div class="code-wrapper">
+    <pre><code>feTurbulence ────────→ (noise) ─────────→ in2 ┐
+                                               ├→ feDisplacementMap → output
+SourceGraphic ─────────────────────────→ in   ┘
+          (two separate streams into one primitive)</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <strong>Rule of thumb</strong>
+    <p>If your pipeline is a straight line (A&rarr;B&rarr;C), you don't need <code>in</code>/<code>result</code>. The moment it branches, merges, or a primitive needs two inputs, you need explicit names to tell the browser which wire connects where.</p>
+  </div>
+
+
+  <h2>2. The 17 Filter Primitives</h2>
+  <p>SVG defines exactly 17 filter primitives. Each does one specific operation. Here's the complete set, grouped by function:</p>
+
+  <table class="comparison-table">
+    <thead>
+      <tr><th>Category</th><th>Primitive</th><th>What it does</th></tr>
+    </thead>
+    <tbody>
+      <tr><td rowspan="2">Blur &amp; Shadow</td><td><code>feGaussianBlur</code></td><td>Gaussian blur with configurable radius</td></tr>
+      <tr><td><code>feDropShadow</code></td><td>Shorthand: offset + blur + colour (SVG 2)</td></tr>
+      <tr><td rowspan="3">Colour</td><td><code>feColorMatrix</code></td><td>4&times;5 matrix colour transform (hue rotate, saturate, etc.)</td></tr>
+      <tr><td><code>feComponentTransfer</code></td><td>Per-channel transfer functions (gamma, threshold, etc.)</td></tr>
+      <tr><td><code>feFlood</code></td><td>Fills the filter region with a solid colour</td></tr>
+      <tr><td rowspan="3">Compositing</td><td><code>feComposite</code></td><td>Porter-Duff compositing (in, out, atop, xor, over, arithmetic)</td></tr>
+      <tr><td><code>feBlend</code></td><td>Blend modes (normal, multiply, screen, darken, lighten)</td></tr>
+      <tr><td><code>feMerge</code></td><td>Layer multiple inputs on top of each other</td></tr>
+      <tr><td rowspan="3">Spatial</td><td><code>feOffset</code></td><td>Shifts pixels by dx/dy (used in shadow pipelines)</td></tr>
+      <tr><td><code>feTile</code></td><td>Tiles the input to fill the filter region</td></tr>
+      <tr><td><code>feDisplacementMap</code></td><td>Distorts pixels using another image as a displacement map</td></tr>
+      <tr><td rowspan="2">Morphology</td><td><code>feMorphology</code></td><td>Erode or dilate (shrink/expand) shapes</td></tr>
+      <tr><td><code>feConvolveMatrix</code></td><td>Custom convolution kernel (sharpen, emboss, edge-detect)</td></tr>
+      <tr><td rowspan="2">Lighting</td><td><code>feDiffuseLighting</code></td><td>Matte surface lighting (Lambertian reflection)</td></tr>
+      <tr><td><code>feSpecularLighting</code></td><td>Shiny surface lighting (specular highlights)</td></tr>
+      <tr><td>Texture</td><td><code>feTurbulence</code></td><td>Generates Perlin noise or turbulence patterns</td></tr>
+      <tr><td>Utility</td><td><code>feImage</code></td><td>Loads an external image or references an SVG element as filter input</td></tr>
+    </tbody>
+  </table>
+
+  <p>We'll cover the most important ones in depth. The rest follow the same pattern  -  once you understand the wiring model and a few core primitives, the others are straightforward to pick up from the <a href="svg-elements-and-attributes.html">reference doc</a>.</p>
+
+  <h2>3. feGaussianBlur</h2>
+  <p>The workhorse filter primitive. It blurs the input by a specified radius using a Gaussian (bell curve) distribution. The <code>stdDeviation</code> attribute controls the blur radius  -  larger values = more blur. It accepts one or two values:</p>
+  <ul>
+    <li><strong>One value</strong> (<code>stdDeviation="5"</code>)  -  equal blur in both x and y (isotropic, soft glow)</li>
+    <li><strong>Two values</strong> (<code>stdDeviation="8 0"</code>)  -  first is x-blur, second is y-blur. This lets you blur in one direction only (motion blur) or weight the axes differently.</li>
+  </ul>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;filter id="blur-example"&gt;
+  &lt;!-- Single value: equal blur in x and y --&gt;
+  &lt;feGaussianBlur stdDeviation="5"/&gt;
+
+  &lt;!-- Two values: different blur for x and y (motion blur effect) --&gt;
+  &lt;feGaussianBlur stdDeviation="8 0"/&gt;
+&lt;/filter&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="100%" height="200" viewBox="0 0 600 200">
+      <defs>
+        <filter id="demo-blur-2"><feGaussianBlur stdDeviation="2"/></filter>
+        <filter id="demo-blur-5"><feGaussianBlur stdDeviation="5"/></filter>
+        <filter id="demo-blur-10"><feGaussianBlur stdDeviation="10"/></filter>
+        <filter id="demo-blur-motion"><feGaussianBlur stdDeviation="8 0"/></filter>
+      </defs>
+      <rect width="600" height="200" fill="var(--demo-svg-bg)"/>
+      <!-- Blur 2 -->
+      <circle cx="75" cy="85" r="40" fill="#61afef" filter="url(#demo-blur-2)"/>
+      <text x="75" y="150" font-size="10" fill="var(--muted)" text-anchor="middle">stdDeviation="2"</text>
+      <!-- Blur 5 -->
+      <circle cx="225" cy="85" r="40" fill="#61afef" filter="url(#demo-blur-5)"/>
+      <text x="225" y="150" font-size="10" fill="var(--muted)" text-anchor="middle">stdDeviation="5"</text>
+      <!-- Blur 10 -->
+      <circle cx="375" cy="85" r="40" fill="#61afef" filter="url(#demo-blur-10)"/>
+      <text x="375" y="150" font-size="10" fill="var(--muted)" text-anchor="middle">stdDeviation="10"</text>
+      <!-- Motion blur -->
+      <circle cx="525" cy="85" r="40" fill="#61afef" filter="url(#demo-blur-motion)"/>
+      <text x="525" y="150" font-size="10" fill="var(--muted)" text-anchor="middle">stdDeviation="8 0"</text>
+      <text x="525" y="165" font-size="9" fill="var(--muted)" text-anchor="middle">(horizontal only)</text>
+    </svg>
+    <p class="demo-caption">Increasing blur radius. The last example uses two values (x-blur, y-blur) to create a directional motion blur.</p>
+  </div>
+
+  <div class="key-concept">
+    <strong>stdDeviation is in filter coordinate units, not pixels</strong>
+    <p>The blur radius is measured in the filter's coordinate system (which by default matches the user coordinate system of the filtered element). If you're working inside a viewBox, the blur amount relates to those units. When the SVG is scaled up on a high-DPI screen, the browser applies more actual pixels of blur to achieve the same visual radius  -  so the blur always looks proportionally correct.</p>
+  </div>
+
+  <h3>Attributes</h3>
+  <table class="comparison-table">
+    <thead><tr><th>Attribute</th><th>Values</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>in</code></td><td>SourceGraphic | SourceAlpha | result name</td><td>Input image</td></tr>
+      <tr><td><code>stdDeviation</code></td><td>number | "x y"</td><td>Blur radius. Single value = equal x/y. Two values = independent horizontal/vertical blur.</td></tr>
+      <tr><td><code>edgeMode</code></td><td><code>duplicate</code> | <code>wrap</code> | <code>none</code></td><td>How to handle pixels at the edge of the input (default: none = transparent black)</td></tr>
+    </tbody>
+  </table>
+
+  <h2>4. Building a Drop Shadow (The Classic Pipeline)</h2>
+  <p>Drop shadows are the "hello world" of filter pipelines. They combine three primitives in sequence, and understanding this chain teaches you 80% of what you need to know about filter wiring:</p>
+
+  <ol>
+    <li><strong>feGaussianBlur</strong> on <code>SourceAlpha</code>  -  creates a blurred silhouette</li>
+    <li><strong>feOffset</strong>  -  shifts the blurred silhouette down and to the right</li>
+    <li><strong>feMerge</strong>  -  layers the original graphic on top of the shadow</li>
+  </ol>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;filter id="drop-shadow"&gt;
+  &lt;!-- 1. Blur the alpha channel (silhouette) --&gt;
+  &lt;feGaussianBlur in="SourceAlpha" stdDeviation="4" result="blur"/&gt;
+
+  &lt;!-- 2. Offset the blurred shadow --&gt;
+  &lt;feOffset in="blur" dx="4" dy="4" result="shadow"/&gt;
+
+  &lt;!-- 3. Layer: shadow behind, original on top --&gt;
+  &lt;feMerge&gt;
+    &lt;feMergeNode in="shadow"/&gt;
+    &lt;feMergeNode in="SourceGraphic"/&gt;
+  &lt;/feMerge&gt;
+&lt;/filter&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="100%" height="200" viewBox="0 0 500 200">
+      <defs>
+        <filter id="demo-drop-shadow">
+          <feGaussianBlur in="SourceAlpha" stdDeviation="4" result="blur"/>
+          <feOffset in="blur" dx="4" dy="4" result="shadow"/>
+          <feMerge>
+            <feMergeNode in="shadow"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+      <rect width="500" height="200" fill="var(--demo-svg-bg)"/>
+      <rect x="50" y="40" width="160" height="120" rx="10" fill="#e5c07b" filter="url(#demo-drop-shadow)"/>
+      <circle cx="370" cy="100" r="60" fill="#c678dd" filter="url(#demo-drop-shadow)"/>
+    </svg>
+    <p class="demo-caption">Manual drop shadow: blur SourceAlpha &rarr; offset &rarr; merge with SourceGraphic on top.</p>
+  </div>
+
+  <h3>Why SourceAlpha and not SourceGraphic?</h3>
+  <p>If you blur <code>SourceGraphic</code>, the shadow retains the element's colours  -  you'd get a coloured halo rather than a dark shadow. <code>SourceAlpha</code> gives you a black silhouette (all the alpha but no colour), which is what shadows look like in the real world.</p>
+
+  <h3>Adding colour to the shadow</h3>
+  <p>The manual pipeline above produces a black shadow. To colour it, insert an <code>feFlood</code> + <code>feComposite</code> step:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;filter id="coloured-shadow"&gt;
+  &lt;feGaussianBlur in="SourceAlpha" stdDeviation="4" result="blur"/&gt;
+  &lt;feOffset in="blur" dx="4" dy="4" result="offsetBlur"/&gt;
+
+  &lt;!-- Flood with desired shadow colour --&gt;
+  &lt;feFlood flood-color="rgba(97, 175, 239, 0.5)" result="colour"/&gt;
+
+  &lt;!-- Clip the flood to the shadow shape --&gt;
+  &lt;feComposite in="colour" in2="offsetBlur" operator="in" result="shadow"/&gt;
+
+  &lt;feMerge&gt;
+    &lt;feMergeNode in="shadow"/&gt;
+    &lt;feMergeNode in="SourceGraphic"/&gt;
+  &lt;/feMerge&gt;
+&lt;/filter&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="100%" height="160" viewBox="0 0 500 160">
+      <defs>
+        <filter id="demo-colour-shadow">
+          <feGaussianBlur in="SourceAlpha" stdDeviation="5" result="blur"/>
+          <feOffset in="blur" dx="4" dy="6" result="offsetBlur"/>
+          <feFlood flood-color="rgba(97, 175, 239, 0.6)" result="colour"/>
+          <feComposite in="colour" in2="offsetBlur" operator="in" result="shadow"/>
+          <feMerge>
+            <feMergeNode in="shadow"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+      <rect width="500" height="160" fill="var(--demo-svg-bg)"/>
+      <rect x="50" y="25" width="160" height="100" rx="10" fill="#e5c07b" filter="url(#demo-colour-shadow)"/>
+      <text x="320" y="80" font-size="28" font-weight="bold" fill="#e06c75" filter="url(#demo-colour-shadow)">Filters!</text>
+    </svg>
+    <p class="demo-caption">Coloured drop shadow using feFlood + feComposite to tint the shadow blue.</p>
+  </div>
+
+  <h2>5. feDropShadow (The Shorthand)</h2>
+  <p>SVG 2 introduced <code>feDropShadow</code> as a convenience primitive that combines the blur + offset + coloured shadow into a single element. It does the same thing as the manual pipeline above, but in one line:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;filter id="easy-shadow"&gt;
+  &lt;feDropShadow dx="3" dy="4" stdDeviation="4"
+                flood-color="rgba(0,0,0,0.4)"/&gt;
+&lt;/filter&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="100%" height="160" viewBox="0 0 500 160">
+      <defs>
+        <filter id="demo-fedropshadow">
+          <feDropShadow dx="3" dy="4" stdDeviation="4" flood-color="rgba(0,0,0,0.4)"/>
+        </filter>
+      </defs>
+      <rect width="500" height="160" fill="var(--demo-svg-bg)"/>
+      <rect x="50" y="25" width="150" height="100" rx="8" fill="#98c379" filter="url(#demo-fedropshadow)"/>
+      <circle cx="340" cy="75" r="50" fill="#e06c75" filter="url(#demo-fedropshadow)"/>
+      <text x="420" y="130" font-size="11" fill="var(--muted)">feDropShadow</text>
+    </svg>
+    <p class="demo-caption">feDropShadow  -  one element does what the manual pipeline needed five.</p>
+  </div>
+
+  <div class="key-concept">
+    <strong>feDropShadow automatically merges the original on top</strong>
+    <p>Unlike the manual pipeline, you don't need an <code>feMerge</code> step  -  <code>feDropShadow</code> implicitly composites the source graphic over the shadow. Its output is the complete "element + shadow" image.</p>
+  </div>
+
+  <div class="warning">
+    <strong>Browser support</strong>
+    <p><code>feDropShadow</code> is well-supported in all modern browsers (Chrome 80+, Firefox 72+, Safari 13.1+). If you need to support older browsers, use the manual pipeline from Section 4.</p>
+  </div>
+
+  <h3>Attributes</h3>
+  <table class="comparison-table">
+    <thead><tr><th>Attribute</th><th>Values</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>in</code></td><td>SourceGraphic | SourceAlpha | result name</td><td>Input image</td></tr>
+      <tr><td><code>dx</code></td><td>number (default 2)</td><td>Horizontal shadow offset</td></tr>
+      <tr><td><code>dy</code></td><td>number (default 2)</td><td>Vertical shadow offset</td></tr>
+      <tr><td><code>stdDeviation</code></td><td>number | "x y" (default 2)</td><td>Blur radius for the shadow</td></tr>
+      <tr><td><code>flood-color</code></td><td>colour (default black)</td><td>Shadow colour</td></tr>
+      <tr><td><code>flood-opacity</code></td><td>0&ndash;1 (default 1)</td><td>Shadow opacity</td></tr>
+    </tbody>
+  </table>
+
+  <h2>6. feColorMatrix</h2>
+  <p>This is SVG's colour Swiss Army knife. It applies a 4&times;5 matrix transformation to every pixel's RGBA values. It can do hue rotation, saturation changes, colour channel swapping, and more  -  all in one primitive.</p>
+
+  <h3>The matrix</h3>
+  <p>The matrix is applied to each pixel's <code>[R, G, B, A, 1]</code> vector. The result is a new <code>[R', G', B', A']</code>:</p>
+
+  <div class="code-wrapper">
+    <pre><code>| R' |   | a00 a01 a02 a03 a04 |   | R |
+| G' | = | a10 a11 a12 a13 a14 | × | G |
+| B' |   | a20 a21 a22 a23 a24 |   | B |
+| A' |   | a30 a31 a32 a33 a34 |   | A |
+                                    | 1 |</code></pre>
+  </div>
+
+  <p>The 5th column (a04, a14, a24, a34) adds constant offsets  -  these let you brighten/darken without a multiplication.</p>
+
+  <h3>Shorthand types</h3>
+  <p>Instead of writing all 20 matrix values, you can use the <code>type</code> attribute for common operations:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;!-- Desaturate (greyscale) --&gt;
+&lt;feColorMatrix type="saturate" values="0"/&gt;
+
+&lt;!-- Half saturation --&gt;
+&lt;feColorMatrix type="saturate" values="0.5"/&gt;
+
+&lt;!-- Hue rotate by 90 degrees --&gt;
+&lt;feColorMatrix type="hueRotate" values="90"/&gt;
+
+&lt;!-- Invert alpha (used for knockout effects) --&gt;
+&lt;feColorMatrix type="matrix"
+  values="1 0 0 0 0
+          0 1 0 0 0
+          0 0 1 0 0
+          0 0 0 -1 1"/&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="100%" height="240" viewBox="0 0 600 240">
+      <defs>
+        <filter id="demo-saturate-0"><feColorMatrix type="saturate" values="0"/></filter>
+        <filter id="demo-saturate-half"><feColorMatrix type="saturate" values="0.5"/></filter>
+        <filter id="demo-hue-90"><feColorMatrix type="hueRotate" values="90"/></filter>
+        <filter id="demo-hue-180"><feColorMatrix type="hueRotate" values="180"/></filter>
+      </defs>
+      <rect width="600" height="240" fill="var(--demo-svg-bg)"/>
+      <!-- Original -->
+      <g transform="translate(20, 20)">
+        <rect width="80" height="80" rx="6" fill="#e06c75"/>
+        <rect x="25" y="25" width="30" height="30" rx="4" fill="#98c379"/>
+        <text x="40" y="115" font-size="9" fill="var(--muted)" text-anchor="middle">Original</text>
+      </g>
+      <!-- Greyscale -->
+      <g transform="translate(130, 20)" filter="url(#demo-saturate-0)">
+        <rect width="80" height="80" rx="6" fill="#e06c75"/>
+        <rect x="25" y="25" width="30" height="30" rx="4" fill="#98c379"/>
+      </g>
+      <text x="170" y="135" font-size="9" fill="var(--muted)" text-anchor="middle">saturate="0"</text>
+      <!-- Half saturate -->
+      <g transform="translate(240, 20)" filter="url(#demo-saturate-half)">
+        <rect width="80" height="80" rx="6" fill="#e06c75"/>
+        <rect x="25" y="25" width="30" height="30" rx="4" fill="#98c379"/>
+      </g>
+      <text x="280" y="135" font-size="9" fill="var(--muted)" text-anchor="middle">saturate="0.5"</text>
+      <!-- Hue 90 -->
+      <g transform="translate(350, 20)" filter="url(#demo-hue-90)">
+        <rect width="80" height="80" rx="6" fill="#e06c75"/>
+        <rect x="25" y="25" width="30" height="30" rx="4" fill="#98c379"/>
+      </g>
+      <text x="390" y="135" font-size="9" fill="var(--muted)" text-anchor="middle">hueRotate="90"</text>
+      <!-- Hue 180 -->
+      <g transform="translate(460, 20)" filter="url(#demo-hue-90)">
+        <rect width="80" height="80" rx="6" fill="#e06c75"/>
+        <rect x="25" y="25" width="30" height="30" rx="4" fill="#98c379"/>
+      </g>
+      <text x="500" y="135" font-size="9" fill="var(--muted)" text-anchor="middle">hueRotate="180"</text>
+
+      <!-- Explanatory row -->
+      <text x="300" y="175" font-size="11" fill="var(--text)" text-anchor="middle">feColorMatrix type shortcuts</text>
+      <text x="300" y="195" font-size="10" fill="var(--muted)" text-anchor="middle">Same source shapes, different colour matrix applied to each</text>
+    </svg>
+    <p class="demo-caption">feColorMatrix in action: greyscale (saturate=0), desaturation (0.5), and hue rotation (90&deg;, 180&deg;).</p>
+  </div>
+
+  <h3>The identity matrix</h3>
+  <p>The "do nothing" matrix (useful as a starting point for understanding):</p>
+  <div class="code-wrapper">
+    <pre><code>1 0 0 0 0    &lt;!-- R' = 1*R + 0*G + 0*B + 0*A + 0 --&gt;
+0 1 0 0 0    &lt;!-- G' = 0*R + 1*G + 0*B + 0*A + 0 --&gt;
+0 0 1 0 0    &lt;!-- B' = 0*R + 0*G + 1*B + 0*A + 0 --&gt;
+0 0 0 1 0    &lt;!-- A' = 0*R + 0*G + 0*B + 1*A + 0 --&gt;</code></pre>
+  </div>
+  <p>Modify individual cells to channel-swap, tint, or adjust brightness. For instance, swapping R and B channels:</p>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;feColorMatrix type="matrix"
+  values="0 0 1 0 0
+          0 1 0 0 0
+          1 0 0 0 0
+          0 0 0 1 0"/&gt;</code></pre>
+  </div>
+
+  <h3>Attributes</h3>
+  <table class="comparison-table">
+    <thead><tr><th>Attribute</th><th>Values</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>in</code></td><td>SourceGraphic | SourceAlpha | result name</td><td>Input image</td></tr>
+      <tr><td><code>type</code></td><td><code>matrix</code> | <code>saturate</code> | <code>hueRotate</code> | <code>luminanceToAlpha</code></td><td>Operation type</td></tr>
+      <tr><td><code>values</code></td><td>depends on type</td><td><strong>matrix:</strong> 20 numbers (4&times;5 matrix).<br><strong>saturate:</strong> 0&ndash;1+ (0=greyscale, 1=unchanged).<br><strong>hueRotate:</strong> degrees (0&ndash;360).<br><strong>luminanceToAlpha:</strong> no values needed.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <h2>7. feComposite &amp; feMerge</h2>
+  <p>These two primitives control how multiple images are combined.</p>
+
+  <h3>feMerge  -  simple layering</h3>
+  <p><code>feMerge</code> stacks inputs on top of each other in order (first <code>feMergeNode</code> is the bottom layer, last is the top). It's the filter equivalent of SVG's natural paint order  -  later elements draw on top.</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;feMerge&gt;
+  &lt;feMergeNode in="background-effect"/&gt;   &lt;!-- bottom --&gt;
+  &lt;feMergeNode in="middle-effect"/&gt;        &lt;!-- middle --&gt;
+  &lt;feMergeNode in="SourceGraphic"/&gt;        &lt;!-- top --&gt;
+&lt;/feMerge&gt;</code></pre>
+  </div>
+
+  <h3>feComposite  -  Porter-Duff operations</h3>
+  <p><code>feComposite</code> combines exactly two inputs using compositing operators. The <code>operator</code> attribute selects the mode:</p>
+
+  <table class="comparison-table">
+    <thead><tr><th>Operator</th><th>Result keeps</th><th>Use case</th></tr></thead>
+    <tbody>
+      <tr><td><code>over</code></td><td>Both layers (in draws on top of in2)</td><td>Default layering (same as feMerge with 2 inputs)</td></tr>
+      <tr><td><code>in</code></td><td>Only where both inputs overlap</td><td>Clipping one image to the shape of another</td></tr>
+      <tr><td><code>out</code></td><td>in only where in2 is absent</td><td>Punch a hole (knockout effects)</td></tr>
+      <tr><td><code>atop</code></td><td>in where in2 exists, plus in2 where in is absent</td><td>Texturing within a shape boundary</td></tr>
+      <tr><td><code>xor</code></td><td>Where exactly one input exists (not both)</td><td>Exclusion / toggle effects</td></tr>
+      <tr><td><code>arithmetic</code></td><td>Custom blend: k1*i1*i2 + k2*i1 + k3*i2 + k4</td><td>Fine-grained compositing control</td></tr>
+    </tbody>
+  </table>
+
+  <div class="demo">
+    <svg width="100%" height="200" viewBox="0 0 600 200">
+      <defs>
+        <filter id="demo-comp-in" x="0" y="0" width="100%" height="100%">
+          <feFlood flood-color="#61afef" result="blue"/>
+          <feComposite in="blue" in2="SourceGraphic" operator="in"/>
+        </filter>
+        <filter id="demo-comp-out" x="0" y="0" width="100%" height="100%">
+          <feFlood flood-color="#e06c75" result="red"/>
+          <feComposite in="red" in2="SourceGraphic" operator="out"/>
+        </filter>
+      </defs>
+      <rect width="600" height="200" fill="var(--demo-svg-bg)"/>
+      <!-- Source shape -->
+      <circle cx="100" cy="100" r="60" fill="#e5c07b"/>
+      <text x="100" y="180" font-size="9" fill="var(--muted)" text-anchor="middle">Original</text>
+      <!-- Composite "in" -->
+      <circle cx="300" cy="100" r="60" fill="#e5c07b" filter="url(#demo-comp-in)"/>
+      <text x="300" y="180" font-size="9" fill="var(--muted)" text-anchor="middle">feFlood(blue) IN source</text>
+      <!-- Composite "out" -->
+      <rect x="400" y="20" width="180" height="160" fill="var(--demo-svg-bg)"/>
+      <circle cx="500" cy="100" r="60" fill="#e5c07b" filter="url(#demo-comp-out)"/>
+      <text x="500" y="180" font-size="9" fill="var(--muted)" text-anchor="middle">feFlood(red) OUT source</text>
+    </svg>
+    <p class="demo-caption">feComposite operators: "in" clips the flood colour to the source shape; "out" keeps the flood only where the source is absent (inverted).</p>
+  </div>
+
+  <h3>feComposite attributes</h3>
+  <table class="comparison-table">
+    <thead><tr><th>Attribute</th><th>Values</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>in</code></td><td>result name or keyword</td><td>First input (drawn "on top" for <code>over</code>)</td></tr>
+      <tr><td><code>in2</code></td><td>result name or keyword</td><td>Second input</td></tr>
+      <tr><td><code>operator</code></td><td><code>over</code> | <code>in</code> | <code>out</code> | <code>atop</code> | <code>xor</code> | <code>lighter</code> | <code>arithmetic</code></td><td>Compositing operation</td></tr>
+      <tr><td><code>k1</code></td><td>number (default 0)</td><td>For <code>arithmetic</code>: result = k1&times;i1&times;i2 + k2&times;i1 + k3&times;i2 + k4</td></tr>
+      <tr><td><code>k2</code></td><td>number (default 0)</td><td>Coefficient for input 1</td></tr>
+      <tr><td><code>k3</code></td><td>number (default 0)</td><td>Coefficient for input 2</td></tr>
+      <tr><td><code>k4</code></td><td>number (default 0)</td><td>Constant added to result</td></tr>
+    </tbody>
+  </table>
+
+  <h3>feMerge attributes</h3>
+  <p>Contains one or more <code>&lt;feMergeNode&gt;</code> children:</p>
+  <table class="comparison-table">
+    <thead><tr><th>Attribute (on feMergeNode)</th><th>Values</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>in</code></td><td>result name or keyword</td><td>The input to layer at this position. First node = bottom, last = top.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>feOffset attributes</h3>
+  <table class="comparison-table">
+    <thead><tr><th>Attribute</th><th>Values</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>in</code></td><td>result name or keyword</td><td>Input image</td></tr>
+      <tr><td><code>dx</code></td><td>number (default 0)</td><td>Horizontal offset in filter coordinate units</td></tr>
+      <tr><td><code>dy</code></td><td>number (default 0)</td><td>Vertical offset in filter coordinate units</td></tr>
+    </tbody>
+  </table>
+
+  <h3>feFlood attributes</h3>
+  <table class="comparison-table">
+    <thead><tr><th>Attribute</th><th>Values</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>flood-color</code></td><td>colour (default black)</td><td>The fill colour for the entire filter sub-region</td></tr>
+      <tr><td><code>flood-opacity</code></td><td>0&ndash;1 (default 1)</td><td>Opacity of the flood</td></tr>
+    </tbody>
+  </table>
+
+  <h2>8. feTurbulence  -  Generating Noise</h2>
+  <p><code>feTurbulence</code> generates procedural noise (Perlin noise or fractal turbulence) without any input  -  it creates pixels from nothing. Combined with <code>feDisplacementMap</code>, it can create organic distortion effects (water ripples, paper texture, fire).</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;filter id="noise"&gt;
+  &lt;feTurbulence type="fractalNoise"
+    baseFrequency="0.05" numOctaves="3" seed="42"/&gt;
+&lt;/filter&gt;
+
+&lt;filter id="turbulence"&gt;
+  &lt;feTurbulence type="turbulence"
+    baseFrequency="0.02" numOctaves="4"/&gt;
+&lt;/filter&gt;</code></pre>
+  </div>
+
+  <p>Key attributes at a glance (full table below the demos):</p>
+  <table class="comparison-table">
+    <thead><tr><th>Attribute</th><th>Values</th><th>Effect</th></tr></thead>
+    <tbody>
+      <tr><td><code>type</code></td><td><code>fractalNoise</code></td><td>Smooth, cloud-like noise (good for textures, paper, fog)</td></tr>
+      <tr><td></td><td><code>turbulence</code></td><td>More contrasty, wrinkly noise (good for water, marble, fire)</td></tr>
+      <tr><td><code>baseFrequency</code></td><td>number | "x y"</td><td>Zoom level of the noise. Smaller = larger, blobby features; larger = finer grain. Two values set x and y independently  -  e.g. <code>"0.05 0.01"</code> produces tall, vertically-stretched features (high frequency horizontally, low vertically). Useful for wood grain, rain, or directional textures.</td></tr>
+      <tr><td><code>numOctaves</code></td><td>integer (default 1)</td><td>Noise layers summed together. More = finer detail but slower.</td></tr>
+      <tr><td><code>seed</code></td><td>number (default 0)</td><td>Random seed. Same seed = reproducible noise pattern.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="demo">
+    <svg width="100%" height="180" viewBox="0 0 500 180">
+      <defs>
+        <filter id="demo-noise-1">
+          <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" seed="1"/>
+        </filter>
+        <filter id="demo-noise-2">
+          <feTurbulence type="turbulence" baseFrequency="0.03" numOctaves="4" seed="5"/>
+        </filter>
+      </defs>
+      <rect width="500" height="180" fill="var(--demo-svg-bg)"/>
+      <rect x="20" y="20" width="210" height="120" rx="6" filter="url(#demo-noise-1)"/>
+      <text x="125" y="160" font-size="9" fill="var(--muted)" text-anchor="middle">fractalNoise (0.04, 3 octaves)</text>
+      <rect x="270" y="20" width="210" height="120" rx="6" filter="url(#demo-noise-2)"/>
+      <text x="375" y="160" font-size="9" fill="var(--muted)" text-anchor="middle">turbulence (0.03, 4 octaves)</text>
+    </svg>
+    <p class="demo-caption">Left: smooth fractal noise. Right: turbulence (more contrast and sharper features).</p>
+  </div>
+
+  <h3>Using noise for distortion</h3>
+  <p>Combine <code>feTurbulence</code> with <code>feDisplacementMap</code> to distort an element organically:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;filter id="wavy"&gt;
+  &lt;feTurbulence type="turbulence" baseFrequency="0.02"
+    numOctaves="2" result="noise"/&gt;
+  &lt;feDisplacementMap in="SourceGraphic" in2="noise"
+    scale="15" xChannelSelector="R" yChannelSelector="G"/&gt;
+&lt;/filter&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="100%" height="160" viewBox="0 0 500 160">
+      <defs>
+        <filter id="demo-wavy">
+          <feTurbulence type="turbulence" baseFrequency="0.02" numOctaves="2" result="noise"/>
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="12" xChannelSelector="R" yChannelSelector="G"/>
+        </filter>
+      </defs>
+      <rect width="500" height="160" fill="var(--demo-svg-bg)"/>
+      <text x="60" y="90" font-size="36" font-weight="bold" fill="#61afef">Hello SVG</text>
+      <text x="60" y="130" font-size="9" fill="var(--muted)">No filter</text>
+      <text x="300" y="90" font-size="36" font-weight="bold" fill="#61afef" filter="url(#demo-wavy)">Hello SVG</text>
+      <text x="300" y="130" font-size="9" fill="var(--muted)">feDisplacementMap</text>
+    </svg>
+    <p class="demo-caption">Turbulence noise used as a displacement map creates an organic warping effect on text.</p>
+  </div>
+
+  <div class="key-concept">
+    <strong>feDisplacementMap explained</strong>
+    <p>For each pixel in the output, the displacement map reads the colour value at that position from the <code>in2</code> image, then shifts the corresponding pixel from <code>in</code> by an amount proportional to that colour value. <code>xChannelSelector</code> picks which colour channel (R, G, B, or A) controls horizontal displacement; <code>yChannelSelector</code> picks the channel for vertical. The <code>scale</code> attribute controls the maximum displacement distance. A neutral value (0.5 in the 0&ndash;1 range, or 128 in 0&ndash;255) means no displacement.</p>
+  </div>
+
+  <h3>feTurbulence attributes</h3>
+  <table class="comparison-table">
+    <thead><tr><th>Attribute</th><th>Values</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>type</code></td><td><code>fractalNoise</code> | <code>turbulence</code></td><td>Noise algorithm. fractalNoise = smooth/cloudy. turbulence = higher contrast/wrinkly.</td></tr>
+      <tr><td><code>baseFrequency</code></td><td>number | "x y" (required)</td><td>Frequency of the noise. Smaller = larger features. Two values set x/y independently  -  e.g. <code>"0.05 0.01"</code> stretches noise vertically (high freq horizontal, low vertical).</td></tr>
+      <tr><td><code>numOctaves</code></td><td>integer (default 1)</td><td>Number of noise layers summed together. More = finer detail but more expensive.</td></tr>
+      <tr><td><code>seed</code></td><td>number (default 0)</td><td>Random seed for reproducible patterns</td></tr>
+      <tr><td><code>stitchTiles</code></td><td><code>stitch</code> | <code>noStitch</code></td><td>Whether to adjust noise to tile seamlessly at boundaries (default: noStitch)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>feDisplacementMap attributes</h3>
+  <table class="comparison-table">
+    <thead><tr><th>Attribute</th><th>Values</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>in</code></td><td>result name or keyword</td><td>The image to be displaced</td></tr>
+      <tr><td><code>in2</code></td><td>result name or keyword</td><td>The displacement map image (its colour channels drive the displacement)</td></tr>
+      <tr><td><code>scale</code></td><td>number (default 0)</td><td>Maximum displacement distance. Positive = displace, 0 = no effect.</td></tr>
+      <tr><td><code>xChannelSelector</code></td><td><code>R</code> | <code>G</code> | <code>B</code> | <code>A</code></td><td>Which channel of in2 controls horizontal displacement (default: A)</td></tr>
+      <tr><td><code>yChannelSelector</code></td><td><code>R</code> | <code>G</code> | <code>B</code> | <code>A</code></td><td>Which channel of in2 controls vertical displacement (default: A)</td></tr>
+    </tbody>
+  </table>
+
+  <h2>9. Lighting Effects</h2>
+  <p>SVG filters include a lighting model with two surface types and three light source types. Combined, they can create embossed, raised, or 3D effects on flat 2D shapes.</p>
+
+  <h3>Surface types</h3>
+  <ul>
+    <li><code>feDiffuseLighting</code>  -  matte surface (Lambertian reflection). Light scatters evenly in all directions. The result is a smooth, clay-like appearance.</li>
+    <li><code>feSpecularLighting</code>  -  shiny surface (Phong-like specular highlights). Light reflects directionally, creating bright hotspots. Think plastic or metal.</li>
+  </ul>
+
+  <h3>Light sources (nested inside lighting elements)</h3>
+  <ul>
+    <li><code>feDistantLight</code>  -  parallel rays from a direction (like the sun). Defined by <code>azimuth</code> and <code>elevation</code> angles.</li>
+    <li><code>fePointLight</code>  -  omnidirectional from a position (like a bare bulb). Defined by <code>x</code>, <code>y</code>, <code>z</code>.</li>
+    <li><code>feSpotLight</code>  -  cone of light from a position aimed at a target. Has <code>pointsAtX/Y/Z</code>, <code>limitingConeAngle</code>, and <code>specularExponent</code>.</li>
+  </ul>
+
+  <h3>How it works</h3>
+  <p>Lighting primitives use the <strong>alpha channel</strong> of their input as a height map (bump map). Brighter alpha = higher surface. The lighting calculation then determines how light would illuminate this bumpy surface, producing a lit image. You typically:</p>
+  <ol>
+    <li>Feed the element's alpha (or a noise texture) as input</li>
+    <li>Apply the lighting primitive to generate a lit surface</li>
+    <li>Composite the lighting result with the original using <code>feComposite operator="arithmetic"</code></li>
+  </ol>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;filter id="emboss"&gt;
+  &lt;!-- Use source alpha as the bump map --&gt;
+  &lt;feDiffuseLighting in="SourceGraphic" surfaceScale="3"
+    diffuseConstant="1" lighting-color="white" result="light"&gt;
+    &lt;feDistantLight azimuth="225" elevation="45"/&gt;
+  &lt;/feDiffuseLighting&gt;
+
+  &lt;!-- Combine lighting with original --&gt;
+  &lt;feComposite in="SourceGraphic" in2="light"
+    operator="arithmetic" k1="1" k2="0" k3="0" k4="0"/&gt;
+&lt;/filter&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="100%" height="200" viewBox="0 0 500 200">
+      <defs>
+        <filter id="demo-diffuse">
+          <feDiffuseLighting in="SourceGraphic" surfaceScale="4" diffuseConstant="1" lighting-color="white" result="light">
+            <feDistantLight azimuth="225" elevation="40"/>
+          </feDiffuseLighting>
+          <feComposite in="SourceGraphic" in2="light" operator="arithmetic" k1="1" k2="0" k3="0" k4="0"/>
+        </filter>
+        <filter id="demo-specular">
+          <feSpecularLighting in="SourceAlpha" surfaceScale="5" specularConstant="1" specularExponent="20" lighting-color="white" result="spec">
+            <fePointLight x="250" y="50" z="150"/>
+          </feSpecularLighting>
+          <feComposite in="SourceGraphic" in2="spec" operator="arithmetic" k1="0" k2="1" k3="1" k4="0"/>
+        </filter>
+      </defs>
+      <rect width="500" height="200" fill="var(--demo-svg-bg)"/>
+      <!-- Diffuse -->
+      <g transform="translate(30, 30)">
+        <rect width="180" height="120" rx="10" fill="#e5c07b" filter="url(#demo-diffuse)"/>
+      </g>
+      <text x="120" y="180" font-size="9" fill="var(--muted)" text-anchor="middle">feDiffuseLighting</text>
+      <text x="120" y="195" font-size="9" fill="var(--muted)" text-anchor="middle">(feDistantLight)</text>
+      <!-- Specular -->
+      <g transform="translate(270, 30)">
+        <rect width="180" height="120" rx="10" fill="#c678dd" filter="url(#demo-specular)"/>
+      </g>
+      <text x="360" y="180" font-size="9" fill="var(--muted)" text-anchor="middle">feSpecularLighting</text>
+      <text x="360" y="195" font-size="9" fill="var(--muted)" text-anchor="middle">(fePointLight)</text>
+    </svg>
+    <p class="demo-caption">Left: diffuse lighting (matte, even shading). Right: specular lighting (shiny highlight from a point light source).</p>
+  </div>
+
+  <div class="warning">
+    <strong>Lighting is powerful but complex</strong>
+    <p>Getting lighting to look "right" requires tweaking <code>surfaceScale</code>, the constant/exponent values, and the light source position. Start with small <code>surfaceScale</code> values (2&ndash;5) and adjust. The arithmetic composite step is where you control how much the lighting affects the final result (k1 controls multiplication of input*light, k2 controls input-only contribution, k3 controls light-only).</p>
+  </div>
+
+  <h3>feDiffuseLighting attributes</h3>
+  <table class="comparison-table">
+    <thead><tr><th>Attribute</th><th>Values</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>in</code></td><td>result name or keyword</td><td>Input whose alpha channel is used as the bump/height map</td></tr>
+      <tr><td><code>surfaceScale</code></td><td>number (default 1)</td><td>Height multiplier for the bump map (higher = more pronounced 3D effect)</td></tr>
+      <tr><td><code>diffuseConstant</code></td><td>number (default 1)</td><td>kd in the Lambertian lighting model. Controls light intensity.</td></tr>
+      <tr><td><code>lighting-color</code></td><td>colour (default white)</td><td>Colour of the light source</td></tr>
+    </tbody>
+  </table>
+
+  <h3>feSpecularLighting attributes</h3>
+  <table class="comparison-table">
+    <thead><tr><th>Attribute</th><th>Values</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>in</code></td><td>result name or keyword</td><td>Input whose alpha channel is used as the bump/height map</td></tr>
+      <tr><td><code>surfaceScale</code></td><td>number (default 1)</td><td>Height multiplier for the bump map</td></tr>
+      <tr><td><code>specularConstant</code></td><td>number (default 1)</td><td>ks in the Phong model. Controls highlight intensity.</td></tr>
+      <tr><td><code>specularExponent</code></td><td>number 1&ndash;128 (default 1)</td><td>Shininess exponent. Higher = tighter, more focused highlights.</td></tr>
+      <tr><td><code>lighting-color</code></td><td>colour (default white)</td><td>Colour of the light source</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Light source elements</h3>
+  <table class="comparison-table">
+    <thead><tr><th>Element</th><th>Attributes</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>&lt;feDistantLight&gt;</code></td><td><code>azimuth</code> (degrees, default 0), <code>elevation</code> (degrees, default 0)</td><td>Parallel light from a direction. Azimuth = compass direction (0=right, 90=down). Elevation = angle above the XY plane.</td></tr>
+      <tr><td><code>&lt;fePointLight&gt;</code></td><td><code>x</code>, <code>y</code>, <code>z</code> (all default 0)</td><td>Omnidirectional light from a 3D position. z controls distance "above" the surface.</td></tr>
+      <tr><td><code>&lt;feSpotLight&gt;</code></td><td><code>x</code>, <code>y</code>, <code>z</code>, <code>pointsAtX</code>, <code>pointsAtY</code>, <code>pointsAtZ</code>, <code>specularExponent</code> (default 1), <code>limitingConeAngle</code> (default none)</td><td>Cone of light from (x,y,z) aimed at (pointsAtX/Y/Z). specularExponent controls falloff from centre of cone. limitingConeAngle clips the cone edge.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>10. feMorphology  -  Erode and Dilate</h2>
+  <p><code>feMorphology</code> shrinks (<code>erode</code>) or expands (<code>dilate</code>) the shape boundaries. It's like a variable-width stroke that can also be used to create outlines, bold text effects, or to thicken/thin elements.</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;!-- Thicken (dilate) by 2 units --&gt;
+&lt;filter id="thick"&gt;
+  &lt;feMorphology operator="dilate" radius="2"/&gt;
+&lt;/filter&gt;
+
+&lt;!-- Thin (erode) by 1 unit --&gt;
+&lt;filter id="thin"&gt;
+  &lt;feMorphology operator="erode" radius="1"/&gt;
+&lt;/filter&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="100%" height="160" viewBox="0 0 600 160">
+      <defs>
+        <filter id="demo-erode"><feMorphology operator="erode" radius="1"/></filter>
+        <filter id="demo-dilate"><feMorphology operator="dilate" radius="2"/></filter>
+      </defs>
+      <rect width="600" height="160" fill="var(--demo-svg-bg)"/>
+      <text x="30" y="90" font-size="36" font-weight="bold" fill="#61afef">SVG Text</text>
+      <text x="30" y="125" font-size="9" fill="var(--muted)">Original</text>
+      <text x="220" y="90" font-size="36" font-weight="bold" fill="#61afef" filter="url(#demo-erode)">SVG Text</text>
+      <text x="220" y="125" font-size="9" fill="var(--muted)">erode (radius=1)</text>
+      <text x="410" y="90" font-size="36" font-weight="bold" fill="#61afef" filter="url(#demo-dilate)">SVG Text</text>
+      <text x="410" y="125" font-size="9" fill="var(--muted)">dilate (radius=2)</text>
+    </svg>
+    <p class="demo-caption">feMorphology: erode shrinks the text, dilate expands it. Useful for creating outlines or adjusting visual weight.</p>
+  </div>
+
+  <h3>Outline text trick</h3>
+  <p>Combine dilate + original to create a text outline effect (dilate creates the "stroke", then layer the original on top as the fill):</p>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;filter id="text-outline"&gt;
+  &lt;feMorphology in="SourceGraphic" operator="dilate"
+    radius="2" result="expanded"/&gt;
+  &lt;!-- Colour the expanded area --&gt;
+  &lt;feFlood flood-color="#e06c75" result="outlineColor"/&gt;
+  &lt;feComposite in="outlineColor" in2="expanded"
+    operator="in" result="outline"/&gt;
+  &lt;!-- Layer: outline behind, original on top --&gt;
+  &lt;feMerge&gt;
+    &lt;feMergeNode in="outline"/&gt;
+    &lt;feMergeNode in="SourceGraphic"/&gt;
+  &lt;/feMerge&gt;
+&lt;/filter&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="100%" height="120" viewBox="0 0 500 120">
+      <defs>
+        <filter id="demo-outline">
+          <feMorphology in="SourceGraphic" operator="dilate" radius="2" result="expanded"/>
+          <feFlood flood-color="#e06c75" result="outlineColor"/>
+          <feComposite in="outlineColor" in2="expanded" operator="in" result="outline"/>
+          <feMerge>
+            <feMergeNode in="outline"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+      <rect width="500" height="120" fill="var(--demo-svg-bg)"/>
+      <text x="250" y="80" font-size="48" font-weight="900" fill="#e5c07b" text-anchor="middle" filter="url(#demo-outline)">OUTLINED</text>
+    </svg>
+    <p class="demo-caption">Text outline created with feMorphology dilate + feFlood + feComposite. The dilated shape (red) shows behind the original text (gold).</p>
+  </div>
+
+  <h3>Attributes</h3>
+  <table class="comparison-table">
+    <thead><tr><th>Attribute</th><th>Values</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>in</code></td><td>result name or keyword</td><td>Input image</td></tr>
+      <tr><td><code>operator</code></td><td><code>erode</code> | <code>dilate</code></td><td>Shrink or expand shape boundaries</td></tr>
+      <tr><td><code>radius</code></td><td>number | "x y" (default 0)</td><td>Radius of the morphology operation. Two values for independent x/y.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>11. A Real-World Example: Glow Effect</h2>
+  <p>Combining blur, colour, and compositing  -  here's a neon glow effect. The approach: blur the source graphic (creates a coloured halo), then layer the crisp original on top:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;filter id="glow"&gt;
+  &lt;!-- Blur the source to create the glow halo --&gt;
+  &lt;feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur"/&gt;
+
+  &lt;!-- Brighten the blur (optional: boost glow intensity) --&gt;
+  &lt;feColorMatrix in="blur" type="matrix"
+    values="1 0 0 0 0
+            0 1 0 0 0
+            0 0 1 0 0
+            0 0 0 2 0"
+    result="brightBlur"/&gt;
+
+  &lt;!-- Layer: glow behind, sharp original on top --&gt;
+  &lt;feMerge&gt;
+    &lt;feMergeNode in="brightBlur"/&gt;
+    &lt;feMergeNode in="SourceGraphic"/&gt;
+  &lt;/feMerge&gt;
+&lt;/filter&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="100%" height="180" viewBox="0 0 500 180">
+      <defs>
+        <filter id="demo-glow" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur"/>
+          <feColorMatrix in="blur" type="matrix"
+            values="1 0 0 0 0
+                    0 1 0 0 0
+                    0 0 1 0 0
+                    0 0 0 2.5 0"
+            result="brightBlur"/>
+          <feMerge>
+            <feMergeNode in="brightBlur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+      <rect width="500" height="180" fill="#1a1a2e"/>
+      <text x="250" y="75" font-size="42" font-weight="bold" fill="#61afef" text-anchor="middle" filter="url(#demo-glow)">NEON</text>
+      <circle cx="100" cy="130" r="25" fill="#e06c75" filter="url(#demo-glow)"/>
+      <circle cx="250" cy="130" r="25" fill="#98c379" filter="url(#demo-glow)"/>
+      <circle cx="400" cy="130" r="25" fill="#c678dd" filter="url(#demo-glow)"/>
+    </svg>
+    <p class="demo-caption">Neon glow: blur the source graphic, boost alpha to intensify the halo, layer the crisp original on top. Works with any colour.</p>
+  </div>
+
+  <div class="key-concept">
+    <strong>Why enlarge the filter region for glow?</strong>
+    <p>Notice <code>x="-20%" y="-20%" width="140%" height="140%"</code> on the filter. The glow extends beyond the element's bounding box (the blurred halo radiates outward). Without the enlarged region, it would get clipped at the edges. Always increase the filter region when your effect expands the visual footprint.</p>
+  </div>
+
+  <h2>12. Performance &amp; Practical Advice</h2>
+  <ul>
+    <li><strong>Filters are expensive.</strong> Every filtered element gets its own offscreen raster buffer. The browser must rasterise the element, run all primitives, then composite the result. Avoid filters on elements that animate at 60fps unless GPU-composited (or use CSS <code>filter</code> for simple cases).</li>
+    <li><strong>CSS <code>filter</code> vs SVG <code>filter</code>:</strong> CSS provides shortcuts for common filters: <code>filter: blur(5px) drop-shadow(3px 3px 5px black) saturate(1.5)</code>. These are typically GPU-accelerated  -  the browser runs them as GPU shaders on a compositor layer (same pipeline as <code>transform</code> and <code>opacity</code>), so they don't block the main thread. SVG filters run during the CPU paint step and process primitives sequentially. The visual result is identical, but CSS filters animate more cheaply. Trade-off: CSS filter only offers a fixed set of predefined effects, while SVG filters give you full pipeline control (17 primitives, arbitrary chaining). Use CSS filter for simple effects on animated elements; use SVG filter when you need the full power or are working inside a self-contained SVG.</li>
+    <li><strong>filterUnits:</strong> <code>userSpaceOnUse</code> (filter region in element's coordinate system) vs <code>objectBoundingBox</code> (default; region as fraction of bounding box). For reusable filters that work on different-sized elements, the default <code>objectBoundingBox</code> is usually what you want.</li>
+    <li><strong>primitiveUnits:</strong> Controls the coordinate system for individual primitive attributes (like stdDeviation, radius, scale). Default is <code>userSpaceOnUse</code>, which means blur radius etc. are in the element's coordinate units.</li>
+    <li><strong>Debugging tip:</strong> To see what a specific intermediate result looks like, temporarily make it the final output by removing subsequent primitives. Or use an <code>feMerge</code> at the end that only references the intermediate <code>result</code> name you want to inspect.</li>
+  </ul>
+
+  <div class="key-concept">
+    <strong>Reusing filters across elements</strong>
+    <p>A single <code>&lt;filter&gt;</code> defined in <code>&lt;defs&gt;</code> can be referenced by many elements. The filter runs independently for each element (using that element's pixels as input), but you only define the pipeline once. This is the standard pattern  -  like gradients and clips.</p>
+  </div>
+
+  <h2>13. Combining Filters with Other SVG Features</h2>
+  <p>Filters play well with everything covered in preceding lessons:</p>
+  <ul>
+    <li><strong>Filters + Clips:</strong> Apply <code>clip-path</code> <em>before</em> filtering (the element is clipped, then the clipped result is filtered). Or filter first, then clip the result using CSS <code>clip-path</code> on the element.</li>
+    <li><strong>Filters + Masks:</strong> Similar to clips. The mask is applied, producing a partially-transparent element, which is then fed into the filter pipeline.</li>
+    <li><strong>Filters + Groups:</strong> Apply <code>filter</code> to a <code>&lt;g&gt;</code> element to filter the entire group as one composited image. This is efficient and lets you create effects that span multiple shapes.</li>
+    <li><strong>Filters + Animation (SMIL):</strong> You can animate filter primitive attributes with SMIL! Animate <code>stdDeviation</code> for a focus/unfocus effect, or <code>baseFrequency</code> in <code>feTurbulence</code> for animated noise. (We'll explore this in Lessons 9&ndash;10.)</li>
+  </ul>
+
+  <div class="demo">
+    <svg width="100%" height="160" viewBox="0 0 400 160">
+      <defs>
+        <filter id="demo-animated-blur">
+          <feGaussianBlur stdDeviation="0">
+            <animate attributeName="stdDeviation" values="0;8;0" dur="3s" repeatCount="indefinite"/>
+          </feGaussianBlur>
+        </filter>
+      </defs>
+      <rect width="400" height="160" fill="var(--demo-svg-bg)"/>
+      <text x="200" y="85" font-size="32" font-weight="bold" fill="#e5c07b" text-anchor="middle" filter="url(#demo-animated-blur)">Focus &amp; Blur</text>
+      <text x="200" y="130" font-size="9" fill="var(--muted)" text-anchor="middle">SMIL animating stdDeviation (0 → 8 → 0, loops)</text>
+    </svg>
+    <p class="demo-caption">Animated filter: SMIL animates the blur's stdDeviation from 0 to 8 and back, creating a focus/defocus pulse.</p>
+  </div>
+
+  <h2>14. Remaining Primitives  -  Attribute Reference</h2>
+  <p>The following primitives don't have dedicated sections above but are useful to know. Every filter primitive also supports the common attributes <code>in</code>, <code>result</code>, <code>x</code>, <code>y</code>, <code>width</code>, <code>height</code> (to define its sub-region within the filter).</p>
+
+  <h3>feComponentTransfer</h3>
+  <p>Per-channel transfer functions. Contains child elements <code>&lt;feFuncR&gt;</code>, <code>&lt;feFuncG&gt;</code>, <code>&lt;feFuncB&gt;</code>, <code>&lt;feFuncA&gt;</code>:</p>
+  <table class="comparison-table">
+    <thead><tr><th>Attribute (on feFuncX)</th><th>Values</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>type</code></td><td><code>identity</code> | <code>table</code> | <code>discrete</code> | <code>linear</code> | <code>gamma</code></td><td>Transfer function type</td></tr>
+      <tr><td><code>tableValues</code></td><td>list of numbers</td><td>For <code>table</code> and <code>discrete</code>: defines the lookup values</td></tr>
+      <tr><td><code>slope</code></td><td>number (default 1)</td><td>For <code>linear</code>: output = slope &times; input + intercept</td></tr>
+      <tr><td><code>intercept</code></td><td>number (default 0)</td><td>For <code>linear</code>: constant added after multiplication</td></tr>
+      <tr><td><code>amplitude</code></td><td>number (default 1)</td><td>For <code>gamma</code>: amplitude &times; input^exponent + offset</td></tr>
+      <tr><td><code>exponent</code></td><td>number (default 1)</td><td>For <code>gamma</code>: the power exponent</td></tr>
+      <tr><td><code>offset</code></td><td>number (default 0)</td><td>For <code>gamma</code>: constant added after gamma</td></tr>
+    </tbody>
+  </table>
+
+  <h3>feBlend</h3>
+  <table class="comparison-table">
+    <thead><tr><th>Attribute</th><th>Values</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>in</code></td><td>result name or keyword</td><td>First input</td></tr>
+      <tr><td><code>in2</code></td><td>result name or keyword</td><td>Second input</td></tr>
+      <tr><td><code>mode</code></td><td><code>normal</code> | <code>multiply</code> | <code>screen</code> | <code>darken</code> | <code>lighten</code> | <code>overlay</code> | <code>color-dodge</code> | <code>color-burn</code> | <code>hard-light</code> | <code>soft-light</code> | <code>difference</code> | <code>exclusion</code> | <code>hue</code> | <code>saturation</code> | <code>color</code> | <code>luminosity</code></td><td>Blend mode (SVG 2 adds the extended CSS blend modes)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>feTile</h3>
+  <table class="comparison-table">
+    <thead><tr><th>Attribute</th><th>Values</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>in</code></td><td>result name or keyword</td><td>The input image to tile. Its sub-region is repeated to fill the filter primitive's sub-region.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>feConvolveMatrix</h3>
+  <table class="comparison-table">
+    <thead><tr><th>Attribute</th><th>Values</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>in</code></td><td>result name or keyword</td><td>Input image</td></tr>
+      <tr><td><code>order</code></td><td>integer | "x y" (default 3)</td><td>Size of the kernel matrix (e.g. "3" = 3&times;3, "5 3" = 5 columns &times; 3 rows)</td></tr>
+      <tr><td><code>kernelMatrix</code></td><td>list of numbers</td><td>The convolution kernel values (order&times;order numbers, row by row)</td></tr>
+      <tr><td><code>divisor</code></td><td>number (default: sum of kernel values, or 1 if sum is 0)</td><td>Each result pixel is divided by this value (normalisation)</td></tr>
+      <tr><td><code>bias</code></td><td>number (default 0)</td><td>Added to each result pixel after division</td></tr>
+      <tr><td><code>targetX</code></td><td>integer (default: floor(orderX/2))</td><td>X position of the kernel "hot spot" (0-indexed from left)</td></tr>
+      <tr><td><code>targetY</code></td><td>integer (default: floor(orderY/2))</td><td>Y position of the kernel "hot spot" (0-indexed from top)</td></tr>
+      <tr><td><code>edgeMode</code></td><td><code>duplicate</code> | <code>wrap</code> | <code>none</code></td><td>Handling of edge pixels (default: duplicate)</td></tr>
+      <tr><td><code>preserveAlpha</code></td><td><code>true</code> | <code>false</code></td><td>If true, alpha channel is not convolved (default: false)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>feImage</h3>
+  <table class="comparison-table">
+    <thead><tr><th>Attribute</th><th>Values</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>href</code> (or <code>xlink:href</code>)</td><td>URL or fragment reference</td><td>External image URL or <code>#elementId</code> to use as filter input</td></tr>
+      <tr><td><code>preserveAspectRatio</code></td><td>same as &lt;image&gt; (default <code>xMidYMid meet</code>)</td><td>How the image is fitted into the filter primitive sub-region</td></tr>
+      <tr><td><code>crossorigin</code></td><td><code>anonymous</code> | <code>use-credentials</code></td><td>CORS setting for external images</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Quiz: Check Your Understanding</h2>
+
+  <div class="quiz" id="quiz1">
+    <h3>Question 1</h3>
+    <p>What does a filter operate on?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">The SVG source code (DOM) of the element</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">The rendered pixels after rasterisation</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">The geometric path data of the element</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">The computed CSS styles of the element</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz2">
+    <h3>Question 2</h3>
+    <p>What is SourceAlpha?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">The element's fill colour as a flat buffer</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">The background behind the filtered element</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">The alpha channel only: a black silhouette</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">The element with 50% transparency applied</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz3">
+    <h3>Question 3</h3>
+    <p>Why does a glow filter need an enlarged filter region?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Glow filters only work on large elements</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">The browser needs extra space to allocate</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">The blur halo extends beyond the bounding box</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">It prevents anti-aliasing artefacts at edges</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz4">
+    <h3>Question 4</h3>
+    <p>What does feComposite operator="in" do?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Layers the first input on top of the second</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">Keeps the first input only where the second exists</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Blends both inputs using the multiply formula</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Inverts the alpha of the first input using second</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <h2>Hands-On Exercise</h2>
+  <p>Build these from scratch to cement the concepts:</p>
+  <ol>
+    <li><strong>Drop shadow:</strong> Create a manual drop shadow pipeline (feGaussianBlur on SourceAlpha &rarr; feOffset &rarr; feMerge). Apply it to a shape and text element.</li>
+    <li><strong>Colour manipulation:</strong> Use <code>feColorMatrix type="hueRotate"</code> to shift an element's colours by 120 degrees. Then try <code>type="saturate" values="0"</code> for greyscale.</li>
+    <li><strong>Glow effect:</strong> Build a neon glow filter (blur SourceGraphic, boost alpha with feColorMatrix, merge with original). Don't forget to enlarge the filter region.</li>
+    <li><strong>Distortion:</strong> Combine <code>feTurbulence</code> with <code>feDisplacementMap</code> to warp a rectangle or text with organic noise.</li>
+  </ol>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;svg width="600" height="500" viewBox="0 0 600 500"
+     xmlns="http://www.w3.org/2000/svg"&gt;
+  &lt;defs&gt;
+    &lt;!-- 1. Drop shadow --&gt;
+    &lt;filter id="ex-shadow"&gt;
+      &lt;feGaussianBlur in="SourceAlpha" stdDeviation="4" result="blur"/&gt;
+      &lt;feOffset in="blur" dx="4" dy="4" result="shadow"/&gt;
+      &lt;feMerge&gt;
+        &lt;feMergeNode in="shadow"/&gt;
+        &lt;feMergeNode in="SourceGraphic"/&gt;
+      &lt;/feMerge&gt;
+    &lt;/filter&gt;
+
+    &lt;!-- 2. Hue rotation --&gt;
+    &lt;filter id="ex-hue"&gt;
+      &lt;feColorMatrix type="hueRotate" values="120"/&gt;
+    &lt;/filter&gt;
+
+    &lt;!-- 3. Glow --&gt;
+    &lt;filter id="ex-glow" x="-20%" y="-20%" width="140%" height="140%"&gt;
+      &lt;feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur"/&gt;
+      &lt;feColorMatrix in="blur" type="matrix"
+        values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 2 0"
+        result="brightBlur"/&gt;
+      &lt;feMerge&gt;
+        &lt;feMergeNode in="brightBlur"/&gt;
+        &lt;feMergeNode in="SourceGraphic"/&gt;
+      &lt;/feMerge&gt;
+    &lt;/filter&gt;
+
+    &lt;!-- 4. Distortion --&gt;
+    &lt;filter id="ex-warp"&gt;
+      &lt;feTurbulence type="turbulence" baseFrequency="0.03"
+        numOctaves="2" result="noise"/&gt;
+      &lt;feDisplacementMap in="SourceGraphic" in2="noise"
+        scale="15" xChannelSelector="R" yChannelSelector="G"/&gt;
+    &lt;/filter&gt;
+  &lt;/defs&gt;
+
+  &lt;!-- 1. Shadow --&gt;
+  &lt;rect x="20" y="20" width="120" height="80" rx="8"
+        fill="coral" filter="url(#ex-shadow)"/&gt;
+
+  &lt;!-- 2. Hue rotate --&gt;
+  &lt;rect x="200" y="20" width="120" height="80" rx="8"
+        fill="coral" filter="url(#ex-hue)"/&gt;
+
+  &lt;!-- 3. Glow --&gt;
+  &lt;text x="300" y="220" font-size="36" fill="#61afef"
+        filter="url(#ex-glow)"&gt;GLOW&lt;/text&gt;
+
+  &lt;!-- 4. Distortion --&gt;
+  &lt;text x="50" y="400" font-size="36" fill="#e5c07b"
+        filter="url(#ex-warp)"&gt;Warped Text&lt;/text&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <div class="recommended">
+    <strong>Recommended resource:</strong>
+    <a href="https://www.smashingmagazine.com/2015/05/why-the-svg-filter-is-awesome/">Sara Soueidan  -  The Art of SVG Filters (Smashing Magazine)</a>  -  Deep walkthrough of SVG filter primitives with visual examples, explaining the pipeline model and practical use cases. One of the best single resources on the topic.
+  </div>
+  <div class="footer-nav">
+    <a href="06-clipping-and-masking.html">&larr; Prev: Clipping &amp; Masking</a>
+    <a href="index.html">Index</a>
+    <a href="08-text-and-textpath.html">Next: Text &amp; textPath &rarr;</a>
+  </div>
+
+    </main>
+  </div><!-- end .page-layout -->
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="scripts.js"></script>
+</body>
+</html>

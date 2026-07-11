@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>SVG Shapes and Path Commands - Lesson 3 | Teach Me</title>
+  <meta name="description" content="SVG's six basic shape elements and the path d attribute. Line commands, cubic and quadratic Bezier curves, arcs, and markers.">
+  <link rel="canonical" href="https://teachmeskills.dev/svg/03-basic-shapes-and-paths.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/svg/03-basic-shapes-and-paths.html">
+  <meta property="og:title" content="SVG Shapes and Path Commands - Lesson 3 | Teach Me">
+  <meta property="og:description" content="SVG's six basic shape elements and the path d attribute. Line commands, cubic and quadratic Bezier curves, arcs, and markers.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="SVG Shapes and Path Commands - Lesson 3 | Teach Me">
+  <meta name="twitter:description" content="SVG's six basic shape elements and the path d attribute. Line commands, cubic and quadratic Bezier curves, arcs, and markers.">
+  <link rel="stylesheet" href="/styles.css">
+ <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header">
+        <a href="index.html">SVG Course</a>
+      </div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-coordinate-system.html">1. Coordinate System</a></li>
+        <li><a href="02-transforms-and-grouping.html">2. Transforms &amp; Grouping</a></li>
+        <li class="current"><a href="03-basic-shapes-and-paths.html">3. Shapes &amp; Paths</a></li>
+        <li><a href="04-styling-presentation-attributes-vs-css.html">4. Styling &amp; CSS</a></li>
+        <li><a href="05-gradients-patterns-paint-servers.html">5. Gradients &amp; Patterns</a></li>
+        <li><a href="06-clipping-and-masking.html">6. Clipping &amp; Masking</a></li>
+        <li><a href="07-filters.html">7. Filters</a></li>
+        <li><a href="08-text-and-textpath.html">8. Text &amp; textPath</a></li>
+        <li><a href="09-smil-animation-fundamentals.html">9. SMIL Fundamentals</a></li>
+        <li><a href="10-smil-advanced.html">10. SMIL Advanced</a></li>
+        <li><a href="11-css-animation-of-svg.html">11. CSS Animation</a></li>
+        <li><a href="12-javascript-and-svg.html">12. JavaScript + SVG</a></li>
+        <li><a href="13-putting-it-together.html">13. Capstone Project</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="svg-elements-and-attributes.html">Elements &amp; Attributes</a></li>
+        <li><a href="svg-dom-methods.html">DOM Methods &amp; Interfaces</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 3</p>
+  <h1>Basic Shapes &amp; Path Commands</h1>
+  <p>With the coordinate system and transforms established, this lesson covers what actually gets <strong>drawn</strong> in that space: SVG's built-in shape elements, and the all-powerful <code>&lt;path&gt;</code> element that can describe any 2D shape.</p>
+
+  <h2>1. The Basic Shape Elements</h2>
+  <p>SVG provides six convenience elements for common geometric shapes. Each is a specialised shorthand  -  they exist to save you from writing verbose path data for shapes you use constantly.</p>
+
+  <h3>&lt;rect&gt;  -  Rectangle</h3>
+  <p>The workhorse shape. Position with <code>x</code>/<code>y</code> (top-left corner), size with <code>width</code>/<code>height</code>, round corners with <code>rx</code>/<code>ry</code>:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;rect x="20" y="20" width="120" height="80" rx="10" ry="10"
+      fill="#61afef" stroke="#528bcc" stroke-width="2"/&gt;</code></pre>
+  </div>
+
+  <p>If only <code>rx</code> is specified, <code>ry</code> defaults to the same value (and vice versa). Set both to create elliptical corners.</p>
+
+  <h3>&lt;circle&gt;  -  Circle</h3>
+  <p>Defined by its centre (<code>cx</code>, <code>cy</code>) and radius (<code>r</code>):</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;circle cx="80" cy="80" r="50"
+      fill="#e06c75" stroke="#b04950" stroke-width="2"/&gt;</code></pre>
+  </div>
+
+  <h3>&lt;ellipse&gt;  -  Ellipse</h3>
+  <p>Like a circle but with independent horizontal (<code>rx</code>) and vertical (<code>ry</code>) radii:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;ellipse cx="100" cy="60" rx="80" ry="40"
+      fill="#e5c07b" stroke="#b8993f" stroke-width="2"/&gt;</code></pre>
+  </div>
+
+  <h3>&lt;line&gt;  -  Line Segment</h3>
+  <p>A straight line from (<code>x1</code>, <code>y1</code>) to (<code>x2</code>, <code>y2</code>). Lines have no fill  -  only stroke is visible:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;line x1="10" y1="10" x2="180" y2="100"
+      stroke="#98c379" stroke-width="3" stroke-linecap="round"/&gt;</code></pre>
+  </div>
+
+  <h3>&lt;polyline&gt;  -  Connected Line Segments</h3>
+  <p>Multiple connected points. The <code>points</code> attribute takes space-separated x,y pairs. The shape is <strong>not</strong> automatically closed:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;polyline points="20,80 60,20 100,60 140,10 180,50"
+      fill="none" stroke="#c678dd" stroke-width="3"
+      stroke-linejoin="round" stroke-linecap="round"/&gt;</code></pre>
+  </div>
+
+  <h3>&lt;polygon&gt;  -  Closed Polyline</h3>
+  <p>Same as polyline, but automatically draws a closing line from the last point back to the first:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;polygon points="100,10 150,80 50,80"
+      fill="#56b6c2" stroke="#3d8f99" stroke-width="2"/&gt;</code></pre>
+  </div>
+
+  <h3>All six shapes at a glance</h3>
+  <div class="demo">
+    <svg width="100%" height="280" viewBox="0 0 700 280">
+      <rect width="700" height="280" fill="var(--demo-svg-bg)"/>
+      <!-- Row 1: rect, circle, ellipse -->
+      <rect x="30" y="30" width="120" height="80" rx="10" ry="10" fill="#61afef" opacity="0.85"/>
+      <text x="90" y="130" font-size="11" fill="var(--muted)" text-anchor="middle">&lt;rect&gt;</text>
+      <text x="90" y="145" font-size="9" fill="var(--muted)" text-anchor="middle">rx="10" ry="10"</text>
+
+      <circle cx="270" cy="70" r="50" fill="#e06c75" opacity="0.85"/>
+      <text x="270" y="140" font-size="11" fill="var(--muted)" text-anchor="middle">&lt;circle&gt;</text>
+      <text x="270" y="155" font-size="9" fill="var(--muted)" text-anchor="middle">r="50"</text>
+
+      <ellipse cx="450" cy="70" rx="80" ry="40" fill="#e5c07b" opacity="0.85"/>
+      <text x="450" y="130" font-size="11" fill="var(--muted)" text-anchor="middle">&lt;ellipse&gt;</text>
+      <text x="450" y="145" font-size="9" fill="var(--muted)" text-anchor="middle">rx="80" ry="40"</text>
+
+      <!-- Row 2: line, polyline, polygon -->
+      <line x1="30" y1="190" x2="150" y2="250" stroke="#98c379" stroke-width="3" stroke-linecap="round"/>
+      <text x="90" y="270" font-size="11" fill="var(--muted)" text-anchor="middle">&lt;line&gt;</text>
+
+      <polyline points="220,250 260,180 300,220 340,170 380,210" fill="none" stroke="#c678dd" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+      <text x="300" y="270" font-size="11" fill="var(--muted)" text-anchor="middle">&lt;polyline&gt;</text>
+
+      <polygon points="540,170 590,250 490,250" fill="#56b6c2" opacity="0.85"/>
+      <text x="540" y="270" font-size="11" fill="var(--muted)" text-anchor="middle">&lt;polygon&gt;</text>
+    </svg>
+    <p class="demo-caption">The six basic SVG shape elements. Each is a convenience  -  all can be replicated with <code>&lt;path&gt;</code>.</p>
+  </div>
+
+  <div class="key-concept">
+    <strong>Shapes are convenience shortcuts</strong>
+    <p>Every basic shape element can also be expressed as a <code>&lt;path&gt;</code>  -  the shapes just save you from writing path commands for common cases. A <code>&lt;circle cx="50" cy="50" r="30"/&gt;</code> is cleaner than the equivalent path with two arc commands. But under the hood, the browser converts them all to paths for rendering.</p>
+  </div>
+
+  <h3>Shared attributes (apply to all shapes)</h3>
+  <p>In addition to their geometry-specific attributes, all shape elements accept these painting and styling attributes:</p>
+  <table>
+    <thead>
+      <tr><th>Attribute</th><th>What it does</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>fill</code></td><td>Interior colour (or <code>none</code>, or <code>url(#gradient)</code>). Default: black.</td></tr>
+      <tr><td><code>fill-opacity</code></td><td>Opacity of the fill (0–1).</td></tr>
+      <tr><td><code>stroke</code></td><td>Outline colour (or <code>none</code>). Default: none.</td></tr>
+      <tr><td><code>stroke-width</code></td><td>Outline thickness. Default: 1.</td></tr>
+      <tr><td><code>stroke-linecap</code></td><td>End cap shape: <code>butt</code> (default), <code>round</code>, <code>square</code>.</td></tr>
+      <tr><td><code>stroke-linejoin</code></td><td>Corner shape where lines meet: <code>miter</code> (default), <code>round</code>, <code>bevel</code>.</td></tr>
+      <tr><td><code>stroke-dasharray</code></td><td>Dash pattern: e.g. <code>"5 3"</code> = 5 on, 3 off.</td></tr>
+      <tr><td><code>stroke-dashoffset</code></td><td>Offset into the dash pattern. Animating this creates "drawing" effects (the technique behind <a href="11-css-animation-of-svg.html">SVG line animations in Lesson 11</a>).</td></tr>
+      <tr><td><code>opacity</code></td><td>Whole-element opacity (fill + stroke together).</td></tr>
+      <tr><td><code>transform</code></td><td>Transformation (translate, rotate, scale, etc.).</td></tr>
+    </tbody>
+  </table>
+  <p>These are all <strong>presentation attributes</strong>  -  they can also be set via CSS. We'll cover the interplay between attributes and CSS in <a href="04-styling-presentation-attributes-vs-css.html">Lesson 4</a>.</p>
+
+  <h2>2. The &lt;path&gt; Element</h2>
+  <p>The <code>&lt;path&gt;</code> element is the most powerful drawing tool in SVG. It can reproduce anything the basic shapes can draw, plus arbitrary curves, complex outlines, and irregular forms. Its power lives entirely in a single attribute: <code>d</code> (for "data").</p>
+
+  <p>The <code>d</code> attribute uses a compact mini-language of single-letter commands followed by numeric parameters. Think of it as instructions for moving a pen across the canvas:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;path d="M 10 10 L 90 10 L 90 90 L 10 90 Z"
+      fill="#61afef" stroke="#528bcc" stroke-width="2"/&gt;
+&lt;!-- Draws a square: move to (10,10), line to each corner, close --&gt;</code></pre>
+  </div>
+
+  <h3>Command overview</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Command</th>
+        <th>Name</th>
+        <th>Parameters</th>
+        <th>What it does</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td><code>M</code> / <code>m</code></td><td>Move to</td><td>x y</td><td>Moves the pen without drawing</td></tr>
+      <tr><td><code>L</code> / <code>l</code></td><td>Line to</td><td>x y</td><td>Draws a straight line to the point</td></tr>
+      <tr><td><code>H</code> / <code>h</code></td><td>Horizontal line</td><td>x</td><td>Draws a horizontal line</td></tr>
+      <tr><td><code>V</code> / <code>v</code></td><td>Vertical line</td><td>y</td><td>Draws a vertical line</td></tr>
+      <tr><td><code>Z</code> / <code>z</code></td><td>Close path</td><td>(none)</td><td>Draws a line back to the starting point</td></tr>
+      <tr><td><code>C</code> / <code>c</code></td><td>Cubic B&#xe9;zier</td><td>x1 y1, x2 y2, x y</td><td>Curve with two control points</td></tr>
+      <tr><td><code>S</code> / <code>s</code></td><td>Smooth cubic</td><td>x2 y2, x y</td><td>Continues previous cubic smoothly</td></tr>
+      <tr><td><code>Q</code> / <code>q</code></td><td>Quadratic B&#xe9;zier</td><td>x1 y1, x y</td><td>Curve with one control point</td></tr>
+      <tr><td><code>T</code> / <code>t</code></td><td>Smooth quadratic</td><td>x y</td><td>Continues previous quadratic smoothly</td></tr>
+      <tr><td><code>A</code> / <code>a</code></td><td>Arc</td><td>rx ry rotation large-arc sweep x y</td><td>Elliptical arc to a point</td></tr>
+    </tbody>
+  </table>
+
+  <div class="key-concept">
+    <strong>Uppercase = absolute, lowercase = relative</strong>
+    <p>Uppercase commands use absolute coordinates (position within the element's current coordinate system  -  accounting for any viewBox and parent transforms). Lowercase commands use relative coordinates (offset from the current pen position). Both produce identical visual results  -  relative is often more convenient for reusable shapes because the path doesn't depend on where it's placed.</p>
+  </div>
+
+  <h2>3. Line Commands in Practice</h2>
+  <p>The most common path operations are the line commands: <code>M</code>, <code>L</code>, <code>H</code>, <code>V</code>, and <code>Z</code>. Let's draw a house using only these:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;path d="M 50 120
+         L 50 200
+         L 200 200
+         L 200 120
+         L 125 50
+         Z"
+      fill="none" stroke="#e5c07b" stroke-width="3"
+      stroke-linejoin="round"/&gt;
+&lt;!-- M: start at left roof point
+     L 50 200: down to bottom-left
+     L 200 200: across to bottom-right
+     L 200 120: up to right roof point
+     L 125 50: up to roof peak
+     Z: close back to start (left roof point) --&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="100%" height="260" viewBox="0 0 500 260">
+      <rect width="500" height="260" fill="var(--demo-svg-bg)"/>
+      <!-- Grid for reference -->
+      <line x1="0" y1="50" x2="500" y2="50" stroke="var(--svg-grid)" stroke-width="0.5"/>
+      <line x1="0" y1="120" x2="500" y2="120" stroke="var(--svg-grid)" stroke-width="0.5"/>
+      <line x1="0" y1="200" x2="500" y2="200" stroke="var(--svg-grid)" stroke-width="0.5"/>
+      <line x1="50" y1="0" x2="50" y2="260" stroke="var(--svg-grid)" stroke-width="0.5"/>
+      <line x1="125" y1="0" x2="125" y2="260" stroke="var(--svg-grid)" stroke-width="0.5"/>
+      <line x1="200" y1="0" x2="200" y2="260" stroke="var(--svg-grid)" stroke-width="0.5"/>
+
+      <!-- The house path -->
+      <path d="M 50 120 L 50 200 L 200 200 L 200 120 L 125 50 Z"
+        fill="none" stroke="#e5c07b" stroke-width="3" stroke-linejoin="round"/>
+
+      <!-- Point labels -->
+      <circle cx="50" cy="120" r="4" fill="var(--accent)"/>
+      <text x="15" y="115" font-size="10" fill="var(--accent)">M 50,120</text>
+
+      <circle cx="50" cy="200" r="4" fill="var(--accent)"/>
+      <text x="5" y="218" font-size="10" fill="var(--accent)">L 50,200</text>
+
+      <circle cx="200" cy="200" r="4" fill="var(--accent)"/>
+      <text x="208" y="218" font-size="10" fill="var(--accent)">L 200,200</text>
+
+      <circle cx="200" cy="120" r="4" fill="var(--accent)"/>
+      <text x="208" y="118" font-size="10" fill="var(--accent)">L 200,120</text>
+
+      <circle cx="125" cy="50" r="4" fill="var(--accent)"/>
+      <text x="133" y="48" font-size="10" fill="var(--accent)">L 125,50</text>
+
+      <!-- Equivalent with H/V shortcuts -->
+      <path d="M 300 120 V 200 H 450 V 120 L 375 50 Z"
+        fill="none" stroke="#98c379" stroke-width="3" stroke-linejoin="round"/>
+      <text x="375" y="240" font-size="11" fill="#98c379" text-anchor="middle">Same house with H and V shortcuts</text>
+      <text x="375" y="255" font-size="9" fill="var(--muted)" text-anchor="middle">M 300 120 V 200 H 450 V 120 L 375 50 Z</text>
+    </svg>
+    <p class="demo-caption"><strong>Left:</strong> house drawn with M and L commands only. <strong>Right:</strong> same shape using H (horizontal) and V (vertical) shortcuts where applicable  -  saves specifying the coordinate that doesn't change.</p>
+  </div>
+
+  <p><code>H</code> and <code>V</code> are just shortcuts: <code>H 200</code> means "draw a horizontal line to x=200" (y stays the same). <code>V 120</code> means "draw a vertical line to y=120" (x stays the same). They save typing when you know one coordinate isn't changing.</p>
+
+  <h2>4. B&#xe9;zier Curves</h2>
+  <p>Lines can only get you so far. For smooth, organic shapes you need curves. SVG paths support two types of B&#xe9;zier curves: cubic (two control points) and quadratic (one control point).</p>
+
+  <h3>Cubic B&#xe9;zier  -  C command</h3>
+  <p>The cubic B&#xe9;zier is the most common curve in vector graphics. It takes <strong>two control points</strong> plus an endpoint:</p>
+  <ul>
+    <li><strong>Control point 1</strong> (x1, y1)  -  defines the direction and "force" the curve leaves the start point</li>
+    <li><strong>Control point 2</strong> (x2, y2)  -  defines the direction and "force" the curve arrives at the end point</li>
+    <li><strong>End point</strong> (x, y)  -  where the curve ends (becomes the new current point)</li>
+  </ul>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;path d="M 30 150 C 30 50, 170 50, 170 150"
+      fill="none" stroke="#c678dd" stroke-width="3"/&gt;
+&lt;!-- Start at (30,150)
+     Control 1: (30, 50)  -  pulls the curve up from start
+     Control 2: (170, 50)  -  pulls the curve up toward end
+     End: (170, 150) --&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="100%" height="220" viewBox="0 0 500 220">
+      <rect width="500" height="220" fill="var(--demo-svg-bg)"/>
+
+      <!-- The cubic Bezier curve -->
+      <path d="M 80 170 C 80 50, 250 50, 250 170" fill="none" stroke="#c678dd" stroke-width="3"/>
+
+      <!-- Control point lines -->
+      <line x1="80" y1="170" x2="80" y2="50" stroke="#e06c75" stroke-width="1.5" stroke-dasharray="4 3"/>
+      <line x1="250" y1="170" x2="250" y2="50" stroke="#e06c75" stroke-width="1.5" stroke-dasharray="4 3"/>
+
+      <!-- Start and end points -->
+      <circle cx="80" cy="170" r="6" fill="#98c379"/>
+      <text x="55" y="195" font-size="10" fill="#98c379">Start</text>
+      <circle cx="250" cy="170" r="6" fill="#98c379"/>
+      <text x="230" y="195" font-size="10" fill="#98c379">End</text>
+
+      <!-- Control points -->
+      <circle cx="80" cy="50" r="6" fill="#e06c75"/>
+      <text x="90" y="48" font-size="10" fill="#e06c75">CP1 (80, 50)</text>
+      <circle cx="250" cy="50" r="6" fill="#e06c75"/>
+      <text x="260" y="48" font-size="10" fill="#e06c75">CP2 (250, 50)</text>
+
+      <!-- Annotations -->
+      <text x="165" y="30" font-size="11" fill="var(--muted)" text-anchor="middle">Cubic B&#xe9;zier: C x1 y1, x2 y2, x y</text>
+      <text x="165" y="210" font-size="10" fill="var(--muted)" text-anchor="middle">Red dashed lines show how control points "pull" the curve</text>
+
+      <!-- Second example: S-curve -->
+      <path d="M 350 170 C 350 90, 420 90, 420 130 C 420 170, 480 170, 480 90" fill="none" stroke="#61afef" stroke-width="3"/>
+      <circle cx="350" cy="170" r="4" fill="#98c379"/>
+      <circle cx="480" cy="90" r="4" fill="#98c379"/>
+      <text x="415" y="210" font-size="10" fill="#61afef" text-anchor="middle">Two cubics chained = S-curve</text>
+    </svg>
+    <p class="demo-caption">A cubic B&#xe9;zier with its control points (red) visible. The dashed lines show the "handles"  -  control points define the tangent direction at each endpoint. Right: two cubics chained to form an S-curve.</p>
+  </div>
+
+  <h3>Quadratic B&#xe9;zier  -  Q command</h3>
+  <p>A simpler curve with only <strong>one control point</strong>. The curve leaves the start point and arrives at the end point both "aiming" toward this single shared control point:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;path d="M 30 150 Q 100 30, 170 150"
+      fill="none" stroke="#56b6c2" stroke-width="3"/&gt;
+&lt;!-- Start: (30, 150)
+     Control: (100, 30)  -  the single shared control point
+     End: (170, 150) --&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="100%" height="220" viewBox="0 0 400 220">
+      <rect width="400" height="220" fill="var(--demo-svg-bg)"/>
+
+      <!-- The quadratic Bézier curve -->
+      <path d="M 80 180 Q 200 20, 320 180" fill="none" stroke="#56b6c2" stroke-width="3"/>
+
+      <!-- Control point lines -->
+      <line x1="80" y1="180" x2="200" y2="20" stroke="#e06c75" stroke-width="1.5" stroke-dasharray="4 3"/>
+      <line x1="200" y1="20" x2="320" y2="180" stroke="#e06c75" stroke-width="1.5" stroke-dasharray="4 3"/>
+
+      <!-- Start and end points -->
+      <circle cx="80" cy="180" r="6" fill="#98c379"/>
+      <text x="50" y="200" font-size="10" fill="#98c379">Start</text>
+      <circle cx="320" cy="180" r="6" fill="#98c379"/>
+      <text x="300" y="200" font-size="10" fill="#98c379">End</text>
+
+      <!-- Control point -->
+      <circle cx="200" cy="20" r="6" fill="#e06c75"/>
+      <text x="210" y="18" font-size="10" fill="#e06c75">CP (200, 20)</text>
+      <text x="210" y="32" font-size="9" fill="var(--muted)">shared by both ends</text>
+
+      <!-- Annotations -->
+      <text x="200" y="210" font-size="10" fill="var(--muted)" text-anchor="middle">Quadratic: Q x1 y1, x y  -  one control point, symmetric curve</text>
+    </svg>
+    <p class="demo-caption">A quadratic Bézier with its single control point (red). Both dashed lines show the tangent direction  -  the curve leaves the start aiming at CP and arrives at the end coming from CP. The result is always symmetric.</p>
+  </div>
+
+  <p>Quadratic curves are inherently symmetric  -  the curve's shape is the same on both sides of the control point. Cubic curves can be asymmetric because each endpoint has its own independent control point.</p>
+
+  <h3>The maths behind Bézier curves</h3>
+  <p>Both are <strong>parametric curves</strong>  -  the position at any point along the curve is a function of a single parameter <strong>t</strong>, where t goes from 0 (start) to 1 (end).</p>
+
+  <p><strong>t</strong> is the independent variable  -  a progress value from 0 to 1, like a slider. Both x and y are separate functions of t (that's what "parametric" means  -  instead of y = f(x), you have x = f(t) and y = g(t)). The control points define the <em>shape</em> of the curve; t asks "at this progress level, where am I on that shape?" The browser sweeps t from 0 to 1 in tiny increments, computing the x,y position at each step, and connects the dots to render the curve. You never specify t yourself  -  SVG handles it internally.</p>
+  <p>Because x and y are both functions of t (rather than y being a function of x), Bézier curves can loop, go vertical, or form any shape  -  they're not constrained by "one y per x" like a regular function graph. Note: t = 0.5 is <em>not</em> necessarily the geometric midpoint of the curve  -  it's halfway through the parametric equation, which may not be the visual centre if the curve is asymmetric.</p>
+
+  <div class="key-concept">
+    <strong>What does "parametric" actually mean?</strong>
+    <p>"Parametric" means the coordinates (x, y) are both expressed as functions of a <strong style="display:inline;">separate, independent variable</strong> (the "parameter") rather than directly in terms of each other:</p>
+    <table>
+      <thead><tr>
+        <th>Form</th>
+        <th>Equation(s)</th>
+        <th>Constraint</th>
+      </tr></thead>
+      <tbody>
+        <tr><td>Standard (non-parametric)</td><td><code>y = f(x)</code></td><td>One y per x  -  can't go vertical, can't loop</td></tr>
+        <tr><td>Parametric</td><td><code>x = f(t)</code>, <code>y = g(t)</code></td><td>No geometric constraints  -  any shape possible</td></tr>
+      </tbody>
+    </table>
+    <p>The word "parameter" here just means "the variable you sweep through." It's like a clock ticking from 0 to 1  -  at each tick, you have an (x, y) position. The parameter t doesn't represent space or distance; it just progresses, and the equations produce coordinates.</p>
+    <p><strong style="display:inline;">Analogy:</strong> describing a walk through a city. <em>Non-parametric:</em> "When you're at street number x, your north-south position is y." (One position per street  -  can't describe backtracking or circles.) <em>Parametric:</em> "At time t=0 you're at this intersection. At t=0.3 you're here. At t=1 you arrive." (Can describe any route.)</p>
+    <p>This is why all vector graphics systems (SVG, PostScript, font outlines) use parametric curves  -  they can express any shape without restriction.</p>
+  </div>
+
+  <div class="key-concept">
+    <strong>Can you convert parametric to y = f(x)?</strong>
+    <p>Sometimes  -  if x increases monotonically. For example, with P0=(0,0), P1=(50,100), P2=(100,0):</p>
+    <div class="code-wrapper" style="margin: 0.5rem 0;">
+      <pre><code>x(t) = 100t          → so t = x/100
+y(t) = 200t - 200t^2  → substitute t = x/100:
+y = 2x - 0.02x^2      ← a regular parabola!</code></pre>
+    </div>
+    <p>But this only works because x goes steadily from 0 to 100. If the curve loops back (x decreases then increases again), you get multiple y values for the same x  -  it fails the vertical line test and <em>can't</em> be expressed as y = f(x). That's exactly when the parametric form is essential.</p>
+  </div>
+
+  <div class="key-concept">
+    <strong>Why "quadratic" and "cubic"?</strong>
+    <p>The names refer to the <strong style="display:inline;">degree of the polynomial</strong>, not to counts of things. "Quadratic" means the equation involves t² (squaring)  -  from Latin <em>quadratus</em> (squared). "Cubic" means the equation involves t³ (cubing). The number of total points is always degree + 1:</p>
+    <table>
+      <thead><tr>
+        <th>Name</th>
+        <th>Degree</th>
+        <th>Total points</th>
+        <th>= Start + End + Control</th>
+      </tr></thead>
+      <tbody>
+        <tr><td>Linear (a straight line)</td><td>1</td><td>2</td><td>2 + 0 control points</td></tr>
+        <tr><td>Quadratic</td><td>2</td><td>3</td><td>2 + 1 control point</td></tr>
+        <tr><td>Cubic</td><td>3</td><td>4</td><td>2 + 2 control points</td></tr>
+      </tbody>
+    </table>
+    <p>"Quad" here means "squared" (like quadratic equation in school), not "four." The Latin connection: a square has four sides, its area is x²  -  so <em>quadratus</em> came to mean "squared."</p>
+  </div>
+
+  <h4>Quadratic Bézier (Q)  -  three points: P0 (start), P1 (control), P2 (end)</h4>
+  <div class="code-wrapper">
+    <pre><code>B(t) = (1-t)^2 * P0  +  2(1-t)t * P1  +  t^2 * P2     where t is 0 to 1</code></pre>
+  </div>
+  <ul>
+    <li>At <strong>t = 0</strong>: B(0) = P0 (you're at the start)</li>
+    <li>At <strong>t = 1</strong>: B(1) = P2 (you're at the end)</li>
+    <li>At <strong>t = 0.5</strong>: the curve is nearest to (but not necessarily at) the control point</li>
+  </ul>
+  <p>The derivative (tangent direction) at the endpoints:</p>
+  <div class="code-wrapper">
+    <pre><code>B'(0) = 2(P1 - P0)     -  curve leaves P0 heading toward P1
+B'(1) = 2(P2 - P1)     -  curve arrives at P2 coming from direction of P1</code></pre>
+  </div>
+  <p>This is why the control point defines the tangent at <em>both</em> endpoints  -  the curve is pulled toward it from both sides. It's a weighted average of the three points where the weights shift as t progresses.</p>
+
+  <h4>Worked example: computing a point on a quadratic Bézier</h4>
+  <p>Given P0 = (20, 100), P1 = (100, 10), P2 = (180, 100)  -  where is the curve at t = 0.5?</p>
+  <div class="code-wrapper">
+    <pre><code>Step 1: compute the three weights from t = 0.5
+
+  (1-t)^2  = (0.5)^2     = 0.25
+  2(1-t)t  = 2(0.5)(0.5) = 0.50
+  t^2      = (0.5)^2     = 0.25
+
+Step 2: apply weights to x coordinates of each point
+
+  x = 0.25 * 20  +  0.50 * 100  +  0.25 * 180
+    = 5           +  50           +  45
+    = 100
+
+Step 3: apply same weights to y coordinates of each point
+
+  y = 0.25 * 100  +  0.50 * 10  +  0.25 * 100
+    = 25           +  5           +  25
+    = 55
+
+Result: at t = 0.5, the curve passes through (100, 55)</code></pre>
+  </div>
+  <p>The same weights apply to both x and y independently. The browser does this for hundreds of t values between 0 and 1, plots each resulting (x, y) point, and connects them to render the smooth curve. You compute the weights once from t, then multiply each weight by the corresponding point's coordinate.</p>
+
+  <h4>But which quadratic? There are infinitely many!</h4>
+  <p>A generic quadratic equation <code>y = ax^2 + bx + c</code> has three unknowns  -  infinite possibilities. But a quadratic Bézier has <strong>three points</strong> (P0, P1, P2), each with an x and y  -  that's 6 numbers. Those 6 numbers fully determine which specific quadratic polynomial you get. There's exactly one curve that satisfies the constraints imposed by those points.</p>
+  <p>The control points <em>select</em> the specific curve from the infinite family. Different points → different curve. Same formula structure, different inputs → unique output. It's like asking "which parabola is y = 3x² − 2x + 5?"  -  the coefficients (3, −2, 5) pin it down. In Bézier curves, the points play the role of the coefficients, just expressed as geometric positions (which you can see and drag) rather than abstract numbers.</p>
+  <p>Same applies to cubic: 4 points × 2 coordinates = 8 numbers, which fully determine one specific cubic curve out of the infinite family.</p>
+
+  <h4>Cubic Bézier (C)  -  four points: P0 (start), P1 (control 1), P2 (control 2), P3 (end)</h4>
+  <div class="code-wrapper">
+    <pre><code>B(t) = (1-t)^3 * P0  +  3(1-t)^2 * t * P1  +  3(1-t) * t^2 * P2  +  t^3 * P3     where t is 0 to 1</code></pre>
+  </div>
+  <ul>
+    <li>At <strong>t = 0</strong>: B(0) = P0</li>
+    <li>At <strong>t = 1</strong>: B(1) = P3</li>
+  </ul>
+  <div class="code-wrapper">
+    <pre><code>B'(0) = 3(P1 - P0)     -  curve leaves P0 toward P1
+B'(1) = 3(P3 - P2)     -  curve arrives at P3 from direction of P2</code></pre>
+  </div>
+  <p>Each endpoint has its own independent control point, so the departure and arrival directions are decoupled  -  this is what gives cubics their asymmetric flexibility over quadratics.</p>
+
+  <h4>Practical implication: control point distance = "force"</h4>
+  <p>The distance from an endpoint to its control point affects how aggressively the curve shoots in that direction. A far control point = strong pull (the curve travels a long way before bending). A close control point = gentle departure. Design tools visualise this as "handles"  -  handle length is the force magnitude, handle angle is the tangent direction.</p>
+
+  <h4>Why S and T commands give smooth joins</h4>
+  <p>The smooth commands (S for cubic, T for quadratic) mirror the previous curve's final control point across the junction:</p>
+  <div class="code-wrapper">
+    <pre><code>reflected_CP = 2·P_junction - CP_previous_end</code></pre>
+  </div>
+  <p>This guarantees <strong>C¹ continuity</strong>  -  the tangent direction <em>and</em> magnitude match at the join, so the transition is perfectly smooth with no visible kink.</p>
+
+  <h3>Smooth continuation  -  S and T commands</h3>
+  <p>When chaining multiple curves, you often want a smooth junction (no visible "corner"). The <code>S</code> and <code>T</code> commands automatically mirror the previous curve's final control point to create seamless continuity:</p>
+  <ul>
+    <li><code>S x2 y2, x y</code>  -  smooth cubic: mirrors the previous C's second control point as the new first control point</li>
+    <li><code>T x y</code>  -  smooth quadratic: mirrors the previous Q's control point as the new control point</li>
+  </ul>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;!-- Smooth cubic: S mirrors previous CP2 --&gt;
+&lt;path d="M 30 100 C 30 30, 100 30, 100 100 S 170 170, 170 100"
+      fill="none" stroke="#c678dd" stroke-width="3"/&gt;
+
+&lt;!-- Smooth quadratic: T mirrors previous CP --&gt;
+&lt;path d="M 30 100 Q 80 30, 130 100 T 230 100"
+      fill="none" stroke="#56b6c2" stroke-width="3"/&gt;</code></pre>
+  </div>
+
+  <p>The "smooth" commands save you from calculating the mirrored control point yourself. They're essential for drawing smooth, multi-segment curves.</p>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <h2>5. The Arc Command</h2>
+  <p>The arc command (<code>A</code>) is the most complex path command. It draws an elliptical arc from the current point to a new endpoint, and requires <strong>7 parameters</strong>:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>A rx ry x-rotation large-arc-flag sweep-flag x y
+
+&lt;!-- Example: --&gt;
+&lt;path d="M 50 100 A 50 30 0 0 1 200 100"
+      fill="none" stroke="#e5c07b" stroke-width="3"/&gt;</code></pre>
+  </div>
+
+  <table>
+    <thead><tr><th>Parameter</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td><code>rx</code></td><td>Horizontal radius of the ellipse</td></tr>
+      <tr><td><code>ry</code></td><td>Vertical radius of the ellipse</td></tr>
+      <tr><td><code>x-rotation</code></td><td>Rotation of the ellipse in degrees (usually 0)</td></tr>
+      <tr><td><code>large-arc-flag</code></td><td>0 = smaller arc, 1 = larger arc</td></tr>
+      <tr><td><code>sweep-flag</code></td><td>0 = counter-clockwise, 1 = clockwise</td></tr>
+      <tr><td><code>x y</code></td><td>End point of the arc</td></tr>
+    </tbody>
+  </table>
+
+  <h3>The two flags  -  4 possible arcs</h3>
+  <p>Given any two points and an ellipse size, there are <strong>4 possible arcs</strong> that connect them. The <code>large-arc-flag</code> and <code>sweep-flag</code> select which one you want:</p>
+
+  <div class="demo">
+    <svg width="100%" height="320" viewBox="0 0 600 320">
+      <rect width="600" height="320" fill="var(--demo-svg-bg)"/>
+
+      <!-- Start and end points (same for all 4) -->
+      <!-- Top-left: large=0, sweep=0 -->
+      <text x="150" y="20" font-size="11" fill="var(--muted)" text-anchor="middle">large-arc=0, sweep=0</text>
+      <circle cx="80" cy="100" r="4" fill="#98c379"/>
+      <circle cx="220" cy="100" r="4" fill="#98c379"/>
+      <path d="M 80 100 A 80 60 0 0 0 220 100" fill="none" stroke="#61afef" stroke-width="3"/>
+      <text x="150" y="155" font-size="9" fill="#61afef" text-anchor="middle">Small arc, counter-clockwise</text>
+
+      <!-- Top-right: large=0, sweep=1 -->
+      <text x="450" y="20" font-size="11" fill="var(--muted)" text-anchor="middle">large-arc=0, sweep=1</text>
+      <circle cx="380" cy="100" r="4" fill="#98c379"/>
+      <circle cx="520" cy="100" r="4" fill="#98c379"/>
+      <path d="M 380 100 A 80 60 0 0 1 520 100" fill="none" stroke="#e5c07b" stroke-width="3"/>
+      <text x="450" y="155" font-size="9" fill="#e5c07b" text-anchor="middle">Small arc, clockwise</text>
+
+      <!-- Bottom-left: large=1, sweep=0 -->
+      <text x="150" y="180" font-size="11" fill="var(--muted)" text-anchor="middle">large-arc=1, sweep=0</text>
+      <circle cx="80" cy="250" r="4" fill="#98c379"/>
+      <circle cx="220" cy="250" r="4" fill="#98c379"/>
+      <path d="M 80 250 A 80 60 0 1 0 220 250" fill="none" stroke="#c678dd" stroke-width="3"/>
+      <text x="150" y="310" font-size="9" fill="#c678dd" text-anchor="middle">Large arc, counter-clockwise</text>
+
+      <!-- Bottom-right: large=1, sweep=1 -->
+      <text x="450" y="180" font-size="11" fill="var(--muted)" text-anchor="middle">large-arc=1, sweep=1</text>
+      <circle cx="380" cy="250" r="4" fill="#98c379"/>
+      <circle cx="520" cy="250" r="4" fill="#98c379"/>
+      <path d="M 380 250 A 80 60 0 1 1 520 250" fill="none" stroke="#e06c75" stroke-width="3"/>
+      <text x="450" y="310" font-size="9" fill="#e06c75" text-anchor="middle">Large arc, clockwise</text>
+    </svg>
+    <p class="demo-caption">All four arc variants between the same two points (green dots), with <code>rx="80" ry="60"</code>. The two flags select which of the four possible arcs to draw.</p>
+  </div>
+
+  <h3>The maths behind arcs</h3>
+  <p>Unlike Béziers (which are parametric polynomial curves), arcs trace a section of an <strong>ellipse</strong>. The maths is more involved because SVG specifies arcs by endpoint rather than by centre  -  so the browser must solve for the ellipse centre given the constraints.</p>
+
+  <h4>What you specify (endpoint parameterisation)</h4>
+  <div class="code-wrapper">
+    <pre><code>A rx ry x-rotation large-arc-flag sweep-flag x₂ y₂
+
+Given: current point (x₁, y₁) and endpoint (x₂, y₂)
+       ellipse radii rx, ry
+       rotation angle φ (x-rotation, in degrees)</code></pre>
+  </div>
+
+  <h4>What the browser computes (centre parameterisation)</h4>
+  <p>The browser converts your endpoint parameters to a centre form. The key steps:</p>
+  <ol>
+    <li><strong>Rotate into the ellipse's local space:</strong> Apply −φ rotation to move the problem into an axis-aligned frame.
+      <div class="code-wrapper">
+        <pre><code>x₁' = cos(φ)·(x₁-x₂)/2 + sin(φ)·(y₁-y₂)/2
+y₁' = -sin(φ)·(x₁-x₂)/2 + cos(φ)·(y₁-y₂)/2</code></pre>
+      </div>
+    </li>
+    <li><strong>Find the centre</strong> of the ellipse in the rotated frame. This involves solving:
+      <div class="code-wrapper">
+        <pre><code>cx' = ±√[ (rx²·ry² - rx²·y₁'² - ry²·x₁'²) / (rx²·y₁'² + ry²·x₁'²) ] · (rx·y₁'/ry)
+cy' = ∓√[...] · (ry·x₁'/rx)</code></pre>
+      </div>
+      <p>The ± sign is chosen based on the <code>large-arc-flag</code> and <code>sweep-flag</code>: they select which of the 4 possible ellipse centres (and therefore which arc) you want.</p>
+    </li>
+    <li><strong>Compute start and sweep angles</strong> (θ₁ and Δθ) using atan2:
+      <div class="code-wrapper">
+        <pre><code>θ₁ = atan2( (y₁' - cy') / ry, (x₁' - cx') / rx )
+θ₂ = atan2( (-y₁' - cy') / ry, (-x₁' - cx') / rx )
+Δθ = θ₂ - θ₁  (adjusted for sweep direction)</code></pre>
+      </div>
+    </li>
+    <li><strong>Trace the ellipse</strong> parametrically from θ₁ to θ₁ + Δθ:
+      <div class="code-wrapper">
+        <pre><code>x(θ) = cx + rx·cos(θ)·cos(φ) - ry·sin(θ)·sin(φ)
+y(θ) = cy + rx·cos(θ)·sin(φ) + ry·sin(θ)·cos(φ)</code></pre>
+      </div>
+    </li>
+  </ol>
+
+  <h4>Why the flags exist</h4>
+  <p>Given two points and an ellipse size, there are always <strong>two possible ellipses</strong> that pass through both points (one "above," one "below"). On each ellipse, there are <strong>two arcs</strong> connecting the points (the short way and the long way). That's 2 × 2 = 4 possible arcs. The two flags select which one:</p>
+  <ul>
+    <li><strong>large-arc-flag</strong>  -  0: take the arc spanning less than 180°. 1: take the arc spanning more than 180°.</li>
+    <li><strong>sweep-flag</strong>  -  0: trace counter-clockwise (decreasing θ). 1: trace clockwise (increasing θ).</li>
+  </ul>
+
+  <h4>Practical takeaway</h4>
+  <p>You don't need to compute any of this by hand  -  the browser does it. But understanding the geometry explains why:</p>
+  <ul>
+    <li>You need two flags (4 possible arcs between any two points)</li>
+    <li>If rx/ry are too small to reach the endpoint, the browser scales them up automatically</li>
+    <li>A full circle is impossible (start = end means the midpoint calculation is undefined  -  infinite solutions)</li>
+    <li>The <code>x-rotation</code> parameter rotates the ellipse itself, not the arc's position</li>
+  </ul>
+
+  <div class="warning">
+    <strong>Arcs can't draw a full circle</strong>
+    <p>The start and end points of an arc cannot be identical  -  if they are, the arc degenerates to nothing. To draw a full circle with arcs, use <strong>two semicircular arcs</strong> back-to-back. Or just use <code>&lt;circle&gt;</code>  -  that's what it's for.</p>
+  </div>
+
+  <h2>6. Practical Tips</h2>
+  <p>Some real-world wisdom about working with path data:</p>
+
+  <ul>
+    <li><strong>You rarely write path data by hand.</strong> Tools like Figma, Illustrator, and Inkscape export SVG with optimised path data. You'll read and tweak paths more often than write them from scratch.</li>
+    <li><strong>When you DO hand-write, you mostly need M, L, C, and Z.</strong> These four commands cover the vast majority of hand-authored paths. H, V, S, T, and A are nice-to-haves.</li>
+    <li><strong>Whitespace is flexible.</strong> Commas are optional separators. Multiple spaces are fine. <code>M10 10L50 10</code> and <code>M 10, 10 L 50, 10</code> are identical. Use whatever's most readable.</li>
+    <li><strong>Path data can be animated</strong> (with SMIL or the Web Animations API)  -  but only if the source and target paths have the <strong>same number and type of commands</strong>. You can morph <code>M..L..L..Z</code> into another <code>M..L..L..Z</code>, but not into <code>M..C..Z</code>.</li>
+    <li><strong>Relative commands make reusable shapes.</strong> A path written with all-relative commands (except the initial <code>M</code>) can be repositioned just by changing the <code>M</code> coordinate  -  the rest is offsets.</li>
+    <li><strong>The <code>pathLength</code> attribute rescales dash calculations.</strong> Every shape element (not just <code>&lt;path&gt;</code>) supports <code>pathLength</code>. It tells the browser: "for <code>stroke-dasharray</code> and <code>stroke-dashoffset</code>, treat this element as if it's <em>this many</em> units long"  -  regardless of the actual geometric length. Set <code>pathLength="100"</code> and a dasharray value of <code>10</code> means "10% of the shape." Set <code>pathLength="1"</code> and you can animate <code>stroke-dashoffset</code> from 1 to 0 to draw any path without ever calculating its real length. This becomes crucial for stroke-drawing animations in <a href="11-css-animation-of-svg.html">Lesson 11</a>.</li>
+  </ul>
+
+  <div class="key-concept">
+    <strong>Debugging paths</strong>
+    <p>If a path looks wrong, add <code>fill="none"</code> and a visible <code>stroke</code> first. Fill can obscure path problems by filling "inside" overlapping segments. Once the outline looks right, add fill back.</p>
+  </div>
+
+  <div class="key-concept">
+    <strong>How curves get made in practice</strong>
+    <p>Almost nobody calculates Bézier control points or arc parameters from first principles. The realistic workflow split:</p>
+    <ul>
+      <li><strong>~80% design tool export</strong>  -  draw visually in Figma/Illustrator/Inkscape, export SVG. The tool generates path data.</li>
+      <li><strong>~15% interactive editors</strong>  -  use tools like <a href="https://nan.fyi/svg-paths">nan.fyi/svg-paths</a> or <a href="https://yqnn.github.io/svg-path-editor/">SVG Path Editor</a> to drag points and see path data update live. Good for hand-tweaking or building specific curves.</li>
+      <li><strong>~5% computed from formulae</strong>  -  only when generating shapes programmatically (data visualisation, dynamic animation paths, algorithmic art). Then you use the Bézier/arc maths in code.</li>
+    </ul>
+    <p>Understanding the maths means you can <em>predict, debug, and tweak intelligently</em>  -  not that you need to compute coordinates by hand. Know why it works; let tools do the arithmetic.</p>
+  </div>
+
+  <h2>7. Markers</h2>
+  <p>A <code>&lt;marker&gt;</code> is a small graphic that attaches to the <strong>vertices</strong> of a path, polyline, polygon, or line. Common uses: arrowheads, dots at data points, decorative endpoints.</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;svg viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg"&gt;
+  &lt;defs&gt;
+    &lt;marker id="arrow" markerWidth="10" markerHeight="10"
+            refX="9" refY="3" orient="auto" markerUnits="strokeWidth"&gt;
+      &lt;path d="M0,0 L0,6 L9,3 Z" fill="coral"/&gt;
+    &lt;/marker&gt;
+    &lt;marker id="start-square" markerWidth="8" markerHeight="8"
+            refX="4" refY="4"&gt;
+      &lt;rect width="8" height="8" fill="#98c379"/&gt;
+    &lt;/marker&gt;
+    &lt;marker id="mid-dot" markerWidth="12" markerHeight="6"
+            refX="6" refY="3" orient="auto"&gt;
+      &lt;ellipse cx="6" cy="3" rx="6" ry="3" fill="#61afef"/&gt;
+    &lt;/marker&gt;
+    &lt;marker id="end-diamond" markerWidth="10" markerHeight="10"
+            refX="9" refY="3" orient="auto"&gt;
+      &lt;path d="M0,0 L0,6 L9,3 Z" fill="#e5c07b"/&gt;
+    &lt;/marker&gt;
+  &lt;/defs&gt;
+
+  &lt;!-- Line with arrowhead --&gt;
+  &lt;line x1="30" y1="40" x2="370" y2="40"
+        stroke="coral" stroke-width="2"
+        marker-end="url(#arrow)"/&gt;
+
+  &lt;!-- Polyline with different markers at start, mid, end --&gt;
+  &lt;polyline points="30,90 130,70 230,100 330,75 370,90"
+            fill="none" stroke="#61afef" stroke-width="2"
+            marker-start="url(#start-square)"
+            marker-mid="url(#mid-dot)"
+            marker-end="url(#end-diamond)"/&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="400" height="120" viewBox="0 0 400 120">
+      <rect width="400" height="120" fill="var(--demo-svg-bg)"/>
+      <defs>
+        <marker id="demo-arrow-l3" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+          <path d="M0,0 L0,6 L9,3 Z" fill="coral"/>
+        </marker>
+        <marker id="demo-start-sq" markerWidth="8" markerHeight="8" refX="4" refY="4">
+          <rect width="8" height="8" fill="#98c379"/>
+        </marker>
+        <marker id="demo-mid-dot" markerWidth="12" markerHeight="6" refX="6" refY="3" orient="auto">
+          <ellipse cx="6" cy="3" rx="6" ry="3" fill="#61afef"/>
+        </marker>
+        <marker id="demo-end-dia" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L9,3 Z" fill="#e5c07b"/>
+        </marker>
+      </defs>
+      <line x1="30" y1="40" x2="370" y2="40" stroke="coral" stroke-width="2" marker-end="url(#demo-arrow-l3)"/>
+      <polyline points="30,90 130,70 230,100 330,75 370,90" fill="none" stroke="#61afef" stroke-width="2" marker-start="url(#demo-start-sq)" marker-mid="url(#demo-mid-dot)" marker-end="url(#demo-end-dia)"/>
+    </svg>
+    <p class="demo-caption">Top: line with arrowhead (<code>marker-end</code>). Bottom: polyline with a green square at start, blue ellipses at mid vertices (notice how they rotate to align with the line direction thanks to <code>orient="auto"</code>), and a yellow arrowhead at end.</p>
+  </div>
+
+  <table class="comparison-table">
+    <thead>
+      <tr><th>Attribute</th><th>Purpose</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>marker-start</code></td><td>Marker at the first vertex</td></tr>
+      <tr><td><code>marker-mid</code></td><td>Marker at every intermediate vertex</td></tr>
+      <tr><td><code>marker-end</code></td><td>Marker at the last vertex</td></tr>
+      <tr><td><code>markerWidth</code>, <code>markerHeight</code></td><td>Size of the marker's viewport</td></tr>
+      <tr><td><code>refX</code>, <code>refY</code></td><td>Point in the marker that aligns with the vertex</td></tr>
+      <tr><td><code>orient</code></td><td><code>auto</code> (rotate to path tangent) or a fixed angle</td></tr>
+      <tr><td><code>markerUnits</code></td><td><code>strokeWidth</code> (scales with stroke) or <code>userSpaceOnUse</code> (fixed size)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="key-concept">
+    <strong>refX/refY = the pin point</strong>
+    <p><code>refX</code> and <code>refY</code> define <strong>which point in the marker graphic aligns with the path vertex</strong>. Think of it as a pin: the marker is a small image, and refX/refY is where the pin goes through it. For an arrowhead whose tip is at (9, 3): set <code>refX="9" refY="3"</code> so the tip sits on the vertex. For a circle centred at (3, 3): set <code>refX="3" refY="3"</code> so the dot centres on the vertex. Then <code>orient="auto"</code> rotates the entire marker around that pin point to face the path direction.</p>
+  </div>
+
+  <div class="key-concept">
+    <strong>orient="auto" rotates to the path tangent</strong>
+    <p>Just like <code>rotate="auto"</code> on <code>&lt;animateMotion&gt;</code> (which you'll meet in <a href="10-smil-advanced.html">Lesson 10</a>), <code>orient="auto"</code> rotates the marker to face the direction of the line at that vertex. This is why arrowheads point the right way on curved paths without any manual rotation.</p>
+  </div>
+
+  <h2>Quiz: Check Your Understanding</h2>
+
+  <div class="quiz" id="quiz1">
+    <h3>Question 1</h3>
+    <p>Which attribute on <code>&lt;rect&gt;</code> creates rounded corners?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)"><code>border-radius</code></div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)"><code>rx</code> and <code>ry</code></div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)"><code>corner</code></div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)"><code>round</code></div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz2">
+    <h3>Question 2</h3>
+    <p>What's the difference between <code>&lt;polyline&gt;</code> and <code>&lt;polygon&gt;</code>?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Polyline supports curves, polygon only supports straight lines</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Polygon requires a fill, polyline does not</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">Polygon automatically closes the shape (connects last point to first); polyline does not</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">They are identical  -  polygon is just an alias</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz3">
+    <h3>Question 3</h3>
+    <p>In <code>&lt;path d="M 10 10 L 50 10 L 50 50 Z"&gt;</code>, what does the Z command do?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Resets the pen to (0, 0)</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Ends the path without drawing anything</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">Draws a straight line back to the M starting point (10, 10), closing the shape</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Fills the interior of the path with the current colour</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <h2>Hands-On Exercise</h2>
+  <p>Practice these concepts by drawing these shapes with <code>&lt;path&gt;</code> commands:</p>
+  <ol>
+    <li><strong>Draw a house</strong> using only line commands (<code>M</code>, <code>L</code>, <code>Z</code>): a rectangular base with a triangular roof on top. Use <code>fill="none"</code> and a visible stroke so you can see the outline clearly.</li>
+    <li><strong>Draw a heart shape</strong> using two cubic B&#xe9;zier curves. Start at the bottom point, curve up-left to the top-left lobe, then curve from there to the bottom point again for the right lobe. Hint: the path is <code>M center-bottom C ... top-left C ... Z</code></li>
+    <li><strong>Draw a circle using two arc commands</strong>  -  two semicircles. Move to the leftmost point, arc to the rightmost point (half circle), then arc back to the start (other half). This demonstrates why <code>&lt;circle&gt;</code> exists as a convenience.</li>
+  </ol>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;svg width="500" height="200" viewBox="0 0 500 200"&gt;
+  &lt;!-- 1. House with line commands --&gt;
+  &lt;path d="M 30 150 L 30 80 L 80 80 L 80 150 Z
+            M 30 80 L 55 50 L 80 80"
+    fill="none" stroke="#e5c07b" stroke-width="2"
+    stroke-linejoin="round"/&gt;
+
+  &lt;!-- 2. Heart with cubic Beziers --&gt;
+  &lt;path d="M 200 140
+           C 200 140, 170 80, 200 80
+           C 230 80, 230 110, 200 140
+           M 200 140
+           C 200 140, 230 80, 200 80"
+    fill="#e06c75" stroke="none"/&gt;
+  &lt;!-- (Simplified  -  experiment with control points!) --&gt;
+
+  &lt;!-- 3. Circle with two arcs --&gt;
+  &lt;path d="M 350 100 A 40 40 0 1 1 430 100
+                      A 40 40 0 1 1 350 100"
+    fill="none" stroke="#61afef" stroke-width="2"/&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <div class="recommended">
+    <strong>Recommended resource:</strong>
+    <a href="https://nan.fyi/svg-paths">nan.fyi/svg-paths</a>  -  Interactive, visual guide to every path command. The best way to build intuition about the <code>d</code> attribute. Lets you drag control points and see the path data update in real time.
+  </div>
+  <div class="footer-nav">
+    <a href="02-transforms-and-grouping.html">&larr; Prev: Transforms &amp; Grouping</a>
+    <a href="index.html">Index</a>
+    <a href="04-styling-presentation-attributes-vs-css.html">Next: Styling: Presentation Attributes vs CSS &rarr;</a>
+  </div>
+
+    </main>
+  </div><!-- end .page-layout -->
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="scripts.js"></script>
+</body>
+</html>

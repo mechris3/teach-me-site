@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>SVG DOM Methods and Interfaces Reference | Teach Me</title>
+  <meta name="description" content="All SVG-specific JavaScript interfaces, methods, and properties. getBBox, getScreenCTM, getTotalLength, and SVG animation control.">
+  <link rel="canonical" href="https://teachmeskills.dev/svg/svg-dom-methods.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/svg/svg-dom-methods.html">
+  <meta property="og:title" content="SVG DOM Methods and Interfaces Reference | Teach Me">
+  <meta property="og:description" content="All SVG-specific JavaScript interfaces, methods, and properties. getBBox, getScreenCTM, getTotalLength, and SVG animation control.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="SVG DOM Methods and Interfaces Reference | Teach Me">
+  <meta name="twitter:description" content="All SVG-specific JavaScript interfaces, methods, and properties. getBBox, getScreenCTM, getTotalLength, and SVG animation control.">
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    body { max-width: 900px; margin: 0 auto; padding: 3rem 1.5rem 4rem; }
+    h2 { border-bottom: 2px solid var(--accent); }
+    h3 { color: var(--accent); margin-top: 2rem; }
+    .method-sig { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.9rem; background: var(--code-bg); padding: 0.4rem 0.8rem; border-radius: 4px; display: block; margin: 0.5rem 0; color: var(--code-text); }
+    .interface-entry { margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+    .toc { background: var(--bg-raised); border-radius: 6px; padding: 1.2rem 1.5rem; margin: 1.5rem 0; }
+    .toc ul { list-style: none; padding: 0; columns: 2; }
+    .toc li { margin-bottom: 0.3rem; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav>
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+  <h1>SVG DOM Methods &amp; Interfaces</h1>
+  <p class="subtitle" style="color:var(--muted); margin-bottom:2rem;">All SVG-specific JavaScript interfaces, methods, and properties. Standard DOM methods (querySelector, addEventListener, etc.) work on SVG elements too but aren't listed here.</p>
+
+  <div class="toc">
+    <strong>Interfaces</strong>
+    <ul>
+      <li><a href="#svgelement">SVGElement (all SVG elements)</a></li>
+      <li><a href="#svgsvgelement">SVGSVGElement (&lt;svg&gt;)</a></li>
+      <li><a href="#svggraphicselement">SVGGraphicsElement (shapes, groups, text)</a></li>
+      <li><a href="#svggeometryelement">SVGGeometryElement (shapes &amp; paths)</a></li>
+      <li><a href="#svgpathelement">SVGPathElement (&lt;path&gt;)</a></li>
+      <li><a href="#svgtextelement">SVGTextContentElement (text)</a></li>
+      <li><a href="#svganimateelement">SVGAnimationElement (SMIL)</a></li>
+      <li><a href="#svgpoint-svgmatrix">SVGPoint &amp; SVGMatrix (helpers)</a></li>
+      <li><a href="#svglength-svgangle">SVGLength, SVGAngle, SVGNumber (typed values)</a></li>
+      <li><a href="#creation">Element Creation</a></li>
+    </ul>
+  </div>
+
+  <h2 id="svgelement">SVGElement (base interface)</h2>
+  <p>All SVG elements inherit from this. Extends <code>Element</code> (so querySelector, classList, dataset, etc. all work).</p>
+
+  <div class="interface-entry">
+    <h3>Properties</h3>
+    <table>
+      <tr><th>Property</th><th>Type</th><th>Description</th></tr>
+      <tr><td><code>.ownerSVGElement</code></td><td>SVGSVGElement</td><td>The nearest ancestor <code>&lt;svg&gt;</code> element. <code>null</code> on the outermost <code>&lt;svg&gt;</code> itself.</td></tr>
+      <tr><td><code>.viewportElement</code></td><td>SVGElement</td><td>The element that established the current viewport (usually the nearest <code>&lt;svg&gt;</code>).</td></tr>
+      <tr><td><code>.dataset</code></td><td>DOMStringMap</td><td>Access to <code>data-*</code> attributes (same as HTML elements).</td></tr>
+      <tr><td><code>.style</code></td><td>CSSStyleDeclaration</td><td>Inline styles. Works for CSS-compatible SVG properties (<code>fill</code>, <code>opacity</code>, <code>transform</code>, etc.).</td></tr>
+      <tr><td><code>.className</code></td><td>SVGAnimatedString</td><td>Note: returns an SVGAnimatedString, not a plain string. Use <code>.classList</code> instead for manipulation.</td></tr>
+    </table>
+  </div>
+
+  <h2 id="svgsvgelement">SVGSVGElement (&lt;svg&gt; root)</h2>
+  <p>The <code>&lt;svg&gt;</code> element's interface. Has the richest set of SVG-specific methods  -  coordinate transforms, viewBox control, animation timing.</p>
+
+  <div class="interface-entry">
+    <h3>Coordinate Methods</h3>
+    <table>
+      <tr><th>Method</th><th>Returns</th><th>Description</th></tr>
+      <tr><td><code>.createSVGPoint()</code></td><td>SVGPoint</td><td>Creates a blank point object for coordinate transforms.</td></tr>
+      <tr><td><code>.createSVGMatrix()</code></td><td>SVGMatrix</td><td>Creates a blank identity matrix.</td></tr>
+      <tr><td><code>.createSVGRect()</code></td><td>SVGRect</td><td>Creates a blank rect object.</td></tr>
+      <tr><td><code>.createSVGTransform()</code></td><td>SVGTransform</td><td>Creates a blank transform object.</td></tr>
+      <tr><td><code>.createSVGNumber()</code></td><td>SVGNumber</td><td>Creates a typed number wrapper.</td></tr>
+      <tr><td><code>.createSVGLength()</code></td><td>SVGLength</td><td>Creates a typed length value.</td></tr>
+      <tr><td><code>.createSVGAngle()</code></td><td>SVGAngle</td><td>Creates a typed angle value.</td></tr>
+    </table>
+
+    <h3>ViewBox &amp; Viewport</h3>
+    <table>
+      <tr><th>Property</th><th>Type</th><th>Description</th></tr>
+      <tr><td><code>.viewBox</code></td><td>SVGAnimatedRect</td><td>Access to the <code>viewBox</code> attribute. <code>.viewBox.baseVal</code> gives <code>{x, y, width, height}</code>.</td></tr>
+      <tr><td><code>.currentScale</code></td><td>Number</td><td>Current zoom level (for outermost SVG only). Settable.</td></tr>
+      <tr><td><code>.currentTranslate</code></td><td>SVGPoint</td><td>Current pan offset (for outermost SVG only). Mutable.</td></tr>
+    </table>
+
+    <h3>Animation Timing (SMIL control)</h3>
+    <table>
+      <tr><th>Method</th><th>Returns</th><th>Description</th></tr>
+      <tr><td><code>.getCurrentTime()</code></td><td>Number (seconds)</td><td>Current document time for SMIL animations.</td></tr>
+      <tr><td><code>.setCurrentTime(seconds)</code></td><td>void</td><td>Seek SMIL animations to a specific time.</td></tr>
+      <tr><td><code>.pauseAnimations()</code></td><td>void</td><td>Pause all SMIL animations in this SVG.</td></tr>
+      <tr><td><code>.unpauseAnimations()</code></td><td>void</td><td>Resume paused SMIL animations.</td></tr>
+      <tr><td><code>.animationsPaused()</code></td><td>Boolean</td><td>Whether SMIL animations are currently paused.</td></tr>
+    </table>
+
+    <h3>Element Lookup</h3>
+    <table>
+      <tr><th>Method</th><th>Returns</th><th>Description</th></tr>
+      <tr><td><code>.getElementById(id)</code></td><td>Element</td><td>Finds element by ID within this SVG fragment (useful for embedded SVG).</td></tr>
+    </table>
+  </div>
+
+  <h2 id="svggraphicselement">SVGGraphicsElement (shapes, groups, text, &lt;use&gt;)</h2>
+  <p>All renderable SVG elements inherit from this. Provides bounding box and coordinate transform methods.</p>
+
+  <div class="interface-entry">
+    <h3>Methods</h3>
+    <table>
+      <tr><th>Method</th><th>Returns</th><th>Description</th></tr>
+      <tr><td><code>.getBBox()</code></td><td>SVGRect <code>{x, y, width, height}</code></td><td>Bounding box in <strong>local coordinate space</strong> (before any transforms on this element). Does not include stroke width.</td></tr>
+      <tr><td><code>.getCTM()</code></td><td>SVGMatrix</td><td>Current Transformation Matrix from this element's coordinate space to the nearest viewport's coordinate space.</td></tr>
+      <tr><td><code>.getScreenCTM()</code></td><td>SVGMatrix</td><td>Matrix from this element's coordinate space to <strong>screen pixels</strong>. Accounts for all ancestor transforms, viewBox, scroll, CSS transforms, zoom.</td></tr>
+    </table>
+
+    <h3>Properties</h3>
+    <table>
+      <tr><th>Property</th><th>Type</th><th>Description</th></tr>
+      <tr><td><code>.transform</code></td><td>SVGAnimatedTransformList</td><td>Access to the element's <code>transform</code> attribute. <code>.transform.baseVal</code> is the list of transform functions.</td></tr>
+    </table>
+
+    <h3>Common usage pattern</h3>
+    <span class="method-sig">// Convert client coords &rarr; SVG coords</span>
+    <span class="method-sig">const pt = svg.createSVGPoint();</span>
+    <span class="method-sig">pt.x = event.clientX; pt.y = event.clientY;</span>
+    <span class="method-sig">const svgPt = pt.matrixTransform(svg.getScreenCTM().inverse());</span>
+  </div>
+
+  <h2 id="svggeometryelement">SVGGeometryElement (all shape elements)</h2>
+  <p>Inherited by <code>&lt;circle&gt;</code>, <code>&lt;rect&gt;</code>, <code>&lt;ellipse&gt;</code>, <code>&lt;line&gt;</code>, <code>&lt;polyline&gt;</code>, <code>&lt;polygon&gt;</code>, and <code>&lt;path&gt;</code>.</p>
+
+  <div class="interface-entry">
+    <h3>Methods</h3>
+    <table>
+      <tr><th>Method</th><th>Returns</th><th>Description</th></tr>
+      <tr><td><code>.getTotalLength()</code></td><td>Number</td><td>Total arc length of the shape's outline (computed via numerical integration for curves). Works on all shapes, not just paths.</td></tr>
+      <tr><td><code>.getPointAtLength(distance)</code></td><td>SVGPoint <code>{x, y}</code></td><td>Coordinates at the given distance along the outline. <code>distance</code> is in the same units as <code>getTotalLength()</code>.</td></tr>
+      <tr><td><code>.isPointInFill(point)</code></td><td>Boolean</td><td>Whether the given SVGPoint is inside the element's fill area (respects <code>fill-rule</code>).</td></tr>
+      <tr><td><code>.isPointInStroke(point)</code></td><td>Boolean</td><td>Whether the given SVGPoint is on the element's stroke (respects <code>stroke-width</code>).</td></tr>
+    </table>
+
+    <h3>Properties</h3>
+    <table>
+      <tr><th>Property</th><th>Type</th><th>Description</th></tr>
+      <tr><td><code>.pathLength</code></td><td>SVGAnimatedNumber</td><td>The <code>pathLength</code> attribute value. Affects how <code>stroke-dasharray</code>/<code>stroke-dashoffset</code> are interpreted.</td></tr>
+    </table>
+
+    <h3>Usage notes</h3>
+    <p><code>getTotalLength()</code> and <code>getPointAtLength()</code> work on <strong>all geometry elements</strong> in modern browsers  -  not just <code>&lt;path&gt;</code>. You can call them on <code>&lt;circle&gt;</code>, <code>&lt;rect&gt;</code>, etc. to find positions along their outlines.</p>
+    <p><code>isPointInFill()</code> is useful for custom hit testing  -  for example, checking whether a click landed inside a complex path shape without relying on browser event targeting.</p>
+  </div>
+
+  <h2 id="svgpathelement">SVGPathElement (&lt;path&gt;)</h2>
+  <p>Extends SVGGeometryElement. In SVG 1.1, <code>&lt;path&gt;</code> had additional methods (now deprecated or removed in SVG 2):</p>
+
+  <div class="interface-entry">
+    <table>
+      <tr><th>Method</th><th>Status</th><th>Description</th></tr>
+      <tr><td><code>.getTotalLength()</code></td><td>Current</td><td>Inherited from SVGGeometryElement.</td></tr>
+      <tr><td><code>.getPointAtLength(d)</code></td><td>Current</td><td>Inherited from SVGGeometryElement.</td></tr>
+      <tr><td><code>.getPathSegAtLength(d)</code></td><td>Removed (SVG 2)</td><td>Was: returns which path segment contains the given distance. No longer available.</td></tr>
+      <tr><td><code>.pathSegList</code></td><td>Removed (SVG 2)</td><td>Was: list of path segments. Replaced by parsing the <code>d</code> attribute string directly.</td></tr>
+    </table>
+    <p>In practice, you interact with <code>&lt;path&gt;</code> via <code>getAttribute('d')</code> / <code>setAttribute('d', ...)</code> for path data, plus the inherited geometry methods.</p>
+  </div>
+
+  <h2 id="svgtextelement">SVGTextContentElement (text elements)</h2>
+  <p>Inherited by <code>&lt;text&gt;</code>, <code>&lt;tspan&gt;</code>, <code>&lt;textPath&gt;</code>. Provides character/glyph-level access.</p>
+
+  <div class="interface-entry">
+    <h3>Methods</h3>
+    <table>
+      <tr><th>Method</th><th>Returns</th><th>Description</th></tr>
+      <tr><td><code>.getNumberOfChars()</code></td><td>Number</td><td>Number of rendered characters (after bidi reordering, ligatures, etc.).</td></tr>
+      <tr><td><code>.getComputedTextLength()</code></td><td>Number</td><td>Total advance width of the rendered text (in user units).</td></tr>
+      <tr><td><code>.getSubStringLength(startIdx, nChars)</code></td><td>Number</td><td>Advance width of a character range.</td></tr>
+      <tr><td><code>.getStartPositionOfChar(idx)</code></td><td>SVGPoint</td><td>Starting position of character at index.</td></tr>
+      <tr><td><code>.getEndPositionOfChar(idx)</code></td><td>SVGPoint</td><td>End position of character at index.</td></tr>
+      <tr><td><code>.getExtentOfChar(idx)</code></td><td>SVGRect</td><td>Bounding box of character at index.</td></tr>
+      <tr><td><code>.getRotationOfChar(idx)</code></td><td>Number (degrees)</td><td>Rotation angle of character at index (relevant for text on a path).</td></tr>
+      <tr><td><code>.getCharNumAtPosition(point)</code></td><td>Number</td><td>Index of the character at the given SVGPoint, or -1.</td></tr>
+      <tr><td><code>.selectSubString(startIdx, nChars)</code></td><td>void</td><td>Selects a range of characters (creates a text selection).</td></tr>
+    </table>
+  </div>
+
+  <h2 id="svganimateelement">SVGAnimationElement (SMIL animation elements)</h2>
+  <p>Inherited by <code>&lt;animate&gt;</code>, <code>&lt;animateTransform&gt;</code>, <code>&lt;animateMotion&gt;</code>, <code>&lt;set&gt;</code>.</p>
+
+  <div class="interface-entry">
+    <h3>Methods</h3>
+    <table>
+      <tr><th>Method</th><th>Returns</th><th>Description</th></tr>
+      <tr><td><code>.getStartTime()</code></td><td>Number (seconds)</td><td>Resolved start time of this animation element.</td></tr>
+      <tr><td><code>.getCurrentTime()</code></td><td>Number (seconds)</td><td>Current time within this animation's active duration.</td></tr>
+      <tr><td><code>.getSimpleDuration()</code></td><td>Number (seconds)</td><td>Simple (one iteration) duration. Throws if <code>indefinite</code>.</td></tr>
+      <tr><td><code>.beginElement()</code></td><td>void</td><td>Programmatically start this animation (as if <code>begin</code> condition was met).</td></tr>
+      <tr><td><code>.endElement()</code></td><td>void</td><td>Programmatically end this animation.</td></tr>
+      <tr><td><code>.beginElementAt(offset)</code></td><td>void</td><td>Start after <code>offset</code> seconds from now.</td></tr>
+      <tr><td><code>.endElementAt(offset)</code></td><td>void</td><td>End after <code>offset</code> seconds from now.</td></tr>
+    </table>
+
+    <h3>Properties</h3>
+    <table>
+      <tr><th>Property</th><th>Type</th><th>Description</th></tr>
+      <tr><td><code>.targetElement</code></td><td>SVGElement</td><td>The element being animated (the parent element).</td></tr>
+    </table>
+
+    <h3>Usage note</h3>
+    <p><code>beginElement()</code> is the way to trigger SMIL animations from JavaScript  -  set <code>begin="indefinite"</code> on the animation element, then call <code>.beginElement()</code> when you want it to start. This bridges JS event handling with SMIL animation.</p>
+  </div>
+
+  <h2 id="svgpoint-svgmatrix">SVGPoint &amp; SVGMatrix (helper objects)</h2>
+
+  <div class="interface-entry">
+    <h3>SVGPoint (DOMPoint in modern spec)</h3>
+    <table>
+      <tr><th>Property/Method</th><th>Description</th></tr>
+      <tr><td><code>.x</code></td><td>X coordinate (mutable).</td></tr>
+      <tr><td><code>.y</code></td><td>Y coordinate (mutable).</td></tr>
+      <tr><td><code>.matrixTransform(matrix)</code></td><td>Returns a new SVGPoint transformed by the given SVGMatrix. This is how you convert between coordinate spaces.</td></tr>
+    </table>
+
+    <h3>SVGMatrix (DOMMatrix in modern spec)</h3>
+    <p>A 2D affine transformation matrix (3&times;2 values: a, b, c, d, e, f). Each method returns a <strong>new</strong> matrix (immutable pattern).</p>
+    <table>
+      <tr><th>Method</th><th>Returns</th><th>Description</th></tr>
+      <tr><td><code>.multiply(other)</code></td><td>SVGMatrix</td><td>Matrix multiplication (compose transforms).</td></tr>
+      <tr><td><code>.inverse()</code></td><td>SVGMatrix</td><td>The inverse matrix. Used to convert <em>from</em> screen <em>to</em> SVG coordinates.</td></tr>
+      <tr><td><code>.translate(x, y)</code></td><td>SVGMatrix</td><td>Post-multiply by a translation.</td></tr>
+      <tr><td><code>.scale(factor)</code></td><td>SVGMatrix</td><td>Post-multiply by a uniform scale.</td></tr>
+      <tr><td><code>.scaleNonUniform(sx, sy)</code></td><td>SVGMatrix</td><td>Non-uniform scale.</td></tr>
+      <tr><td><code>.rotate(angle)</code></td><td>SVGMatrix</td><td>Post-multiply by a rotation (degrees).</td></tr>
+      <tr><td><code>.rotateFromVector(x, y)</code></td><td>SVGMatrix</td><td>Rotate to align with the vector (x, y).</td></tr>
+      <tr><td><code>.flipX()</code></td><td>SVGMatrix</td><td>Flip horizontally.</td></tr>
+      <tr><td><code>.flipY()</code></td><td>SVGMatrix</td><td>Flip vertically.</td></tr>
+      <tr><td><code>.skewX(angle)</code></td><td>SVGMatrix</td><td>Horizontal skew (degrees).</td></tr>
+      <tr><td><code>.skewY(angle)</code></td><td>SVGMatrix</td><td>Vertical skew (degrees).</td></tr>
+    </table>
+
+    <h3>Properties (matrix components)</h3>
+    <table>
+      <tr><th>Property</th><th>Description</th></tr>
+      <tr><td><code>.a</code></td><td>Scale X component</td></tr>
+      <tr><td><code>.b</code></td><td>Skew Y component</td></tr>
+      <tr><td><code>.c</code></td><td>Skew X component</td></tr>
+      <tr><td><code>.d</code></td><td>Scale Y component</td></tr>
+      <tr><td><code>.e</code></td><td>Translate X</td></tr>
+      <tr><td><code>.f</code></td><td>Translate Y</td></tr>
+    </table>
+    <p><strong>Modern note:</strong> Browsers are transitioning from <code>SVGPoint</code>/<code>SVGMatrix</code> to <code>DOMPoint</code>/<code>DOMMatrix</code>. The SVG-specific versions still work but may be deprecated in future specs. <code>DOMMatrix</code> also supports 3D transforms.</p>
+  </div>
+
+  <h2 id="svglength-svgangle">SVGLength, SVGAngle, SVGNumber (typed values)</h2>
+  <p>SVG attributes that represent lengths, angles, or numbers have typed DOM interfaces. These are accessed via properties like <code>circle.r</code>, <code>rect.width</code>, etc.</p>
+
+  <div class="interface-entry">
+    <h3>SVGAnimatedLength (e.g. <code>circle.r</code>)</h3>
+    <table>
+      <tr><th>Property</th><th>Type</th><th>Description</th></tr>
+      <tr><td><code>.baseVal</code></td><td>SVGLength</td><td>The base (non-animated) value.</td></tr>
+      <tr><td><code>.animVal</code></td><td>SVGLength (read-only)</td><td>The current animated value (reflects SMIL animations).</td></tr>
+    </table>
+
+    <h3>SVGLength (the actual value)</h3>
+    <table>
+      <tr><th>Property/Method</th><th>Description</th></tr>
+      <tr><td><code>.value</code></td><td>The value in user units (pixels). Settable.</td></tr>
+      <tr><td><code>.valueInSpecifiedUnits</code></td><td>The value in its declared unit (e.g. if <code>"50%"</code>, this is <code>50</code>).</td></tr>
+      <tr><td><code>.unitType</code></td><td>Numeric constant for the unit: <code>SVG_LENGTHTYPE_PX</code>, <code>_PERCENTAGE</code>, <code>_EM</code>, etc.</td></tr>
+      <tr><td><code>.convertToSpecifiedUnits(unitType)</code></td><td>Convert the value to a different unit in place.</td></tr>
+      <tr><td><code>.newValueSpecifiedUnits(unitType, value)</code></td><td>Set a new value with a specific unit.</td></tr>
+    </table>
+
+    <h3>Practical example</h3>
+    <span class="method-sig">// Read circle radius as a number (no string parsing needed)</span>
+    <span class="method-sig">const radius = circle.r.baseVal.value;  // e.g. 40</span>
+    <span class="method-sig">// Set it directly</span>
+    <span class="method-sig">circle.r.baseVal.value = 60;</span>
+    <span class="method-sig">// Check what it currently looks like during animation</span>
+    <span class="method-sig">const animatedR = circle.r.animVal.value;</span>
+  </div>
+
+  <h2 id="creation">Element Creation &amp; Namespace</h2>
+  <p>The essential pattern for creating SVG elements from JavaScript.</p>
+
+  <div class="interface-entry">
+    <table>
+      <tr><th>Method</th><th>Context</th><th>Description</th></tr>
+      <tr><td><code>document.createElementNS(ns, tag)</code></td><td>Document</td><td>Create an element in a specific namespace. <strong>Required</strong> for SVG elements.</td></tr>
+      <tr><td><code>element.setAttributeNS(ns, name, value)</code></td><td>Element</td><td>Set a namespaced attribute. Only needed for <code>xlink:href</code> (legacy). Modern SVG uses plain <code>href</code>.</td></tr>
+      <tr><td><code>element.setAttribute(name, value)</code></td><td>Element</td><td>Set a non-namespaced attribute. Works for all common SVG attributes.</td></tr>
+    </table>
+
+    <h3>Namespace URIs</h3>
+    <table>
+      <tr><th>Namespace</th><th>URI</th><th>When needed</th></tr>
+      <tr><td>SVG</td><td><code>http://www.w3.org/2000/svg</code></td><td>Every <code>createElementNS</code> call for SVG elements.</td></tr>
+      <tr><td>XLink (legacy)</td><td><code>http://www.w3.org/1999/xlink</code></td><td>Only for <code>xlink:href</code> on older SVG. Use plain <code>href</code> instead.</td></tr>
+      <tr><td>XML</td><td><code>http://www.w3.org/XML/1998/namespace</code></td><td>Rarely needed. For <code>xml:lang</code>, <code>xml:space</code>.</td></tr>
+    </table>
+
+    <h3>Helper pattern</h3>
+    <span class="method-sig">const SVG_NS = 'http://www.w3.org/2000/svg';</span>
+    <span class="method-sig">function svgEl(tag, attrs = {}, parent = null) {</span>
+    <span class="method-sig">&nbsp;&nbsp;const el = document.createElementNS(SVG_NS, tag);</span>
+    <span class="method-sig">&nbsp;&nbsp;for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);</span>
+    <span class="method-sig">&nbsp;&nbsp;if (parent) parent.appendChild(el);</span>
+    <span class="method-sig">&nbsp;&nbsp;return el;</span>
+    <span class="method-sig">}</span>
+  </div>
+
+  <h2>Notes</h2>
+  <ul style="padding-left:1.5rem; margin-top:1rem;">
+    <li>All standard DOM methods work on SVG elements: <code>querySelector</code>, <code>querySelectorAll</code>, <code>addEventListener</code>, <code>classList</code>, <code>dataset</code>, <code>closest</code>, <code>append</code>, <code>remove</code>, etc.</li>
+    <li>The Web Animations API (<code>element.animate()</code>) works on SVG elements for CSS-animatable properties.</li>
+    <li><code>getBoundingClientRect()</code> (inherited from Element) works on SVG elements and returns screen-pixel bounds.</li>
+    <li>SVG elements support all pointer/mouse/keyboard/focus events. Use <code>pointer-events</code> attribute to control hit testing.</li>
+    <li>For the full W3C specification, see: <a href="https://www.w3.org/TR/SVG11/types.html">SVG 1.1 Types</a> | <a href="https://svgwg.org/svg2-draft/types.html">SVG 2 Types (Draft)</a></li>
+  </ul>
+
+  <div style="margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); font-size: 0.9rem;">
+    <a href="index.html">&larr; Back to Index</a>
+  </div>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="scripts.js"></script>
+</body>
+</html>

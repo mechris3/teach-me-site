@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>Putting It Together: SVG Capstone - Lesson 13 | Teach Me</title>
+  <meta name="description" content="A complete animated solar system combining all SVG techniques: coordinate systems, gradients, filters, SMIL motion, and JavaScript interaction.">
+  <link rel="canonical" href="https://teachmeskills.dev/svg/13-putting-it-together.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/svg/13-putting-it-together.html">
+  <meta property="og:title" content="Putting It Together: SVG Capstone - Lesson 13 | Teach Me">
+  <meta property="og:description" content="A complete animated solar system combining all SVG techniques: coordinate systems, gradients, filters, SMIL motion, and JavaScript interaction.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Putting It Together: SVG Capstone - Lesson 13 | Teach Me">
+  <meta name="twitter:description" content="A complete animated solar system combining all SVG techniques: coordinate systems, gradients, filters, SMIL motion, and JavaScript interaction.">
+  <link rel="stylesheet" href="/styles.css">
+ <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header">
+        <a href="index.html">SVG Course</a>
+      </div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-coordinate-system.html">1. Coordinate System</a></li>
+        <li><a href="02-transforms-and-grouping.html">2. Transforms &amp; Grouping</a></li>
+        <li><a href="03-basic-shapes-and-paths.html">3. Shapes &amp; Paths</a></li>
+        <li><a href="04-styling-presentation-attributes-vs-css.html">4. Styling &amp; CSS</a></li>
+        <li><a href="05-gradients-patterns-paint-servers.html">5. Gradients &amp; Patterns</a></li>
+        <li><a href="06-clipping-and-masking.html">6. Clipping &amp; Masking</a></li>
+        <li><a href="07-filters.html">7. Filters</a></li>
+        <li><a href="08-text-and-textpath.html">8. Text &amp; textPath</a></li>
+        <li><a href="09-smil-animation-fundamentals.html">9. SMIL Fundamentals</a></li>
+        <li><a href="10-smil-advanced.html">10. SMIL Advanced</a></li>
+        <li><a href="11-css-animation-of-svg.html">11. CSS Animation</a></li>
+        <li><a href="12-javascript-and-svg.html">12. JavaScript + SVG</a></li>
+        <li class="current"><a href="13-putting-it-together.html">13. Capstone Project</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="svg-elements-and-attributes.html">Elements &amp; Attributes</a></li>
+        <li><a href="svg-dom-methods.html">DOM Methods &amp; Interfaces</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 13</p>
+  <h1>Putting It Together</h1>
+  <p>This lesson is different. No new concepts  -  instead, we build a <strong>complete, polished animated SVG</strong> from scratch, combining techniques from every lesson in the course. The project: an animated solar system with orbiting planets, a glowing sun, a streak comet, and interactive controls.</p>
+
+  <p>By the end you'll have a self-contained SVG that demonstrates: coordinate systems &amp; viewBox (<a href="01-coordinate-system.html">L1</a>), transforms &amp; groups (<a href="02-transforms-and-grouping.html">L2</a>), shapes &amp; paths (<a href="03-basic-shapes-and-paths.html">L3</a>), styling (<a href="04-styling-presentation-attributes-vs-css.html">L4</a>), gradients (<a href="05-gradients-patterns-paint-servers.html">L5</a>), clipping (<a href="06-clipping-and-masking.html">L6</a>), filters (<a href="07-filters.html">L7</a>), text on a path (<a href="08-text-and-textpath.html">L8</a>), SMIL motion (<a href="09-smil-animation-fundamentals.html">L9</a>/<a href="10-smil-advanced.html">L10</a>), CSS animation (<a href="11-css-animation-of-svg.html">L11</a>), and JavaScript interaction (<a href="12-javascript-and-svg.html">L12</a>).</p>
+
+  <h2>1. The Finished Product</h2>
+  <p>Here's what we're building. Study it, then we'll construct it piece by piece:</p>
+
+  <div class="demo">
+    <svg id="capstone-solar" width="600" height="600" viewBox="0 0 600 600" style="max-width:100%; height:auto;">
+      <!-- Background -->
+      <rect width="600" height="600" fill="#0d1117"/>
+
+      <defs>
+        <!-- Sun glow filter -->
+        <filter id="cap-sun-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <!-- Comet tail filter -->
+        <filter id="cap-comet-blur" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="2"/>
+        </filter>
+        <!-- Sun gradient -->
+        <radialGradient id="cap-sun-grad" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#fff7e6"/>
+          <stop offset="40%" stop-color="#fbbf24"/>
+          <stop offset="100%" stop-color="#f59e0b"/>
+        </radialGradient>
+        <!-- Planet gradients -->
+        <radialGradient id="cap-earth-grad" cx="40%" cy="35%" r="60%">
+          <stop offset="0%" stop-color="#60a5fa"/>
+          <stop offset="100%" stop-color="#1e40af"/>
+        </radialGradient>
+        <radialGradient id="cap-mars-grad" cx="40%" cy="35%" r="60%">
+          <stop offset="0%" stop-color="#fca5a5"/>
+          <stop offset="100%" stop-color="#b91c1c"/>
+        </radialGradient>
+        <!-- Orbit paths -->
+        <path id="cap-orbit-1" d="M 300,165 A 135,135 0 1 1 299.99,165" fill="none"/>
+        <path id="cap-orbit-2" d="M 300,110 A 190,190 0 1 1 299.99,110" fill="none"/>
+        <path id="cap-orbit-3" d="M 300,60 A 240,240 0 1 1 299.99,60" fill="none"/>
+        <!-- Comet path -->
+        <path id="cap-comet-path" d="M 50,50 C 200,100 500,150 550,500 C 400,550 100,400 50,50"/>
+        <!-- Saturn ring clip -->
+        <clipPath id="cap-ring-clip">
+          <rect x="-30" y="2" width="60" height="30"/>
+        </clipPath>
+      </defs>
+
+      <!-- Stars (scattered small circles) -->
+      <g class="cap-stars" opacity="0.6">
+        <circle cx="45" cy="80" r="1" fill="white"/><circle cx="120" cy="30" r="0.8" fill="white"/>
+        <circle cx="200" cy="55" r="1.2" fill="white"/><circle cx="350" cy="25" r="0.8" fill="white"/>
+        <circle cx="480" cy="70" r="1" fill="white"/><circle cx="550" cy="120" r="0.7" fill="white"/>
+        <circle cx="70" cy="200" r="0.9" fill="white"/><circle cx="530" cy="230" r="1.1" fill="white"/>
+        <circle cx="80" cy="380" r="0.8" fill="white"/><circle cx="520" cy="400" r="1" fill="white"/>
+        <circle cx="150" cy="520" r="1.2" fill="white"/><circle cx="450" cy="540" r="0.9" fill="white"/>
+        <circle cx="30" cy="500" r="0.7" fill="white"/><circle cx="570" cy="550" r="1" fill="white"/>
+        <circle cx="280" cy="560" r="0.8" fill="white"/><circle cx="400" cy="580" r="1.1" fill="white"/>
+      </g>
+
+      <!-- Orbits (visible tracks) -->
+      <use href="#cap-orbit-1" stroke="#64748b" stroke-width="1" stroke-dasharray="10 8" opacity="0.6" fill="none"/>
+      <use href="#cap-orbit-2" stroke="#64748b" stroke-width="1" stroke-dasharray="10 8" opacity="0.6" fill="none"/>
+      <use href="#cap-orbit-3" stroke="#64748b" stroke-width="1" stroke-dasharray="10 8" opacity="0.6" fill="none"/>
+
+      <!-- Sun -->
+      <circle cx="300" cy="300" r="45" fill="url(#cap-sun-grad)" filter="url(#cap-sun-glow)">
+        <animate attributeName="r" values="45;48;45" dur="3s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- Planet 1: Mercury (inner orbit, fast) -->
+      <circle r="6" fill="#a8a29e">
+        <animateMotion dur="4s" repeatCount="indefinite"><mpath href="#cap-orbit-1"/></animateMotion>
+      </circle>
+
+      <!-- Planet 2: Earth (middle orbit) -->
+      <circle r="10" fill="url(#cap-earth-grad)">
+        <animateMotion dur="8s" repeatCount="indefinite"><mpath href="#cap-orbit-2"/></animateMotion>
+      </circle>
+
+      <!-- Planet 3: Saturn (outer orbit, slow) with ring -->
+      <g>
+        <animateMotion dur="15s" repeatCount="indefinite"><mpath href="#cap-orbit-3"/></animateMotion>
+        <!-- Ring behind planet -->
+        <ellipse cx="0" cy="0" rx="24" ry="8" fill="none" stroke="#c2a045" stroke-width="2.5" opacity="0.6"/>
+        <!-- Planet body on top -->
+        <circle r="14" fill="#e5c07b"/>
+      </g>
+
+      <!-- Comet (glowing dot on its own path) -->
+      <circle r="3" fill="white" opacity="0.85">
+        <animateMotion dur="6s" repeatCount="indefinite"><mpath href="#cap-comet-path"/></animateMotion>
+      </circle>
+
+      <!-- Text label on orbit path -->
+      <text font-size="8" fill="#64748b" font-family="monospace">
+        <textPath href="#cap-orbit-3" startOffset="15%">outer orbit &bull; Saturn</textPath>
+      </text>
+    </svg>
+    <div class="demo-controls">
+      <button onclick="document.getElementById('capstone-solar').animationsPaused() ? document.getElementById('capstone-solar').unpauseAnimations() : document.getElementById('capstone-solar').pauseAnimations()">Pause / Play</button>
+    </div>
+    <p class="demo-caption">The complete animated solar system. Sun pulses (SMIL), planets orbit (animateMotion), Saturn has a ring, comet follows its own path, text sits on the outer orbit, stars twinkle in the background. Click any planet for a highlight pulse.</p>
+  </div>
+
+  <h2>2. Setting Up the Canvas</h2>
+  <p>Every SVG project starts with the coordinate system (<a href="01-coordinate-system.html">Lesson 1</a>). We're using a 600&times;600 square viewBox  -  large enough for detail, simple coordinates, and it scales responsively via CSS.</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;svg width="600" height="600" viewBox="0 0 600 600"&gt;
+  &lt;!-- Dark space background --&gt;
+  &lt;rect width="600" height="600" fill="#0d1117"/&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <strong>Lesson 1 in action</strong>
+    <p>The <code>viewBox</code> defines our coordinate space. Setting <code>width</code>/<code>height</code> equal to the viewBox dimensions gives us a 1:1 pixel ratio at natural size, while allowing the SVG to scale responsively when constrained by CSS (<code>max-width: 100%</code>).</p>
+  </div>
+
+  <h2>3. The Stars</h2>
+  <p>Scattered small circles with low opacity create depth. We could generate these with JavaScript (<a href="12-javascript-and-svg.html">Lesson 12</a>), but for a self-contained file, hand-placed dots work well:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;g class="stars" opacity="0.6"&gt;
+  &lt;circle cx="45" cy="80" r="1" fill="white"/&gt;
+  &lt;circle cx="120" cy="30" r="0.8" fill="white"/&gt;
+  &lt;circle cx="200" cy="55" r="1.2" fill="white"/&gt;
+  &lt;!-- ... more scattered across the 600x600 space --&gt;
+&lt;/g&gt;</code></pre>
+  </div>
+
+  <p>Group opacity (<a href="02-transforms-and-grouping.html">Lesson 2</a>) lets us dim all stars at once. Varying the radius slightly (0.7&ndash;1.2) creates natural variation without needing different fills or filters.</p>
+
+  <h2>4. Orbit Paths</h2>
+  <p>Each orbit is a circular arc path defined in <code>&lt;defs&gt;</code> (<a href="03-basic-shapes-and-paths.html">Lesson 3</a>) and reused multiple times: once as a visible dashed track, and again as a motion path for the planet.</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;defs&gt;
+  &lt;!-- Circle as a path (for animateMotion) --&gt;
+  &lt;!-- Arc from top, sweeps full circle back to start --&gt;
+  &lt;path id="orbit-1" d="M 300,165 A 135,135 0 1 1 299.99,165" fill="none"/&gt;
+  &lt;path id="orbit-2" d="M 300,110 A 190,190 0 1 1 299.99,110" fill="none"/&gt;
+  &lt;path id="orbit-3" d="M 300,60 A 240,240 0 1 1 299.99,60" fill="none"/&gt;
+&lt;/defs&gt;
+
+&lt;!-- Visible orbit tracks (dashed) --&gt;
+&lt;use href="#orbit-1" stroke="#334155" stroke-width="0.5" stroke-dasharray="4 4" opacity="0.5"/&gt;
+&lt;use href="#orbit-2" stroke="#334155" stroke-width="0.5" stroke-dasharray="4 4" opacity="0.5"/&gt;
+&lt;use href="#orbit-3" stroke="#334155" stroke-width="0.5" stroke-dasharray="4 4" opacity="0.5"/&gt;</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <strong>Why paths instead of &lt;circle&gt; for orbits?</strong>
+    <p><code>&lt;animateMotion&gt;</code> needs a <code>&lt;path&gt;</code> element (via <code>&lt;mpath&gt;</code>). You can't use a <code>&lt;circle&gt;</code> directly as a motion path. The arc command <code>A 135,135 0 1 1 299.99,165</code> traces a full circle  -  note the tiny offset (<code>299.99</code> instead of <code>300</code>) which is needed because an arc can't start and end at the same point (it would be zero-length).</p>
+  </div>
+
+  <h2>5. The Sun</h2>
+  <p>The sun combines a radial gradient (<a href="05-gradients-patterns-paint-servers.html">Lesson 5</a>), a glow filter (<a href="07-filters.html">Lesson 7</a>), and a gentle SMIL pulse (<a href="09-smil-animation-fundamentals.html">Lesson 9</a>):</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;defs&gt;
+  &lt;!-- Glow: blur + layer original on top --&gt;
+  &lt;filter id="sun-glow" x="-50%" y="-50%" width="200%" height="200%"&gt;
+    &lt;feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur"/&gt;
+    &lt;feMerge&gt;
+      &lt;feMergeNode in="blur"/&gt;
+      &lt;feMergeNode in="SourceGraphic"/&gt;
+    &lt;/feMerge&gt;
+  &lt;/filter&gt;
+
+  &lt;!-- Hot centre fading to golden edge --&gt;
+  &lt;radialGradient id="sun-grad" cx="50%" cy="50%" r="50%"&gt;
+    &lt;stop offset="0%" stop-color="#fff7e6"/&gt;
+    &lt;stop offset="40%" stop-color="#fbbf24"/&gt;
+    &lt;stop offset="100%" stop-color="#f59e0b"/&gt;
+  &lt;/radialGradient&gt;
+&lt;/defs&gt;
+
+&lt;!-- Sun: gradient fill + glow filter + breathing animation --&gt;
+&lt;circle cx="300" cy="300" r="45" fill="url(#sun-grad)" filter="url(#sun-glow)"&gt;
+  &lt;animate attributeName="r" values="45;48;45" dur="3s" repeatCount="indefinite"/&gt;
+&lt;/circle&gt;</code></pre>
+  </div>
+
+  <p>The filter region is expanded (<code>x="-50%" width="200%"</code>) so the blur doesn't get clipped at the default 10% boundary. The <code>feMerge</code> composites the blurred version behind the sharp original  -  creating a glow halo without losing the sun's crisp edge.</p>
+
+  <h2>6. Orbiting Planets</h2>
+  <p>Each planet uses <code>&lt;animateMotion&gt;</code> with <code>&lt;mpath&gt;</code> (<a href="10-smil-advanced.html">Lesson 10</a>) to follow its orbit path. Different durations create the feel of inner planets moving faster:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;!-- Mercury: fast inner orbit --&gt;
+&lt;circle r="6" fill="#a8a29e"&gt;
+  &lt;animateMotion dur="4s" repeatCount="indefinite"&gt;
+    &lt;mpath href="#orbit-1"/&gt;
+  &lt;/animateMotion&gt;
+&lt;/circle&gt;
+
+&lt;!-- Earth: medium orbit with gradient fill --&gt;
+&lt;circle r="10" fill="url(#earth-grad)"&gt;
+  &lt;animateMotion dur="8s" repeatCount="indefinite"&gt;
+    &lt;mpath href="#orbit-2"/&gt;
+  &lt;/animateMotion&gt;
+&lt;/circle&gt;
+
+&lt;!-- Saturn: slow outer orbit with ring --&gt;
+&lt;g&gt;
+  &lt;animateMotion dur="15s" repeatCount="indefinite"&gt;
+    &lt;mpath href="#orbit-3"/&gt;
+  &lt;/animateMotion&gt;
+  &lt;circle r="14" fill="#e5c07b"/&gt;
+  &lt;!-- Ring (next section) --&gt;
+&lt;/g&gt;</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <strong>Lesson 10 in action: animateMotion defaults to paced</strong>
+    <p>We don't set <code>calcMode</code>  -  it defaults to <code>paced</code>, giving constant velocity around the orbit regardless of how the arc control points are spaced. This is what makes the motion feel natural.</p>
+  </div>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <h2>7. Saturn's Ring</h2>
+  <p>The ring is an ellipse with a <code>clipPath</code> (<a href="06-clipping-and-masking.html">Lesson 6</a>) that hides the top half  -  creating the illusion that the ring passes behind the planet:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;defs&gt;
+  &lt;!-- Only show the bottom half of the ring --&gt;
+  &lt;clipPath id="ring-clip"&gt;
+    &lt;rect x="-30" y="2" width="60" height="30"/&gt;
+  &lt;/clipPath&gt;
+&lt;/defs&gt;
+
+&lt;!-- Inside Saturn's &lt;g&gt; (which is already moving along orbit-3) --&gt;
+&lt;g clip-path="url(#ring-clip)"&gt;
+  &lt;ellipse cx="0" cy="0" rx="24" ry="8"
+           fill="none" stroke="#c2a045" stroke-width="3" opacity="0.7"/&gt;
+&lt;/g&gt;</code></pre>
+  </div>
+
+  <p>The clip rect starts at <code>y="2"</code> (just below centre), so the top arc of the ellipse is hidden behind the planet body. Since everything is positioned at (0,0) within the group, it moves with Saturn automatically.</p>
+
+  <h2>8. The Comet</h2>
+  <p>The comet combines motion paths (<a href="10-smil-advanced.html">Lesson 10</a>), a blur filter (<a href="07-filters.html">Lesson 7</a>), and a stroke-based tail effect (<a href="11-css-animation-of-svg.html">Lesson 11</a>):</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;defs&gt;
+  &lt;!-- Irregular comet trajectory --&gt;
+  &lt;path id="comet-path"
+        d="M 50,50 C 200,100 500,150 550,500 C 400,550 100,400 50,50"/&gt;
+  &lt;!-- Soft blur for the comet head --&gt;
+  &lt;filter id="comet-blur" x="-20%" y="-20%" width="140%" height="140%"&gt;
+    &lt;feGaussianBlur stdDeviation="2"/&gt;
+  &lt;/filter&gt;
+&lt;/defs&gt;
+
+&lt;!-- Comet head (glowing dot) --&gt;
+&lt;g filter="url(#comet-blur)" opacity="0.9"&gt;
+  &lt;circle r="3" fill="white"&gt;
+    &lt;animateMotion dur="6s" repeatCount="indefinite" rotate="auto"&gt;
+      &lt;mpath href="#comet-path"/&gt;
+    &lt;/animateMotion&gt;
+  &lt;/circle&gt;
+&lt;/g&gt;
+
+&lt;!-- Comet tail (animated dash along the same path) --&gt;
+&lt;use href="#comet-path" fill="none" stroke="white" stroke-width="1.5"
+     opacity="0.4" stroke-linecap="round" stroke-dasharray="50 550"&gt;
+  &lt;animate attributeName="stroke-dashoffset"
+           from="0" to="-600" dur="6s" repeatCount="indefinite"/&gt;
+&lt;/use&gt;</code></pre>
+  </div>
+
+  <p>The tail uses <code>stroke-dasharray="50 550"</code>  -  a 50-unit visible dash followed by a 550-unit gap. Animating <code>stroke-dashoffset</code> from 0 to -600 (the path's approximate length) makes that dash slide along the path at the same speed as the comet head, creating the illusion of a trailing streak.</p>
+
+  <h2>9. Text on the Orbit</h2>
+  <p>A label riding the outer orbit path, using <code>&lt;textPath&gt;</code> (<a href="08-text-and-textpath.html">Lesson 8</a>):</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;text font-size="8" fill="#64748b" font-family="monospace"&gt;
+  &lt;textPath href="#orbit-3" startOffset="15%"&gt;
+    outer orbit &amp;bull; Saturn
+  &lt;/textPath&gt;
+&lt;/text&gt;</code></pre>
+  </div>
+
+  <p>The text follows the curve of orbit-3, positioned at 15% along the path. It's styled subtly (small, muted colour) so it adds information without competing with the animation.</p>
+
+  <h2>10. Adding Interactivity</h2>
+  <p>Finally, we add JavaScript controls (<a href="12-javascript-and-svg.html">Lesson 12</a>)  -  play/pause and speed adjustment. This bridges the static SMIL animation into something the user can control:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;script&gt;
+const svg = document.getElementById('solar-system');
+
+function togglePause() {
+  if (svg.animationsPaused()) {
+    svg.unpauseAnimations();
+  } else {
+    svg.pauseAnimations();
+  }
+}
+
+function setSpeed(rate) {
+  // SMIL doesn't have a native speed control, but we can
+  // manipulate the document time to simulate it.
+  // For true speed control, use WAAPI instead of SMIL.
+  // Here we simply pause/unpause as a basic control.
+}
+
+// Click any planet to highlight it
+svg.addEventListener('click', (e) =&gt; {
+  const planet = e.target.closest('circle[r]');
+  if (!planet || planet.closest('g.stars')) return;
+
+  // Pulse effect via WAAPI
+  planet.animate([
+    { filter: 'brightness(1)' },
+    { filter: 'brightness(2)' },
+    { filter: 'brightness(1)' }
+  ], { duration: 500 });
+});
+&lt;/script&gt;</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <strong>The three animation systems working together</strong>
+    <p>In this project: <strong>SMIL</strong> handles continuous motion (orbit paths, sun pulse) because it's declarative and self-contained. <strong>CSS</strong> could replace the sun pulse with <code>@keyframes</code> if you prefer. <strong>JavaScript</strong> adds user-driven interaction (pause/play, click highlights) that neither SMIL nor CSS can do alone. This is the pragmatic split for real projects.</p>
+  </div>
+
+  <h2>11. Skills Checklist</h2>
+  <p>Building (or studying) this project exercises every major SVG skill from the course:</p>
+
+  <table class="comparison-table">
+    <thead>
+      <tr><th>Skill</th><th>Where it appears</th><th>Lesson</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Coordinate system &amp; viewBox</td><td>600&times;600 canvas, responsive scaling</td><td><a href="01-coordinate-system.html">1</a></td></tr>
+      <tr><td>Transforms &amp; grouping</td><td>Saturn's group (ring + planet move together)</td><td><a href="02-transforms-and-grouping.html">2</a></td></tr>
+      <tr><td>Shapes &amp; paths</td><td>Circles (planets), arcs (orbits), curves (comet path)</td><td><a href="03-basic-shapes-and-paths.html">3</a></td></tr>
+      <tr><td>Styling</td><td>stroke-dasharray on orbits, fill/opacity choices</td><td><a href="04-styling-presentation-attributes-vs-css.html">4</a></td></tr>
+      <tr><td>Gradients</td><td>Sun (radial), Earth (radial with offset focal)</td><td><a href="05-gradients-patterns-paint-servers.html">5</a></td></tr>
+      <tr><td>Clipping</td><td>Saturn's ring (bottom-half clip)</td><td><a href="06-clipping-and-masking.html">6</a></td></tr>
+      <tr><td>Filters</td><td>Sun glow (blur + merge), comet blur</td><td><a href="07-filters.html">7</a></td></tr>
+      <tr><td>Text &amp; textPath</td><td>Label on outer orbit curve</td><td><a href="08-text-and-textpath.html">8</a></td></tr>
+      <tr><td>SMIL fundamentals</td><td>Sun radius pulse (<code>&lt;animate&gt;</code>)</td><td><a href="09-smil-animation-fundamentals.html">9</a></td></tr>
+      <tr><td>SMIL advanced</td><td>Planet orbits (<code>&lt;animateMotion&gt;</code> + <code>&lt;mpath&gt;</code>)</td><td><a href="10-smil-advanced.html">10</a></td></tr>
+      <tr><td>CSS animation</td><td>Comet tail (stroke-dasharray technique)</td><td><a href="11-css-animation-of-svg.html">11</a></td></tr>
+      <tr><td>JavaScript + SVG</td><td>Pause/play, click-to-highlight (WAAPI)</td><td><a href="12-javascript-and-svg.html">12</a></td></tr>
+    </tbody>
+  </table>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <h2>Alternative Capstone Projects</h2>
+  <p>The solar system is one way to combine everything. Here are three alternative projects you could tackle independently, each exercising the full skill set:</p>
+
+  <ol>
+    <li><strong>Animated logo reveal</strong>  -  Design a logo with 5+ paths. Use the stroke-drawing technique to reveal each path sequentially (CSS), then fade in fills (CSS), then add a subtle continuous idle animation (SMIL rotation or floating). Add a <code>&lt;textPath&gt;</code> tagline along a curve. Include a radial gradient background, a drop-shadow filter on the logo, and a JS "replay" button.</li>
+    <li><strong>Interactive weather scene</strong>  -  Build a landscape with sun, clouds, rain, and lightning. Use clipping for the horizon line, gradients for the sky, filters for cloud softness, CSS keyframes for rain drops, SMIL for cloud drift, and JavaScript buttons to switch between sunny/rainy/stormy states (toggling element visibility and animation playback).</li>
+    <li><strong>Data dashboard card</strong>  -  Create a single KPI card with: a line chart (path), animated bar chart (rects with CSS staggered entrance), a circular progress indicator (stroke-dashoffset), gradient fills, a filter-based shadow, text labels, and JavaScript that generates the chart from an array of data values. Add a "refresh" button that regenerates random data and re-animates with WAAPI.</li>
+  </ol>
+
+  <div class="recommended">
+    <strong>Recommended resource:</strong>
+    <a href="https://codepen.io/tag/svg">CodePen SVG tag</a>  -  thousands of real-world SVG animations for inspiration. Study how professionals combine these exact techniques. Also see <a href="https://css-tricks.com/lodge/svg/">CSS-Tricks SVG Lodge</a> for project-oriented SVG tutorials, and <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial">MDN SVG Tutorial</a> for when you need to look up specific details during a build.
+  </div>
+  <div class="footer-nav">
+    <a href="12-javascript-and-svg.html">&larr; Prev: JavaScript + SVG</a>
+    <a href="index.html">Index</a>
+    <span style="color:var(--muted);">Course Complete</span>
+  </div>
+
+    </main>
+  </div><!-- end .page-layout -->
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="scripts.js"></script>
+  <script>
+    // Capstone interactivity: click planets to pulse
+    (function() {
+      const svg = document.getElementById('capstone-solar');
+      if (!svg) return;
+      svg.addEventListener('click', (e) => {
+        const el = e.target;
+        if (el.tagName === 'circle' && !el.closest('.cap-stars')) {
+          el.animate([
+            { filter: 'brightness(1)' },
+            { filter: 'brightness(2.5)' },
+            { filter: 'brightness(1)' }
+          ], { duration: 400, easing: 'ease-out' });
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

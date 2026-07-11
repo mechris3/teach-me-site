@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>SVG Clipping and Masking - Lesson 6 | Teach Me</title>
+  <meta name="description" content="clipPath for hard geometric crops, mask for soft gradient fades. Luminance vs alpha masking, practical reveal animations.">
+  <link rel="canonical" href="https://teachmeskills.dev/svg/06-clipping-and-masking.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/svg/06-clipping-and-masking.html">
+  <meta property="og:title" content="SVG Clipping and Masking - Lesson 6 | Teach Me">
+  <meta property="og:description" content="clipPath for hard geometric crops, mask for soft gradient fades. Luminance vs alpha masking, practical reveal animations.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="SVG Clipping and Masking - Lesson 6 | Teach Me">
+  <meta name="twitter:description" content="clipPath for hard geometric crops, mask for soft gradient fades. Luminance vs alpha masking, practical reveal animations.">
+  <link rel="stylesheet" href="/styles.css">
+ <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header">
+        <a href="index.html">SVG Course</a>
+      </div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-coordinate-system.html">1. Coordinate System</a></li>
+        <li><a href="02-transforms-and-grouping.html">2. Transforms &amp; Grouping</a></li>
+        <li><a href="03-basic-shapes-and-paths.html">3. Shapes &amp; Paths</a></li>
+        <li><a href="04-styling-presentation-attributes-vs-css.html">4. Styling &amp; CSS</a></li>
+        <li><a href="05-gradients-patterns-paint-servers.html">5. Gradients &amp; Patterns</a></li>
+        <li class="current"><a href="06-clipping-and-masking.html">6. Clipping &amp; Masking</a></li>
+        <li><a href="07-filters.html">7. Filters</a></li>
+        <li><a href="08-text-and-textpath.html">8. Text &amp; textPath</a></li>
+        <li><a href="09-smil-animation-fundamentals.html">9. SMIL Fundamentals</a></li>
+        <li><a href="10-smil-advanced.html">10. SMIL Advanced</a></li>
+        <li><a href="11-css-animation-of-svg.html">11. CSS Animation</a></li>
+        <li><a href="12-javascript-and-svg.html">12. JavaScript + SVG</a></li>
+        <li><a href="13-putting-it-together.html">13. Capstone Project</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="svg-elements-and-attributes.html">Elements &amp; Attributes</a></li>
+        <li><a href="svg-dom-methods.html">DOM Methods &amp; Interfaces</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 6</p>
+  <h1>Clipping &amp; Masking</h1>
+  <p>Painting shapes with gradients and patterns is covered. Now: how to <em>hide</em> parts of them. Clipping and masking are two complementary techniques for controlling which portions of an element are visible  -  and they both use the same <code>&lt;defs&gt;</code> + <code>url(#id)</code> referencing pattern covered in Lesson 5.</p>
+
+  <h2>1. The Concept</h2>
+  <p>Both clipping and masking control the visibility of elements  -  they hide parts of a shape or group. The difference lies in <em>how</em> they determine what's visible:</p>
+  <ul>
+    <li><strong>Clipping</strong>  -  visibility determined by <strong>geometry</strong>: is this point inside or outside a shape boundary? Inside = visible, outside = hidden. That's the only question.</li>
+    <li><strong>Masking</strong>  -  visibility determined by <strong>pixel values</strong>: how bright (or how opaque) is the mask at this point? There's no "inside" or "outside"  -  just a field of values that control transparency everywhere.</li>
+  </ul>
+
+  <div class="key-concept">
+    <strong>But SVG is vectors, not pixels?</strong>
+    <p>Correct  -  clipping is defined as a geometric containment test (is this point inside the clip shape?), not a pixel operation. It's pure maths at the definition level. But when the browser <em>renders</em> the SVG to screen pixels, pixels on the clip boundary get anti-aliased (partial opacity based on sub-pixel coverage) so edges look smooth rather than jagged. This anti-aliasing is a rendering artifact, not a feature of the clipping model  -  the model itself is strictly inside/outside. Masks, by contrast, can produce gradual transparency <em>anywhere</em>, not just at the boundary.</p>
+  </div>
+  <p>Both are applied using the familiar pattern:</p>
+  <ul>
+    <li>Define the clip/mask in <code>&lt;defs&gt;</code> with an <code>id</code></li>
+    <li>Reference it on the target element: <code>clip-path="url(#id)"</code> or <code>mask="url(#id)"</code></li>
+  </ul>
+
+  <div class="key-concept">
+    <strong>Clipping = cookie cutter. Masking = spray paint stencil.</strong>
+    <p>A clip path is a cookie cutter  -  hard edges, on/off, the shape's outline is all that matters. A mask is a spray paint stencil  -  soft edges, gradual fade, the brightness or alpha of every pixel controls how much shows through.</p>
+  </div>
+
+  <h2>2. clipPath</h2>
+  <p>A <code>&lt;clipPath&gt;</code> element contains one or more shapes that define the <strong>visible region</strong>. Anything inside the clipping shape's outline is visible; everything outside is hidden. The geometry is all that matters  -  fill colour, stroke, opacity on the shapes inside the <code>&lt;clipPath&gt;</code> are completely ignored.</p>
+
+  <h3>Basic structure</h3>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;svg viewBox="0 0 200 200"&gt;
+  &lt;defs&gt;
+    &lt;clipPath id="circle-clip"&gt;
+      &lt;circle cx="100" cy="100" r="80"/&gt;
+    &lt;/clipPath&gt;
+  &lt;/defs&gt;
+
+  &lt;!-- This rect is clipped to a circle --&gt;
+  &lt;rect width="200" height="200" fill="coral"
+        clip-path="url(#circle-clip)"/&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="200" height="200" viewBox="0 0 200 200">
+      <defs>
+        <clipPath id="intro-circle-clip">
+          <circle cx="100" cy="100" r="80"/>
+        </clipPath>
+      </defs>
+      <rect width="200" height="200" fill="var(--demo-svg-bg)"/>
+      <rect width="200" height="200" fill="coral" clip-path="url(#intro-circle-clip)"/>
+    </svg>
+    <p class="demo-caption">Result: the coral rect is clipped to the circle  -  only the circular area is visible.</p>
+  </div>
+
+  <h3>Key points about clipPath</h3>
+  <ul>
+    <li>Shapes inside <code>&lt;clipPath&gt;</code> are <strong>geometry only</strong>  -  their fill, stroke, and opacity don't matter. Only their outline (the mathematical boundary) defines the clipping region.</li>
+    <li>You can use <strong>any shape</strong> inside a clipPath: <code>&lt;rect&gt;</code>, <code>&lt;circle&gt;</code>, <code>&lt;ellipse&gt;</code>, <code>&lt;path&gt;</code>, <code>&lt;polygon&gt;</code>, <code>&lt;text&gt;</code>, even <code>&lt;g&gt;</code> groups.</li>
+    <li>Multiple shapes inside a clipPath create a <strong>union</strong>  -  the visible region is anywhere that's inside <em>any</em> of the shapes.</li>
+  </ul>
+
+  <h3>clipPathUnits</h3>
+  <ul>
+    <li><code>userSpaceOnUse</code> (default)  -  the clip shape coordinates are in the same coordinate system as the element being clipped.</li>
+    <li><code>objectBoundingBox</code>  -  coordinates are 0&ndash;1, relative to the target element's bounding box. Useful for reusable, scale-independent clips.</li>
+  </ul>
+
+  <h3>Demo: Clipping a rect to a circle</h3>
+  <div class="demo">
+    <svg width="100%" height="220" viewBox="0 0 500 220">
+      <defs>
+        <clipPath id="demo-circle-clip">
+          <circle cx="125" cy="110" r="85"/>
+        </clipPath>
+        <linearGradient id="demo-clip-grad">
+          <stop offset="0%" stop-color="#e06c75"/>
+          <stop offset="50%" stop-color="#e5c07b"/>
+          <stop offset="100%" stop-color="#61afef"/>
+        </linearGradient>
+      </defs>
+      <rect width="500" height="220" fill="var(--demo-svg-bg)"/>
+      <!-- Unclipped -->
+      <rect x="20" y="20" width="210" height="180" rx="6" fill="url(#demo-clip-grad)" opacity="0.3"/>
+      <text x="125" y="215" font-size="11" fill="var(--muted)" text-anchor="middle">Original rect (faded)</text>
+      <!-- Clipped -->
+      <rect x="270" y="20" width="210" height="180" rx="6" fill="url(#demo-clip-grad)" clip-path="url(#demo-circle-clip)" transform="translate(270, 0)"/>
+      <clipPath id="demo-circle-clip2">
+        <circle cx="375" cy="110" r="85"/>
+      </clipPath>
+      <rect x="270" y="20" width="210" height="180" fill="url(#demo-clip-grad)" clip-path="url(#demo-circle-clip2)"/>
+      <text x="375" y="215" font-size="11" fill="var(--muted)" text-anchor="middle">Clipped to circle</text>
+    </svg>
+    <p class="demo-caption">Left: the original gradient rect. Right: the same rect clipped to a circle  -  only the circular region is visible.</p>
+  </div>
+
+  <h3>Demo: Text as a clip path</h3>
+  <p>Since <code>&lt;text&gt;</code> is a valid shape in SVG, you can use text outlines as your clipping region  -  creating a text-shaped window into anything:</p>
+
+  <div class="demo">
+    <svg width="100%" height="160" viewBox="0 0 500 160">
+      <defs>
+        <clipPath id="demo-text-clip">
+          <text x="250" y="110" font-size="80" font-weight="900" text-anchor="middle" font-family="Impact, Arial Black, sans-serif">SVG</text>
+        </clipPath>
+        <linearGradient id="demo-text-grad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#e06c75"/>
+          <stop offset="33%" stop-color="#e5c07b"/>
+          <stop offset="66%" stop-color="#98c379"/>
+          <stop offset="100%" stop-color="#61afef"/>
+        </linearGradient>
+        <pattern id="demo-text-pattern" patternUnits="userSpaceOnUse" width="20" height="20">
+          <circle cx="10" cy="10" r="3" fill="#c678dd"/>
+          <circle cx="0" cy="0" r="3" fill="#56b6c2"/>
+          <circle cx="20" cy="0" r="3" fill="#56b6c2"/>
+          <circle cx="0" cy="20" r="3" fill="#56b6c2"/>
+          <circle cx="20" cy="20" r="3" fill="#56b6c2"/>
+        </pattern>
+      </defs>
+      <rect width="500" height="160" fill="var(--demo-svg-bg)"/>
+      <g clip-path="url(#demo-text-clip)">
+        <rect width="500" height="160" fill="url(#demo-text-grad)"/>
+        <rect width="500" height="160" fill="url(#demo-text-pattern)" opacity="0.6"/>
+      </g>
+    </svg>
+    <p class="demo-caption">Text as a clip path  -  the letters "SVG" become a window into a gradient + dot pattern below.</p>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;defs&gt;
+  &lt;clipPath id="text-clip"&gt;
+    &lt;text x="250" y="110" font-size="80" font-weight="900"
+          text-anchor="middle"&gt;SVG&lt;/text&gt;
+  &lt;/clipPath&gt;
+&lt;/defs&gt;
+
+&lt;!-- Anything inside this group is clipped to the text outline --&gt;
+&lt;g clip-path="url(#text-clip)"&gt;
+  &lt;rect width="500" height="160" fill="url(#my-gradient)"/&gt;
+  &lt;rect width="500" height="160" fill="url(#my-pattern)" opacity="0.6"/&gt;
+&lt;/g&gt;</code></pre>
+  </div>
+
+  <h2>3. mask</h2>
+  <p>Where <code>&lt;clipPath&gt;</code> is binary, <code>&lt;mask&gt;</code> uses the <strong>luminance</strong> (brightness) or alpha channel of its content to determine visibility on a per-pixel basis. This enables soft edges, gradient fades, and feathered borders that clipPath simply can't achieve.</p>
+
+  <h3>How luminance masking works</h3>
+  <ul>
+    <li><strong>White pixels</strong> in the mask = fully visible (the element shows through completely)</li>
+    <li><strong>Black pixels</strong> in the mask = fully hidden (the element is invisible there)</li>
+    <li><strong>Grey pixels</strong> = partially transparent (proportional to brightness)</li>
+  </ul>
+  <p>The mask's content is rendered to an offscreen buffer, converted to luminance values, and those values become the opacity of the masked element at each pixel.</p>
+
+  <h3>Key attributes</h3>
+  <ul>
+    <li><code>x, y, width, height</code>  -  the mask region (the area where masking takes effect)</li>
+    <li><code>maskUnits</code>  -  coordinate system for x/y/width/height (<code>objectBoundingBox</code> is default)</li>
+    <li><code>maskContentUnits</code>  -  coordinate system for the content inside the mask (<code>userSpaceOnUse</code> is default)</li>
+  </ul>
+
+  <div class="key-concept">
+    <strong>Default mask region: extends 10% beyond the element</strong>
+    <p>By default, the mask area extends from -10% to 110% of the element's bounding box in both axes (x="-10%" y="-10%" width="120%" height="120%"). This gives you a small buffer so mask edges don't abruptly clip right at the element boundary. You can override these values if you need a different coverage area.</p>
+  </div>
+
+  <h3>Demo: Gradient fade mask</h3>
+  <p>A gradient from white to black inside the mask creates a smooth fade-out effect:</p>
+
+  <div class="demo">
+    <svg width="100%" height="200" viewBox="0 0 500 200">
+      <defs>
+        <linearGradient id="demo-fade-grad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="white"/>
+          <stop offset="100%" stop-color="black"/>
+        </linearGradient>
+        <mask id="demo-fade-mask">
+          <rect x="20" y="20" width="460" height="160" fill="url(#demo-fade-grad)"/>
+        </mask>
+        <linearGradient id="demo-content-grad">
+          <stop offset="0%" stop-color="#e06c75"/>
+          <stop offset="50%" stop-color="#c678dd"/>
+          <stop offset="100%" stop-color="#61afef"/>
+        </linearGradient>
+      </defs>
+      <rect width="500" height="200" fill="var(--demo-svg-bg)"/>
+      <rect x="20" y="20" width="460" height="160" rx="8" fill="url(#demo-content-grad)" mask="url(#demo-fade-mask)"/>
+    </svg>
+    <p class="demo-caption">A horizontal white-to-black gradient in the mask causes the colourful rect to fade from fully visible (left) to fully hidden (right).</p>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;defs&gt;
+  &lt;!-- A gradient from white (visible) to black (hidden) --&gt;
+  &lt;linearGradient id="fade-grad"&gt;
+    &lt;stop offset="0%" stop-color="white"/&gt;
+    &lt;stop offset="100%" stop-color="black"/&gt;
+  &lt;/linearGradient&gt;
+
+  &lt;mask id="fade-mask"&gt;
+    &lt;rect width="100%" height="100%" fill="url(#fade-grad)"/&gt;
+  &lt;/mask&gt;
+&lt;/defs&gt;
+
+&lt;rect width="400" height="150" fill="coral" mask="url(#fade-mask)"/&gt;</code></pre>
+  </div>
+
+  <h3>Demo: Soft-edged shape mask</h3>
+  <p>A radial gradient from white (centre) to black (edges) creates a spotlight or vignette effect:</p>
+
+  <div class="demo">
+    <svg width="100%" height="200" viewBox="0 0 500 200">
+      <defs>
+        <radialGradient id="demo-soft-grad" cx="0.5" cy="0.5" r="0.5">
+          <stop offset="0%" stop-color="white"/>
+          <stop offset="70%" stop-color="white"/>
+          <stop offset="100%" stop-color="black"/>
+        </radialGradient>
+        <mask id="demo-soft-mask">
+          <rect x="20" y="10" width="460" height="180" fill="url(#demo-soft-grad)"/>
+        </mask>
+        <pattern id="demo-mask-checker" patternUnits="userSpaceOnUse" width="30" height="30">
+          <rect width="15" height="15" fill="#e06c75"/>
+          <rect x="15" y="15" width="15" height="15" fill="#e06c75"/>
+          <rect x="15" width="15" height="15" fill="#61afef"/>
+          <rect y="15" width="15" height="15" fill="#61afef"/>
+        </pattern>
+      </defs>
+      <rect width="500" height="200" fill="var(--demo-svg-bg)"/>
+      <rect x="20" y="10" width="460" height="180" fill="url(#demo-mask-checker)" mask="url(#demo-soft-mask)"/>
+    </svg>
+    <p class="demo-caption">A radial gradient mask creates soft, feathered edges  -  the checkerboard pattern fades smoothly into nothing at the edges.</p>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;defs&gt;
+  &lt;!-- Radial gradient: white centre (visible) to black edges (hidden) --&gt;
+  &lt;radialGradient id="soft-grad" cx="0.5" cy="0.5" r="0.5"&gt;
+    &lt;stop offset="0%" stop-color="white"/&gt;
+    &lt;stop offset="70%" stop-color="white"/&gt;
+    &lt;stop offset="100%" stop-color="black"/&gt;
+  &lt;/radialGradient&gt;
+
+  &lt;mask id="soft-mask"&gt;
+    &lt;rect width="100%" height="100%" fill="url(#soft-grad)"/&gt;
+  &lt;/mask&gt;
+
+  &lt;!-- Checkerboard pattern (something visible to mask) --&gt;
+  &lt;pattern id="checker" patternUnits="userSpaceOnUse" width="30" height="30"&gt;
+    &lt;rect width="15" height="15" fill="#e06c75"/&gt;
+    &lt;rect x="15" y="15" width="15" height="15" fill="#e06c75"/&gt;
+    &lt;rect x="15" width="15" height="15" fill="#61afef"/&gt;
+    &lt;rect y="15" width="15" height="15" fill="#61afef"/&gt;
+  &lt;/pattern&gt;
+&lt;/defs&gt;
+
+&lt;!-- Content fades out at edges  -  spotlight/vignette effect --&gt;
+&lt;rect width="400" height="200" fill="url(#checker)"
+      mask="url(#soft-mask)"/&gt;</code></pre>
+  </div>
+
+  <h2>4. Luminance vs Alpha Masking</h2>
+  <p>SVG masks default to <strong>luminance mode</strong>: the brightness of each pixel in the mask determines how visible the masked element is at that point. But there's an alternative  -  <strong>alpha mode</strong>  -  which uses the mask pixel's alpha channel instead.</p>
+
+  <div class="key-concept">
+    <strong>Where do the "pixels" in a mask come from?</strong>
+    <p>The <code>&lt;mask&gt;</code> element contains normal SVG content  -  shapes, gradients, text, anything you can draw. The browser renders this content <strong style="display:inline;">offscreen</strong> (you never see it directly). The rendered result is then interpreted as a brightness map:</p>
+    <ol>
+      <li>The browser renders the mask's SVG content to a hidden buffer  -  shapes, gradients, everything renders as normal.</li>
+      <li>At each point, the browser reads the <b style="color: var(--code-text);">brightness</b> of the rendered result.</li>
+      <li>That brightness becomes the <b style="color: var(--code-text);">opacity</b> of the masked element at the same position.</li>
+    </ol>
+    <p>So when we say "white pixels" we mean: the areas of the mask's rendered content that you happened to fill with white (or a gradient stop that is white). You're drawing an "opacity map" using the same SVG shapes and gradients from the preceding lessons  -  but its output is interpreted as brightness values rather than displayed visually.</p>
+  </div>
+
+  <h3>Concrete examples: what the mask contains → what you see</h3>
+  <div class="demo">
+    <svg width="100%" height="380" viewBox="0 0 600 380">
+      <defs>
+        <!-- Mask 1: white circle covering the result rect area -->
+        <mask id="demo-lum-circle">
+          <circle cx="100" cy="245" r="60" fill="white"/>
+        </mask>
+        <!-- Mask 2: grey circle (50% luminance = 50% opacity) -->
+        <mask id="demo-lum-grey">
+          <circle cx="300" cy="245" r="60" fill="#808080"/>
+        </mask>
+        <!-- Mask 3: bright red (has SOME luminance, but less than white) -->
+        <mask id="demo-lum-red">
+          <circle cx="500" cy="245" r="60" fill="#ff0000"/>
+        </mask>
+      </defs>
+      <rect width="600" height="380" fill="var(--demo-svg-bg)"/>
+
+      <!-- Labels: what's IN the mask -->
+      <text x="100" y="20" font-size="11" fill="var(--muted)" text-anchor="middle">Mask contains:</text>
+      <text x="100" y="36" font-size="11" fill="var(--text)" text-anchor="middle" font-weight="bold">white circle</text>
+      <text x="300" y="20" font-size="11" fill="var(--muted)" text-anchor="middle">Mask contains:</text>
+      <text x="300" y="36" font-size="11" fill="var(--text)" text-anchor="middle" font-weight="bold">grey circle (#808080)</text>
+      <text x="500" y="20" font-size="11" fill="var(--muted)" text-anchor="middle">Mask contains:</text>
+      <text x="500" y="36" font-size="11" fill="var(--text)" text-anchor="middle" font-weight="bold">red circle (#ff0000)</text>
+
+      <!-- Row 1: Show the mask content (what's "drawn" inside the mask) -->
+      <rect x="35" y="50" width="130" height="100" fill="#111" rx="6"/>
+      <circle cx="100" cy="100" r="45" fill="white"/>
+      <rect x="235" y="50" width="130" height="100" fill="#111" rx="6"/>
+      <circle cx="300" cy="100" r="45" fill="#808080"/>
+      <rect x="435" y="50" width="130" height="100" fill="#111" rx="6"/>
+      <circle cx="500" cy="100" r="45" fill="#ff0000"/>
+
+      <!-- Arrow -->
+      <text x="100" y="175" font-size="10" fill="var(--muted)" text-anchor="middle">↓ brightness read as opacity ↓</text>
+      <text x="300" y="175" font-size="10" fill="var(--muted)" text-anchor="middle">↓ brightness read as opacity ↓</text>
+      <text x="500" y="175" font-size="10" fill="var(--muted)" text-anchor="middle">↓ brightness read as opacity ↓</text>
+
+      <!-- Row 2: Show the result (masked element) -->
+      <rect x="35" y="195" width="130" height="100" fill="var(--bg-surface)" rx="6" stroke="var(--border)" stroke-width="0.5"/>
+      <rect x="40" y="200" width="120" height="90" fill="#61afef" rx="4" mask="url(#demo-lum-circle)"/>
+      <rect x="235" y="195" width="130" height="100" fill="var(--bg-surface)" rx="6" stroke="var(--border)" stroke-width="0.5"/>
+      <rect x="240" y="200" width="120" height="90" fill="#61afef" rx="4" mask="url(#demo-lum-grey)"/>
+      <rect x="435" y="195" width="130" height="100" fill="var(--bg-surface)" rx="6" stroke="var(--border)" stroke-width="0.5"/>
+      <rect x="440" y="200" width="120" height="90" fill="#61afef" rx="4" mask="url(#demo-lum-red)"/>
+
+      <!-- Result labels -->
+      <text x="100" y="320" font-size="11" fill="var(--text)" text-anchor="middle" font-weight="bold">100% visible</text>
+      <text x="100" y="338" font-size="10" fill="var(--muted)" text-anchor="middle">(white = full luminance)</text>
+      <text x="300" y="320" font-size="11" fill="var(--text)" text-anchor="middle" font-weight="bold">~50% visible</text>
+      <text x="300" y="338" font-size="10" fill="var(--muted)" text-anchor="middle">(grey = half luminance)</text>
+      <text x="500" y="320" font-size="11" fill="var(--text)" text-anchor="middle" font-weight="bold">~21% visible</text>
+      <text x="500" y="338" font-size="10" fill="var(--muted)" text-anchor="middle">(red has low luminance!)</text>
+    </svg>
+    <p class="demo-caption"><strong>Top row:</strong> what's drawn inside the mask (rendered offscreen). <strong>Bottom row:</strong> the result  -  a blue rect masked by each. White = fully visible. Grey = half visible. Red is surprisingly dim because red has low luminance (~0.21) despite being a "bright" colour.</p>
+  </div>
+
+  <h3>Luminance mode (default)</h3>
+  <p>In luminance mode, the browser computes the luminance (perceived brightness) of each rendered pixel in the mask using the standard formula:</p>
+
+  <div class="code-wrapper">
+    <pre><code>luminance = 0.2126 * R + 0.7152 * G + 0.0722 * B
+
+where R, G, B are in the range 0–1</code></pre>
+  </div>
+
+  <p>This formula reflects how the human eye perceives brightness  -  green contributes the most, blue the least. That's why:</p>
+  <ul>
+    <li><strong>White</strong> (R=1, G=1, B=1) → luminance = 1.0 → <strong>fully visible</strong></li>
+    <li><strong>Black</strong> (R=0, G=0, B=0) → luminance = 0.0 → <strong>fully hidden</strong></li>
+    <li><strong>50% grey</strong> (R=0.5, G=0.5, B=0.5) → luminance = 0.5 → <strong>50% visible</strong></li>
+    <li><strong>Pure red</strong> (R=1, G=0, B=0) → luminance = 0.2126 → <strong>only ~21% visible</strong> (surprisingly dim!)</li>
+    <li><strong>Pure green</strong> (R=0, G=1, B=0) → luminance = 0.7152 → <strong>~72% visible</strong> (greens are bright)</li>
+    <li><strong>Pure blue</strong> (R=0, G=0, B=1) → luminance = 0.0722 → <strong>only ~7% visible</strong> (blues are very dark)</li>
+  </ul>
+
+  <p>The final mask value at each point is: <code>luminance × alpha</code>. So a semi-transparent white pixel (alpha 0.5) produces 1.0 × 0.5 = 0.5 (half visible). A fully transparent pixel produces 0 regardless of colour.</p>
+
+  <div class="warning">
+    <strong>Gotcha: coloured masks don't work how you'd expect</strong>
+    <p>If you put a bright red shape in your mask thinking "red is a strong colour, it'll make things visible"  -  you'll be surprised. Red has low luminance (0.21). Use <strong>white</strong> for full visibility, <strong>black</strong> for full hiding, and <strong>greyscale gradients</strong> for smooth fades. Avoid coloured content in luminance masks unless you specifically want the luminance-weighted effect.</p>
+  </div>
+
+  <h3>What happens in the areas where you drew nothing?</h3>
+  <p>The mask's background is effectively <strong>transparent black</strong> (rgba 0,0,0,0). Since luminance of black = 0 and alpha = 0, the mask value is 0 × 0 = 0 → fully hidden. So any area of the mask where you didn't draw anything will hide the masked element completely. This is why a white circle on the mask's default empty background creates a "spotlight"  -  only the circle area is visible.</p>
+
+  <h3>Alpha mode</h3>
+  <p>In alpha mode, luminance is completely ignored. Only the <strong>alpha channel</strong> (opacity) of each mask pixel determines visibility:</p>
+  <ul>
+    <li>A fully opaque pixel (alpha = 1) → <strong>fully visible</strong>, regardless of colour (red, blue, white  -  doesn't matter)</li>
+    <li>A fully transparent pixel (alpha = 0) → <strong>fully hidden</strong>, regardless of colour</li>
+    <li>A semi-transparent pixel (alpha = 0.5) → <strong>50% visible</strong></li>
+  </ul>
+
+  <p><strong>When is alpha mode useful?</strong> When your mask content has coloured shapes (e.g. an imported graphic or icon) and you want their <em>transparency</em> to control the mask, not their brightness. In luminance mode, a red shape would only give ~21% visibility  -  in alpha mode, the same opaque red shape gives 100% visibility because it's fully opaque.</p>
+
+  <div class="demo">
+    <svg width="100%" height="180" viewBox="0 0 600 180">
+      <defs>
+        <!-- Luminance mask with coloured circles -->
+        <mask id="demo-lum-mode">
+          <circle cx="80" cy="90" r="50" fill="red"/>
+          <circle cx="180" cy="90" r="50" fill="green"/>
+          <circle cx="280" cy="90" r="50" fill="blue"/>
+        </mask>
+        <!-- Alpha mask with same coloured circles (all opaque) -->
+        <mask id="demo-alpha-mode" style="mask-type: alpha">
+          <circle cx="380" cy="90" r="50" fill="red"/>
+          <circle cx="480" cy="90" r="50" fill="green"/>
+          <circle cx="580" cy="90" r="50" fill="blue"/>
+        </mask>
+      </defs>
+      <rect width="600" height="180" fill="var(--demo-svg-bg)"/>
+      <!-- Labels -->
+      <text x="180" y="16" font-size="11" fill="var(--text)" text-anchor="middle" font-weight="bold">Luminance mode</text>
+      <text x="480" y="16" font-size="11" fill="var(--text)" text-anchor="middle" font-weight="bold">Alpha mode</text>
+      <!-- Luminance result -->
+      <rect x="20" y="30" width="270" height="120" fill="#e5c07b" mask="url(#demo-lum-mode)" rx="4"/>
+      <!-- Alpha result -->
+      <rect x="320" y="30" width="270" height="120" fill="#e5c07b" mask="url(#demo-alpha-mode)" rx="4"/>
+      <!-- Annotations -->
+      <text x="80" y="170" font-size="8" fill="var(--muted)" text-anchor="middle">R: 21%</text>
+      <text x="180" y="170" font-size="8" fill="var(--muted)" text-anchor="middle">G: 72%</text>
+      <text x="280" y="170" font-size="8" fill="var(--muted)" text-anchor="middle">B: 7%</text>
+      <text x="480" y="170" font-size="8" fill="var(--muted)" text-anchor="middle">All: 100% (opaque)</text>
+    </svg>
+    <p class="demo-caption"><strong>Left (luminance):</strong> Red/green/blue circles used as masks  -  each has different luminance, so the gold rect shows through at different opacities. <strong>Right (alpha):</strong> Same circles, but in alpha mode  -  all are fully opaque, so all show 100% regardless of colour.</p>
+  </div>
+
+  <h3>How to set mask mode</h3>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;!-- SVG 2 / CSS approach --&gt;
+&lt;mask id="my-mask" style="mask-type: alpha"&gt;
+  &lt;!-- mask content --&gt;
+&lt;/mask&gt;
+
+&lt;!-- Or via CSS on the mask element --&gt;
+&lt;style&gt;
+  #my-mask { mask-type: luminance; }  /* default */
+  #my-mask { mask-type: alpha; }      /* alpha mode */
+&lt;/style&gt;</code></pre>
+  </div>
+
+  <h3>When to use which</h3>
+  <ul>
+    <li><strong>Luminance</strong>: Simpler for gradient fades (white-to-black gradients are intuitive). The mental model is "brightness = visibility".</li>
+    <li><strong>Alpha</strong>: Needed when your mask content has coloured shapes and you want their transparency (not brightness) to control visibility. Also useful when compositing semi-transparent overlapping shapes in the mask.</li>
+  </ul>
+
+  <div class="key-concept">
+    <strong>Practical advice: use greyscale in luminance masks</strong>
+    <p>In luminance mode, <em>any</em> colour participates  -  it gets converted to a brightness number via the formula. But coloured content produces hard-to-predict results (you'd need to mentally compute the luminance to know what visibility a particular colour gives). In practice, stick to <strong>greyscale</strong> (white, black, and shades of grey) in luminance masks. Grey value maps directly to visibility percentage: 50% grey = 50% visible, 75% grey = 75% visible. No surprises.</p>
+    <p>Only use coloured content in masks when you're in <strong>alpha mode</strong> (where colour is ignored and only opacity matters)  -  or when you specifically want the luminance-weighted effect (rare).</p>
+  </div>
+
+  <div class="warning">
+    <strong>Browser support for mask-type</strong>
+    <p><code>mask-type</code> is well-supported in modern browsers (Chrome, Firefox, Safari), but older browser versions may not recognise it. If you need alpha masking in environments without <code>mask-type</code> support, you can work around it by using white-coloured shapes with varying opacity inside a luminance mask  -  since opacity affects luminance calculation.</p>
+  </div>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <h2>5. Clipping vs Masking  -  When to Use Which</h2>
+  <p>Both achieve "hiding parts of things," but they have different strengths:</p>
+
+  <table class="comparison-table">
+    <thead>
+      <tr>
+        <th>Need</th>
+        <th>Use</th>
+        <th>Why</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Hard geometric crop (circle, hexagon, polygon frame)</td>
+        <td><code>clipPath</code></td>
+        <td>Binary, crisp edges, better performance</td>
+      </tr>
+      <tr>
+        <td>Soft fade / gradient transparency</td>
+        <td><code>mask</code></td>
+        <td>Supports partial opacity per pixel</td>
+      </tr>
+      <tr>
+        <td>Text-shaped window</td>
+        <td><code>clipPath</code></td>
+        <td>Text outlines work perfectly as clip geometry</td>
+      </tr>
+      <tr>
+        <td>Revealing content with animation</td>
+        <td><code>mask</code></td>
+        <td>Can animate mask content (gradient position, shape size)</td>
+      </tr>
+      <tr>
+        <td>Complex composition (multiple overlapping translucencies)</td>
+        <td><code>mask</code></td>
+        <td>Luminance gives fine-grained per-pixel control</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>6. Practical Examples</h2>
+
+  <h3>Circular image crop</h3>
+  <p>The most common real-world use of clipPath  -  cropping a rectangular image to a circle (avatar photos, profile pictures):</p>
+
+  <div class="demo">
+    <svg width="100%" height="220" viewBox="0 0 500 220">
+      <defs>
+        <clipPath id="demo-avatar-clip">
+          <circle cx="125" cy="110" r="85"/>
+        </clipPath>
+        <pattern id="demo-avatar-img" patternUnits="userSpaceOnUse" width="250" height="220">
+          <rect width="250" height="220" fill="#3e4451"/>
+          <circle cx="125" cy="80" r="40" fill="#61afef"/>
+          <rect x="60" y="130" width="130" height="90" rx="65" fill="#61afef"/>
+        </pattern>
+      </defs>
+      <rect width="500" height="220" fill="var(--demo-svg-bg)"/>
+      <!-- Unclipped "image" -->
+      <rect x="10" y="10" width="230" height="200" fill="url(#demo-avatar-img)" stroke="var(--border)" stroke-width="1" rx="4"/>
+      <text x="125" y="215" font-size="10" fill="var(--muted)" text-anchor="middle">Original (rectangular)</text>
+      <!-- Clipped "image" -->
+      <g transform="translate(260, 0)">
+        <rect x="10" y="10" width="230" height="200" fill="url(#demo-avatar-img)" clip-path="url(#demo-avatar-clip)"/>
+        <circle cx="125" cy="110" r="85" fill="none" stroke="var(--accent)" stroke-width="2"/>
+      </g>
+      <text x="385" y="215" font-size="10" fill="var(--muted)" text-anchor="middle">Clipped to circle</text>
+    </svg>
+    <p class="demo-caption">Circular avatar crop  -  the most common clipPath use case on the web.</p>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;defs&gt;
+  &lt;clipPath id="avatar-clip"&gt;
+    &lt;circle cx="100" cy="100" r="90"/&gt;
+  &lt;/clipPath&gt;
+&lt;/defs&gt;
+
+&lt;!-- Clip an image (or any content) to a circle --&gt;
+&lt;image href="photo.jpg" x="0" y="0" width="200" height="200"
+       clip-path="url(#avatar-clip)"/&gt;</code></pre>
+  </div>
+
+  <h3>Gradient fade to transparent</h3>
+  <p>Common in hero sections and content edges  -  content fades smoothly into the background:</p>
+
+  <div class="demo">
+    <svg width="100%" height="180" viewBox="0 0 500 180">
+      <defs>
+        <linearGradient id="demo-hero-fade" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="white"/>
+          <stop offset="60%" stop-color="white"/>
+          <stop offset="100%" stop-color="black"/>
+        </linearGradient>
+        <mask id="demo-hero-mask">
+          <rect width="500" height="180" fill="url(#demo-hero-fade)"/>
+        </mask>
+      </defs>
+      <rect width="500" height="180" fill="var(--demo-svg-bg)"/>
+      <g mask="url(#demo-hero-mask)">
+        <rect x="20" y="10" width="460" height="160" rx="6" fill="#2d5a8a"/>
+        <text x="250" y="50" font-size="16" fill="white" text-anchor="middle" font-weight="bold">Hero Content</text>
+        <text x="250" y="75" font-size="11" fill="#ccc" text-anchor="middle">This content fades out at the bottom</text>
+        <rect x="40" y="95" width="120" height="8" rx="4" fill="#61afef" opacity="0.8"/>
+        <rect x="40" y="112" width="200" height="8" rx="4" fill="#61afef" opacity="0.5"/>
+        <rect x="40" y="129" width="160" height="8" rx="4" fill="#61afef" opacity="0.3"/>
+        <rect x="40" y="146" width="180" height="8" rx="4" fill="#61afef" opacity="0.2"/>
+      </g>
+    </svg>
+    <p class="demo-caption">A vertical mask with white (top, visible) fading to black (bottom, hidden)  -  content smoothly fades into nothing.</p>
+  </div>
+
+  <h3>Reveal animation concept</h3>
+  <p>Masks are powerful for reveal animations  -  animate the mask content (e.g. expand a circle or slide a gradient) to progressively reveal the masked element:</p>
+
+  <div class="demo">
+    <svg width="100%" height="180" viewBox="0 0 400 180">
+      <defs>
+        <mask id="demo-reveal-mask">
+          <circle cx="200" cy="90" r="0" fill="white">
+            <animate attributeName="r" from="0" to="200" dur="3s" repeatCount="indefinite"/>
+          </circle>
+        </mask>
+        <linearGradient id="demo-reveal-grad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#e06c75"/>
+          <stop offset="50%" stop-color="#c678dd"/>
+          <stop offset="100%" stop-color="#61afef"/>
+        </linearGradient>
+      </defs>
+      <rect width="400" height="180" fill="var(--demo-svg-bg)"/>
+      <g mask="url(#demo-reveal-mask)">
+        <rect width="400" height="180" fill="url(#demo-reveal-grad)"/>
+        <text x="200" y="95" font-size="20" fill="white" text-anchor="middle" font-weight="bold">Revealed!</text>
+      </g>
+    </svg>
+    <p class="demo-caption">A SMIL-animated circle in the mask expands from r=0, progressively revealing the content underneath. (Loops every 3 seconds.)</p>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;defs&gt;
+  &lt;mask id="reveal-mask"&gt;
+    &lt;!-- This circle grows to reveal content --&gt;
+    &lt;circle cx="200" cy="150" r="0" fill="white"&gt;
+      &lt;animate attributeName="r" from="0" to="250"
+               dur="2s" fill="freeze"/&gt;
+    &lt;/circle&gt;
+  &lt;/mask&gt;
+&lt;/defs&gt;
+
+&lt;!-- Content is revealed as the mask circle expands --&gt;
+&lt;g mask="url(#reveal-mask)"&gt;
+  &lt;rect width="400" height="300" fill="url(#fancy-gradient)"/&gt;
+  &lt;text x="200" y="160" text-anchor="middle"&gt;Revealed!&lt;/text&gt;
+&lt;/g&gt;</code></pre>
+  </div>
+
+  <h3>Combining clipPath with transforms</h3>
+  <p>You can apply transforms to the clip path content, or animate the clipped element's transform for reveal effects. Since clipPath clips in the element's own coordinate space, transforms on the element move the content while the clip stays in place (or vice versa):</p>
+
+  <div class="demo">
+    <svg width="100%" height="160" viewBox="0 0 400 160">
+      <defs>
+        <clipPath id="demo-sliding-clip">
+          <rect x="-200" y="0" width="200" height="160">
+            <animate attributeName="x" from="-200" to="0" dur="2s" repeatCount="indefinite"/>
+          </rect>
+        </clipPath>
+        <linearGradient id="demo-slide-grad">
+          <stop offset="0%" stop-color="#98c379"/>
+          <stop offset="100%" stop-color="#61afef"/>
+        </linearGradient>
+      </defs>
+      <rect width="400" height="160" fill="var(--demo-svg-bg)"/>
+      <!-- Outline showing where the content is -->
+      <rect x="100" y="20" width="200" height="120" rx="6" fill="none" stroke="var(--border)" stroke-width="1" stroke-dasharray="4 3"/>
+      <text x="200" y="155" font-size="9" fill="var(--muted)" text-anchor="middle">Dashed outline = full content area</text>
+      <!-- Clipped content sliding in -->
+      <rect x="100" y="20" width="200" height="120" rx="6" fill="url(#demo-slide-grad)" clip-path="url(#demo-sliding-clip)" transform="translate(100, 0)"/>
+    </svg>
+    <p class="demo-caption">A sliding clip rect reveals content from left to right. The clip shape's <code>x</code> attribute is animated from -200 to 0. (Loops every 2 seconds.)</p>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;defs&gt;
+  &lt;clipPath id="sliding-clip"&gt;
+    &lt;rect x="0" y="0" width="200" height="300"&gt;
+      &lt;!-- Slide the clip rect to reveal content --&gt;
+      &lt;animate attributeName="x" from="-200" to="0"
+               dur="1s" fill="freeze"/&gt;
+    &lt;/rect&gt;
+  &lt;/clipPath&gt;
+&lt;/defs&gt;
+
+&lt;image href="photo.jpg" width="200" height="300"
+       clip-path="url(#sliding-clip)"/&gt;</code></pre>
+  </div>
+
+  <h2>7. Performance Considerations</h2>
+  <ul>
+    <li><strong>clipPath is generally faster than mask.</strong> Clipping is a simple boolean geometry test (inside/outside), while masking requires per-pixel luminance or alpha calculation from rendered mask content.</li>
+    <li><strong>Both create stacking contexts</strong>  -  similar to <code>opacity</code> or <code>filter</code>, the browser composites the element separately.</li>
+    <li><strong>Avoid complex mask content on animated elements</strong> if performance matters. Gradients are cheap; large blurred shapes or complex SVG content inside a mask can be expensive to re-render every frame.</li>
+    <li><strong>CSS <code>clip-path</code> can reference SVG clipPaths</strong>  -  this bridges CSS and SVG: <code>clip-path: url(#my-svg-clip)</code> works on HTML elements too, giving you SVG's arbitrary-shape clipping in your regular HTML layout.</li>
+    <li><strong>Prefer clipPath when you don't need soft edges.</strong> If your design only needs a hard geometric crop, always reach for clipPath  -  it's simpler, faster, and more widely GPU-accelerated.</li>
+  </ul>
+
+  <div class="key-concept">
+    <strong>Rule of thumb: clipPath for hard edges, mask for soft edges</strong>
+    <p>If the boundary between visible and hidden is a crisp geometric line, use <code>clipPath</code>. If you need any form of gradual transition, partial transparency, or feathered edges, you need a <code>mask</code>.</p>
+  </div>
+
+  <h2>8. The &lt;image&gt; Element</h2>
+  <p>The examples above clip and mask <code>&lt;image&gt;</code> elements  -  but what <em>is</em> <code>&lt;image&gt;</code>? It embeds a raster image (PNG, JPEG, WebP) or another SVG file into your SVG document, sized and positioned within the coordinate system:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;svg viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg"&gt;
+  &lt;!-- Embed a raster image --&gt;
+  &lt;image href="photo.jpg" x="20" y="20" width="260" height="160"
+         preserveAspectRatio="xMidYMid slice"/&gt;
+
+  &lt;!-- Clip it to a circle --&gt;
+  &lt;clipPath id="avatar"&gt;
+    &lt;circle cx="150" cy="100" r="80"/&gt;
+  &lt;/clipPath&gt;
+  &lt;image href="photo.jpg" x="20" y="20" width="260" height="160"
+         clip-path="url(#avatar)"
+         preserveAspectRatio="xMidYMid slice"/&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <table class="comparison-table">
+    <thead>
+      <tr><th>Attribute</th><th>Purpose</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>href</code></td><td>URL to the image (relative, absolute, or data URI)</td></tr>
+      <tr><td><code>x</code>, <code>y</code></td><td>Position of the top-left corner in the coordinate system</td></tr>
+      <tr><td><code>width</code>, <code>height</code></td><td>Size within the SVG (the image scales to fit)</td></tr>
+      <tr><td><code>preserveAspectRatio</code></td><td>How the image scales within its box (same values as on <code>&lt;svg&gt;</code>). <code>xMidYMid slice</code> for cover-style cropping.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="demo">
+    <svg width="300" height="200" viewBox="0 0 300 200">
+      <rect width="300" height="200" fill="var(--demo-svg-bg)"/>
+      <defs>
+        <clipPath id="demo-img-clip">
+          <circle cx="150" cy="100" r="70"/>
+        </clipPath>
+      </defs>
+      <!-- A gradient rect standing in for a photo -->
+      <rect x="30" y="20" width="240" height="160" rx="6" fill="url(#demo-img-grad)"/>
+      <defs>
+        <linearGradient id="demo-img-grad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#e06c75"/>
+          <stop offset="50%" stop-color="#e5c07b"/>
+          <stop offset="100%" stop-color="#61afef"/>
+        </linearGradient>
+      </defs>
+      <!-- Same rect clipped to a circle -->
+      <rect x="30" y="20" width="240" height="160" fill="url(#demo-img-grad)" clip-path="url(#demo-img-clip)"/>
+      <text x="150" y="190" text-anchor="middle" font-size="9" fill="var(--muted)">Left half: unclipped | Visible: clipped to circle</text>
+    </svg>
+    <p class="demo-caption">An image (here simulated with a gradient) clipped to a circle using <code>clip-path</code>. The <code>&lt;image&gt;</code> element works identically  -  just replace the rect with <code>&lt;image href="photo.jpg" ...&gt;</code>.</p>
+  </div>
+
+  <div class="key-concept">
+    <strong>&lt;image&gt; is a first-class SVG citizen</strong>
+    <p><code>&lt;image&gt;</code> participates fully in the SVG rendering pipeline. You can clip it, mask it, filter it, transform it, and animate it with SMIL  -  just like any shape. It uses the same <code>preserveAspectRatio</code> system covered in <a href="01-coordinate-system.html">Lesson 1</a> to control how the image fits within its bounding box.</p>
+  </div>
+
+  <h2>Quiz: Check Your Understanding</h2>
+
+  <div class="quiz" id="quiz1">
+    <h3>Question 1</h3>
+    <p>What's the fundamental difference between clipPath and mask?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">clipPath uses shapes and mask uses gradients</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">clipPath is binary (fully visible or hidden); mask supports gradual/partial transparency</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">clipPath works on groups and mask works on individual elements</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">clipPath is SVG-only and mask works with HTML elements too</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz2">
+    <h3>Question 2</h3>
+    <p>In a luminance mask, what colour makes content fully visible?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Black  -  black means "no masking applied"</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Any colour at full opacity  -  opacity determines visibility</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">White  -  maximum luminance means fully visible</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Transparent  -  see-through means the content shows through</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz3">
+    <h3>Question 3</h3>
+    <p>Can you use <code>&lt;text&gt;</code> inside a <code>&lt;clipPath&gt;</code>?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">Yes  -  the text outline becomes the clipping shape</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">No  -  only basic shapes (rect, circle, path) are allowed</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Only if you convert the text to a path first</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Yes, but only in SVG 2 compliant browsers</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <h2>Hands-On Exercise</h2>
+  <p>Build these from scratch to cement the concepts:</p>
+  <ol>
+    <li><strong>Circular crop:</strong> Create a <code>&lt;clipPath&gt;</code> with a circle and use it to clip a gradient-filled <code>&lt;rect&gt;</code> into a circular shape.</li>
+    <li><strong>Gradient fade mask:</strong> Create a <code>&lt;mask&gt;</code> containing a rect filled with a white-to-black linear gradient. Apply it to a colourful element to produce a smooth fade-to-invisible effect.</li>
+    <li><strong>Text clip path:</strong> Use <code>&lt;text&gt;</code> inside a <code>&lt;clipPath&gt;</code> to create a text-shaped window into a pattern or gradient background.</li>
+  </ol>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;svg width="600" height="500" viewBox="0 0 600 500" xmlns="http://www.w3.org/2000/svg"&gt;
+  &lt;defs&gt;
+    &lt;!-- 1. Circular clip --&gt;
+    &lt;clipPath id="ex-circle-clip"&gt;
+      &lt;circle cx="130" cy="80" r="70"/&gt;
+    &lt;/clipPath&gt;
+
+    &lt;!-- 2. Fade mask --&gt;
+    &lt;linearGradient id="ex-fade-grad"&gt;
+      &lt;stop offset="0%" stop-color="white"/&gt;
+      &lt;stop offset="100%" stop-color="black"/&gt;
+    &lt;/linearGradient&gt;
+    &lt;mask id="ex-fade-mask"&gt;
+      &lt;rect x="20" y="200" width="260" height="120" fill="url(#ex-fade-grad)"/&gt;
+    &lt;/mask&gt;
+
+    &lt;!-- 3. Text clip --&gt;
+    &lt;clipPath id="ex-text-clip"&gt;
+      &lt;text x="300" y="440" font-size="72" font-weight="900"&gt;HELLO&lt;/text&gt;
+    &lt;/clipPath&gt;
+
+    &lt;!-- Shared gradient --&gt;
+    &lt;linearGradient id="ex-rainbow" x1="0" y1="0" x2="1" y2="1"&gt;
+      &lt;stop offset="0%" stop-color="#e06c75"/&gt;
+      &lt;stop offset="50%" stop-color="#e5c07b"/&gt;
+      &lt;stop offset="100%" stop-color="#61afef"/&gt;
+    &lt;/linearGradient&gt;
+  &lt;/defs&gt;
+
+  &lt;!-- 1. Gradient rect clipped to a circle --&gt;
+  &lt;rect x="20" y="20" width="260" height="160" rx="6"
+        fill="url(#ex-rainbow)" clip-path="url(#ex-circle-clip)"/&gt;
+
+  &lt;!-- 2. Colourful rect with a fade mask --&gt;
+  &lt;rect x="20" y="200" width="260" height="120" rx="6"
+        fill="url(#ex-rainbow)" mask="url(#ex-fade-mask)"/&gt;
+
+  &lt;!-- 3. Text-shaped window into the gradient --&gt;
+  &lt;rect x="20" y="380" width="560" height="100"
+        fill="url(#ex-rainbow)" clip-path="url(#ex-text-clip)"/&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <div class="recommended">
+    <strong>Recommended resource:</strong>
+    <a href="https://css-tricks.com/clipping-masking-css/">Sara Soueidan  -  Clipping and Masking in CSS (CSS-Tricks)</a>  -  Comprehensive walkthrough of clipping and masking covering both SVG attributes and CSS properties, with clear visual examples of each technique and their browser support.
+  </div>
+  <div class="footer-nav">
+    <a href="05-gradients-patterns-paint-servers.html">&larr; Prev: Gradients, Patterns &amp; Paint Servers</a>
+    <a href="index.html">Index</a>
+    <a href="07-filters.html">Next: Filters &rarr;</a>
+  </div>
+
+    </main>
+  </div><!-- end .page-layout -->
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="scripts.js"></script>
+</body>
+</html>

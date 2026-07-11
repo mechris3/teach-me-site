@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>SVG Elements and Attributes Reference | Teach Me</title>
+  <meta name="description" content="Comprehensive reference of all SVG elements grouped by category, with their attributes, purposes, and usage notes.">
+  <link rel="canonical" href="https://teachmeskills.dev/svg/svg-elements-and-attributes.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/svg/svg-elements-and-attributes.html">
+  <meta property="og:title" content="SVG Elements and Attributes Reference | Teach Me">
+  <meta property="og:description" content="Comprehensive reference of all SVG elements grouped by category, with their attributes, purposes, and usage notes.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="SVG Elements and Attributes Reference | Teach Me">
+  <meta name="twitter:description" content="Comprehensive reference of all SVG elements grouped by category, with their attributes, purposes, and usage notes.">
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    /* Reference-specific layout (no sidebar, single column) */
+    body { max-width: 900px; margin: 0 auto; padding: 3rem 1.5rem 4rem; }
+    h2 { border-bottom: 2px solid var(--accent); }
+    h3 { color: var(--accent); }
+    .toc { background: var(--bg-raised); border-radius: 6px; padding: 1.2rem 1.5rem; margin: 1.5rem 0; }
+    .toc ul { list-style: none; padding: 0; columns: 2; }
+    .toc li { margin-bottom: 0.3rem; }
+    .element-entry { margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+    .deprecated { color: #b71c1c; font-size: 0.8rem; font-weight: bold; }
+    .category-badge { display: inline-block; font-size: 0.75rem; padding: 0.15em 0.5em; border-radius: 3px; background: var(--bg-surface); color: var(--accent); margin-left: 0.5rem; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav>
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+  <h1>SVG Elements &amp; Attributes Reference</h1>
+  <p class="subtitle">A comprehensive reference of all SVG elements and their key attributes. Organised by category.</p>
+
+  <div class="toc">
+    <strong>Categories</strong>
+    <ul>
+      <li><a href="#container">Container Elements</a></li>
+      <li><a href="#shapes">Basic Shapes</a></li>
+      <li><a href="#paths">Paths</a></li>
+      <li><a href="#text">Text</a></li>
+      <li><a href="#paint">Paint Servers (Gradients &amp; Patterns)</a></li>
+      <li><a href="#clipping">Clipping &amp; Masking</a></li>
+      <li><a href="#filters">Filter Effects</a></li>
+      <li><a href="#animation">Animation (SMIL)</a></li>
+      <li><a href="#descriptive">Descriptive &amp; Metadata</a></li>
+      <li><a href="#linking">Linking &amp; References</a></li>
+      <li><a href="#markers">Markers</a></li>
+      <li><a href="#images">Images &amp; Foreign Content</a></li>
+      <li><a href="#presentation-attrs">Presentation Attributes (CSS/SVG Overlap)</a></li>
+      <li><a href="#global-attrs">Global Attributes</a></li>
+    </ul>
+  </div>
+
+  <h2 id="container">Container Elements</h2>
+
+  <div class="element-entry">
+    <h3 id="el-svg"><code>&lt;svg&gt;</code> <span class="category-badge">Container</span></h3>
+    <p>The root container. Establishes a new viewport and coordinate system. Can be nested.</p>
+    <table>
+      <tr><th>Attribute</th><th>Description</th></tr>
+      <tr><td><code>width</code>, <code>height</code></td><td>Viewport dimensions. CSS units or unitless (px).</td></tr>
+      <tr><td><code>viewBox</code></td><td><code>"min-x min-y width height"</code>  -  defines the user coordinate system.</td></tr>
+      <tr><td><code>preserveAspectRatio</code></td><td>How viewBox maps to viewport when aspect ratios differ. Default: <code>xMidYMid meet</code>.</td></tr>
+      <tr><td><code>xmlns</code></td><td>Namespace: <code>http://www.w3.org/2000/svg</code>. Required for standalone SVG files; optional when inline in HTML5.</td></tr>
+      <tr><td><code>x</code>, <code>y</code></td><td>Position when nested inside another SVG.</td></tr>
+    </table>
+    <div><strong >Example:</strong><pre ><code>&lt;svg width="200" height="150" viewBox="0 0 200 150"&gt;
+  &lt;circle cx="100" cy="75" r="50" fill="gold"/&gt;
+&lt;/svg&gt;</code></pre></div>
+  </div>
+
+  <div class="element-entry">
+    <h3 id="el-g"><code>&lt;g&gt;</code> <span class="category-badge">Container</span></h3>
+    <p>Groups child elements. Applies shared transforms, styles, or event handlers. Does NOT create a new viewport.</p>
+    <table>
+      <tr><th>Attribute</th><th>Description</th></tr>
+      <tr><td><code>transform</code></td><td>Transformation applied to all children.</td></tr>
+      <tr><td><code>opacity</code></td><td>Group-level opacity (composites children as a unit before applying).</td></tr>
+    </table>
+    <div><strong >Example:</strong><pre ><code>&lt;g transform="translate(50, 30)" fill="#61afef"&gt;
+  &lt;rect x="0" y="0" width="40" height="30"/&gt;
+  &lt;rect x="50" y="0" width="40" height="30"/&gt;
+&lt;/g&gt;</code></pre></div>
+  </div>
+
+  <div class="element-entry">
+    <h3 id="el-defs"><code>&lt;defs&gt;</code> <span class="category-badge">Container</span></h3>
+    <p>Defines reusable elements that are not rendered directly. Children are referenced via <code>url(#id)</code> or <code>xlink:href</code>/<code>href</code>.</p>
+    <div><strong >Example:</strong><pre ><code>&lt;defs&gt;
+  &lt;linearGradient id="sky"&gt;
+    &lt;stop offset="0%" stop-color="#87ceeb"/&gt;
+    &lt;stop offset="100%" stop-color="#1e90ff"/&gt;
+  &lt;/linearGradient&gt;
+&lt;/defs&gt;
+&lt;rect fill="url(#sky)" width="200" height="100"/&gt;</code></pre></div>
+  </div>
+
+  <div class="element-entry">
+    <h3 id="el-symbol"><code>&lt;symbol&gt;</code> <span class="category-badge">Container</span></h3>
+    <p>Like <code>&lt;defs&gt;</code> content but with its own <code>viewBox</code> and <code>preserveAspectRatio</code>. Instantiated via <code>&lt;use&gt;</code>. Ideal for icon systems.</p>
+    <table>
+      <tr><th>Attribute</th><th>Description</th></tr>
+      <tr><td><code>viewBox</code></td><td>Internal coordinate system for the symbol.</td></tr>
+      <tr><td><code>preserveAspectRatio</code></td><td>Aspect ratio handling when used at different sizes.</td></tr>
+    </table>
+    <div><strong >Example:</strong><pre ><code>&lt;symbol id="icon-star" viewBox="0 0 24 24"&gt;
+  &lt;polygon points="12,2 15,9 22,9 16,14 18,21 12,17 6,21 8,14 2,9 9,9"/&gt;
+&lt;/symbol&gt;
+&lt;use href="#icon-star" width="48" height="48"/&gt;</code></pre></div>
+  </div>
+
+  <div class="element-entry">
+    <h3 id="el-use"><code>&lt;use&gt;</code> <span class="category-badge">Container</span></h3>
+    <p>Instantiates a copy of another element (referenced by <code>href</code>). Creates a shadow DOM-like boundary that limits CSS styling from outside.</p>
+    <table>
+      <tr><th>Attribute</th><th>Description</th></tr>
+      <tr><td><code>href</code></td><td>Reference to the element to clone: <code>#id</code> or <code>file.svg#id</code>.</td></tr>
+      <tr><td><code>x</code>, <code>y</code></td><td>Position offset for the cloned content.</td></tr>
+      <tr><td><code>width</code>, <code>height</code></td><td>Override dimensions (only effective on <code>&lt;symbol&gt;</code> or <code>&lt;svg&gt;</code> targets).</td></tr>
+    </table>
+    <div><strong >Example:</strong><pre ><code>&lt;defs&gt;&lt;circle id="dot" r="5"/&gt;&lt;/defs&gt;
+&lt;use href="#dot" x="30" y="30" fill="red"/&gt;
+&lt;use href="#dot" x="70" y="30" fill="blue"/&gt;</code></pre></div>
+  </div>
+
+  <div class="element-entry">
+    <h3 id="el-switch"><code>&lt;switch&gt;</code> <span class="category-badge">Container</span></h3>
+    <p>Renders the first child whose <code>requiredFeatures</code>, <code>requiredExtensions</code>, or <code>systemLanguage</code> evaluates to true. Used for internationalisation or feature detection.</p>
+    <div><strong >Example:</strong><pre ><code>&lt;switch&gt;
+  &lt;text systemLanguage="fr"&gt;Bonjour&lt;/text&gt;
+  &lt;text systemLanguage="en"&gt;Hello&lt;/text&gt;
+  &lt;text&gt;Hi&lt;/text&gt;
+&lt;/switch&gt;</code></pre></div>
+  </div>
+
+  <h2 id="shapes">Basic Shapes</h2>
+
+  <div class="element-entry">
+    <h3 id="el-rect"><code>&lt;rect&gt;</code> <span class="category-badge">Shape</span></h3>
+    <p>Rectangle. Supports rounded corners.</p>
+    <table>
+      <tr><th>Attribute</th><th>Description</th></tr>
+      <tr><td><code>x</code>, <code>y</code></td><td>Top-left corner position. Default: 0.</td></tr>
+      <tr><td><code>width</code>, <code>height</code></td><td>Dimensions. Required.</td></tr>
+      <tr><td><code>rx</code>, <code>ry</code></td><td>Corner radii. If only one is specified, the other mirrors it. Max clamped to half the dimension.</td></tr>
+    </table>
+    <div><strong >Example:</strong><pre ><code>&lt;rect x="10" y="10" width="120" height="80" rx="8"
+      fill="#e5c07b" stroke="#b8993f" stroke-width="2"/&gt;</code></pre></div>
+  </div>
+
+  <div class="element-entry">
+    <h3 id="el-circle"><code>&lt;circle&gt;</code> <span class="category-badge">Shape</span></h3>
+    <p>Circle defined by centre point and radius.</p>
+    <table>
+      <tr><th>Attribute</th><th>Description</th></tr>
+      <tr><td><code>cx</code>, <code>cy</code></td><td>Centre coordinates. Default: 0.</td></tr>
+      <tr><td><code>r</code></td><td>Radius. Required. Negative values are invalid.</td></tr>
+    </table>
+    <div><strong >Example:</strong><pre ><code>&lt;circle cx="80" cy="80" r="50"
+        fill="#e06c75" stroke="#b04950" stroke-width="2"/&gt;</code></pre></div>
+  </div>
+
+  <div class="element-entry">
+    <h3 id="el-ellipse"><code>&lt;ellipse&gt;</code> <span class="category-badge">Shape</span></h3>
+    <p>Ellipse  -  a circle with independent x and y radii.</p>
+    <table>
+      <tr><th>Attribute</th><th>Description</th></tr>
+      <tr><td><code>cx</code>, <code>cy</code></td><td>Centre coordinates.</td></tr>
+      <tr><td><code>rx</code>, <code>ry</code></td><td>Horizontal and vertical radii.</td></tr>
+    </table>
+    <div><strong >Example:</strong><pre ><code>&lt;ellipse cx="100" cy="60" rx="80" ry="40"
+         fill="#98c379" opacity="0.8"/&gt;</code></pre></div>
+  </div>
+
+  <div class="element-entry">
+    <h3 id="el-line"><code>&lt;line&gt;</code> <span class="category-badge">Shape</span></h3>
+    <p>Straight line between two points. Must have a <code>stroke</code> to be visible (no fill).</p>
+    <table>
+      <tr><th>Attribute</th><th>Description</th></tr>
+      <tr><td><code>x1</code>, <code>y1</code></td><td>Start point.</td></tr>
+      <tr><td><code>x2</code>, <code>y2</code></td><td>End point.</td></tr>
+    </table>
+    <div><strong >Example:</strong><pre ><code>&lt;line x1="10" y1="10" x2="190" y2="90"
+      stroke="#c678dd" stroke-width="3" stroke-linecap="round"/&gt;</code></pre></div>
+  </div>
+
+  <div class="element-entry">
+    <h3 id="el-polyline"><code>&lt;polyline&gt;</code> <span class="category-badge">Shape</span></h3>
+    <p>Connected series of straight line segments. Open shape (not automatically closed).</p>
+    <table>
+      <tr><th>Attribute</th><th>Description</th></tr>
+      <tr><td><code>points</code></td><td>Space or comma-separated list of x,y pairs: <code>"0,0 50,25 100,0"</code>.</td></tr>
+    </table>
+    <div><strong >Example:</strong><pre ><code>&lt;polyline points="20,80 60,20 100,60 140,10 180,50"
+          fill="none" stroke="#61afef" stroke-width="2"/&gt;</code></pre></div>
+  </div>
+
+  <div class="element-entry">
+    <h3 id="el-polygon"><code>&lt;polygon&gt;</code> <span class="category-badge">Shape</span></h3>
+    <p>Like <code>&lt;polyline&gt;</code> but automatically closes the shape (last point connects to first).</p>
+    <table>
+      <tr><th>Attribute</th><th>Description</th></tr>
+      <tr><td><code>points</code></td><td>Same format as polyline.</td></tr>
+    </table>
+    <div><strong >Example:</strong><pre ><code>&lt;polygon points="100,10 150,80 50,80"
+         fill="#56b6c2" stroke="#3d8f99" stroke-width="2"/&gt;</code></pre></div>
+  </div>
+
+  <h2 id="paths">Paths</h2>
+
+  <div class="element-entry">
+    <h3 id="el-path"><code>&lt;path&gt;</code> <span class="category-badge">Shape</span></h3>
+    <p>The most powerful shape element. Can describe any 2D shape using a mini-language of commands in the <code>d</code> attribute.</p>
+    <table>
+      <tr><th>Attribute</th><th>Description</th></tr>
+      <tr><td><code>d</code></td><td>Path data string  -  a sequence of commands (see below).</td></tr>
+      <tr><td><code>pathLength</code></td><td>Declares the "author's expected" total length. Affects <code>stroke-dasharray</code> and <code>stroke-dashoffset</code> calculations.</td></tr>
+    </table>
+    <h4>Path Commands</h4>
+    <table>
+      <tr><th>Command</th><th>Name</th><th>Parameters</th></tr>
+      <tr><td><code>M</code> / <code>m</code></td><td>Move To</td><td><code>x y</code></td></tr>
+      <tr><td><code>L</code> / <code>l</code></td><td>Line To</td><td><code>x y</code></td></tr>
+      <tr><td><code>H</code> / <code>h</code></td><td>Horizontal Line</td><td><code>x</code></td></tr>
+      <tr><td><code>V</code> / <code>v</code></td><td>Vertical Line</td><td><code>y</code></td></tr>
+      <tr><td><code>C</code> / <code>c</code></td><td>Cubic Bézier</td><td><code>x1 y1 x2 y2 x y</code> (two control points + endpoint)</td></tr>
+      <tr><td><code>S</code> / <code>s</code></td><td>Smooth Cubic</td><td><code>x2 y2 x y</code> (first control point reflected from previous)</td></tr>
+      <tr><td><code>Q</code> / <code>q</code></td><td>Quadratic Bézier</td><td><code>x1 y1 x y</code> (one control point + endpoint)</td></tr>
+      <tr><td><code>T</code> / <code>t</code></td><td>Smooth Quadratic</td><td><code>x y</code> (control point reflected from previous)</td></tr>
+      <tr><td><code>A</code> / <code>a</code></td><td>Arc</td><td><code>rx ry x-rotation large-arc-flag sweep-flag x y</code></td></tr>
+      <tr><td><code>Z</code> / <code>z</code></td><td>Close Path</td><td>(none)</td></tr>
+    </table>
+    <p><em>Uppercase = absolute coordinates. Lowercase = relative to current point.</em></p>
+    <div><strong >Example:</strong><pre ><code>&lt;path d="M 10 80 C 40 10, 65 10, 95 80 S 150 150, 180 80"
+      fill="none" stroke="#c678dd" stroke-width="3"/&gt;</code></pre></div>
+  </div>
+
+  <h2 id="text">Text</h2>
+
+  <div class="element-entry">
+    <h3 id="el-text"><code>&lt;text&gt;</code> <span class="category-badge">Text</span></h3>
+    <p>Renders text. Supports all font-related presentation attributes.</p>
+    <table>
+      <tr><th>Attribute</th><th>Description</th></tr>
+      <tr><td><code>x</code>, <code>y</code></td><td>Position of the text anchor point (baseline-left by default). Can be a list for per-glyph positioning.</td></tr>
+      <tr><td><code>dx</code>, <code>dy</code></td><td>Relative offsets. Can also be a list for per-glyph adjustment.</td></tr>
+      <tr><td><code>rotate</code></td><td>Rotation per glyph (list of degrees).</td></tr>
+      <tr><td><code>textLength</code></td><td>Desired total text length  -  browser adjusts spacing/glyphs to fit.</td></tr>
+      <tr><td><code>lengthAdjust</code></td><td><code>spacing</code> or <code>spacingAndGlyphs</code>.</td></tr>
+    </table>
+    <div><strong >Example:</strong><pre ><code>&lt;text x="20" y="40" font-size="18" fill="#333"&gt;Hello SVG&lt;/text&gt;</code></pre></div>
+  </div>
+
+  <div class="element-entry">
+    <h3 id="el-tspan"><code>&lt;tspan&gt;</code> <span class="category-badge">Text</span></h3>
+    <p>Inline text span within <code>&lt;text&gt;</code>. Allows position/style changes mid-text (like <code>&lt;span&gt;</code> in HTML).</p>
+    <p>Accepts the same positioning attributes as <code>&lt;text&gt;</code>: <code>x</code>, <code>y</code>, <code>dx</code>, <code>dy</code>, <code>rotate</code>.</p>
+    <div><strong >Example:</strong><pre ><code>&lt;text x="10" y="30"&gt;
+  Normal &lt;tspan fill="red" font-weight="bold"&gt;Bold Red&lt;/tspan&gt; text
+&lt;/text&gt;</code></pre></div>
+  </div>
+
+  <div class="element-entry">
+    <h3 id="el-textpath"><code>&lt;textPath&gt;</code> <span class="category-badge">Text</span></h3>
+    <p>Renders text along the outline of a <code>&lt;path&gt;</code> element.</p>
+    <table>
+      <tr><th>Attribute</th><th>Description</th></tr>
+      <tr><td><code>href</code></td><td>Reference to the path: <code>#pathId</code>.</td></tr>
+      <tr><td><code>startOffset</code></td><td>Distance along the path where text begins (length or %).</td></tr>
+      <tr><td><code>method</code></td><td><code>align</code> (default) or <code>stretch</code>.</td></tr>
+      <tr><td><code>spacing</code></td><td><code>auto</code> or <code>exact</code>.</td></tr>
+    </table>
+    <div><strong >Example:</strong><pre ><code>&lt;defs&gt;&lt;path id="curve" d="M 10 80 Q 95 10 180 80"/&gt;&lt;/defs&gt;
+&lt;text&gt;&lt;textPath href="#curve"&gt;Text on a curve&lt;/textPath&gt;&lt;/text&gt;</code></pre></div>
+  </div>
+
+  <h2 id="paint">Paint Servers (Gradients &amp; Patterns)</h2>
+
+  <div class="element-entry">
+    <h3 id="el-lineargradient"><code>&lt;linearGradient&gt;</code> <span class="category-badge">Paint</span></h3>
+    <p>Defines a linear colour gradient. Referenced as <code>fill="url(#id)"</code> or <code>stroke="url(#id)"</code>.</p>
+    <table>
+      <tr><th>Attribute</th><th>Description</th></tr>
+      <tr><td><code>x1</code>, <code>y1</code>, <code>x2</code>, <code>y2</code></td><td>Start and end points of the gradient vector. Default: horizontal (0,0)→(1,0).</td></tr>
+      <tr><td><code>gradientUnits</code></td><td><code>objectBoundingBox</code> (default, 0–1 range) or <code>userSpaceOnUse</code> (absolute coords).</td></tr>
+      <tr><td><code>gradientTransform</code></td><td>Transform applied to the gradient coordinate system.</td></tr>
+      <tr><td><code>spreadMethod</code></td><td><code>pad</code> (default), <code>reflect</code>, or <code>repeat</code>.</td></tr>
+      <tr><td><code>href</code></td><td>Inherit stops from another gradient.</td></tr>
+    </table>
+    <div><strong >Example:</strong><pre ><code>&lt;linearGradient id="sunset" x1="0" y1="0" x2="0" y2="1"&gt;
+  &lt;stop offset="0%" stop-color="#ff6b6b"/&gt;
+  &lt;stop offset="100%" stop-color="#feca57"/&gt;
+&lt;/linearGradient&gt;
+&lt;rect fill="url(#sunset)" width="200" height="100"/&gt;</code></pre></div>
+  </div>
+
+  <div class="element-entry">
+    <h3 id="el-radialgradient"><code>&lt;radialGradient&gt;</code> <span class="category-badge">Paint</span></h3>
+    <p>Defines a radial (circular/elliptical) colour gradient.</p>
+    <table>
+      <tr><th>Attribute</th><th>Description</th></tr>
+      <tr><td><code>cx</code>, <code>cy</code></td><td>Centre of the end circle.</td></tr>
+      <tr><td><code>r</code></td><td>Radius of the end circle.</td></tr>
+      <tr><td><code>fx</code>, <code>fy</code></td><td>Focal point (centre of the start circle). Defaults to cx, cy.</td></tr>
+      <tr><td><code>fr</code></td><td>Radius of the focal (start) circle. Default: 0. (SVG 2)</td></tr>
+      <tr><td><code>gradientUnits</code></td><td>Same as linearGradient.</td></tr>
+      <tr><td><code>spreadMethod</code></td><td>Same as linearGradient.</td></tr>
+    </table>
+    <div><strong >Example:</strong><pre ><code>&lt;radialGradient id="sphere" cx="50%" cy="50%" r="50%" fx="30%" fy="30%"&gt;
+  &lt;stop offset="0%" stop-color="white"/&gt;
+  &lt;stop offset="100%" stop-color="#333"/&gt;
+&lt;/radialGradient&gt;
+&lt;circle cx="80" cy="80" r="60" fill="url(#sphere)"/&gt;</code></pre></div>
+  </div>
+
+  <div class="element-entry">
+    <h3 id="el-stop"><code>&lt;stop&gt;</code> <span class="category-badge">Paint</span></h3>
+    <p>Defines a colour stop within a gradient.</p>
+    <table>
+      <tr><th>Attribute</th><th>Description</th></tr>
+      <tr><td><code>offset</code></td><td>Position along the gradient: 0–1 or 0%–100%.</td></tr>
+      <tr><td><code>stop-color</code></td><td>The colour at this stop.</td></tr>
+      <tr><td><code>stop-opacity</code></td><td>Opacity at this stop (0–1).</td></tr>
+    </table>
+    <div><strong >Example:</strong><pre ><code>&lt;stop offset="50%" stop-color="#e06c75" stop-opacity="0.8"/&gt;</code></pre></div>
+  </div>
+
+  <div class="element-entry">
+    <h3 id="el-pattern"><code>&lt;pattern&gt;</code> <span class="category-badge">Paint</span></h3>
+    <p>Defines a repeating tile pattern used as a fill or stroke paint.</p>
+    <table>
+      <tr><th>Attribute</th><th>Description</th></tr>
+      <tr><td><code>x</code>, <code>y</code></td><td>Position of the pattern tile origin.</td></tr>
+      <tr><td><code>width</code>, <code>height</code></td><td>Size of one tile.</td></tr>
+      <tr><td><code>patternUnits</code></td><td><code>objectBoundingBox</code> (default) or <code>userSpaceOnUse</code>.</td></tr>
+      <tr><td><code>patternContentUnits</code></td><td>Coordinate system for pattern contents.</td></tr>
+      <tr><td><code>patternTransform</code></td><td>Transform on the pattern tile.</td></tr>
+      <tr><td><code>viewBox</code></td><td>Internal coordinate system for pattern contents.</td></tr>
+    </table>
+    <div><strong >Example:</strong><pre ><code>&lt;pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse"&gt;
+  &lt;circle cx="10" cy="10" r="3" fill="#61afef"/&gt;
+&lt;/pattern&gt;
+&lt;rect fill="url(#dots)" width="200" height="100"/&gt;</code></pre></div>
+  </div>
+
+  <h2 id="clipping">Clipping &amp; Masking</h2>
+
+  <div class="element-entry">
+    <h3 id="el-clippath"><code>&lt;clipPath&gt;</code> <span class="category-badge">Clipping</span></h3>
+    <p>Defines a clipping region. Anything outside the clip path geometry is invisible. Binary: fully visible or fully hidden.</p>
+    <table>
+      <tr><th>Attribute</th><th>Description</th></tr>
+      <tr><td><code>clipPathUnits</code></td><td><code>userSpaceOnUse</code> (default) or <code>objectBoundingBox</code>.</td></tr>
+    </table>
+    <p>Applied via: <code>clip-path="url(#id)"</code></p>
+    <div><strong >Example:</strong><pre ><code>&lt;clipPath id="circle-clip"&gt;
+  &lt;circle cx="100" cy="75" r="60"/&gt;
+&lt;/clipPath&gt;
+&lt;image href="photo.jpg" width="200" height="150" clip-path="url(#circle-clip)"/&gt;</code></pre></div>
+  </div>
+
+  <div class="element-entry">
+    <h3 id="el-mask"><code>&lt;mask&gt;</code> <span class="category-badge">Masking</span></h3>
+    <p>Defines a luminance or alpha mask. Unlike clipPath, supports soft edges and gradual transparency.</p>
+    <table>
+      <tr><th>Attribute</th><th>Description</th></tr>
+      <tr><td><code>x</code>, <code>y</code>, <code>width</code>, <code>height</code></td><td>The mask application area. Default: -10% to 120% of the target bounding box.</td></tr>
+      <tr><td><code>maskUnits</code></td><td>Units for x/y/width/height: <code>objectBoundingBox</code> (default) or <code>userSpaceOnUse</code>.</td></tr>
+      <tr><td><code>maskContentUnits</code></td><td>Units for mask content: <code>userSpaceOnUse</code> (default) or <code>objectBoundingBox</code>.</td></tr>
+    </table>
+    <p>Applied via: <code>mask="url(#id)"</code></p>
+    <div><strong >Example:</strong><pre ><code>&lt;mask id="fade"&gt;
+  &lt;rect width="200" height="100" fill="url(#leftToRight)"/&gt;
+&lt;/mask&gt;
+&lt;rect fill="teal" width="200" height="100" mask="url(#fade)"/&gt;</code></pre></div>
+  </div>
+
+  <h2 id="filters">Filter Effects</h2>
+
+  <div class="element-entry">
+    <h3 id="el-filter"><code>&lt;filter&gt;</code> <span class="category-badge">Filter</span></h3>
+    <p>Container for filter primitives. Applied via <code>filter="url(#id)"</code>.</p>
+    <table>
+      <tr><th>Attribute</th><th>Description</th></tr>
+      <tr><td><code>x</code>, <code>y</code>, <code>width</code>, <code>height</code></td><td>Filter region. Default: -10% to 120%.</td></tr>
+      <tr><td><code>filterUnits</code></td><td>Units for the filter region.</td></tr>
+      <tr><td><code>primitiveUnits</code></td><td>Units for primitive coordinates within the filter.</td></tr>
+    </table>
+    <div><strong >Example:</strong><pre ><code>&lt;filter id="blur"&gt;
+  &lt;feGaussianBlur stdDeviation="3"/&gt;
+&lt;/filter&gt;
+&lt;circle cx="80" cy="80" r="40" fill="tomato" filter="url(#blur)"/&gt;</code></pre></div>
+  </div>
+
+  <div class="element-entry">
+    <h3>Filter Primitives</h3>
+    <p>Each primitive takes <code>in</code>, <code>in2</code> (input buffers) and produces a <code>result</code> (named output buffer). Common inputs: <code>SourceGraphic</code>, <code>SourceAlpha</code>, <code>BackgroundImage</code>, or a named result.</p>
+    <table>
+      <tr><th>Element</th><th>Purpose</th><th>Key Attributes</th></tr>
+      <tr><td><code>&lt;feBlend&gt;</code></td><td>Blend two inputs</td><td><code>mode</code>: normal, multiply, screen, darken, lighten, overlay, etc.</td></tr>
+      <tr><td><code>&lt;feColorMatrix&gt;</code></td><td>Colour space transforms</td><td><code>type</code>: matrix, saturate, hueRotate, luminanceToAlpha. <code>values</code>.</td></tr>
+      <tr><td><code>&lt;feComponentTransfer&gt;</code></td><td>Per-channel transfer functions</td><td>Contains <code>&lt;feFuncR&gt;</code>, <code>&lt;feFuncG&gt;</code>, <code>&lt;feFuncB&gt;</code>, <code>&lt;feFuncA&gt;</code>.</td></tr>
+      <tr><td><code>&lt;feComposite&gt;</code></td><td>Porter-Duff compositing</td><td><code>operator</code>: over, in, out, atop, xor, arithmetic. <code>k1</code>–<code>k4</code> for arithmetic.</td></tr>
+      <tr><td><code>&lt;feConvolveMatrix&gt;</code></td><td>Convolution (sharpen, emboss, edge detect)</td><td><code>kernelMatrix</code>, <code>order</code>, <code>divisor</code>, <code>bias</code>, <code>edgeMode</code>.</td></tr>
+      <tr><td><code>&lt;feDiffuseLighting&gt;</code></td><td>Diffuse lighting simulation</td><td><code>surfaceScale</code>, <code>diffuseConstant</code>. Contains a light source element.</td></tr>
+      <tr><td><code>&lt;feDisplacementMap&gt;</code></td><td>Pixel displacement using another image</td><td><code>scale</code>, <code>xChannelSelector</code>, <code>yChannelSelector</code>.</td></tr>
+      <tr><td><code>&lt;feDropShadow&gt;</code></td><td>Drop shadow (shorthand)</td><td><code>dx</code>, <code>dy</code>, <code>stdDeviation</code>, <code>flood-color</code>, <code>flood-opacity</code>.</td></tr>
+      <tr><td><code>&lt;feFlood&gt;</code></td><td>Fill the filter region with a solid colour</td><td><code>flood-color</code>, <code>flood-opacity</code>.</td></tr>
+      <tr><td><code>&lt;feGaussianBlur&gt;</code></td><td>Gaussian blur</td><td><code>stdDeviation</code> (one value = uniform, two = x/y). <code>edgeMode</code>.</td></tr>
+      <tr><td><code>&lt;feImage&gt;</code></td><td>Fetch an external image or SVG fragment as filter input</td><td><code>href</code>, <code>preserveAspectRatio</code>.</td></tr>
+      <tr><td><code>&lt;feMerge&gt;</code></td><td>Layer multiple inputs on top of each other</td><td>Contains <code>&lt;feMergeNode&gt;</code> children with <code>in</code> attributes.</td></tr>
+      <tr><td><code>&lt;feMorphology&gt;</code></td><td>Erode or dilate shapes</td><td><code>operator</code>: erode, dilate. <code>radius</code>.</td></tr>
+      <tr><td><code>&lt;feOffset&gt;</code></td><td>Offset the input image</td><td><code>dx</code>, <code>dy</code>.</td></tr>
+      <tr><td><code>&lt;feSpecularLighting&gt;</code></td><td>Specular (glossy) lighting</td><td><code>surfaceScale</code>, <code>specularConstant</code>, <code>specularExponent</code>.</td></tr>
+      <tr><td><code>&lt;feTile&gt;</code></td><td>Tile the input to fill the filter region</td><td>(uses standard in/result)</td></tr>
+      <tr><td><code>&lt;feTurbulence&gt;</code></td><td>Generate Perlin noise or fractal turbulence</td><td><code>type</code>: turbulence, fractalNoise. <code>baseFrequency</code>, <code>numOctaves</code>, <code>seed</code>, <code>stitchTiles</code>.</td></tr>
+    </table>
+    <h4>Light Source Elements (inside feDiffuseLighting / feSpecularLighting)</h4>
+    <table>
+      <tr><th>Element</th><th>Description</th></tr>
+      <tr><td><code>&lt;feDistantLight&gt;</code></td><td>Directional light. Attrs: <code>azimuth</code>, <code>elevation</code>.</td></tr>
+      <tr><td><code>&lt;fePointLight&gt;</code></td><td>Point light source. Attrs: <code>x</code>, <code>y</code>, <code>z</code>.</td></tr>
+      <tr><td><code>&lt;feSpotLight&gt;</code></td><td>Spotlight. Attrs: <code>x</code>, <code>y</code>, <code>z</code>, <code>pointsAtX/Y/Z</code>, <code>specularExponent</code>, <code>limitingConeAngle</code>.</td></tr>
+    </table>
+    <div><strong >Example:</strong><pre ><code>&lt;filter id="shadow"&gt;
+  &lt;feDropShadow dx="3" dy="3" stdDeviation="2" flood-color="#000" flood-opacity="0.4"/&gt;
+&lt;/filter&gt;
+&lt;rect x="20" y="20" width="100" height="60" fill="#61afef" filter="url(#shadow)"/&gt;</code></pre></div>
+  </div>
+
+  <h2 id="animation">Animation (SMIL)</h2>
+  <p><strong>SMIL</strong> stands for <strong>Synchronized Multimedia Integration Language</strong>. It's a W3C specification for describing multimedia presentations. SVG adopted a subset of SMIL for declarative, self-contained animation  -  no CSS or JavaScript required.</p>
+
+  <div class="element-entry">
+    <h3 id="el-animate"><code>&lt;animate&gt;</code> <span class="category-badge">Animation</span></h3>
+    <p>Animates a single attribute over time. The workhorse of SMIL animation.</p>
+    <table>
+      <tr><th>Attribute</th><th>Description</th></tr>
+      <tr><td><code>attributeName</code></td><td>The attribute to animate (e.g., <code>cx</code>, <code>fill</code>, <code>opacity</code>).</td></tr>
+      <tr><td><code>from</code></td><td>Start value.</td></tr>
+      <tr><td><code>to</code></td><td>End value.</td></tr>
+      <tr><td><code>by</code></td><td>Relative change (alternative to <code>to</code>).</td></tr>
+      <tr><td><code>values</code></td><td>Semicolon-separated keyframe values (overrides from/to).</td></tr>
+      <tr><td><code>dur</code></td><td>Duration: <code>2s</code>, <code>500ms</code>, or <code>indefinite</code>.</td></tr>
+      <tr><td><code>begin</code></td><td>When to start: time offset, event (<code>click</code>), syncbase (<code>anim1.end</code>), or <code>indefinite</code>.</td></tr>
+      <tr><td><code>end</code></td><td>When to stop (same syntax as begin).</td></tr>
+      <tr><td><code>repeatCount</code></td><td>Number of repetitions or <code>indefinite</code>.</td></tr>
+      <tr><td><code>repeatDur</code></td><td>Total repeat duration.</td></tr>
+      <tr><td><code>fill</code></td><td><code>freeze</code> (hold last value) or <code>remove</code> (revert to original). NOT the paint fill.</td></tr>
+      <tr><td><code>calcMode</code></td><td>Interpolation: <code>linear</code> (default), <code>discrete</code>, <code>paced</code>, <code>spline</code>.</td></tr>
+      <tr><td><code>keyTimes</code></td><td>Semicolon-separated time positions (0–1) for each <code>values</code> entry.</td></tr>
+      <tr><td><code>keySplines</code></td><td>Cubic bezier control points for <code>spline</code> calcMode.</td></tr>
+      <tr><td><code>additive</code></td><td><code>replace</code> (default) or <code>sum</code> (add to base value).</td></tr>
+      <tr><td><code>accumulate</code></td><td><code>none</code> (default) or <code>sum</code> (each repeat builds on previous).</td></tr>
+    </table>
+    <div><strong >Example:</strong><pre ><code>&lt;circle cx="50" cy="50" r="20" fill="tomato"&gt;
+  &lt;animate attributeName="cx" from="50" to="150" dur="2s" repeatCount="indefinite"/&gt;
+&lt;/circle&gt;</code></pre></div>
+  </div>
+
+  <div class="element-entry">
+    <h3 id="el-animatetransform"><code>&lt;animateTransform&gt;</code> <span class="category-badge">Animation</span></h3>
+    <p>Animates the <code>transform</code> attribute specifically. Required because transform values aren't simple scalars.</p>
+    <table>
+      <tr><th>Attribute</th><th>Description</th></tr>
+      <tr><td><code>type</code></td><td>Transform type: <code>translate</code>, <code>rotate</code>, <code>scale</code>, <code>skewX</code>, <code>skewY</code>.</td></tr>
+      <tr><td><code>from</code>, <code>to</code>, <code>by</code>, <code>values</code></td><td>Values appropriate to the type (e.g., <code>"0 50 50"</code> for rotate = angle cx cy).</td></tr>
+      <tr><td><code>additive</code></td><td><code>sum</code> allows composing multiple transform animations.</td></tr>
+    </table>
+    <p>All timing attributes from <code>&lt;animate&gt;</code> apply.</p>
+    <div><strong >Example:</strong><pre ><code>&lt;rect x="40" y="40" width="20" height="20" fill="#e5c07b"&gt;
+  &lt;animateTransform attributeName="transform" type="rotate"
+    from="0 50 50" to="360 50 50" dur="3s" repeatCount="indefinite"/&gt;
+&lt;/rect&gt;</code></pre></div>
+  </div>
+
+  <div class="element-entry">
+    <h3 id="el-animatemotion"><code>&lt;animateMotion&gt;</code> <span class="category-badge">Animation</span></h3>
+    <p>Moves an element along a path.</p>
+    <table>
+      <tr><th>Attribute</th><th>Description</th></tr>
+      <tr><td><code>path</code></td><td>The motion path (same syntax as <code>&lt;path d="..."&gt;</code>).</td></tr>
+      <tr><td><code>rotate</code></td><td><code>auto</code> (orient to path tangent), <code>auto-reverse</code>, or a fixed angle.</td></tr>
+      <tr><td><code>keyPoints</code></td><td>Fine-grained control over position along path at each keyTime.</td></tr>
+    </table>
+    <p>Can also contain an <code>&lt;mpath&gt;</code> child to reference an external path element.</p>
+    <div><strong >Example:</strong><pre ><code>&lt;circle r="6" fill="#c678dd"&gt;
+  &lt;animateMotion path="M 20 50 Q 100 0 180 50" dur="2s" repeatCount="indefinite" rotate="auto"/&gt;
+&lt;/circle&gt;</code></pre></div>
+  </div>
+
+  <div class="element-entry">
+    <h3 id="el-mpath"><code>&lt;mpath&gt;</code> <span class="category-badge">Animation</span></h3>
+    <p>Child of <code>&lt;animateMotion&gt;</code>. References a <code>&lt;path&gt;</code> element to use as the motion path.</p>
+    <table>
+      <tr><th>Attribute</th><th>Description</th></tr>
+      <tr><td><code>href</code></td><td>Reference to the path element: <code>#pathId</code>.</td></tr>
+    </table>
+    <div><strong >Example:</strong><pre ><code>&lt;path id="track" d="M 10 80 Q 95 10 180 80" fill="none"/&gt;
+&lt;circle r="5" fill="orange"&gt;
+  &lt;animateMotion dur="3s" repeatCount="indefinite"&gt;&lt;mpath href="#track"/&gt;&lt;/animateMotion&gt;
+&lt;/circle&gt;</code></pre></div>
+  </div>
+
+  <div class="element-entry">
+    <h3 id="el-set"><code>&lt;set&gt;</code> <span class="category-badge">Animation</span></h3>
+    <p>Sets an attribute to a fixed value for a duration. No interpolation  -  instant state change. Useful for visibility toggles, colour swaps on events, etc.</p>
+    <table>
+      <tr><th>Attribute</th><th>Description</th></tr>
+      <tr><td><code>attributeName</code></td><td>Attribute to set.</td></tr>
+      <tr><td><code>to</code></td><td>The value to set.</td></tr>
+      <tr><td><code>begin</code>, <code>dur</code>, <code>end</code>, <code>fill</code></td><td>Standard timing attributes.</td></tr>
+    </table>
+    <div><strong >Example:</strong><pre ><code>&lt;rect x="30" y="30" width="60" height="60" fill="blue"&gt;
+  &lt;set attributeName="fill" to="red" begin="click" dur="1s"/&gt;
+&lt;/rect&gt;</code></pre></div>
+  </div>
+
+  <h2 id="descriptive">Descriptive &amp; Metadata</h2>
+
+  <div class="element-entry">
+    <h3 id="el-title"><code>&lt;title&gt;</code> <span class="category-badge">Descriptive</span></h3>
+    <p>Accessible name for the parent element. Shown as tooltip on hover in most browsers. Important for accessibility.</p>
+    <div><strong >Example:</strong><pre ><code>&lt;circle cx="50" cy="50" r="30" fill="gold"&gt;
+  &lt;title&gt;Golden coin&lt;/title&gt;
+&lt;/circle&gt;</code></pre></div>
+  </div>
+
+  <div class="element-entry">
+    <h3 id="el-desc"><code>&lt;desc&gt;</code> <span class="category-badge">Descriptive</span></h3>
+    <p>Longer accessible description. Not displayed visually but available to assistive technologies.</p>
+    <div><strong >Example:</strong><pre ><code>&lt;svg role="img" aria-labelledby="chart-title chart-desc"&gt;
+  &lt;title id="chart-title"&gt;Sales chart&lt;/title&gt;
+  &lt;desc id="chart-desc"&gt;Bar chart showing monthly sales from Jan to Jun.&lt;/desc&gt;
+&lt;/svg&gt;</code></pre></div>
+  </div>
+
+  <div class="element-entry">
+    <h3 id="el-metadata"><code>&lt;metadata&gt;</code> <span class="category-badge">Descriptive</span></h3>
+    <p>Container for metadata (e.g., RDF, Dublin Core). Not rendered.</p>
+    <div><strong >Example:</strong><pre ><code>&lt;metadata&gt;
+  &lt;rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"&gt;
+    &lt;rdf:Description rdf:about="" dc:title="My Graphic"/&gt;
+  &lt;/rdf:RDF&gt;
+&lt;/metadata&gt;</code></pre></div>
+  </div>
+
+  <h2 id="linking">Linking &amp; References</h2>
+
+  <div class="element-entry">
+    <h3 id="el-a"><code>&lt;a&gt;</code> <span class="category-badge">Linking</span></h3>
+    <p>Hyperlink wrapper for SVG content. Works like HTML <code>&lt;a&gt;</code>.</p>
+    <table>
+      <tr><th>Attribute</th><th>Description</th></tr>
+      <tr><td><code>href</code></td><td>Link target URL.</td></tr>
+      <tr><td><code>target</code></td><td>Where to open: <code>_self</code>, <code>_blank</code>, etc.</td></tr>
+    </table>
+    <div><strong >Example:</strong><pre ><code>&lt;a href="https://example.com" target="_blank"&gt;
+  &lt;text x="10" y="30" fill="blue"&gt;Click me&lt;/text&gt;
+&lt;/a&gt;</code></pre></div>
+  </div>
+
+  <h2 id="markers">Markers</h2>
+
+  <div class="element-entry">
+    <h3 id="el-marker"><code>&lt;marker&gt;</code> <span class="category-badge">Marker</span></h3>
+    <p>Defines a graphic drawn at vertices of <code>&lt;path&gt;</code>, <code>&lt;line&gt;</code>, <code>&lt;polyline&gt;</code>, or <code>&lt;polygon&gt;</code>. Think arrowheads, dots, or custom vertex decorations.</p>
+    <table>
+      <tr><th>Attribute</th><th>Description</th></tr>
+      <tr><td><code>markerWidth</code>, <code>markerHeight</code></td><td>Size of the marker viewport.</td></tr>
+      <tr><td><code>refX</code>, <code>refY</code></td><td>The point in the marker that aligns with the vertex.</td></tr>
+      <tr><td><code>orient</code></td><td><code>auto</code> (follow path tangent), <code>auto-start-reverse</code>, or a fixed angle.</td></tr>
+      <tr><td><code>markerUnits</code></td><td><code>strokeWidth</code> (default, scales with stroke) or <code>userSpaceOnUse</code>.</td></tr>
+      <tr><td><code>viewBox</code></td><td>Internal coordinate system.</td></tr>
+      <tr><td><code>preserveAspectRatio</code></td><td>Aspect ratio handling.</td></tr>
+    </table>
+    <p>Applied via: <code>marker-start</code>, <code>marker-mid</code>, <code>marker-end</code> properties.</p>
+    <div><strong >Example:</strong><pre ><code>&lt;marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"&gt;
+  &lt;polygon points="0 0, 10 3.5, 0 7" fill="#333"/&gt;
+&lt;/marker&gt;
+&lt;line x1="20" y1="50" x2="160" y2="50" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/&gt;</code></pre></div>
+  </div>
+
+  <h2 id="images">Images &amp; Foreign Content</h2>
+
+  <div class="element-entry">
+    <h3 id="el-image"><code>&lt;image&gt;</code> <span class="category-badge">Image</span></h3>
+    <p>Embeds a raster image (PNG, JPEG, etc.) or another SVG file.</p>
+    <table>
+      <tr><th>Attribute</th><th>Description</th></tr>
+      <tr><td><code>href</code></td><td>Image URL.</td></tr>
+      <tr><td><code>x</code>, <code>y</code></td><td>Position.</td></tr>
+      <tr><td><code>width</code>, <code>height</code></td><td>Rendered dimensions.</td></tr>
+      <tr><td><code>preserveAspectRatio</code></td><td>How to fit the image within the given dimensions.</td></tr>
+    </table>
+    <div><strong >Example:</strong><pre ><code>&lt;image href="photo.png" x="10" y="10" width="180" height="120"
+       preserveAspectRatio="xMidYMid meet"/&gt;</code></pre></div>
+  </div>
+
+  <div class="element-entry">
+    <h3 id="el-foreignobject"><code>&lt;foreignObject&gt;</code> <span class="category-badge">Container</span></h3>
+    <p>Embeds non-SVG content (typically HTML/XHTML) within an SVG. Extremely useful for rich text, form elements, or complex layouts inside SVG.</p>
+    <table>
+      <tr><th>Attribute</th><th>Description</th></tr>
+      <tr><td><code>x</code>, <code>y</code></td><td>Position.</td></tr>
+      <tr><td><code>width</code>, <code>height</code></td><td>Dimensions of the foreign content area.</td></tr>
+    </table>
+    <div><strong >Example:</strong><pre ><code>&lt;foreignObject x="20" y="20" width="160" height="80"&gt;
+  &lt;div xmlns="http://www.w3.org/1999/xhtml" style="font-size:14px;"&gt;
+    &lt;p&gt;HTML content inside SVG&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/foreignObject&gt;</code></pre></div>
+  </div>
+
+  <h2 id="presentation-attrs">Presentation Attributes (CSS / SVG Overlap)</h2>
+  <p>These are attributes that can also be set via CSS. They act as the lowest-priority style declaration (below user-agent stylesheet). CSS properties with the same name override them.</p>
+  <p><strong>Priority order:</strong> Inline <code>style=""</code> &gt; CSS rules (by specificity) &gt; Presentation attributes</p>
+
+  <table>
+    <tr><th>Attribute / CSS Property</th><th>Applies To</th><th>Description</th></tr>
+    <tr><td><code>fill</code></td><td>Shapes, text</td><td>Interior paint: colour, gradient url(), pattern url(), <code>none</code>.</td></tr>
+    <tr><td><code>fill-opacity</code></td><td>Shapes, text</td><td>Opacity of the fill paint (0–1).</td></tr>
+    <tr><td><code>fill-rule</code></td><td>Shapes</td><td><code>nonzero</code> (default) or <code>evenodd</code>. Determines inside/outside for complex paths.</td></tr>
+    <tr><td><code>stroke</code></td><td>Shapes, text</td><td>Outline paint.</td></tr>
+    <tr><td><code>stroke-width</code></td><td>Shapes, text</td><td>Stroke thickness.</td></tr>
+    <tr><td><code>stroke-linecap</code></td><td>Shapes</td><td><code>butt</code> (default), <code>round</code>, <code>square</code>.</td></tr>
+    <tr><td><code>stroke-linejoin</code></td><td>Shapes</td><td><code>miter</code> (default), <code>round</code>, <code>bevel</code>.</td></tr>
+    <tr><td><code>stroke-dasharray</code></td><td>Shapes</td><td>Dash pattern: <code>"5 3"</code>, <code>"10 5 2 5"</code>, etc.</td></tr>
+    <tr><td><code>stroke-dashoffset</code></td><td>Shapes</td><td>Offset into the dash pattern. Animating this creates "drawing" effects.</td></tr>
+    <tr><td><code>stroke-opacity</code></td><td>Shapes, text</td><td>Stroke paint opacity.</td></tr>
+    <tr><td><code>stroke-miterlimit</code></td><td>Shapes</td><td>Limit on miter join extension. Default: 4.</td></tr>
+    <tr><td><code>opacity</code></td><td>All</td><td>Element-level opacity (composites element then applies).</td></tr>
+    <tr><td><code>transform</code></td><td>All</td><td>2D/3D transform. SVG values: <code>translate()</code>, <code>rotate()</code>, <code>scale()</code>, <code>skewX()</code>, <code>skewY()</code>, <code>matrix()</code>.</td></tr>
+    <tr><td><code>transform-origin</code></td><td>All</td><td>Origin for transforms. In SVG, defaults to <code>0 0</code> (not <code>50% 50%</code> like CSS on HTML elements!).</td></tr>
+    <tr><td><code>visibility</code></td><td>All</td><td><code>visible</code>, <code>hidden</code>, <code>collapse</code>. Hidden elements still occupy space and receive events.</td></tr>
+    <tr><td><code>display</code></td><td>All</td><td><code>inline</code> (default), <code>none</code>. <code>none</code> removes from rendering tree entirely.</td></tr>
+    <tr><td><code>clip-path</code></td><td>All</td><td>Reference to a <code>&lt;clipPath&gt;</code>.</td></tr>
+    <tr><td><code>mask</code></td><td>All</td><td>Reference to a <code>&lt;mask&gt;</code>.</td></tr>
+    <tr><td><code>filter</code></td><td>All</td><td>Reference to a <code>&lt;filter&gt;</code>.</td></tr>
+    <tr><td><code>color</code></td><td>All</td><td>Inherited current colour. Used via <code>fill="currentColor"</code>.</td></tr>
+    <tr><td><code>font-family</code></td><td>Text</td><td>Font family (same as CSS).</td></tr>
+    <tr><td><code>font-size</code></td><td>Text</td><td>Font size.</td></tr>
+    <tr><td><code>font-weight</code></td><td>Text</td><td>Font weight.</td></tr>
+    <tr><td><code>font-style</code></td><td>Text</td><td>Font style (italic, oblique).</td></tr>
+    <tr><td><code>text-anchor</code></td><td>Text</td><td><code>start</code> (default), <code>middle</code>, <code>end</code>. SVG equivalent of text-align.</td></tr>
+    <tr><td><code>dominant-baseline</code></td><td>Text</td><td>Vertical text alignment baseline.</td></tr>
+    <tr><td><code>text-decoration</code></td><td>Text</td><td>Underline, overline, line-through.</td></tr>
+    <tr><td><code>letter-spacing</code></td><td>Text</td><td>Space between characters.</td></tr>
+    <tr><td><code>word-spacing</code></td><td>Text</td><td>Space between words.</td></tr>
+    <tr><td><code>pointer-events</code></td><td>All</td><td>Controls hit-testing: <code>visiblePainted</code>, <code>visible</code>, <code>painted</code>, <code>fill</code>, <code>stroke</code>, <code>all</code>, <code>none</code>.</td></tr>
+    <tr><td><code>cursor</code></td><td>All</td><td>Cursor style on hover.</td></tr>
+    <tr><td><code>overflow</code></td><td><code>&lt;svg&gt;</code>, <code>&lt;symbol&gt;</code>, <code>&lt;pattern&gt;</code>, <code>&lt;marker&gt;</code></td><td><code>visible</code> (SVG default for outermost), <code>hidden</code> (default for inner SVG). Controls whether content outside viewport is clipped.</td></tr>
+  </table>
+
+  <h3>Key Differences: SVG Presentation Attributes vs CSS</h3>
+  <table>
+    <tr><th>Behaviour</th><th>HTML + CSS</th><th>SVG</th></tr>
+    <tr><td>Default transform-origin</td><td><code>50% 50%</code> (centre of element)</td><td><code>0 0</code> (top-left of SVG viewport)</td></tr>
+    <tr><td>Box model</td><td>Yes (margin, padding, border)</td><td>No. SVG elements have no margin/padding/border.</td></tr>
+    <tr><td><code>fill</code> / <code>stroke</code></td><td>Not applicable to HTML</td><td>Primary paint mechanism for shapes.</td></tr>
+    <tr><td><code>background</code></td><td>Yes</td><td>Not applicable to SVG elements (use <code>fill</code> or underlying <code>&lt;rect&gt;</code>).</td></tr>
+    <tr><td><code>width</code>/<code>height</code> via CSS</td><td>Sizes the element</td><td>On <code>&lt;svg&gt;</code>: sizes viewport. On shapes: depends  -  <code>&lt;rect&gt;</code> respects CSS width/height in SVG 2; most shapes use geometry attributes.</td></tr>
+    <tr><td>Percentage values</td><td>Relative to parent/container</td><td>Relative to viewBox dimensions (not parent element).</td></tr>
+  </table>
+
+  <h2 id="global-attrs">Global Attributes</h2>
+  <p>Available on all SVG elements:</p>
+  <table>
+    <tr><th>Attribute</th><th>Description</th></tr>
+    <tr><td><code>id</code></td><td>Unique identifier. Used for referencing (<code>url(#id)</code>, <code>href="#id"</code>).</td></tr>
+    <tr><td><code>class</code></td><td>CSS class(es). Space-separated.</td></tr>
+    <tr><td><code>style</code></td><td>Inline CSS declarations.</td></tr>
+    <tr><td><code>tabindex</code></td><td>Tab order for keyboard navigation.</td></tr>
+    <tr><td><code>lang</code></td><td>Language of text content.</td></tr>
+    <tr><td><code>data-*</code></td><td>Custom data attributes (same as HTML).</td></tr>
+    <tr><td><code>aria-*</code></td><td>ARIA accessibility attributes.</td></tr>
+    <tr><td><code>role</code></td><td>ARIA role.</td></tr>
+  </table>
+
+  <h3>Event Attributes</h3>
+  <p>SVG elements support all standard DOM event handler attributes:</p>
+  <table>
+    <tr><th>Category</th><th>Attributes</th></tr>
+    <tr><td>Mouse</td><td><code>onclick</code>, <code>onmousedown</code>, <code>onmouseup</code>, <code>onmouseover</code>, <code>onmouseout</code>, <code>onmousemove</code></td></tr>
+    <tr><td>Focus</td><td><code>onfocusin</code>, <code>onfocusout</code></td></tr>
+    <tr><td>Keyboard</td><td><code>onkeydown</code>, <code>onkeyup</code></td></tr>
+    <tr><td>SVG-specific</td><td><code>onload</code>, <code>onunload</code>, <code>onabort</code>, <code>onerror</code>, <code>onresize</code>, <code>onscroll</code></td></tr>
+    <tr><td>Animation</td><td><code>onbegin</code>, <code>onend</code>, <code>onrepeat</code></td></tr>
+  </table>
+
+  <h2>Notes</h2>
+  <ul>
+    <li>Elements marked <span class="deprecated">DEPRECATED</span> are included for completeness but should not be used in new work.</li>
+    <li>For the full W3C specification, see: <a href="https://www.w3.org/TR/SVG11/">SVG 1.1</a> | <a href="https://www.w3.org/TR/SVG/">SVG 2 (Working Draft)</a></li>
+    <li>For browser support details, see: <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Element">MDN SVG Element Reference</a></li>
+  </ul>
+
+  <div style="margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid #e0e0e0; font-size: 0.9rem;">
+    <a href="index.html">&larr; Back to Index</a>
+  </div>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="scripts.js"></script>
+</body>
+</html>

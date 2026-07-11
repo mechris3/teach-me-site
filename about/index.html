@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <title>About | Teach Me</title>
+    <meta name="description" content="About Teach Me - curated frontend lessons for developers and designers.">
+
+    <link rel="canonical" href="https://teachmeskills.dev/about/">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://teachmeskills.dev/about/">
+    <meta property="og:title" content="About | Teach Me">
+    <meta property="og:description" content="About Teach Me - curated frontend lessons for developers and designers.">
+    <meta property="og:site_name" content="Teach Me">
+    <meta property="og:locale" content="en_GB">
+
+    <!-- Twitter/X -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="About | Teach Me">
+    <meta name="twitter:description" content="About Teach Me - curated frontend lessons for developers and designers.">
+
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <header class="site-header">
+        <a href="/">Teach Me</a>
+        <nav>
+            <a href="/">Courses</a>
+            <a href="/about/">About</a>
+            <button class="theme-toggle" aria-label="Toggle light/dark mode"></button>
+        </nav>
+    </header>
+
+    <main class="page-content">
+        <h1>About</h1>
+        <p>Teach Me is a collection of free, in-depth frontend lessons built by Christopher, a web developer with 20 years of experience in HTML, CSS, and JavaScript.</p>
+        <p>The lessons are reference-grade tutorials designed for developers and designers who value precise, visual explanations over surface-level introductions.</p>
+        <p>Content created with AI assistance and manually verified.</p>
+        <p>Questions or feedback? Find me on <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a>.</p>
+    </main>
+
+    <footer class="site-footer">
+        <p>Content created with AI assistance and manually verified.</p>
+        <p><a href="/">Home</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+    </footer>
+
+    <script>
+        (function() {
+            const toggle = document.querySelector('.theme-toggle');
+            const root = document.documentElement;
+            const stored = localStorage.getItem('lesson-theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = stored || (prefersDark ? 'dark' : 'light');
+            root.setAttribute('data-theme', theme);
+            toggle.textContent = theme === 'dark' ? '\u2600\uFE0F' : '\uD83C\uDF19';
+            toggle.addEventListener('click', function() {
+                const current = root.getAttribute('data-theme');
+                const next = current === 'dark' ? 'light' : 'dark';
+                root.setAttribute('data-theme', next);
+                localStorage.setItem('lesson-theme', next);
+                toggle.textContent = next === 'dark' ? '\u2600\uFE0F' : '\uD83C\uDF19';
+            });
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>SMIL Animation Fundamentals - Lesson 9 | Teach Me</title>
+  <meta name="description" content="SVG's declarative animation system. The animate element, timing, easing with calcMode and keySplines, additive and accumulative animation.">
+  <link rel="canonical" href="https://teachmeskills.dev/svg/09-smil-animation-fundamentals.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/svg/09-smil-animation-fundamentals.html">
+  <meta property="og:title" content="SMIL Animation Fundamentals - Lesson 9 | Teach Me">
+  <meta property="og:description" content="SVG's declarative animation system. The animate element, timing, easing with calcMode and keySplines, additive and accumulative animation.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="SMIL Animation Fundamentals - Lesson 9 | Teach Me">
+  <meta name="twitter:description" content="SVG's declarative animation system. The animate element, timing, easing with calcMode and keySplines, additive and accumulative animation.">
+  <link rel="stylesheet" href="/styles.css">
+ <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header">
+        <a href="index.html">SVG Course</a>
+      </div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-coordinate-system.html">1. Coordinate System</a></li>
+        <li><a href="02-transforms-and-grouping.html">2. Transforms &amp; Grouping</a></li>
+        <li><a href="03-basic-shapes-and-paths.html">3. Shapes &amp; Paths</a></li>
+        <li><a href="04-styling-presentation-attributes-vs-css.html">4. Styling &amp; CSS</a></li>
+        <li><a href="05-gradients-patterns-paint-servers.html">5. Gradients &amp; Patterns</a></li>
+        <li><a href="06-clipping-and-masking.html">6. Clipping &amp; Masking</a></li>
+        <li><a href="07-filters.html">7. Filters</a></li>
+        <li><a href="08-text-and-textpath.html">8. Text &amp; textPath</a></li>
+        <li class="current"><a href="09-smil-animation-fundamentals.html">9. SMIL Fundamentals</a></li>
+        <li><a href="10-smil-advanced.html">10. SMIL Advanced</a></li>
+        <li><a href="11-css-animation-of-svg.html">11. CSS Animation</a></li>
+        <li><a href="12-javascript-and-svg.html">12. JavaScript + SVG</a></li>
+        <li><a href="13-putting-it-together.html">13. Capstone Project</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="svg-elements-and-attributes.html">Elements &amp; Attributes</a></li>
+        <li><a href="svg-dom-methods.html">DOM Methods &amp; Interfaces</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 9</p>
+  <h1>SMIL Animation Fundamentals</h1>
+  <p>SMIL (Synchronized Multimedia Integration Language) gives SVG a <strong>declarative animation system</strong> that lives inside the markup itself. No JavaScript, no external CSS files  -  the animation is part of the SVG document. While CSS <code>@keyframes</code> inside a <code>&lt;style&gt;</code> block can also produce self-contained animations, SMIL can target <em>any SVG attribute</em>  -  including geometry (<code>cx</code>, <code>d</code>, <code>viewBox</code>), filter parameters (<code>stdDeviation</code>), and text attributes (<code>startOffset</code>) that CSS simply can't reach. For truly self-contained animated SVGs that go beyond what CSS properties allow, SMIL is the tool.</p>
+
+  <p>This lesson covers the core <code>&lt;animate&gt;</code> element and the timing model that drives it. <a href="10-smil-advanced.html">Lesson 10</a> will build on this with <code>&lt;animateTransform&gt;</code>, <code>&lt;animateMotion&gt;</code>, and advanced timing (syncbase, events, orchestration).</p>
+
+  <h2>1. The Mental Model</h2>
+  <p>A SMIL animation is a <strong>child element</strong> nested inside the element it animates. It declares: "animate <em>this attribute</em>, from <em>this value</em> to <em>that value</em>, over <em>this duration</em>." The browser handles interpolation.</p>
+
+  <div class="key-concept">
+    <strong>Animations are children of their targets</strong>
+    <p>Unlike CSS <code>@keyframes</code> (which are defined globally and applied via class), SMIL animations live <em>inside</em> the element they affect. This is what makes them self-contained  -  move or copy the element, and its animation comes with it. The animation element overrides the attribute value for its duration, then (by default) the attribute snaps back to its original value.</p>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;circle cx="50" cy="50" r="20" fill="coral"&gt;
+  &lt;!-- This animate element is a CHILD of the circle --&gt;
+  &lt;animate
+    attributeName="r"
+    from="20"
+    to="40"
+    dur="2s"
+    repeatCount="indefinite"/&gt;
+&lt;/circle&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="400" height="120" viewBox="0 0 400 120">
+      <rect width="400" height="120" fill="var(--demo-svg-bg)"/>
+      <circle cx="200" cy="60" r="20" fill="coral">
+        <animate attributeName="r" from="20" to="40" dur="2s" repeatCount="indefinite"/>
+      </circle>
+    </svg>
+    <p class="demo-caption">A pulsing circle  -  the simplest possible SMIL animation. The radius animates from 20 to 40, looping indefinitely.</p>
+  </div>
+
+  <h2>2. The &lt;animate&gt; Element</h2>
+  <p><code>&lt;animate&gt;</code> is the workhorse. It animates a single attribute of its parent element over time. Here are its core attributes:</p>
+
+  <table class="comparison-table">
+    <thead>
+      <tr><th>Attribute</th><th>Purpose</th><th>Example</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>attributeName</code></td><td>Which attribute to animate</td><td><code>"cx"</code>, <code>"fill"</code>, <code>"opacity"</code></td></tr>
+      <tr><td><code>from</code></td><td>Starting value</td><td><code>"0"</code></td></tr>
+      <tr><td><code>to</code></td><td>Ending value</td><td><code>"100"</code></td></tr>
+      <tr><td><code>by</code></td><td>Relative change (alternative to <code>to</code>)</td><td><code>"50"</code> (adds 50 to current)</td></tr>
+      <tr><td><code>values</code></td><td>Semicolon-separated keyframe values (overrides from/to)</td><td><code>"0;100;50"</code></td></tr>
+      <tr><td><code>dur</code></td><td>Duration (clock value)</td><td><code>"3s"</code>, <code>"500ms"</code>, <code>"0:02:30"</code></td></tr>
+      <tr><td><code>begin</code></td><td>When to start</td><td><code>"0s"</code>, <code>"2s"</code>, <code>"click"</code></td></tr>
+      <tr><td><code>repeatCount</code></td><td>How many times to repeat</td><td><code>"3"</code>, <code>"indefinite"</code></td></tr>
+      <tr><td><code>repeatDur</code></td><td>Total time to keep repeating</td><td><code>"10s"</code></td></tr>
+      <tr><td><code>fill</code></td><td>What happens when animation ends</td><td><code>"freeze"</code> or <code>"remove"</code></td></tr>
+    </tbody>
+  </table>
+
+  <div class="warning">
+    <strong>fill="freeze" vs fill="red"</strong>
+    <p>The <code>fill</code> attribute on an animation element means something completely different from <code>fill</code> on a shape. On <code>&lt;animate&gt;</code>, it controls whether the final animated value is <strong>held</strong> (<code>freeze</code>) or <strong>removed</strong> (<code>remove</code>, the default  -  snaps back to the original). This is a common source of confusion.</p>
+  </div>
+
+  <h3>from/to vs values</h3>
+  <p>You can define an animation two ways:</p>
+  <ul>
+    <li><strong><code>from</code>/<code>to</code></strong>  -  simple A-to-B transition</li>
+    <li><strong><code>values</code></strong>  -  multiple keyframes, semicolon-separated. The animation progresses through them evenly (unless you use <code>keyTimes</code>)</li>
+  </ul>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;!-- Two-value animation (from/to) --&gt;
+&lt;rect width="50" height="50" fill="coral"&gt;
+  &lt;animate attributeName="x" from="0" to="300" dur="3s"
+           repeatCount="indefinite"/&gt;
+&lt;/rect&gt;
+
+&lt;!-- Multi-value animation (values) --&gt;
+&lt;rect width="50" height="50" fill="#61afef"&gt;
+  &lt;animate attributeName="x" values="0;300;150;300;0" dur="4s"
+           repeatCount="indefinite"/&gt;
+&lt;/rect&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="400" height="140" viewBox="0 0 400 140">
+      <rect width="400" height="140" fill="var(--demo-svg-bg)"/>
+      <rect y="10" width="50" height="50" rx="4" fill="coral">
+        <animate attributeName="x" from="0" to="350" dur="3s" repeatCount="indefinite"/>
+      </rect>
+      <rect y="80" width="50" height="50" rx="4" fill="#61afef">
+        <animate attributeName="x" values="0;350;175;350;0" dur="4s" repeatCount="indefinite"/>
+      </rect>
+      <text x="200" y="135" text-anchor="middle" font-size="9" fill="var(--muted)">Top: from/to (linear) | Bottom: values (multi-keyframe bounce)</text>
+    </svg>
+    <p class="demo-caption">Top: simple linear motion. Bottom: multi-keyframe path creating a bouncing pattern.</p>
+  </div>
+
+  <h2>3. Timing: dur, begin, repeatCount</h2>
+
+  <h3>Clock values (dur)</h3>
+  <p>Duration uses <strong>clock-value syntax</strong>:</p>
+  <table class="comparison-table">
+    <thead>
+      <tr><th>Format</th><th>Example</th><th>Meaning</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Seconds</td><td><code>3s</code></td><td>3 seconds</td></tr>
+      <tr><td>Milliseconds</td><td><code>500ms</code></td><td>Half a second</td></tr>
+      <tr><td>Minutes</td><td><code>0:30</code> or <code>30s</code></td><td>30 seconds</td></tr>
+      <tr><td>Full clock</td><td><code>0:01:30</code></td><td>1 minute 30 seconds</td></tr>
+    </tbody>
+  </table>
+
+  <h3>begin  -  when the animation starts</h3>
+  <p>The <code>begin</code> attribute is surprisingly powerful. At its simplest, it's a time offset from document load:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;!-- Starts immediately --&gt;
+&lt;animate ... begin="0s"/&gt;
+
+&lt;!-- Starts 2 seconds after document load --&gt;
+&lt;animate ... begin="2s"/&gt;
+
+&lt;!-- Starts when parent element is clicked --&gt;
+&lt;animate ... begin="click"/&gt;</code></pre>
+  </div>
+
+  <h3>Click-to-start animation</h3>
+  <p>Setting <code>begin="click"</code> means the animation waits until the user clicks the <em>parent element</em> (the one the <code>&lt;animate&gt;</code> is nested inside). No JavaScript needed:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;svg viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg"&gt;
+  &lt;circle cx="80" cy="60" r="30" fill="coral" style="cursor:pointer"&gt;
+    &lt;animate attributeName="cx" from="80" to="320" dur="1s"
+             begin="click" fill="freeze"/&gt;
+  &lt;/circle&gt;
+  &lt;text x="200" y="110" text-anchor="middle"
+        font-size="12"&gt;Click the circle&lt;/text&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="400" height="120" viewBox="0 0 400 120">
+      <rect width="400" height="120" fill="var(--demo-svg-bg)"/>
+      <circle cx="80" cy="60" r="30" fill="coral" style="cursor:pointer">
+        <animate attributeName="cx" from="80" to="320" dur="1s" begin="click" fill="freeze"/>
+      </circle>
+      <text x="200" y="110" text-anchor="middle" font-size="12" fill="var(--muted)">Click the circle</text>
+    </svg>
+    <p class="demo-caption">Click the coral circle  -  it slides to the right. No JavaScript, no event listeners. <code>begin="click"</code> is pure SMIL.</p>
+  </div>
+
+  <h3>Chaining animations with event offsets</h3>
+  <p>You can offset from any event trigger. <code>begin="click+1.5s"</code> means "1.5 seconds after the click." This lets you sequence multiple animations from a single user action:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;svg viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg"&gt;
+  &lt;circle cx="50" cy="60" r="20" fill="coral" style="cursor:pointer"&gt;
+    &lt;!-- Step 1: move right (starts on click) --&gt;
+    &lt;animate attributeName="cx" from="50" to="350" dur="1.5s"
+             begin="click" fill="freeze"/&gt;
+    &lt;!-- Step 2: shrink 1.5s after click (= when move finishes) --&gt;
+    &lt;animate attributeName="r" from="20" to="8"
+             dur="0.5s" begin="click+1.5s" fill="freeze"/&gt;
+  &lt;/circle&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="400" height="120" viewBox="0 0 400 120">
+      <rect width="400" height="120" fill="var(--demo-svg-bg)"/>
+      <circle cx="50" cy="60" r="20" fill="coral" style="cursor:pointer">
+        <animate attributeName="cx" from="50" to="350" dur="1.5s" begin="click" fill="freeze"/>
+        <animate attributeName="r" from="20" to="8" dur="0.5s" begin="click+1.5s" fill="freeze"/>
+      </circle>
+      <text x="200" y="110" text-anchor="middle" font-size="9" fill="var(--muted)">Click the circle: moves right (1.5s), THEN shrinks (0.5s)</text>
+    </svg>
+    <p class="demo-caption">Click the coral circle. It moves right, then shrinks  -  the second animation uses <code>begin="click+1.5s"</code> to start exactly when the first finishes.</p>
+  </div>
+
+  <h3>Syncbase timing (preview)</h3>
+  <p>The spec also defines <strong>syncbase timing</strong>  -  referencing another animation by <code>id</code>:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;!-- Syncbase syntax (Lesson 10 will cover this in depth) --&gt;
+&lt;animate id="anim1" attributeName="cx" from="50" to="300"
+         dur="2s" fill="freeze"/&gt;
+
+&lt;!-- Starts when anim1 ends --&gt;
+&lt;animate ... begin="anim1.end"/&gt;
+
+&lt;!-- Starts 0.5s AFTER anim1 ends --&gt;
+&lt;animate ... begin="anim1.end+0.5s"/&gt;</code></pre>
+  </div>
+
+  <div class="warning">
+    <strong>Syncbase timing browser support</strong>
+    <p>The spec defines <code>begin="animId.end"</code> for chaining, but browser support is inconsistent  -  even Chrome can fail to fire syncbase-referenced animations on nested sibling <code>&lt;animate&gt;</code> elements targeting the same parent. The reliable cross-browser alternative is the <strong>event offset</strong> pattern shown above (<code>begin="click+1.5s"</code>). We'll explore syncbase workarounds and more robust sequencing patterns in <a href="10-smil-advanced.html">Lesson 10</a>.</p>
+  </div>
+
+  <h3>repeatCount  -  how many cycles</h3>
+  <ul>
+    <li><code>repeatCount="3"</code>  -  plays 3 times then stops</li>
+    <li><code>repeatCount="indefinite"</code>  -  loops forever</li>
+    <li><code>repeatDur="10s"</code>  -  keeps repeating until 10s total have elapsed (even mid-cycle)</li>
+  </ul>
+
+  <h2>4. The fill Attribute (Animation)</h2>
+  <p>When a non-repeating animation ends, what should happen to the attribute?</p>
+
+  <table class="comparison-table">
+    <thead>
+      <tr><th>Value</th><th>Behaviour</th><th>Use case</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>remove</code></td><td>Attribute snaps back to its base value (default)</td><td>Temporary effects, attention pulses</td></tr>
+      <tr><td><code>freeze</code></td><td>Attribute holds its final animated value</td><td>One-shot transitions, reveals, state changes</td></tr>
+    </tbody>
+  </table>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;svg viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg"&gt;
+  &lt;!-- fill="remove" (default)  -  snaps back --&gt;
+  &lt;circle cx="80" cy="60" r="30" fill="coral"&gt;
+    &lt;animate attributeName="r" from="30" to="10" dur="2s"
+             fill="remove" repeatCount="1"/&gt;
+  &lt;/circle&gt;
+
+  &lt;!-- fill="freeze"  -  stays at final value --&gt;
+  &lt;circle cx="250" cy="60" r="30" fill="#61afef"&gt;
+    &lt;animate attributeName="r" from="30" to="10" dur="2s"
+             fill="freeze" repeatCount="1"/&gt;
+  &lt;/circle&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="400" height="120" viewBox="0 0 400 120">
+      <rect width="400" height="120" fill="var(--demo-svg-bg)"/>
+      <circle cx="120" cy="60" r="30" fill="coral">
+        <animate attributeName="r" from="30" to="10" dur="2s" fill="remove" repeatCount="1"/>
+      </circle>
+      <text x="120" y="110" text-anchor="middle" font-size="9" fill="var(--muted)">fill="remove"</text>
+      <circle cx="280" cy="60" r="30" fill="#61afef">
+        <animate attributeName="r" from="30" to="10" dur="2s" fill="freeze" repeatCount="1"/>
+      </circle>
+      <text x="280" y="110" text-anchor="middle" font-size="9" fill="var(--muted)">fill="freeze"</text>
+    </svg>
+    <p class="demo-caption">Both shrink from r=30 to r=10 over 2s. Left snaps back to 30 after; right stays at 10 permanently.</p>
+  </div>
+
+  <h2>5. Interpolation: calcMode</h2>
+  <p>The <code>calcMode</code> attribute controls <em>how</em> the browser interpolates between values. This is SMIL's easing system.</p>
+
+  <table class="comparison-table">
+    <thead>
+      <tr><th>Value</th><th>Behaviour</th><th>CSS equivalent</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>linear</code></td><td>Constant speed between each pair of values (default for most attributes)</td><td><code>linear</code></td></tr>
+      <tr><td><code>discrete</code></td><td>Jumps between values with no interpolation (default for non-numeric attributes like <code>fill</code> colour changes)</td><td><code>steps(1)</code></td></tr>
+      <tr><td><code>paced</code></td><td>Constant velocity across all segments (ignores <code>keyTimes</code>)</td><td>No direct equivalent</td></tr>
+      <tr><td><code>spline</code></td><td>Cubic B&eacute;zier easing between segments (requires <code>keySplines</code>)</td><td><code>cubic-bezier(...)</code></td></tr>
+    </tbody>
+  </table>
+
+  <div class="key-concept">
+    <strong>paced is unique to SMIL</strong>
+    <p><code>calcMode="paced"</code> ensures constant velocity regardless of the spacing of your keyframe values. If your values are <code>"0;100;300"</code>, a <code>linear</code> animation would spend equal time on each segment (fast on the long segment, slow on the short one). <code>paced</code> adjusts timing so the element moves at the same speed throughout. This is invaluable for smooth motion animations.</p>
+  </div>
+
+  <h3>calcMode="spline" with keySplines</h3>
+  <p>For custom easing curves, set <code>calcMode="spline"</code> and provide <code>keySplines</code>. This uses the same cubic B&eacute;zier model as CSS <code>cubic-bezier()</code>.</p>
+
+  <p>Each spline is four numbers: <code>x1 y1 x2 y2</code>  -  the two control points of a cubic B&eacute;zier on a <strong>unit square</strong> where:</p>
+  <ul>
+    <li><strong>X axis</strong> = normalised time within the segment (0 = start, 1 = end)</li>
+    <li><strong>Y axis</strong> = interpolation progress through the value change (0 = start value, 1 = end value)</li>
+  </ul>
+  <p>This is a <strong>timing function</strong>, not a spatial curve. Unlike the B&eacute;zier curves in <a href="03-basic-shapes-and-paths.html">path commands</a> (which define physical shapes in x/y space), this B&eacute;zier maps <em>time</em> to <em>progress</em>. The slope of the curve at any point represents the instantaneous velocity  -  a steep section means fast movement, a flat section means slow. You're not defining velocity directly; you're shaping the time-to-progress relationship, and velocity is its derivative.</p>
+
+  <table class="comparison-table">
+    <thead>
+      <tr><th>Easing</th><th>keySplines value</th><th>Meaning</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>ease-in</td><td><code>0.42 0 1 1</code></td><td>Starts slow, ends at full speed</td></tr>
+      <tr><td>ease-out</td><td><code>0 0 0.58 1</code></td><td>Starts at full speed, decelerates</td></tr>
+      <tr><td>ease-in-out</td><td><code>0.42 0 0.58 1</code></td><td>Slow start and end, fast middle</td></tr>
+      <tr><td>ease (CSS default)</td><td><code>0.25 0.1 0.25 1</code></td><td>Gentle version of ease-in-out</td></tr>
+      <tr><td>overshoot</td><td><code>0.6 -0.28 0.74 0.05</code></td><td>Goes past the target then settles</td></tr>
+    </tbody>
+  </table>
+
+  <p><strong>Semicolons separate segments.</strong> If <code>values</code> has N entries, there are N&minus;1 segments, so you need N&minus;1 splines. For <code>values="A;B;C"</code> (2 segments): <code>keySplines="&lt;A&rarr;B curve&gt;; &lt;B&rarr;C curve&gt;"</code>.</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;svg viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg"&gt;
+  &lt;!-- Linear (for comparison) --&gt;
+  &lt;circle cx="30" cy="40" r="15" fill="grey" opacity="0.4"&gt;
+    &lt;animate attributeName="cx" values="30;370;30"
+             dur="3s" repeatCount="indefinite"/&gt;
+  &lt;/circle&gt;
+
+  &lt;!-- Spline-eased --&gt;
+  &lt;circle cx="30" cy="80" r="15" fill="coral"&gt;
+    &lt;animate attributeName="cx"
+             values="30;370;30"
+             dur="3s"
+             calcMode="spline"
+             keyTimes="0;0.5;1"
+             keySplines="0.42 0 1 1; 0 0 0.58 1"
+             repeatCount="indefinite"/&gt;
+  &lt;/circle&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="400" height="120" viewBox="0 0 400 120">
+      <rect width="400" height="120" fill="var(--demo-svg-bg)"/>
+      <!-- Linear for comparison -->
+      <circle cx="50" cy="40" r="15" fill="var(--muted)" opacity="0.4">
+        <animate attributeName="cx" values="30;370;30" dur="3s" repeatCount="indefinite"/>
+      </circle>
+      <text x="200" y="18" text-anchor="middle" font-size="9" fill="var(--muted)">grey = linear</text>
+      <!-- Spline eased -->
+      <circle cx="50" cy="80" r="15" fill="coral">
+        <animate attributeName="cx" values="30;370;30" dur="3s" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.42 0 1 1; 0 0 0.58 1" repeatCount="indefinite"/>
+      </circle>
+      <text x="200" y="115" text-anchor="middle" font-size="9" fill="var(--muted)">coral = ease-in / ease-out (spline)</text>
+    </svg>
+    <p class="demo-caption">Both travel the same distance in the same time. The spline-eased circle accelerates and decelerates naturally.</p>
+  </div>
+
+  <h2>6. keyTimes  -  Controlling Timing</h2>
+  <p><code>keyTimes</code> maps each value in the <code>values</code> list to a point in normalised time (0 to 1). It lets you spend more time on some segments and less on others.</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;!-- values has 4 entries, so keyTimes needs 4 entries --&gt;
+&lt;animate attributeName="cx"
+         values="50;200;350;200"
+         keyTimes="0;0.2;0.5;1"
+         dur="4s"
+         repeatCount="indefinite"/&gt;
+&lt;!-- 
+  0 &rarr; 0.2 (20% of 4s = 0.8s): cx goes 50 &rarr; 200 (fast)
+  0.2 &rarr; 0.5 (30% of 4s = 1.2s): cx goes 200 &rarr; 350 (medium)
+  0.5 &rarr; 1.0 (50% of 4s = 2.0s): cx goes 350 &rarr; 200 (slow)
+--&gt;</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <strong>Rules for keyTimes</strong>
+    <p>The number of <code>keyTimes</code> values must equal the number of <code>values</code>. The first must be <code>0</code>, the last must be <code>1</code> (for <code>linear</code>/<code>spline</code> modes). For <code>discrete</code> mode, the last doesn't have to be 1. For <code>paced</code> mode, <code>keyTimes</code> is ignored entirely.</p>
+  </div>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <h2>7. The &lt;set&gt; Element</h2>
+  <p><code>&lt;set&gt;</code> is a simplified animation that performs a <strong>discrete value change</strong> at a point in time. No interpolation, no duration needed  -  it just switches an attribute to a new value. Think of it as <code>calcMode="discrete"</code> with a single target value.</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;circle cx="200" cy="60" r="30" fill="coral"&gt;
+  &lt;!-- Change colour to blue after 2 seconds --&gt;
+  &lt;set attributeName="fill" to="#61afef" begin="2s" fill="freeze"/&gt;
+&lt;/circle&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="400" height="120" viewBox="0 0 400 120">
+      <rect width="400" height="120" fill="var(--demo-svg-bg)"/>
+      <circle cx="200" cy="60" r="30" fill="coral">
+        <set attributeName="fill" to="#61afef" begin="2s" fill="freeze"/>
+      </circle>
+      <text x="200" y="110" text-anchor="middle" font-size="9" fill="var(--muted)">Turns blue after 2 seconds (one-shot, no interpolation)</text>
+    </svg>
+    <p class="demo-caption"><code>&lt;set&gt;</code> is ideal for visibility toggles, colour state changes, and triggering discrete property switches.</p>
+  </div>
+
+  <p><code>&lt;set&gt;</code> fully supports the <code>begin</code> attribute with all the same values as <code>&lt;animate&gt;</code>  -  time offsets, click events, and syncbase timing all work. This makes it ideal for click-driven state changes:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;!-- Colour change on click --&gt;
+&lt;circle cx="100" cy="60" r="30" fill="coral" style="cursor:pointer"&gt;
+  &lt;set attributeName="fill" to="#61afef" begin="click" fill="freeze"/&gt;
+&lt;/circle&gt;
+
+&lt;!-- Visibility toggle after a delay --&gt;
+&lt;rect x="10" y="10" width="80" height="40" fill="coral"&gt;
+  &lt;set attributeName="visibility" to="hidden" begin="3s" fill="freeze"/&gt;
+&lt;/rect&gt;</code></pre>
+  </div>
+
+  <h3>Cross-element triggers</h3>
+  <p>The spec defines <code>begin="elementId.click"</code> for triggering an animation from a click on a different element. However, browser support for cross-element event references is unreliable (Chrome often ignores them). The workaround is to place the <code>&lt;set&gt;</code> inside the clickable element itself and target a different attribute, or use <code>begin="click"</code> directly on each element that should react. We'll explore cross-element orchestration patterns in <a href="10-smil-advanced.html">Lesson 10</a>.</p>
+
+  <p>For now, the reliable pattern is: <code>&lt;set&gt;</code> nested inside the element being clicked, controlling that same element:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;svg viewBox="0 0 300 100" xmlns="http://www.w3.org/2000/svg"&gt;
+  &lt;!-- Click to change colour (set is inside the clickable element) --&gt;
+  &lt;rect x="50" y="20" width="200" height="60" rx="8"
+        fill="coral" style="cursor:pointer"&gt;
+    &lt;set attributeName="fill" to="#61afef" begin="click" fill="freeze"/&gt;
+  &lt;/rect&gt;
+  &lt;text x="150" y="57" text-anchor="middle"
+        font-size="16" fill="white" pointer-events="none"&gt;Click me&lt;/text&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="300" height="100" viewBox="0 0 300 100">
+      <rect width="300" height="100" fill="var(--demo-svg-bg)"/>
+      <rect x="50" y="20" width="200" height="60" rx="8" fill="coral" style="cursor:pointer">
+        <set attributeName="fill" to="#61afef" begin="click" fill="freeze"/>
+      </rect>
+      <text x="150" y="57" text-anchor="middle" font-size="16" fill="white" pointer-events="none">Click me</text>
+    </svg>
+    <p class="demo-caption">Click the rectangle  -  it turns blue permanently. <code>&lt;set&gt;</code> with <code>begin="click"</code> and <code>fill="freeze"</code> makes a one-shot state change.</p>
+  </div>
+
+  <p>Common uses for <code>&lt;set&gt;</code>:</p>
+  <ul>
+    <li>Toggling <code>visibility</code> or <code>display</code> at a specific time or on click</li>
+    <li>Changing a <code>href</code> to swap images</li>
+    <li>Switching class names for CSS-driven state changes</li>
+    <li>Any non-interpolatable attribute (strings, enumerations)</li>
+    <li>Button-driven state machines  -  combine multiple <code>&lt;set&gt;</code> elements to build toggle-style UI entirely in SVG</li>
+  </ul>
+
+  <h2>8. Animating Colour</h2>
+  <p>Colour attributes (<code>fill</code>, <code>stroke</code>, <code>stop-color</code>) can be smoothly interpolated with <code>&lt;animate&gt;</code>. The browser handles the colour space interpolation:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;circle cx="200" cy="60" r="40" fill="coral"&gt;
+  &lt;animate attributeName="fill"
+           values="coral;#61afef;#98c379;#e5c07b;coral"
+           dur="6s" repeatCount="indefinite"/&gt;
+&lt;/circle&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="400" height="120" viewBox="0 0 400 120">
+      <rect width="400" height="120" fill="var(--demo-svg-bg)"/>
+      <circle cx="200" cy="60" r="40" fill="coral">
+        <animate attributeName="fill" values="coral;#61afef;#98c379;#e5c07b;coral" dur="6s" repeatCount="indefinite"/>
+      </circle>
+    </svg>
+    <p class="demo-caption">Smooth colour cycling through four colours. The browser interpolates between hex values in sRGB space.</p>
+  </div>
+
+  <h2>9. Additive and Accumulative Animation</h2>
+  <p>Two lesser-known but powerful attributes control how animated values combine:</p>
+
+  <table class="comparison-table">
+    <thead>
+      <tr><th>Attribute</th><th>Values</th><th>Effect</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>additive</code></td><td><code>replace</code> (default) / <code>sum</code></td><td><code>sum</code>: animated value is <em>added to</em> the base value instead of replacing it</td></tr>
+      <tr><td><code>accumulate</code></td><td><code>none</code> (default) / <code>sum</code></td><td><code>sum</code>: each repeat cycle starts from where the last one ended (values accumulate)</td></tr>
+    </tbody>
+  </table>
+
+  <p><code>additive</code> and <code>accumulate</code> answer different questions:</p>
+  <ul>
+    <li><strong><code>additive</code></strong> &rarr; "What do I do with the base attribute value <em>within each cycle</em>?" (<code>replace</code>: ignore it; <code>sum</code>: add to it)</li>
+    <li><strong><code>accumulate</code></strong> &rarr; "What do I do <em>between repeat cycles</em>?" (<code>none</code>: reset; <code>sum</code>: build on previous)</li>
+  </ul>
+
+  <p>Think of it this way: <strong>additive</strong> controls the <em>spatial reference</em> (relative to where?) and <strong>accumulate</strong> controls the <em>temporal reference</em> (does each repeat reset or build?).</p>
+
+  <p>Concrete example  -  <code>&lt;rect x="100"&gt;</code> with <code>from="0" to="50"</code>, <code>repeatCount="3"</code>:</p>
+
+  <table class="comparison-table">
+    <thead>
+      <tr><th>Settings</th><th>Cycle 1</th><th>Cycle 2</th><th>Cycle 3</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Neither (defaults)</td><td>x: 0&rarr;50</td><td>x: 0&rarr;50</td><td>x: 0&rarr;50</td></tr>
+      <tr><td><code>additive="sum"</code></td><td>x: 100&rarr;150</td><td>x: 100&rarr;150</td><td>x: 100&rarr;150</td></tr>
+      <tr><td><code>accumulate="sum"</code></td><td>x: 0&rarr;50</td><td>x: 50&rarr;100</td><td>x: 100&rarr;150</td></tr>
+      <tr><td>Both <code>sum</code></td><td>x: 100&rarr;150</td><td>x: 150&rarr;200</td><td>x: 200&rarr;250</td></tr>
+    </tbody>
+  </table>
+
+  <h3>accumulate example</h3>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;!-- Without accumulate: bounces between 0 and 100 each cycle --&gt;
+&lt;rect x="0" y="10" width="30" height="30" fill="coral"&gt;
+  &lt;animate attributeName="x" from="0" to="100" dur="2s"
+           repeatCount="3" fill="freeze"/&gt;
+&lt;/rect&gt;
+
+&lt;!-- With accumulate="sum": each cycle adds 100 more --&gt;
+&lt;rect x="0" y="50" width="30" height="30" fill="#61afef"&gt;
+  &lt;animate attributeName="x" from="0" to="100" dur="2s"
+           repeatCount="3" fill="freeze"
+           accumulate="sum"/&gt;
+&lt;/rect&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="400" height="100" viewBox="0 0 400 100">
+      <rect width="400" height="100" fill="var(--demo-svg-bg)"/>
+      <rect x="10" y="10" width="30" height="30" rx="4" fill="coral">
+        <animate attributeName="x" from="0" to="100" dur="2s" repeatCount="3" fill="freeze"/>
+      </rect>
+      <text x="200" y="32" font-size="9" fill="var(--muted)" text-anchor="middle">No accumulate: resets each cycle</text>
+      <rect x="10" y="55" width="30" height="30" rx="4" fill="#61afef">
+        <animate attributeName="x" from="0" to="100" dur="2s" repeatCount="3" fill="freeze" accumulate="sum"/>
+      </rect>
+      <text x="200" y="77" font-size="9" fill="var(--muted)" text-anchor="middle">accumulate="sum": each cycle adds 100</text>
+    </svg>
+    <p class="demo-caption">Top resets to 0 each cycle; bottom starts each cycle where the last ended (0&rarr;100, 100&rarr;200, 200&rarr;300).</p>
+  </div>
+
+  <h3>additive example</h3>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;!-- additive="replace" (default): animated value IS the x value --&gt;
+&lt;rect x="100" y="10" width="30" height="30" fill="coral"&gt;
+  &lt;animate attributeName="x" from="0" to="50" dur="2s"
+           repeatCount="indefinite"/&gt;
+  &lt;!-- x goes 0&rarr;50, ignoring the base x="100" --&gt;
+&lt;/rect&gt;
+
+&lt;!-- additive="sum": animated value is ADDED to base x="100" --&gt;
+&lt;rect x="100" y="60" width="30" height="30" fill="#61afef"&gt;
+  &lt;animate attributeName="x" from="0" to="50" dur="2s"
+           additive="sum" repeatCount="indefinite"/&gt;
+  &lt;!-- x goes (100+0)&rarr;(100+50) = 100&rarr;150 --&gt;
+&lt;/rect&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="400" height="110" viewBox="0 0 400 110">
+      <rect width="400" height="110" fill="var(--demo-svg-bg)"/>
+      <line x1="100" y1="0" x2="100" y2="110" stroke="var(--svg-grid)" stroke-dasharray="4 2"/>
+      <text x="100" y="8" font-size="8" fill="var(--muted)" text-anchor="middle">base x=100</text>
+      <rect x="100" y="15" width="30" height="30" rx="4" fill="coral">
+        <animate attributeName="x" from="0" to="50" dur="2s" repeatCount="indefinite"/>
+      </rect>
+      <text x="300" y="35" font-size="9" fill="var(--muted)" text-anchor="middle">replace: ignores base, goes 0&rarr;50</text>
+      <rect x="100" y="60" width="30" height="30" rx="4" fill="#61afef">
+        <animate attributeName="x" from="0" to="50" dur="2s" additive="sum" repeatCount="indefinite"/>
+      </rect>
+      <text x="300" y="80" font-size="9" fill="var(--muted)" text-anchor="middle">sum: adds to base, goes 100&rarr;150</text>
+    </svg>
+    <p class="demo-caption">Both animate from="0" to="50". With <code>replace</code>, the rect jumps to x=0 then goes to 50 (ignoring base). With <code>sum</code>, the rect starts at its base (100) and shifts +0 to +50 from there.</p>
+  </div>
+
+  <h2>10. Multiple Animations on One Element</h2>
+  <p>You can stack multiple <code>&lt;animate&gt;</code> children on the same element, each targeting a different attribute. They run independently and simultaneously:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;circle cx="200" cy="60" r="20" fill="coral"&gt;
+  &lt;!-- Animate position --&gt;
+  &lt;animate attributeName="cx" values="50;350;50"
+           dur="4s" repeatCount="indefinite"/&gt;
+  &lt;!-- Animate size simultaneously --&gt;
+  &lt;animate attributeName="r" values="20;35;20"
+           dur="2s" repeatCount="indefinite"/&gt;
+  &lt;!-- Animate opacity simultaneously --&gt;
+  &lt;animate attributeName="opacity" values="1;0.4;1"
+           dur="4s" repeatCount="indefinite"/&gt;
+&lt;/circle&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="400" height="120" viewBox="0 0 400 120">
+      <rect width="400" height="120" fill="var(--demo-svg-bg)"/>
+      <circle cx="200" cy="60" r="20" fill="coral">
+        <animate attributeName="cx" values="50;350;50" dur="4s" repeatCount="indefinite"/>
+        <animate attributeName="r" values="20;35;20" dur="2s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="1;0.4;1" dur="4s" repeatCount="indefinite"/>
+      </circle>
+    </svg>
+    <p class="demo-caption">Three independent animations on one circle: position (4s cycle), radius (2s cycle), opacity (4s cycle). Different durations create complex-looking motion from simple rules.</p>
+  </div>
+
+  <div class="key-concept">
+    <strong>Polyrhythm principle</strong>
+    <p>Using different <code>dur</code> values on multiple animations of the same element creates <strong>polyrhythmic motion</strong>  -  the overall pattern doesn't repeat until the least common multiple of all durations. A 3s and 4s animation won't sync up until 12s. This is a cheap way to create organic, non-repetitive-looking animation from very simple declarations.</p>
+  </div>
+
+  <h2>11. SMIL and the CSS Cascade</h2>
+  <p>You might worry: if CSS overrides presentation attributes (<a href="04-styling-presentation-attributes-vs-css.html">Lesson 4</a>), and SMIL animates attributes, won't CSS block SMIL? No  -  SMIL operates at a <strong>higher priority</strong> than both.</p>
+
+  <p>The actual priority order (highest wins):</p>
+  <ol>
+    <li><strong>SMIL animation</strong> (special "override" layer  -  always wins while active)</li>
+    <li>CSS <code>!important</code></li>
+    <li>CSS specificity (stylesheets, <code>&lt;style&gt;</code> blocks)</li>
+    <li>Presentation attributes (<code>fill="coral"</code>)</li>
+    <li>Inherited values</li>
+  </ol>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;style&gt;
+  .styled { fill: blue; }  /* CSS wins over presentation attr */
+&lt;/style&gt;
+
+&lt;circle class="styled" fill="red" cx="100" cy="60" r="30"&gt;
+  &lt;!-- SMIL wins over CSS  -  circle animates to green --&gt;
+  &lt;animate attributeName="fill" to="green" dur="2s"
+           fill="freeze"/&gt;
+&lt;/circle&gt;
+&lt;!-- Priority: SMIL (green) > CSS (blue) > attribute (red) --&gt;</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <strong>SMIL always wins while active</strong>
+    <p>The SVG spec defines SMIL animations as applying <em>after</em> the CSS cascade resolves  -  they operate in a special override step. This means you can safely use CSS for static styling and SMIL for animation on the same element. When a <code>fill="remove"</code> animation ends, CSS takes back control. When <code>fill="freeze"</code>, SMIL holds indefinitely.</p>
+  </div>
+
+  <div class="warning">
+    <strong>This only matters for shared properties</strong>
+    <p>The CSS/SMIL conflict only arises for properties that exist in both worlds (like <code>fill</code>, <code>stroke</code>, <code>opacity</code>). Geometry attributes like <code>cx</code>, <code>cy</code>, <code>r</code>, <code>d</code>, <code>viewBox</code> are pure SVG attributes with no CSS equivalent  -  CSS can't set them, so there's never a conflict. SMIL animates them freely.</p>
+  </div>
+
+  <h2>12. What Can (and Can't) Be Animated</h2>
+  <p>SMIL can animate any <strong>presentation attribute</strong> or <strong>geometry attribute</strong> that takes a numeric or colour value. Some examples:</p>
+
+  <table class="comparison-table">
+    <thead>
+      <tr><th>Animatable</th><th>Examples</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Geometry</td><td><code>x</code>, <code>y</code>, <code>cx</code>, <code>cy</code>, <code>r</code>, <code>rx</code>, <code>ry</code>, <code>width</code>, <code>height</code>, <code>points</code>, <code>d</code> (path data!)</td></tr>
+      <tr><td>Paint</td><td><code>fill</code>, <code>stroke</code>, <code>stop-color</code>, <code>flood-color</code></td></tr>
+      <tr><td>Opacity</td><td><code>opacity</code>, <code>fill-opacity</code>, <code>stroke-opacity</code></td></tr>
+      <tr><td>Stroke</td><td><code>stroke-width</code>, <code>stroke-dasharray</code>, <code>stroke-dashoffset</code></td></tr>
+      <tr><td>Transforms</td><td>via <code>&lt;animateTransform&gt;</code> (Lesson 10)</td></tr>
+      <tr><td>Filter params</td><td><code>stdDeviation</code>, <code>dx</code>/<code>dy</code> on filter prims, etc.</td></tr>
+      <tr><td>Text</td><td><code>startOffset</code>, <code>textLength</code>, <code>dx</code>, <code>dy</code></td></tr>
+      <tr><td>viewBox</td><td>Yes! Animating <code>viewBox</code> creates zoom/pan effects</td></tr>
+    </tbody>
+  </table>
+
+  <table class="comparison-table">
+    <thead>
+      <tr><th>Not directly animatable with SMIL</th><th>Workaround</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>class</code> attribute</td><td>Use <code>&lt;set&gt;</code> to swap class names</td></tr>
+      <tr><td>CSS custom properties</td><td>Animate the underlying attribute instead</td></tr>
+      <tr><td><code>transform</code> (as a string)</td><td>Use <code>&lt;animateTransform&gt;</code></td></tr>
+      <tr><td><code>clip-path</code> / <code>mask</code> references</td><td>Animate the shapes <em>inside</em> the clip/mask</td></tr>
+    </tbody>
+  </table>
+
+  <div class="key-concept">
+    <strong>Shape morphing with d and points</strong>
+    <p>You can animate the <code>d</code> attribute of a <code>&lt;path&gt;</code> to morph between shapes. The constraint: both path data strings must have the <strong>same number and type of commands</strong>. You can't morph a path with 3 segments into one with 7  -  the browser needs a 1:1 mapping between points. The <code>points</code> attribute on <code>&lt;polygon&gt;</code>/<code>&lt;polyline&gt;</code> is simpler  -  just match the number of coordinate pairs (no command types to worry about). Both are the basis of shape morphing animations (Lesson 13 capstone material).</p>
+  </div>
+
+  <h2>13. Practical Example: Breathing Circle</h2>
+  <p>Combining the techniques covered so far into a polished, production-quality animation:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"&gt;
+  &lt;circle cx="100" cy="100" r="40" fill="none"
+          stroke="coral" stroke-width="3" opacity="0.8"&gt;
+    &lt;!-- Radius breathes in and out --&gt;
+    &lt;animate attributeName="r" values="40;60;40"
+             dur="4s" calcMode="spline"
+             keyTimes="0;0.5;1"
+             keySplines="0.4 0 0.2 1; 0.4 0 0.2 1"
+             repeatCount="indefinite"/&gt;
+    &lt;!-- Opacity pulses gently --&gt;
+    &lt;animate attributeName="opacity" values="0.8;0.3;0.8"
+             dur="4s" calcMode="spline"
+             keyTimes="0;0.5;1"
+             keySplines="0.4 0 0.2 1; 0.4 0 0.2 1"
+             repeatCount="indefinite"/&gt;
+    &lt;!-- Stroke thins as it expands --&gt;
+    &lt;animate attributeName="stroke-width" values="3;1;3"
+             dur="4s" repeatCount="indefinite"/&gt;
+  &lt;/circle&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="200" height="200" viewBox="0 0 200 200">
+      <rect width="200" height="200" fill="var(--demo-svg-bg)"/>
+      <circle cx="100" cy="100" r="40" fill="none" stroke="coral" stroke-width="3" opacity="0.8">
+        <animate attributeName="r" values="40;60;40" dur="4s" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.4 0 0.2 1; 0.4 0 0.2 1" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.8;0.3;0.8" dur="4s" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.4 0 0.2 1; 0.4 0 0.2 1" repeatCount="indefinite"/>
+        <animate attributeName="stroke-width" values="3;1;3" dur="4s" repeatCount="indefinite"/>
+      </circle>
+    </svg>
+    <p class="demo-caption">A "breathing" circle: radius, opacity, and stroke-width all animate with eased timing. Feels organic because of the spline easing  -  compare to a linear version and the difference is dramatic.</p>
+  </div>
+
+  <h2>14. Practical Example: Loading Spinner</h2>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"&gt;
+  &lt;circle cx="50" cy="50" r="40" fill="none"
+          stroke="#61afef" stroke-width="6"
+          stroke-dasharray="200" stroke-dashoffset="200"
+          stroke-linecap="round"&gt;
+    &lt;!-- Draw the stroke --&gt;
+    &lt;animate attributeName="stroke-dashoffset"
+             values="200;0;200" dur="2s"
+             repeatCount="indefinite"/&gt;
+  &lt;/circle&gt;
+
+  &lt;!-- Rotate the whole circle for spin --&gt;
+  &lt;animateTransform attributeName="transform" type="rotate"
+    values="0 50 50;360 50 50" dur="1.5s"
+    repeatCount="indefinite"
+    xlink:href="circle"/&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="100" height="100" viewBox="0 0 100 100">
+      <rect width="100" height="100" fill="var(--demo-svg-bg)"/>
+      <g>
+        <circle cx="50" cy="50" r="40" fill="none" stroke="#61afef" stroke-width="6" stroke-dasharray="200" stroke-dashoffset="200" stroke-linecap="round">
+          <animate attributeName="stroke-dashoffset" values="200;0;200" dur="2s" repeatCount="indefinite"/>
+        </circle>
+        <animateTransform attributeName="transform" type="rotate" values="0 50 50;360 50 50" dur="1.5s" repeatCount="indefinite"/>
+      </g>
+    </svg>
+    <p class="demo-caption">A loading spinner combining stroke-dashoffset animation (the drawing effect) with rotation. Two animations, zero JavaScript. This uses <code>&lt;animateTransform&gt;</code> which we'll cover fully in Lesson 10.</p>
+  </div>
+
+  <h2>15. Browser Support &amp; the "Deprecated" Myth</h2>
+  <p>You may have read that SMIL is "deprecated." Here's the actual situation:</p>
+  <ul>
+    <li><strong>Chrome</strong> announced deprecation intent in 2015, then <strong>reversed it</strong> in 2016. SMIL remains fully supported.</li>
+    <li><strong>Firefox</strong>  -  full support, never threatened removal.</li>
+    <li><strong>Safari</strong>  -  full support.</li>
+    <li><strong>Edge</strong> (Chromium)  -  full support (same engine as Chrome).</li>
+    <li><strong>IE</strong>  -  never supported SMIL. IE is dead, so this doesn't matter.</li>
+  </ul>
+
+  <p>SMIL is <strong>not deprecated</strong> in any current browser. The <a href="https://www.w3.org/TR/SVG11/animate.html">SVG 1.1 spec</a> defines it, and the <a href="https://svgwg.org/specs/animations/">SVG Animations Level 2 spec</a> is actively developed. For self-contained SVG animations, SMIL remains the best tool.</p>
+
+  <div class="warning">
+    <strong>Accessibility consideration</strong>
+    <p>Respect <code>prefers-reduced-motion</code>. While SMIL doesn't directly respond to this media query (unlike CSS animations), you can use a <code>&lt;style&gt;</code> block to hide or pause animated elements: <code>@media (prefers-reduced-motion: reduce) { animate, set, animateTransform, animateMotion { display: none; } }</code></p>
+  </div>
+
+  <h2>16. SMIL vs CSS vs JavaScript  -  When to Use What</h2>
+  <p>The browser has three completely independent animation systems. They're not wrappers around each other  -  each has its own spec, its own engine, and its own strengths:</p>
+
+  <table class="comparison-table">
+    <thead>
+      <tr><th></th><th>SMIL</th><th>CSS Animations</th><th>JavaScript</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Lives in</strong></td><td>SVG markup (XML elements)</td><td>Stylesheets / <code>&lt;style&gt;</code></td><td><code>&lt;script&gt;</code> blocks</td></tr>
+      <tr><td><strong>Targets</strong></td><td>Any SVG attribute (geometry, paint, filters, path data, viewBox)</td><td>CSS properties only</td><td>Anything via DOM</td></tr>
+      <tr><td><strong>Self-contained</strong></td><td>Yes  -  no dependencies</td><td>Needs a <code>&lt;style&gt;</code> block</td><td>Needs a <code>&lt;script&gt;</code> block</td></tr>
+      <tr><td><strong>Orchestration</strong></td><td>Native syncbase timing (<code>anim1.end+0.5s</code>)</td><td>Manual delay chaining</td><td>Full programmatic control</td></tr>
+      <tr><td><strong>Easing</strong></td><td>Linear, discrete, paced, spline</td><td>Linear, ease, cubic-bezier, steps</td><td>You calculate it</td></tr>
+      <tr><td><strong>Performance</strong></td><td>CPU (paint step)</td><td>GPU compositor (for opacity/transform)</td><td>Depends on implementation</td></tr>
+      <tr><td><strong>Path morphing</strong></td><td>Native (<code>d</code> attribute)</td><td>Limited (some browsers support via CSS <code>d</code>)</td><td>Full control with libraries</td></tr>
+      <tr><td><strong>Event triggers</strong></td><td>Built-in (<code>begin="click"</code>)</td><td>Requires JS to toggle classes</td><td>Native</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Decision guide</h3>
+  <table class="comparison-table">
+    <thead>
+      <tr><th>Use case</th><th>Best tool</th><th>Why</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Self-contained SVG file (no external deps)</td><td><strong>SMIL</strong></td><td>No <code>&lt;style&gt;</code> or <code>&lt;script&gt;</code> needed  -  works in <code>&lt;img&gt;</code> tags</td></tr>
+      <tr><td>Hover/focus effects on inline SVG</td><td><strong>CSS</strong></td><td>CSS transitions are simpler and GPU-accelerated for opacity/transform</td></tr>
+      <tr><td>Animate <code>d</code> (path morphing)</td><td><strong>SMIL</strong></td><td>Native support; CSS <code>d</code> property support is inconsistent</td></tr>
+      <tr><td>Animate <code>viewBox</code> (zoom/pan)</td><td><strong>SMIL</strong></td><td>Only SMIL can animate this declaratively</td></tr>
+      <tr><td>Complex choreography with user interaction</td><td><strong>JavaScript</strong></td><td>Conditional logic, state machines, physics</td></tr>
+      <tr><td>Performance-critical (60fps transform/opacity)</td><td><strong>CSS</strong></td><td>GPU compositor layer  -  doesn't repaint</td></tr>
+      <tr><td>Sequenced animation chain</td><td><strong>SMIL</strong></td><td>Syncbase timing makes this trivial declaratively</td></tr>
+      <tr><td>Data-driven or generative animation</td><td><strong>JavaScript</strong></td><td>Need loops, conditionals, API data</td></tr>
+      <tr><td>SVG inside <code>&lt;img&gt;</code> tag</td><td><strong>SMIL</strong></td><td>Only option  -  <code>&lt;img&gt;</code> blocks scripts and external CSS</td></tr>
+    </tbody>
+  </table>
+
+  <div class="key-concept">
+    <strong>They're not mutually exclusive</strong>
+    <p>You can (and often will) mix them. Use SMIL for the base animation loop, CSS for hover states and transitions, and JavaScript for user-driven interactivity. They compose well because they operate on different layers of the rendering pipeline.</p>
+  </div>
+
+  <h3>Performance differences</h3>
+  <p>The key performance distinction is <strong>where the animation runs</strong> in the rendering pipeline:</p>
+
+  <table class="comparison-table">
+    <thead>
+      <tr><th>Approach</th><th>Where it runs</th><th>Cost per frame</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>CSS <code>transform</code> / <code>opacity</code></td><td>GPU compositor thread</td><td>Nearly free  -  no repaint</td></tr>
+      <tr><td>CSS other properties (<code>fill</code>, <code>stroke</code>, etc.)</td><td>CPU repaint</td><td>Moderate</td></tr>
+      <tr><td>SMIL (any attribute)</td><td>CPU repaint</td><td>Moderate</td></tr>
+      <tr><td>SMIL on filter params (<code>stdDeviation</code>, etc.)</td><td>CPU repaint + re-rasterise filter</td><td>Expensive</td></tr>
+      <tr><td>JavaScript + rAF manipulating DOM</td><td>CPU + potential layout thrash</td><td>Varies widely</td></tr>
+    </tbody>
+  </table>
+
+  <p>CSS <code>transform</code> and <code>opacity</code> are special  -  the browser promotes the element to its own <strong>compositor layer</strong> (a GPU texture) and animates it without touching the main thread. No repaint, no relayout. That's why they hit smooth 60fps even on a busy page. Everything else  -  including SMIL and CSS animating <code>fill</code>/<code>stroke</code>  -  triggers a CPU repaint each frame.</p>
+
+  <div class="key-concept">
+    <strong>When does this matter?</strong>
+    <p>For the kind of self-contained SVG animations you're building (5&ndash;15 elements, moderate complexity), SMIL performance is not a concern. It becomes relevant with 30+ simultaneous animations, high-frequency cycling, animated filters (which re-run the entire filter pipeline every frame), or mobile devices with weak CPUs. For anything that maps to <code>transform</code> or <code>opacity</code>, prefer CSS for the GPU fast-path. Use SMIL for everything else.</p>
+  </div>
+
+  <h2>Quiz</h2>
+
+  <div class="quiz">
+    <h3>Question 1</h3>
+    <p>What does <code>fill="freeze"</code> on an <code>&lt;animate&gt;</code> element do?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Sets the fill colour of the parent element to frozen blue</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">Holds the final animated value after the animation ends</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Pauses the animation at its current frame indefinitely</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Prevents the animation from being overridden by CSS</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz">
+    <h3>Question 2</h3>
+    <p>What is the difference between <code>calcMode="linear"</code> and <code>calcMode="paced"</code> when animating through the values <code>"0;100;300"</code>?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Linear uses cubic easing; paced uses no easing at all</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Linear plays in order; paced randomises the value sequence</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">Linear spends equal time on each segment; paced maintains constant velocity across all segments</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Linear requires keyTimes; paced requires keySplines values</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz">
+    <h3>Question 3</h3>
+    <p>How do you make a SMIL animation start when the user clicks the animated element?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Set <code>trigger="onclick"</code> on the animate element</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">Set <code>begin="click"</code> on the animate element</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Wrap the animate in an <code>&lt;event type="click"&gt;</code> element</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Add a JavaScript click handler that calls animate.start()</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz">
+    <h3>Question 4</h3>
+    <p>What constraint must be met to animate the <code>d</code> attribute (path morphing)?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Both paths must have the same total length in user units</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Both paths must use only cubic bezier commands (C/c)</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">Both path strings must have the same number and type of commands</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">The paths must be defined in the same defs block</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz">
+    <h3>Question 5</h3>
+    <p>What does <code>accumulate="sum"</code> do on a repeating animation?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Adds all animated values together into a single final value</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">Each repeat cycle starts from where the previous cycle ended</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Sums the animation with the element's base CSS value</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Adds a cumulative delay between each repeat cycle</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <h2>Exercises</h2>
+  <ol>
+    <li><strong>Pulsing dot</strong>  -  Create a circle that pulses its radius and opacity in a breathing pattern using <code>calcMode="spline"</code> for natural easing. Make it feel alive, not mechanical.</li>
+    <li><strong>Colour cycle</strong>  -  Animate a rectangle's fill through 5 colours of your choice over 10 seconds, looping indefinitely.</li>
+    <li><strong>Progress bar</strong>  -  A horizontal rect whose width animates from 0 to full width over 3 seconds, then freezes. Use <code>fill="freeze"</code>.</li>
+    <li><strong>Bouncing ball</strong>  -  Animate a circle's <code>cy</code> with <code>values</code> and <code>keySplines</code> to create a realistic bounce (fast at bottom, slow at top). Hint: use ease-in on the way down and ease-out on the way up.</li>
+    <li><strong>Polyrhythm</strong>  -  Put 3 animations on one element with durations 3s, 4s, and 5s. Observe how long it takes before the pattern repeats exactly.</li>
+  </ol>
+
+  <div class="recommended">
+    <strong>Recommended resource:</strong>
+    <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/SVG_animation_with_SMIL">MDN: SVG Animation with SMIL</a>  -  concise overview with live examples covering animate, animateTransform, and animateMotion. For the definitive timing model, see the <a href="https://www.w3.org/TR/SVG11/animate.html">W3C SVG 1.1 Animation chapter</a>. For a modern take on why SMIL still matters, read <a href="https://shop.smashingmagazine.com/2025/05/smashing-animations-part-3-smil-not-dead/">Andy Clarke: SMIL's Not Dead (Smashing, 2025)</a>.
+  </div>
+  <div class="footer-nav">
+    <a href="08-text-and-textpath.html">&larr; Prev: Text &amp; textPath</a>
+    <a href="index.html">Index</a>
+    <a href="10-smil-advanced.html">Next: SMIL Advanced &rarr;</a>
+  </div>
+
+    </main>
+  </div><!-- end .page-layout -->
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="scripts.js"></script>
+</body>
+</html>

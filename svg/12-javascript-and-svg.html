@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>JavaScript and SVG - Lesson 12 | Teach Me</title>
+  <meta name="description" content="The namespace gotcha, createElementNS, coordinate conversion with getScreenCTM, Web Animations API, dragging, and path interrogation.">
+  <link rel="canonical" href="https://teachmeskills.dev/svg/12-javascript-and-svg.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/svg/12-javascript-and-svg.html">
+  <meta property="og:title" content="JavaScript and SVG - Lesson 12 | Teach Me">
+  <meta property="og:description" content="The namespace gotcha, createElementNS, coordinate conversion with getScreenCTM, Web Animations API, dragging, and path interrogation.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="JavaScript and SVG - Lesson 12 | Teach Me">
+  <meta name="twitter:description" content="The namespace gotcha, createElementNS, coordinate conversion with getScreenCTM, Web Animations API, dragging, and path interrogation.">
+  <link rel="stylesheet" href="/styles.css">
+ <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header">
+        <a href="index.html">SVG Course</a>
+      </div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-coordinate-system.html">1. Coordinate System</a></li>
+        <li><a href="02-transforms-and-grouping.html">2. Transforms &amp; Grouping</a></li>
+        <li><a href="03-basic-shapes-and-paths.html">3. Shapes &amp; Paths</a></li>
+        <li><a href="04-styling-presentation-attributes-vs-css.html">4. Styling &amp; CSS</a></li>
+        <li><a href="05-gradients-patterns-paint-servers.html">5. Gradients &amp; Patterns</a></li>
+        <li><a href="06-clipping-and-masking.html">6. Clipping &amp; Masking</a></li>
+        <li><a href="07-filters.html">7. Filters</a></li>
+        <li><a href="08-text-and-textpath.html">8. Text &amp; textPath</a></li>
+        <li><a href="09-smil-animation-fundamentals.html">9. SMIL Fundamentals</a></li>
+        <li><a href="10-smil-advanced.html">10. SMIL Advanced</a></li>
+        <li><a href="11-css-animation-of-svg.html">11. CSS Animation</a></li>
+        <li class="current"><a href="12-javascript-and-svg.html">12. JavaScript + SVG</a></li>
+        <li><a href="13-putting-it-together.html">13. Capstone Project</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="svg-elements-and-attributes.html">Elements &amp; Attributes</a></li>
+        <li><a href="svg-dom-methods.html">DOM Methods &amp; Interfaces</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 12</p>
+  <h1>JavaScript + SVG</h1>
+  <p>The previous lessons covered animating SVG with SMIL (declarative, self-contained) and CSS (transitions, keyframes, GPU-accelerated). JavaScript is the third and most powerful option  -  it gives you imperative control, dynamic creation, user interaction, and access to APIs that neither SMIL nor CSS can reach. This lesson focuses on the <strong>SVG-specific gotchas</strong> rather than DOM basics.</p>
+
+  <h2>1. The Namespace Gotcha</h2>
+  <p>The single biggest trap when creating SVG elements with JavaScript: you <strong>must</strong> use <code>createElementNS</code>, not <code>createElement</code>. SVG lives in a different XML namespace than HTML, and elements created without the correct namespace silently fail to render.</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>const SVG_NS = 'http://www.w3.org/2000/svg';
+
+// WRONG  -  creates an HTML element that happens to be named "circle"
+const broken = document.createElement('circle');
+
+// RIGHT  -  creates a real SVG circle element
+const circle = document.createElementNS(SVG_NS, 'circle');
+circle.setAttribute('cx', '100');
+circle.setAttribute('cy', '100');
+circle.setAttribute('r', '40');
+circle.setAttribute('fill', 'coral');
+
+document.querySelector('svg').appendChild(circle);</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="200" height="200" viewBox="0 0 200 200" id="demo-namespace">
+      <rect width="200" height="200" fill="var(--demo-svg-bg)"/>
+      <text x="100" y="100" text-anchor="middle" font-size="11" fill="var(--muted)">Click to create a circle</text>
+    </svg>
+    <p class="demo-caption">Click the SVG  -  a circle is created with <code>createElementNS</code> and appended dynamically.</p>
+  </div>
+
+  <div class="key-concept">
+    <strong>The namespace constant</strong>
+    <p>Define <code>const SVG_NS = 'http://www.w3.org/2000/svg'</code> once at the top of any SVG-manipulating script. You'll use it for every element creation. Some developers use a helper: <code>const svgEl = (tag) => document.createElementNS(SVG_NS, tag)</code>.</p>
+  </div>
+
+  <div class="warning">
+    <strong>Attributes don't need namespacing (mostly)</strong>
+    <p>Unlike element creation, <code>setAttribute</code> works fine for most SVG attributes  -  <code>cx</code>, <code>fill</code>, <code>transform</code>, etc. The only exception is <code>xlink:href</code> (legacy) which needs <code>setAttributeNS('http://www.w3.org/1999/xlink', 'href', value)</code>. In modern SVG you can use plain <code>href</code> instead, avoiding the namespace entirely.</p>
+  </div>
+
+  <h2>2. Reading and Modifying SVG Attributes</h2>
+  <p>SVG attributes are accessed via the standard DOM API, but with some SVG-specific quirks:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>const rect = document.querySelector('rect');
+
+// Reading attributes
+const x = rect.getAttribute('x');          // "50" (string!)
+const width = rect.getAttribute('width');   // "100" (string!)
+
+// Modifying attributes
+rect.setAttribute('fill', '#61afef');
+rect.setAttribute('width', '150');
+
+// Numeric access via SVG DOM (typed, animatable)
+const baseX = rect.x.baseVal.value;        // 50 (number!)
+rect.x.baseVal.value = 75;                 // Direct numeric assignment
+
+// Style properties (presentation attributes that are also CSS)
+rect.style.opacity = '0.5';               // Works  -  opacity is a CSS property
+rect.style.fill = 'coral';                // Works  -  fill is a CSS property too
+// rect.style.cx = '100';                 // Won't work in older browsers (geometry prop)</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <strong>getAttribute returns strings, SVG DOM returns numbers</strong>
+    <p>The <code>.baseVal.value</code> interface (on properties like <code>rect.x</code>, <code>circle.r</code>, <code>rect.width</code>) gives you actual numbers without parsing. It's also the "base" value before any animation is applied  -  <code>.animVal.value</code> gives the current animated value. For most use cases, <code>getAttribute</code> + <code>parseFloat</code> is simpler.</p>
+  </div>
+
+  <h3>classList and dataset</h3>
+  <p>Good news: <code>classList</code> and <code>dataset</code> work on SVG elements exactly as they do on HTML elements:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>const circle = document.querySelector('circle');
+
+// classList  -  toggle CSS animations, visibility classes
+circle.classList.add('pulse');
+circle.classList.toggle('highlighted');
+
+// dataset  -  store custom data
+circle.dataset.index = '3';
+circle.dataset.label = 'Point C';
+// Reads: circle.getAttribute('data-index') === '3'</code></pre>
+  </div>
+
+  <h2>3. Dynamic SVG Creation</h2>
+  <p>Building SVG programmatically is where JavaScript shines  -  generating shapes from data, creating visualisations, or building graphics that would be tedious to hand-author.</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>const SVG_NS = 'http://www.w3.org/2000/svg';
+
+function createBarChart(container, data) {
+  const svg = document.createElementNS(SVG_NS, 'svg');
+  svg.setAttribute('viewBox', '0 0 300 150');
+  svg.setAttribute('width', '300');
+  svg.setAttribute('height', '150');
+
+  const barWidth = 300 / data.length - 10;
+
+  data.forEach((value, i) =&gt; {
+    const height = value * 1.2;
+    const rect = document.createElementNS(SVG_NS, 'rect');
+    rect.setAttribute('x', i * (barWidth + 10) + 5);
+    rect.setAttribute('y', 150 - height);
+    rect.setAttribute('width', barWidth);
+    rect.setAttribute('height', height);
+    rect.setAttribute('rx', '3');
+    rect.setAttribute('fill', `hsl(${i * 50}, 70%, 60%)`);
+    svg.appendChild(rect);
+  });
+
+  container.appendChild(svg);
+}
+
+createBarChart(document.getElementById('chart'), [80, 45, 90, 60, 75]);</code></pre>
+  </div>
+
+  <div class="demo">
+    <div id="demo-dynamic-chart"></div>
+    <p class="demo-caption">A bar chart generated entirely from JavaScript. No SVG in the HTML source  -  it's all created via <code>createElementNS</code>.</p>
+  </div>
+
+  <h3>Helper pattern: element factory</h3>
+  <p>When building complex SVG programmatically, a small factory function eliminates the repetition:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>const SVG_NS = 'http://www.w3.org/2000/svg';
+
+function svgEl(tag, attrs = {}, parent = null) {
+  const el = document.createElementNS(SVG_NS, tag);
+  for (const [key, val] of Object.entries(attrs)) {
+    el.setAttribute(key, val);
+  }
+  if (parent) parent.appendChild(el);
+  return el;
+}
+
+// Usage  -  much cleaner:
+const svg = svgEl('svg', { viewBox: '0 0 200 200', width: 200, height: 200 });
+svgEl('circle', { cx: 100, cy: 100, r: 40, fill: 'coral' }, svg);
+svgEl('rect', { x: 20, y: 20, width: 60, height: 60, fill: '#61afef' }, svg);
+document.body.appendChild(svg);</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <strong>This pattern scales</strong>
+    <p>The <code>svgEl</code> helper is a one-liner that eliminates 3 lines of boilerplate per element (<code>createElementNS</code> + attribute loop + <code>appendChild</code>). For data visualisation code that creates hundreds of elements, the noise reduction is significant. Some developers extend it to accept children or text content.</p>
+    <p style="margin-top:0.6rem;">For serious data visualisation work, <a href="https://d3js.org/">D3.js</a> takes this pattern to its logical conclusion  -  it provides a data-join abstraction (<code>selectAll/data/enter/exit</code>) that eliminates the manual loop entirely, plus scales, axes, and layout algorithms. For complex, choreographed animation, <a href="https://gsap.com/">GSAP</a> (GreenSock Animation Platform) provides a timeline-based engine with sequencing, scroll-triggers, SVG path morphing, and stroke-draw plugins  -  it's doing the same <code>setAttribute</code> and style manipulation under the hood, wrapped in a high-level <code>tl.to().to().to()</code> API. Both are out of scope for this course (we're building raw SVG fluency first), but everything you learn here translates directly  -  these libraries generate the same native calls you're now writing by hand.</p>
+  </div>
+
+  <h2>4. Event Handling on SVG Elements</h2>
+  <p>SVG elements receive all standard DOM events  -  <code>click</code>, <code>pointerdown</code>, <code>pointermove</code>, <code>pointerup</code>, <code>wheel</code>, etc. The SVG-specific considerations are around <strong>coordinate transformation</strong> and <strong>hit testing</strong>.</p>
+
+  <h3>Coordinate conversion</h3>
+  <p>Mouse/pointer events give you coordinates in the page's client space, but SVG elements live in <code>viewBox</code> space. You need to convert:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>const svg = document.querySelector('svg');
+
+svg.addEventListener('click', (e) =&gt; {
+  // Convert client coords to SVG viewBox coords
+  const pt = svg.createSVGPoint();
+  pt.x = e.clientX;
+  pt.y = e.clientY;
+  const svgPt = pt.matrixTransform(svg.getScreenCTM().inverse());
+
+  console.log(`SVG coords: (${svgPt.x}, ${svgPt.y})`);
+
+  // Now you can place an element at the click position:
+  const circle = document.createElementNS(SVG_NS, 'circle');
+  circle.setAttribute('cx', svgPt.x);
+  circle.setAttribute('cy', svgPt.y);
+  circle.setAttribute('r', '8');
+  circle.setAttribute('fill', 'coral');
+  svg.appendChild(circle);
+});</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="400" height="200" viewBox="0 0 400 200" id="demo-click-coords" style="cursor:crosshair">
+      <rect width="400" height="200" fill="var(--demo-svg-bg)"/>
+      <text x="200" y="100" text-anchor="middle" font-size="11" fill="var(--muted)">Click anywhere to place circles</text>
+    </svg>
+    <p class="demo-caption">Each click places a circle at the correct <code>viewBox</code> coordinates, regardless of how the SVG is scaled on the page.</p>
+  </div>
+
+  <div class="warning">
+    <strong>getScreenCTM() is your best friend</strong>
+    <p><code>getScreenCTM()</code> returns the matrix that transforms from SVG user units to screen pixels (accounting for viewBox, preserveAspectRatio, CSS transforms on ancestors, scroll position  -  everything). Its <code>.inverse()</code> goes the other way: screen → SVG. This is the only reliable coordinate conversion method. Never try to calculate it manually.</p>
+  </div>
+
+  <h3>Hit testing with pointer-events</h3>
+  <p>The <code>pointer-events</code> CSS/presentation attribute controls what parts of an SVG element respond to mouse/touch events:</p>
+
+  <table class="comparison-table">
+    <thead>
+      <tr><th>Value</th><th>Responds to events on&hellip;</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>visiblePainted</code></td><td>Visible fill and stroke areas (default)</td></tr>
+      <tr><td><code>visible</code></td><td>Entire element when visible (even transparent fill)</td></tr>
+      <tr><td><code>fill</code></td><td>Fill area only (even if invisible)</td></tr>
+      <tr><td><code>stroke</code></td><td>Stroke area only (even if invisible)</td></tr>
+      <tr><td><code>all</code></td><td>Fill and stroke, regardless of visibility or paint</td></tr>
+      <tr><td><code>none</code></td><td>Nothing (events pass through to elements behind)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;!-- This circle has fill="none" but is still clickable --&gt;
+&lt;circle cx="100" cy="100" r="50"
+        fill="none" stroke="coral" stroke-width="2"
+        pointer-events="all"
+        onclick="alert('clicked!')"&gt;&lt;/circle&gt;
+
+&lt;!-- This rect is visible but click-through (events pass to elements behind) --&gt;
+&lt;rect x="10" y="10" width="80" height="80"
+      fill="rgba(0,0,0,0.3)"
+      pointer-events="none"&gt;&lt;/rect&gt;</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <strong>pointer-events: all for invisible hit areas</strong>
+    <p>A common pattern: create a transparent <code>&lt;rect&gt;</code> behind your interactive elements with <code>pointer-events="all"</code> to expand the clickable area. Or set <code>pointer-events="none"</code> on overlay/tooltip elements so they don't interfere with interactions on elements beneath.</p>
+  </div>
+
+  <h2>5. The Web Animations API</h2>
+  <p>The Web Animations API (WAAPI) gives you <code>@keyframes</code>-level power from JavaScript, with programmatic control over playback. It's the best of both worlds: CSS-quality animation with JS-level control.</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>const circle = document.querySelector('circle');
+
+// Basic animation  -  same as @keyframes but from JS
+const anim = circle.animate([
+  { transform: 'scale(1)', opacity: 1 },
+  { transform: 'scale(1.5)', opacity: 0.5 },
+  { transform: 'scale(1)', opacity: 1 }
+], {
+  duration: 2000,
+  iterations: Infinity,
+  easing: 'ease-in-out'
+});
+
+// Playback control  -  what CSS can't do
+anim.pause();
+anim.play();
+anim.reverse();
+anim.playbackRate = 2;    // Double speed
+anim.currentTime = 500;   // Seek to 500ms
+anim.cancel();            // Remove animation entirely</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="200" height="200" viewBox="0 0 200 200" id="demo-waapi">
+      <rect width="200" height="200" fill="var(--demo-svg-bg)"/>
+      <circle cx="100" cy="100" r="30" fill="#61afef" id="demo-waapi-circle" style="transform-origin:center;"/>
+    </svg>
+    <div class="demo-controls">
+      <button onclick="demoWaapi('play')">Play</button>
+      <button onclick="demoWaapi('pause')">Pause</button>
+      <button onclick="demoWaapi('reverse')">Reverse</button>
+      <button onclick="demoWaapi('fast')">2&times;</button>
+    </div>
+    <p class="demo-caption">WAAPI animation with playback controls. Try pausing, reversing, and doubling speed  -  none of this is possible with CSS alone.</p>
+  </div>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <h3>Animating SVG-specific properties</h3>
+  <p>WAAPI can animate any CSS-animatable property on SVG, including SVG presentation attributes:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>const path = document.querySelector('path');
+
+// Stroke drawing via WAAPI  -  programmatic control over the draw
+const length = path.getTotalLength();
+path.style.strokeDasharray = length;
+path.style.strokeDashoffset = length;
+
+const drawAnim = path.animate([
+  { strokeDashoffset: length },
+  { strokeDashoffset: 0 }
+], {
+  duration: 2000,
+  fill: 'forwards',
+  easing: 'ease'
+});
+
+// React to completion
+drawAnim.finished.then(() =&gt; {
+  console.log('Drawing complete!');
+  path.animate([{ fillOpacity: 0 }, { fillOpacity: 1 }], {
+    duration: 500, fill: 'forwards'
+  });
+});</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <strong>WAAPI advantages over CSS @keyframes</strong>
+    <p>WAAPI gives you: dynamic values (computed at runtime, like <code>getTotalLength()</code>), playback control (pause/reverse/seek/speed), completion promises (<code>anim.finished</code>), the ability to create and cancel animations conditionally, and per-instance timing (no shared stylesheet keyframe names). Use CSS for simple fire-and-forget animations; use WAAPI when you need runtime control.</p>
+  </div>
+
+  <table class="comparison-table">
+    <thead>
+      <tr><th>Feature</th><th>CSS @keyframes</th><th>Web Animations API</th><th>SMIL</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Pause/resume</td><td>Via <code>animation-play-state</code></td><td>Native: <code>anim.pause()</code></td><td>Via <code>SVGElement.pauseAnimations()</code></td></tr>
+      <tr><td>Reverse</td><td><code>animation-direction</code></td><td>Native: <code>anim.reverse()</code></td><td>Not supported</td></tr>
+      <tr><td>Seek</td><td>Not possible</td><td><code>anim.currentTime = ms</code></td><td><code>SVGElement.setCurrentTime(s)</code></td></tr>
+      <tr><td>Dynamic values</td><td>CSS custom properties only</td><td>Any computed value</td><td>Not possible</td></tr>
+      <tr><td>Completion event</td><td><code>animationend</code> event</td><td><code>anim.finished</code> promise</td><td><code>onend</code> attribute</td></tr>
+      <tr><td>Animate non-CSS attrs</td><td>No</td><td>No (CSS properties only)</td><td>Yes (any attribute)</td></tr>
+    </tbody>
+  </table>
+
+  <h2>6. Path Interrogation</h2>
+  <p>SVG paths expose methods that let you query their geometry at runtime  -  essential for animation, positioning elements along curves, and building interactive tools.</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>const path = document.querySelector('path');
+
+// Total length (for stroke-draw animations)
+const len = path.getTotalLength();  // e.g. 347.2
+
+// Point at a specific distance along the path
+const pt = path.getPointAtLength(len * 0.5);  // midpoint
+console.log(pt.x, pt.y);  // coordinates at 50% along the path
+
+// Use case: position an element at a percentage along a path
+function positionAt(element, path, percent) {
+  const pt = path.getPointAtLength(path.getTotalLength() * percent);
+  element.setAttribute('cx', pt.x);
+  element.setAttribute('cy', pt.y);
+}</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="400" height="150" viewBox="0 0 400 150" id="demo-path-query">
+      <rect width="400" height="150" fill="var(--demo-svg-bg)"/>
+      <path id="demo-track-path" d="M 30,120 C 80,20 160,20 200,75 S 320,130 370,50" fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="4 3"/>
+      <circle id="demo-path-dot" cx="30" cy="120" r="8" fill="coral"/>
+    </svg>
+    <div class="demo-controls">
+      <label>Position: <input type="range" id="demo-path-slider" min="0" max="100" value="0" style="width:200px"></label>
+      <span id="demo-path-pct" style="font-size:0.85rem; color:var(--muted);">0%</span>
+    </div>
+    <p class="demo-caption">Drag the slider to position the circle along the path using <code>getPointAtLength</code>. The path is dashed for visibility.</p>
+  </div>
+
+  <h3>Other useful SVG DOM methods</h3>
+  <table class="comparison-table">
+    <thead>
+      <tr><th>Method</th><th>Returns</th><th>Use case</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>el.getBBox()</code></td><td><code>{x, y, width, height}</code></td><td>Element's bounding box in local coordinates (before transforms)</td></tr>
+      <tr><td><code>el.getBoundingClientRect()</code></td><td>DOMRect in screen pixels</td><td>Element's bounds after all transforms, in viewport coords</td></tr>
+      <tr><td><code>el.getCTM()</code></td><td>SVGMatrix</td><td>Current transformation matrix from element to nearest viewport</td></tr>
+      <tr><td><code>el.getScreenCTM()</code></td><td>SVGMatrix</td><td>Matrix from element to screen (includes all ancestor transforms)</td></tr>
+      <tr><td><code>path.getTotalLength()</code></td><td>Number</td><td>Path's computed arc length</td></tr>
+      <tr><td><code>path.getPointAtLength(d)</code></td><td><code>{x, y}</code></td><td>Coordinates at distance <code>d</code> along the path</td></tr>
+      <tr><td><code>svg.createSVGPoint()</code></td><td>SVGPoint</td><td>Create a point for coordinate transforms</td></tr>
+      <tr><td><code>svg.createSVGMatrix()</code></td><td>SVGMatrix</td><td>Create a matrix for transform calculations</td></tr>
+    </tbody>
+  </table>
+
+  <div class="key-concept">
+    <strong>getBBox() vs getBoundingClientRect()</strong>
+    <p><code>getBBox()</code> returns the box in the element's <em>local coordinate space</em> (before any transforms on the element or its ancestors). <code>getBoundingClientRect()</code> returns the box in <em>screen pixels</em> (after all transforms). Use <code>getBBox()</code> when you need to position other SVG elements relative to this one (same coordinate space). Use <code>getBoundingClientRect()</code> when coordinating with HTML elements or the page.</p>
+  </div>
+
+  <h2>7. Dragging SVG Elements</h2>
+  <p>A complete drag implementation combining coordinate conversion, pointer events, and SVG transforms:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>const svg = document.querySelector('svg');
+const draggable = document.querySelector('.draggable');
+
+let dragging = false;
+let offset = { x: 0, y: 0 };
+
+function svgCoords(e) {
+  const pt = svg.createSVGPoint();
+  pt.x = e.clientX;
+  pt.y = e.clientY;
+  return pt.matrixTransform(svg.getScreenCTM().inverse());
+}
+
+draggable.addEventListener('pointerdown', (e) =&gt; {
+  dragging = true;
+  draggable.setPointerCapture(e.pointerId);
+  const pos = svgCoords(e);
+  offset.x = pos.x - parseFloat(draggable.getAttribute('cx'));
+  offset.y = pos.y - parseFloat(draggable.getAttribute('cy'));
+});
+
+svg.addEventListener('pointermove', (e) =&gt; {
+  if (!dragging) return;
+  const pos = svgCoords(e);
+  draggable.setAttribute('cx', pos.x - offset.x);
+  draggable.setAttribute('cy', pos.y - offset.y);
+});
+
+svg.addEventListener('pointerup', () =&gt; { dragging = false; });</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="400" height="200" viewBox="0 0 400 200" id="demo-drag">
+      <rect width="400" height="200" fill="var(--demo-svg-bg)"/>
+      <circle class="demo-draggable" cx="200" cy="100" r="25" fill="coral" style="cursor:grab;"/>
+      <circle class="demo-draggable" cx="100" cy="100" r="20" fill="#61afef" style="cursor:grab;"/>
+      <circle class="demo-draggable" cx="300" cy="100" r="20" fill="#98c379" style="cursor:grab;"/>
+    </svg>
+    <p class="demo-caption">Drag any circle. Uses <code>setPointerCapture</code> for reliable tracking even when the pointer leaves the element during fast moves.</p>
+  </div>
+
+  <div class="key-concept">
+    <strong>setPointerCapture is essential</strong>
+    <p>Without pointer capture, if you move the mouse faster than the browser can reposition the element, the pointer "escapes" the shape and <code>pointermove</code> events stop firing on it. <code>setPointerCapture(e.pointerId)</code> routes all subsequent pointer events to this element until <code>pointerup</code>, regardless of where the pointer is. This is the modern replacement for the old "attach handler to document" pattern.</p>
+  </div>
+
+  <h2>8. Responsive SVG with JavaScript</h2>
+  <p>SVG scales beautifully via <code>viewBox</code>, but sometimes you need JavaScript to adapt the <em>content</em> (not just scale)  -  adjusting label positions, toggling detail levels, or recalculating layouts:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>const svg = document.querySelector('svg');
+
+// ResizeObserver  -  fires when the SVG element's rendered size changes
+const ro = new ResizeObserver(entries =&gt; {
+  const { width } = entries[0].contentRect;
+
+  if (width &lt; 300) {
+    // Compact: hide labels, simplify
+    svg.querySelectorAll('.label').forEach(l =&gt; l.style.display = 'none');
+    svg.querySelectorAll('.detail').forEach(d =&gt; d.style.display = 'none');
+  } else {
+    // Full: show everything
+    svg.querySelectorAll('.label').forEach(l =&gt; l.style.display = '');
+    svg.querySelectorAll('.detail').forEach(d =&gt; d.style.display = '');
+  }
+});
+
+ro.observe(svg);</code></pre>
+  </div>
+
+  <div class="warning">
+    <strong>viewBox handles scaling; ResizeObserver handles adaptation</strong>
+    <p>Don't use ResizeObserver to manually scale SVG  -  that's what <code>viewBox</code> is for (it scales automatically). Use ResizeObserver when you need to change the <em>content</em> at different sizes: hiding/showing labels, switching between detailed and simplified views, repositioning elements that shouldn't scale with the rest (like fixed-size text or icons).</p>
+  </div>
+
+  <h2>Quiz</h2>
+
+  <div class="quiz">
+    <h3>Question 1</h3>
+    <p>Why must you use <code>createElementNS</code> instead of <code>createElement</code> for SVG elements?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">createElement doesn't accept SVG tag names as valid strings</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">SVG elements live in a different XML namespace than HTML elements</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">createElement creates elements that can't have attributes set on them</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">createElement is deprecated in modern browsers for all new elements</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz">
+    <h3>Question 2</h3>
+    <p>What does <code>svg.getScreenCTM().inverse()</code> give you?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">The SVG element's position on the page in pixels</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">A matrix that converts screen pixel coordinates to SVG user coordinates</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">The inverse of all CSS transforms applied to the SVG element</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">A matrix that converts SVG coordinates to screen pixel coordinates</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz">
+    <h3>Question 3</h3>
+    <p>What does <code>path.getPointAtLength(path.getTotalLength() * 0.75)</code> return?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">The control point at 75% of the path's Bezier curves</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">The coordinates of the path's end reduced by 25%</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">The x,y coordinates at 75% of the distance along the path</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">A point that is 75% of the way between the path's start and end in a straight line</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz">
+    <h3>Question 4</h3>
+    <p>What does <code>setPointerCapture</code> do during a drag operation?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Prevents the default browser drag behaviour (text selection, image ghost)</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Locks the cursor to the dragged element's visual bounds</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">Routes all subsequent pointer events to the capturing element regardless of pointer position</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Prevents other pointer event listeners on the page from firing</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz">
+    <h3>Question 5</h3>
+    <p>Which WAAPI feature has no equivalent in CSS <code>@keyframes</code>?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Animating transform and opacity simultaneously on one element</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Using easing functions like ease-in-out between keyframes</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">Seeking to a specific time in the animation with currentTime</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Running an animation with infinite repetition count</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <h2>Exercises</h2>
+  <ol>
+    <li><strong>Click-to-create</strong>  -  Build an SVG canvas where clicking creates circles at the click position (use <code>getScreenCTM</code> for coordinate conversion). Each circle should have a random colour and radius. Add a "Clear all" button that removes all dynamically-created circles.</li>
+    <li><strong>Path follower</strong>  -  Draw a complex Bézier path. Use <code>requestAnimationFrame</code> and <code>getPointAtLength</code> to move a circle along the path at constant speed. Add a speed slider that adjusts the animation rate.</li>
+    <li><strong>Drag-and-snap</strong>  -  Create 5 draggable circles and a set of target "slots" (outlined circles). When a dragged circle is released near a slot, snap it to the slot's centre. Use <code>getBBox()</code> to calculate proximity.</li>
+    <li><strong>WAAPI orchestration</strong>  -  Create 3 shapes. Use the Web Animations API to run a choreographed sequence: shape 1 animates, then on its <code>.finished</code> promise, shape 2 starts, then shape 3. Add a "Replay" button and a "Reverse all" button.</li>
+    <li><strong>Dynamic chart</strong>  -  Build a function that takes an array of numbers and generates a complete SVG bar chart with: bars, x-axis labels, y-axis scale, grid lines, and a title. Animate the bars in with WAAPI (staggered, growing from bottom). Handle window resize by adapting label visibility.</li>
+  </ol>
+
+  <div class="recommended">
+    <strong>Recommended resource:</strong>
+    <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Animations_API">MDN: Web Animations API</a>  -  comprehensive reference for <code>Element.animate()</code>, <code>KeyframeEffect</code>, <code>Animation</code> playback control, and timing options. For SVG DOM specifics, see <a href="https://developer.mozilla.org/en-US/docs/Web/API/SVGGeometryElement">MDN: SVGGeometryElement</a> (covers <code>getTotalLength</code>, <code>getPointAtLength</code>). For coordinate transforms, see <a href="https://www.w3.org/TR/SVG11/coords.html#InterfaceSVGLocatable">W3C SVG Coordinate Interface</a>.
+  </div>
+  <div class="footer-nav">
+    <a href="11-css-animation-of-svg.html">&larr; Prev: CSS Animation of SVG</a>
+    <a href="index.html">Index</a>
+    <a href="13-putting-it-together.html">Next: Capstone Project &rarr;</a>
+  </div>
+
+    </main>
+  </div><!-- end .page-layout -->
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="scripts.js"></script>
+  <script>
+    // --- Lesson 12 interactive demos ---
+    const SVG_NS = 'http://www.w3.org/2000/svg';
+
+    // Demo 1: Namespace  -  click to create circle
+    (function() {
+      const svg = document.getElementById('demo-namespace');
+      if (!svg) return;
+      svg.addEventListener('click', (e) => {
+        const pt = svg.createSVGPoint();
+        pt.x = e.clientX;
+        pt.y = e.clientY;
+        const svgPt = pt.matrixTransform(svg.getScreenCTM().inverse());
+        const circle = document.createElementNS(SVG_NS, 'circle');
+        circle.setAttribute('cx', svgPt.x);
+        circle.setAttribute('cy', svgPt.y);
+        circle.setAttribute('r', '12');
+        circle.setAttribute('fill', 'coral');
+        circle.setAttribute('opacity', '0.8');
+        svg.appendChild(circle);
+      });
+    })();
+
+    // Demo 2: Dynamic chart
+    (function() {
+      const container = document.getElementById('demo-dynamic-chart');
+      if (!container) return;
+      const data = [80, 45, 95, 60, 75, 50, 88];
+      const svg = document.createElementNS(SVG_NS, 'svg');
+      svg.setAttribute('viewBox', '0 0 300 150');
+      svg.setAttribute('width', '300');
+      svg.setAttribute('height', '150');
+      const bg = document.createElementNS(SVG_NS, 'rect');
+      bg.setAttribute('width', '300');
+      bg.setAttribute('height', '150');
+      bg.setAttribute('fill', 'var(--demo-svg-bg)');
+      svg.appendChild(bg);
+      const barW = 300 / data.length - 8;
+      const colors = ['coral', '#e5c07b', '#98c379', '#61afef', '#c678dd', '#56b6c2', '#e06c75'];
+      data.forEach((v, i) => {
+        const h = v * 1.3;
+        const rect = document.createElementNS(SVG_NS, 'rect');
+        rect.setAttribute('x', i * (barW + 8) + 4);
+        rect.setAttribute('y', 150 - h);
+        rect.setAttribute('width', barW);
+        rect.setAttribute('height', h);
+        rect.setAttribute('rx', '3');
+        rect.setAttribute('fill', colors[i % colors.length]);
+        svg.appendChild(rect);
+      });
+      container.appendChild(svg);
+    })();
+
+    // Demo 3: Click-to-place coords
+    (function() {
+      const svg = document.getElementById('demo-click-coords');
+      if (!svg) return;
+      svg.addEventListener('click', (e) => {
+        const pt = svg.createSVGPoint();
+        pt.x = e.clientX;
+        pt.y = e.clientY;
+        const svgPt = pt.matrixTransform(svg.getScreenCTM().inverse());
+        const circle = document.createElementNS(SVG_NS, 'circle');
+        circle.setAttribute('cx', svgPt.x);
+        circle.setAttribute('cy', svgPt.y);
+        circle.setAttribute('r', '6');
+        circle.setAttribute('fill', `hsl(${Math.random()*360}, 70%, 60%)`);
+        svg.appendChild(circle);
+      });
+    })();
+
+    // Demo 4: WAAPI controls
+    let waapiAnim;
+    (function() {
+      const circle = document.getElementById('demo-waapi-circle');
+      if (!circle) return;
+      waapiAnim = circle.animate([
+        { transform: 'scale(1)', opacity: 1 },
+        { transform: 'scale(1.6)', opacity: 0.4 },
+        { transform: 'scale(1)', opacity: 1 }
+      ], { duration: 2000, iterations: Infinity, easing: 'ease-in-out' });
+    })();
+    function demoWaapi(action) {
+      if (!waapiAnim) return;
+      if (action === 'play') { waapiAnim.playbackRate = 1; waapiAnim.play(); }
+      if (action === 'pause') waapiAnim.pause();
+      if (action === 'reverse') waapiAnim.reverse();
+      if (action === 'fast') waapiAnim.playbackRate = 2;
+    }
+
+    // Demo 5: Path slider
+    (function() {
+      const path = document.getElementById('demo-track-path');
+      const dot = document.getElementById('demo-path-dot');
+      const slider = document.getElementById('demo-path-slider');
+      const pctLabel = document.getElementById('demo-path-pct');
+      if (!path || !dot || !slider) return;
+      const totalLen = path.getTotalLength();
+      slider.addEventListener('input', () => {
+        const pct = slider.value / 100;
+        const pt = path.getPointAtLength(totalLen * pct);
+        dot.setAttribute('cx', pt.x);
+        dot.setAttribute('cy', pt.y);
+        pctLabel.textContent = slider.value + '%';
+      });
+    })();
+
+    // Demo 6: Drag
+    (function() {
+      const svg = document.getElementById('demo-drag');
+      if (!svg) return;
+      const circles = svg.querySelectorAll('.demo-draggable');
+      let active = null, offset = {x:0, y:0};
+      function svgCoords(e) {
+        const pt = svg.createSVGPoint();
+        pt.x = e.clientX; pt.y = e.clientY;
+        return pt.matrixTransform(svg.getScreenCTM().inverse());
+      }
+      circles.forEach(c => {
+        c.addEventListener('pointerdown', (e) => {
+          active = c;
+          c.setPointerCapture(e.pointerId);
+          c.style.cursor = 'grabbing';
+          const pos = svgCoords(e);
+          offset.x = pos.x - parseFloat(c.getAttribute('cx'));
+          offset.y = pos.y - parseFloat(c.getAttribute('cy'));
+        });
+      });
+      svg.addEventListener('pointermove', (e) => {
+        if (!active) return;
+        const pos = svgCoords(e);
+        active.setAttribute('cx', pos.x - offset.x);
+        active.setAttribute('cy', pos.y - offset.y);
+      });
+      svg.addEventListener('pointerup', () => {
+        if (active) active.style.cursor = 'grab';
+        active = null;
+      });
+    })();
+  </script>
+</body>
+</html>

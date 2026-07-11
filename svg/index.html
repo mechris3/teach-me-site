@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <title>SVG - From Coordinates to Animation | Teach Me</title>
+    <meta name="description" content="A complete SVG course: coordinate system, transforms, shapes, paths, styling, gradients, filters, text, SMIL animation, CSS animation, and JavaScript.">
+
+    <link rel="canonical" href="https://teachmeskills.dev/svg/">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://teachmeskills.dev/svg/">
+    <meta property="og:title" content="SVG - From Coordinates to Animation | Teach Me">
+    <meta property="og:description" content="A complete SVG course covering the coordinate system, transforms, shapes, paths, styling, gradients, filters, text, SMIL animation, CSS animation, and JavaScript interaction.">
+    <meta property="og:site_name" content="Teach Me">
+    <meta property="og:locale" content="en_GB">
+
+    <!-- Twitter/X -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="SVG - From Coordinates to Animation | Teach Me">
+    <meta name="twitter:description" content="A complete SVG course covering the coordinate system, transforms, shapes, paths, styling, gradients, filters, text, SMIL animation, CSS animation, and JavaScript interaction.">
+
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="site-header">
+        <a href="/">Teach Me</a>
+        <nav>
+            <a href="/">Courses</a>
+            <a href="/about/">About</a>
+            <button class="theme-toggle" aria-label="Toggle light/dark mode"></button>
+        </nav>
+    </header>
+
+    <main class="page-content">
+        <h1>SVG - From Coordinates to Animation</h1>
+        <p class="tagline">13 lessons taking you from the coordinate system to complex, interactive animations.</p>
+
+        <h2>Lessons</h2>
+        <ol class="lesson-list">
+            <li><span class="lesson-number">1.</span> <a href="01-coordinate-system.html">The Coordinate System</a></li>
+            <li><span class="lesson-number">2.</span> <a href="02-transforms-and-grouping.html">Transforms and Grouping</a></li>
+            <li><span class="lesson-number">3.</span> <a href="03-basic-shapes-and-paths.html">Basic Shapes and Paths</a></li>
+            <li><span class="lesson-number">4.</span> <a href="04-styling-presentation-attributes-vs-css.html">Styling: Presentation Attributes vs CSS</a></li>
+            <li><span class="lesson-number">5.</span> <a href="05-gradients-patterns-paint-servers.html">Gradients, Patterns, and Paint Servers</a></li>
+            <li><span class="lesson-number">6.</span> <a href="06-clipping-and-masking.html">Clipping and Masking</a></li>
+            <li><span class="lesson-number">7.</span> <a href="07-filters.html">Filters</a></li>
+            <li><span class="lesson-number">8.</span> <a href="08-text-and-textpath.html">Text and TextPath</a></li>
+            <li><span class="lesson-number">9.</span> <a href="09-smil-animation-fundamentals.html">SMIL Animation Fundamentals</a></li>
+            <li><span class="lesson-number">10.</span> <a href="10-smil-advanced.html">SMIL Advanced</a></li>
+            <li><span class="lesson-number">11.</span> <a href="11-css-animation-of-svg.html">CSS Animation of SVG</a></li>
+            <li><span class="lesson-number">12.</span> <a href="12-javascript-and-svg.html">JavaScript and SVG</a></li>
+            <li><span class="lesson-number">13.</span> <a href="13-putting-it-together.html">Putting It Together</a></li>
+        </ol>
+
+        <h2>Reference</h2>
+        <ul class="reference-list">
+            <li><a href="svg-elements-and-attributes.html">SVG Elements and Attributes</a></li>
+            <li><a href="svg-dom-methods.html">SVG DOM Methods</a></li>
+        </ul>
+    </main>
+
+    <footer class="site-footer">
+        <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+    </footer>
+
+    <script>
+        (function() {
+            const toggle = document.querySelector('.theme-toggle');
+            const root = document.documentElement;
+            const stored = localStorage.getItem('lesson-theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = stored || (prefersDark ? 'dark' : 'light');
+            root.setAttribute('data-theme', theme);
+            toggle.textContent = theme === 'dark' ? '\u2600\uFE0F' : '\uD83C\uDF19';
+            toggle.addEventListener('click', function() {
+                const current = root.getAttribute('data-theme');
+                const next = current === 'dark' ? 'light' : 'dark';
+                root.setAttribute('data-theme', next);
+                localStorage.setItem('lesson-theme', next);
+                toggle.textContent = next === 'dark' ? '\u2600\uFE0F' : '\uD83C\uDF19';
+            });
+        })();
+    </script>
+</body>
+</html>

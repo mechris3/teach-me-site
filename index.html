@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <title>Teach Me - Curated Frontend Lessons</title>
+    <meta name="description" content="Free, in-depth frontend lessons covering SVG, advanced CSS, and more. Reference-grade tutorials for developers and designers.">
+
+    <link rel="canonical" href="https://teachmeskills.dev/">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://teachmeskills.dev/">
+    <meta property="og:title" content="Teach Me - Curated Frontend Lessons">
+    <meta property="og:description" content="Free, in-depth frontend lessons covering SVG, advanced CSS, and more. Reference-grade tutorials for developers and designers.">
+    <meta property="og:site_name" content="Teach Me">
+    <meta property="og:locale" content="en_GB">
+
+    <!-- Twitter/X -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Teach Me - Curated Frontend Lessons">
+    <meta name="twitter:description" content="Free, in-depth frontend lessons covering SVG, advanced CSS, and more. Reference-grade tutorials for developers and designers.">
+
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <header class="site-header">
+        <a href="/">Teach Me</a>
+        <nav>
+            <a href="/">Courses</a>
+            <a href="/about/">About</a>
+            <button class="theme-toggle" aria-label="Toggle light/dark mode"></button>
+        </nav>
+    </header>
+
+    <main class="page-content">
+        <h1>Curated Frontend Lessons</h1>
+        <p class="tagline">In-depth, reference-grade tutorials for developers and designers.</p>
+
+        <h2>Courses</h2>
+        <ul class="course-list">
+            <li>
+                <a href="/svg/">SVG - From Coordinates to Animation</a>
+                <p class="description">13 lessons covering the SVG coordinate system, shapes, paths, styling, gradients, filters, text, SMIL animation, CSS animation, and JavaScript interaction.</p>
+            </li>
+            <!-- Future courses -->
+            <!--
+            <li>
+                <a href="/css/">Advanced CSS</a>
+                <p class="description">Coming soon.</p>
+            </li>
+            -->
+        </ul>
+    </main>
+
+    <footer class="site-footer">
+        <p>Content created with AI assistance and manually verified.</p>
+        <p><a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+    </footer>
+
+    <script>
+        (function() {
+            const toggle = document.querySelector('.theme-toggle');
+            const root = document.documentElement;
+            const stored = localStorage.getItem('lesson-theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = stored || (prefersDark ? 'dark' : 'light');
+            root.setAttribute('data-theme', theme);
+            toggle.textContent = theme === 'dark' ? '\u2600\uFE0F' : '\uD83C\uDF19';
+            toggle.addEventListener('click', function() {
+                const current = root.getAttribute('data-theme');
+                const next = current === 'dark' ? 'light' : 'dark';
+                root.setAttribute('data-theme', next);
+                localStorage.setItem('lesson-theme', next);
+                toggle.textContent = next === 'dark' ? '\u2600\uFE0F' : '\uD83C\uDF19';
+            });
+        })();
+    </script>
+</body>
+</html>

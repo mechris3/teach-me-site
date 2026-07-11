@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>CSS Animation of SVG - Lesson 11 | Teach Me</title>
+  <meta name="description" content="CSS transitions and keyframes on SVG elements. The transform-origin gotcha, stroke drawing technique, and staggered animations.">
+  <link rel="canonical" href="https://teachmeskills.dev/svg/11-css-animation-of-svg.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/svg/11-css-animation-of-svg.html">
+  <meta property="og:title" content="CSS Animation of SVG - Lesson 11 | Teach Me">
+  <meta property="og:description" content="CSS transitions and keyframes on SVG elements. The transform-origin gotcha, stroke drawing technique, and staggered animations.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="CSS Animation of SVG - Lesson 11 | Teach Me">
+  <meta name="twitter:description" content="CSS transitions and keyframes on SVG elements. The transform-origin gotcha, stroke drawing technique, and staggered animations.">
+  <link rel="stylesheet" href="/styles.css">
+ <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header">
+        <a href="index.html">SVG Course</a>
+      </div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-coordinate-system.html">1. Coordinate System</a></li>
+        <li><a href="02-transforms-and-grouping.html">2. Transforms &amp; Grouping</a></li>
+        <li><a href="03-basic-shapes-and-paths.html">3. Shapes &amp; Paths</a></li>
+        <li><a href="04-styling-presentation-attributes-vs-css.html">4. Styling &amp; CSS</a></li>
+        <li><a href="05-gradients-patterns-paint-servers.html">5. Gradients &amp; Patterns</a></li>
+        <li><a href="06-clipping-and-masking.html">6. Clipping &amp; Masking</a></li>
+        <li><a href="07-filters.html">7. Filters</a></li>
+        <li><a href="08-text-and-textpath.html">8. Text &amp; textPath</a></li>
+        <li><a href="09-smil-animation-fundamentals.html">9. SMIL Fundamentals</a></li>
+        <li><a href="10-smil-advanced.html">10. SMIL Advanced</a></li>
+        <li class="current"><a href="11-css-animation-of-svg.html">11. CSS Animation</a></li>
+        <li><a href="12-javascript-and-svg.html">12. JavaScript + SVG</a></li>
+        <li><a href="13-putting-it-together.html">13. Capstone Project</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="svg-elements-and-attributes.html">Elements &amp; Attributes</a></li>
+        <li><a href="svg-dom-methods.html">DOM Methods &amp; Interfaces</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 11</p>
+  <h1>CSS Animation of SVG</h1>
+  <p><a href="10-smil-advanced.html">Lessons 9&ndash;10</a> covered SMIL  -  SVG's built-in animation system. Now we shift to CSS, which brings familiar tools (<code>transition</code>, <code>@keyframes</code>, <code>animation</code>) to SVG elements. CSS animation is GPU-accelerated, integrates with your existing stylesheets, and handles already-familiar properties. But SVG has quirks  -  especially around <code>transform-origin</code>  -  that trip up even experienced CSS developers.</p>
+
+  <h2>1. What CSS Can (and Can't) Animate on SVG</h2>
+  <p>Not every SVG attribute is a CSS property. The key distinction from <a href="04-styling-presentation-attributes-vs-css.html">Lesson 4</a>: only <strong>presentation attributes</strong> that have CSS property equivalents can be transitioned or animated with CSS. Here's the practical breakdown:</p>
+
+  <table class="comparison-table">
+    <thead>
+      <tr><th>CSS-animatable</th><th>Not CSS-animatable (use SMIL or JS)</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>opacity</code></td><td><code>x</code>, <code>y</code>, <code>width</code>, <code>height</code> (on most elements)</td></tr>
+      <tr><td><code>transform</code></td><td><code>viewBox</code></td></tr>
+      <tr><td><code>fill</code>, <code>stroke</code></td><td><code>d</code> (path data)  -  except in Chrome/Edge</td></tr>
+      <tr><td><code>fill-opacity</code>, <code>stroke-opacity</code></td><td><code>points</code> (polygon/polyline)</td></tr>
+      <tr><td><code>stroke-width</code></td><td><code>r</code>, <code>cx</code>, <code>cy</code> (geometry props  -  see note)</td></tr>
+      <tr><td><code>stroke-dasharray</code></td><td><code>dx</code>, <code>dy</code> (text positioning)</td></tr>
+      <tr><td><code>stroke-dashoffset</code></td><td><code>textLength</code></td></tr>
+      <tr><td><code>color</code>, <code>filter</code>, <code>clip-path</code></td><td><code>gradientTransform</code>, <code>patternTransform</code></td></tr>
+    </tbody>
+  </table>
+
+  <div class="warning">
+    <strong>Geometry properties: the evolving spec</strong>
+    <p>SVG 2 promotes <code>r</code>, <code>cx</code>, <code>cy</code>, <code>rx</code>, <code>ry</code>, <code>x</code>, <code>y</code>, <code>width</code>, <code>height</code> to CSS properties (the "geometry properties"). Chrome and Firefox now support animating these via CSS, but Safari's support is incomplete. For cross-browser reliability today, stick to SMIL or JavaScript for geometry attributes. The future is CSS, but the present is messy.</p>
+  </div>
+
+  <div class="key-concept">
+    <strong>The rule of thumb</strong>
+    <p>If you can set it in a CSS stylesheet and it works, you can transition/animate it with CSS. If it only works as an XML attribute (like <code>viewBox</code> or <code>d</code> in Firefox/Safari), you need SMIL or JavaScript.</p>
+  </div>
+
+  <h2>2. CSS Transitions on SVG</h2>
+  <p>Transitions work on SVG elements exactly as they do on HTML elements. Apply <code>transition</code> in CSS, then change the property via <code>:hover</code>, a class toggle, or any state change:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;style&gt;
+  .hover-circle {
+    fill: coral;
+    stroke: #333;
+    stroke-width: 2;
+    transition: fill 0.4s ease, stroke-width 0.3s ease, r 0.3s ease;
+  }
+  .hover-circle:hover {
+    fill: #61afef;
+    stroke: coral;
+    stroke-width: 8;
+    r: 55;
+  }
+&lt;/style&gt;
+
+&lt;svg viewBox="0 0 200 200"&gt;
+  &lt;circle class="hover-circle" cx="100" cy="100" r="40"/&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="200" height="200" viewBox="0 0 200 200">
+      <rect width="200" height="200" fill="var(--demo-svg-bg)"/>
+      <style>
+        .demo-hover-circle {
+          fill: coral;
+          stroke: #333;
+          stroke-width: 2;
+          transition: fill 0.4s ease, stroke-width 0.3s ease, r 0.3s ease;
+          cursor: pointer;
+        }
+        .demo-hover-circle:hover {
+          fill: #61afef;
+          stroke: coral;
+          stroke-width: 8;
+          r: 55;
+        }
+      </style>
+      <circle class="demo-hover-circle" cx="100" cy="100" r="40"/>
+    </svg>
+    <p class="demo-caption">Hover the circle  -  <code>fill</code>, <code>stroke-width</code>, and <code>r</code> all transition smoothly. The stroke goes from thin dark (#333) to thick coral (2 &rarr; 8) for a clear visual difference.</p>
+  </div>
+
+  <h3>Transitioning stroke properties</h3>
+  <p>Stroke properties are particularly useful for hover states on icons and UI elements:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;style&gt;
+  .icon-path {
+    fill: none;
+    stroke: var(--muted);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: stroke 0.3s, stroke-width 0.2s;
+  }
+  .icon-path:hover {
+    stroke: coral;
+    stroke-width: 3;
+  }
+&lt;/style&gt;
+
+&lt;svg viewBox="0 0 24 24" width="48" height="48"&gt;
+  &lt;path class="icon-path"
+        d="M12 2 L2 7 L12 12 L22 7 Z M2 17 L12 22 L22 17 M2 12 L12 17 L22 12"/&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="120" height="120" viewBox="0 0 24 24" style="cursor:pointer">
+      <rect width="24" height="24" fill="var(--demo-svg-bg)"/>
+      <style>
+        .demo-icon-path {
+          fill: none;
+          stroke: var(--muted);
+          stroke-width: 1.5;
+          stroke-linecap: round;
+          stroke-linejoin: round;
+          transition: stroke 0.3s, stroke-width 0.2s;
+        }
+        .demo-icon-path:hover {
+          stroke: coral;
+          stroke-width: 2.5;
+        }
+      </style>
+      <path class="demo-icon-path" d="M12 2 L2 7 L12 12 L22 7 Z"/>
+      <path class="demo-icon-path" d="M2 17 L12 22 L22 17"/>
+      <path class="demo-icon-path" d="M2 12 L12 17 L22 12"/>
+    </svg>
+    <p class="demo-caption">Hover each layer of the icon  -  stroke colour and width transition independently per path.</p>
+  </div>
+
+  <h2>3. @keyframes Animation</h2>
+  <p>For continuous or multi-step animations, <code>@keyframes</code> gives you full control over the timeline. The syntax is identical to HTML element animations:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;style&gt;
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%      { opacity: 0.6; transform: scale(1.3); }
+  }
+  .pulse-circle {
+    animation: pulse 2s ease-in-out infinite;
+    transform-origin: center;  /* Critical for SVG  -  see section 4 */
+  }
+&lt;/style&gt;
+
+&lt;svg viewBox="0 0 200 200"&gt;
+  &lt;circle class="pulse-circle" cx="100" cy="100" r="30" fill="#61afef"/&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="200" height="200" viewBox="0 0 200 200">
+      <rect width="200" height="200" fill="var(--demo-svg-bg)"/>
+      <style>
+        @keyframes demo-pulse {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50%      { opacity: 0.6; transform: scale(1.3); }
+        }
+        .demo-pulse-circle {
+          animation: demo-pulse 2s ease-in-out infinite;
+          transform-origin: center;
+        }
+      </style>
+      <circle class="demo-pulse-circle" cx="100" cy="100" r="30" fill="#61afef"/>
+    </svg>
+    <p class="demo-caption">Pulsing circle using <code>@keyframes</code>. Note <code>transform-origin: center</code>  -  without it, the scale would anchor to the SVG top-left corner.</p>
+  </div>
+
+  <h3>Multi-step colour cycling</h3>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;style&gt;
+  @keyframes color-cycle {
+    0%   { fill: coral; }
+    25%  { fill: #e5c07b; }
+    50%  { fill: #98c379; }
+    75%  { fill: #61afef; }
+    100% { fill: coral; }
+  }
+  .cycling-rect {
+    animation: color-cycle 4s linear infinite;
+  }
+&lt;/style&gt;
+
+&lt;svg viewBox="0 0 200 120"&gt;
+  &lt;rect class="cycling-rect" x="50" y="30" width="100" height="60" rx="8"/&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="200" height="120" viewBox="0 0 200 120">
+      <rect width="200" height="120" fill="var(--demo-svg-bg)"/>
+      <style>
+        @keyframes demo-color-cycle {
+          0%   { fill: coral; }
+          25%  { fill: #e5c07b; }
+          50%  { fill: #98c379; }
+          75%  { fill: #61afef; }
+          100% { fill: coral; }
+        }
+        .demo-cycling-rect {
+          animation: demo-color-cycle 4s linear infinite;
+        }
+      </style>
+      <rect class="demo-cycling-rect" x="50" y="30" width="100" height="60" rx="8"/>
+    </svg>
+    <p class="demo-caption">Four-colour fill cycle. CSS interpolates between named colours, hex, rgb  -  even <code>currentColor</code>.</p>
+  </div>
+
+  <h3>Spinning loader</h3>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;style&gt;
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  .spinner {
+    animation: spin 1s linear infinite;
+    transform-origin: center;
+    fill: none;
+    stroke: #61afef;
+    stroke-width: 4;
+    stroke-linecap: round;
+    stroke-dasharray: 90 150;
+  }
+&lt;/style&gt;
+
+&lt;svg viewBox="0 0 50 50" width="80" height="80"&gt;
+  &lt;circle class="spinner" cx="25" cy="25" r="20"/&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="80" height="80" viewBox="0 0 50 50">
+      <style>
+        @keyframes demo-spin {
+          to { transform: rotate(360deg); }
+        }
+        .demo-spinner {
+          animation: demo-spin 1s linear infinite;
+          transform-origin: center;
+          fill: none;
+          stroke: var(--accent);
+          stroke-width: 4;
+          stroke-linecap: round;
+          stroke-dasharray: 90 150;
+        }
+      </style>
+      <circle class="demo-spinner" cx="25" cy="25" r="20"/>
+    </svg>
+    <p class="demo-caption">Classic spinner: a dashed-stroke circle rotating continuously. Two lines of CSS.</p>
+  </div>
+
+  <h2>4. The transform-origin Gotcha</h2>
+  <p>This is the single biggest source of confusion when animating SVG with CSS. On HTML elements, <code>transform-origin</code> defaults to the element's centre (<code>50% 50%</code>). On SVG elements, the default is different depending on the SVG spec version and browser:</p>
+
+  <table class="comparison-table">
+    <thead>
+      <tr><th>Context</th><th>Default transform-origin</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>HTML elements</td><td><code>50% 50%</code> of the element's border box (its own centre)</td></tr>
+      <tr><td>SVG elements (SVG 1.1 / older browsers)</td><td><code>0 0</code> of the SVG viewport (top-left of the entire SVG)</td></tr>
+      <tr><td>SVG elements (SVG 2 / modern browsers)</td><td><code>0 0</code> of the element's own bounding box</td></tr>
+    </tbody>
+  </table>
+
+  <div class="warning">
+    <strong>Neither default is "element centre"</strong>
+    <p>Unlike HTML, SVG elements do NOT default to rotating/scaling from their own visual centre. In modern browsers (SVG 2), the origin is the top-left corner of the element's bounding box. In older browsers, it's the top-left of the entire SVG canvas. Either way, you must explicitly set <code>transform-origin</code> for centre-based transforms.</p>
+  </div>
+
+  <h3>The problem in action</h3>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;style&gt;
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  /* Without transform-origin set */
+  .bad-rotate {
+    animation: spin 3s linear infinite;
+    /* transform-origin defaults to bounding-box top-left! */
+  }
+  /* With transform-origin fixed */
+  .good-rotate {
+    animation: spin 3s linear infinite;
+    transform-origin: center;  /* = 50% 50% of bounding box */
+  }
+&lt;/style&gt;
+
+&lt;svg viewBox="0 0 400 200"&gt;
+  &lt;rect class="bad-rotate" x="75" y="75" width="50" height="50" fill="coral"/&gt;
+  &lt;rect class="good-rotate" x="275" y="75" width="50" height="50" fill="#98c379"/&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="400" height="200" viewBox="0 0 400 200">
+      <rect width="400" height="200" fill="var(--demo-svg-bg)"/>
+      <style>
+        @keyframes demo-spin-slow {
+          to { transform: rotate(360deg); }
+        }
+        .demo-bad-rotate {
+          animation: demo-spin-slow 3s linear infinite;
+          /* No transform-origin  -  defaults to top-left of bounding box */
+        }
+        .demo-good-rotate {
+          animation: demo-spin-slow 3s linear infinite;
+          transform-origin: center;
+        }
+      </style>
+      <!-- Left: broken -->
+      <text x="100" y="25" text-anchor="middle" font-size="11" fill="var(--muted)">No transform-origin</text>
+      <rect class="demo-bad-rotate" x="75" y="75" width="50" height="50" rx="4" fill="coral"/>
+      <!-- Right: fixed -->
+      <text x="300" y="25" text-anchor="middle" font-size="11" fill="var(--muted)">transform-origin: center</text>
+      <rect class="demo-good-rotate" x="275" y="75" width="50" height="50" rx="4" fill="#98c379"/>
+    </svg>
+    <p class="demo-caption">Left: rotates around its top-left corner (wrong). Right: rotates around its own centre (correct). Same <code>@keyframes</code>, different <code>transform-origin</code>.</p>
+  </div>
+
+  <h3>The solutions</h3>
+  <p>Three approaches to get centre-based transforms working reliably:</p>
+
+  <table class="comparison-table">
+    <thead>
+      <tr><th>Approach</th><th>Code</th><th>Best for</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Keyword <code>center</code></td>
+        <td><code>transform-origin: center</code></td>
+        <td>Modern browsers (SVG 2). Simplest.</td>
+      </tr>
+      <tr>
+        <td>Percentage</td>
+        <td><code>transform-origin: 50% 50%</code></td>
+        <td>Same as above  -  resolves to bounding-box centre</td>
+      </tr>
+      <tr>
+        <td>Explicit coordinates</td>
+        <td><code>transform-origin: 100px 100px</code></td>
+        <td>When you need a specific fixed point (not the element's centre)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="key-concept">
+    <strong>Always set transform-origin explicitly on animated SVG elements</strong>
+    <p>Make it a habit: any time you use <code>transform</code> in a CSS animation or transition on an SVG element, add <code>transform-origin: center</code> (or the appropriate value). This eliminates the #1 debugging headache in SVG + CSS animation. The <code>center</code> keyword maps to <code>50% 50%</code> of the element's bounding box in SVG 2, which is almost always what you want.</p>
+  </div>
+
+  <h3>transform-box: another piece of the puzzle</h3>
+  <p>When you write <code>transform-origin: 50% 50%</code>, the browser needs to know: 50% of <em>what</em>? The <code>transform-box</code> property answers that question. It defines the reference box that percentages resolve against:</p>
+
+  <div class="demo">
+    <svg width="400" height="200" viewBox="0 0 400 200">
+      <rect width="400" height="200" fill="var(--demo-svg-bg)"/>
+      <!-- view-box scenario (left) -->
+      <text x="100" y="20" text-anchor="middle" font-size="10" fill="var(--muted)">transform-box: view-box</text>
+      <rect x="0" y="25" width="200" height="170" fill="none" stroke="var(--muted)" stroke-dasharray="3 3" stroke-width="1"/>
+      <text x="100" y="192" text-anchor="middle" font-size="8" fill="var(--muted)">viewport (200&times;170)</text>
+      <!-- The element -->
+      <rect x="60" y="70" width="50" height="50" rx="4" fill="coral" opacity="0.4"/>
+      <!-- Origin marker at viewport centre (100, 110) -->
+      <circle cx="100" cy="110" r="5" fill="none" stroke="#e5c07b" stroke-width="2"/>
+      <line x1="95" y1="110" x2="105" y2="110" stroke="#e5c07b" stroke-width="1.5"/>
+      <line x1="100" y1="105" x2="100" y2="115" stroke="#e5c07b" stroke-width="1.5"/>
+      <text x="100" y="130" text-anchor="middle" font-size="8" fill="#e5c07b">50% 50% = viewport centre</text>
+
+      <!-- fill-box scenario (right) -->
+      <text x="300" y="20" text-anchor="middle" font-size="10" fill="var(--muted)">transform-box: fill-box</text>
+      <rect x="200" y="25" width="200" height="170" fill="none" stroke="var(--muted)" stroke-dasharray="3 3" stroke-width="1" opacity="0.4"/>
+      <!-- The element's bounding box highlighted -->
+      <rect x="260" y="70" width="50" height="50" rx="4" fill="coral" opacity="0.4"/>
+      <rect x="260" y="70" width="50" height="50" fill="none" stroke="#98c379" stroke-width="1.5" stroke-dasharray="4 2"/>
+      <text x="285" y="133" text-anchor="middle" font-size="8" fill="#98c379">bounding box</text>
+      <!-- Origin marker at element centre (285, 95) -->
+      <circle cx="285" cy="95" r="5" fill="none" stroke="#e5c07b" stroke-width="2"/>
+      <line x1="280" y1="95" x2="290" y2="95" stroke="#e5c07b" stroke-width="1.5"/>
+      <line x1="285" y1="90" x2="285" y2="100" stroke="#e5c07b" stroke-width="1.5"/>
+      <text x="285" y="150" text-anchor="middle" font-size="8" fill="#e5c07b">50% 50% = element centre</text>
+    </svg>
+    <p class="demo-caption">Same <code>transform-origin: 50% 50%</code>, totally different results. Left: 50% resolves against the entire SVG viewport (element orbits a distant point). Right: 50% resolves against the element's own bounding box (element spins in place). The crosshair marks where the origin lands.</p>
+  </div>
+
+  <table class="comparison-table">
+    <thead>
+      <tr><th>Value</th><th>What "50% 50%" means</th><th>When you'd see it</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>view-box</code></td><td>Centre of the nearest SVG viewport (the whole <code>&lt;svg&gt;</code> canvas)</td><td>SVG 1.1 / legacy browsers. Elements orbit the SVG centre.</td></tr>
+      <tr><td><code>fill-box</code></td><td>Centre of the element's own bounding box</td><td>SVG 2 / modern browsers (default). Elements spin in place.</td></tr>
+      <tr><td><code>border-box</code></td><td>Centre of the element's CSS border box</td><td>HTML default. Rarely relevant for SVG elements.</td></tr>
+    </tbody>
+  </table>
+
+  <p>Modern browsers default to <code>fill-box</code> for SVG elements, which is almost always what you want. But if you're seeing an element orbit a point far from itself (especially in older browsers or when the SVG has a large viewBox), the browser is using <code>view-box</code> instead. The fix: set both properties explicitly:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;style&gt;
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  .my-svg-element {
+    animation: spin 3s linear infinite;
+    transform-box: fill-box;    /* "50% means 50% of MY box" */
+    transform-origin: center;   /* = 50% 50% of that box */
+  }
+&lt;/style&gt;
+
+&lt;svg viewBox="0 0 200 200"&gt;
+  &lt;rect class="my-svg-element" x="75" y="75" width="50" height="50" fill="coral"/&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="400" height="180" viewBox="0 0 400 180">
+      <rect width="400" height="180" fill="var(--demo-svg-bg)"/>
+      <style>
+        @keyframes demo-tbox-spin {
+          to { transform: rotate(360deg); }
+        }
+        .demo-viewbox-origin {
+          animation: demo-tbox-spin 3s linear infinite;
+          transform-box: view-box;
+          transform-origin: 50% 50%;
+        }
+        .demo-fillbox-origin {
+          animation: demo-tbox-spin 3s linear infinite;
+          transform-box: fill-box;
+          transform-origin: 50% 50%;
+        }
+      </style>
+      <text x="100" y="18" text-anchor="middle" font-size="10" fill="var(--muted)">transform-box: view-box</text>
+      <text x="300" y="18" text-anchor="middle" font-size="10" fill="var(--muted)">transform-box: fill-box</text>
+      <!-- Left: view-box (orbits viewport centre) -->
+      <rect class="demo-viewbox-origin" x="75" y="65" width="40" height="40" rx="4" fill="coral"/>
+      <!-- Right: fill-box (spins in place) -->
+      <rect class="demo-fillbox-origin" x="280" y="65" width="40" height="40" rx="4" fill="#98c379"/>
+      <text x="100" y="170" text-anchor="middle" font-size="9" fill="var(--muted)">Orbits the SVG centre</text>
+      <text x="300" y="170" text-anchor="middle" font-size="9" fill="var(--muted)">Spins in place</text>
+    </svg>
+    <p class="demo-caption">Both have <code>transform-origin: 50% 50%</code>. Left uses <code>view-box</code> (50% = middle of viewport, so the rect orbits far from itself). Right uses <code>fill-box</code> (50% = middle of the rect's own box, so it spins neatly in place).</p>
+  </div>
+
+  <div class="key-concept">
+    <strong>The two-property recipe</strong>
+    <p>For bullet-proof, cross-browser SVG transforms: always set <strong>both</strong> <code>transform-box: fill-box</code> and <code>transform-origin: center</code>. This combination means "rotate around my own centre" regardless of browser age or SVG viewport size. Once this becomes muscle memory, you'll never debug a mysterious orbit again.</p>
+  </div>
+
+  <h2>5. The Stroke Drawing Technique</h2>
+  <p>This is the technique that makes SVG logos "draw themselves" on screen. It's one of the most visually satisfying effects in web animation, and it's built entirely on two CSS-animatable properties: <code>stroke-dasharray</code> and <code>stroke-dashoffset</code>.</p>
+
+  <h3>How it works</h3>
+  <p>The mental model:</p>
+  <ol>
+    <li>Set <code>stroke-dasharray</code> to the path's total length  -  this creates one dash as long as the entire path, followed by a gap of equal length</li>
+    <li>Set <code>stroke-dashoffset</code> to the same value  -  this shifts the dash forward along the path so it sits entirely past the end, leaving only the invisible gap over the visible path length</li>
+    <li>Animate <code>stroke-dashoffset</code> to <code>0</code>  -  the dash slides into view, creating the illusion of the path being drawn</li>
+  </ol>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;style&gt;
+  @keyframes draw {
+    to { stroke-dashoffset: 0; }
+  }
+  .draw-path {
+    fill: none;
+    stroke: coral;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-dasharray: 320;    /* total length of the path */
+    stroke-dashoffset: 320;   /* initially hidden */
+    animation: draw 2s ease forwards;
+  }
+&lt;/style&gt;
+
+&lt;svg viewBox="0 0 200 200"&gt;
+  &lt;path class="draw-path"
+        d="M 20,100 C 20,20 180,20 180,100 C 180,180 20,180 20,100"/&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="200" height="200" viewBox="0 0 200 200" id="draw-demo-1">
+      <rect width="200" height="200" fill="var(--demo-svg-bg)"/>
+      <style>
+        @keyframes demo-draw {
+          to { stroke-dashoffset: 0; }
+        }
+        .demo-draw-path {
+          fill: none;
+          stroke: coral;
+          stroke-width: 3;
+          stroke-linecap: round;
+          stroke-dasharray: 500;
+          stroke-dashoffset: 500;
+          animation: demo-draw 2.5s ease forwards;
+        }
+      </style>
+      <path class="demo-draw-path" d="M 20,100 C 20,20 180,20 180,100 C 180,180 20,180 20,100"/>
+    </svg>
+    <p class="demo-caption">A figure-8 path drawing itself. Refresh the page (or click below) to replay.</p>
+    <div class="demo-controls">
+      <button onclick="replayDraw('draw-demo-1', '.demo-draw-path')">Replay</button>
+    </div>
+  </div>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <h3>Finding the path length</h3>
+  <p>You need the path's total length so you know what value to set <code>stroke-dasharray</code> and <code>stroke-dashoffset</code> to. But why can't you just calculate it from the path data?</p>
+  <p>For straight lines it's easy (Pythagoras). But most paths contain Bézier curves, and Bézier curves have <strong>no closed-form formula for arc length</strong>. The length of a cubic Bézier can only be computed via numerical integration (the browser internally subdivides the curve into tiny segments and sums them). That's why <code>getTotalLength()</code> exists  -  it's the browser doing that calculation for you. Three practical approaches:</p>
+
+  <table class="comparison-table">
+    <thead>
+      <tr><th>Method</th><th>How</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>JavaScript</td><td><code>document.querySelector('path').getTotalLength()</code></td></tr>
+      <tr><td>Browser DevTools</td><td>Select the path, run <code>$0.getTotalLength()</code> in Console</td></tr>
+      <tr><td>Over-estimate</td><td>Set dasharray to a value <em>larger</em> than the path length  -  works perfectly, the excess is simply ignored</td></tr>
+    </tbody>
+  </table>
+
+  <div class="key-concept">
+    <strong>Over-estimating is perfectly fine</strong>
+    <p>If your path is 287 units long and you set <code>stroke-dasharray: 400; stroke-dashoffset: 400</code>, the animation still works. Think of it like a <strong>train and a tunnel</strong>:</p>
+    <ul>
+      <li>The <strong>tunnel</strong> is the path  -  only what's inside the tunnel is visible</li>
+      <li>The <strong>train</strong> is the dash  -  it can be longer than the tunnel</li>
+      <li><strong>Dashoffset</strong> controls where the train is parked along the track</li>
+    </ul>
+    <p>An over-long train fills the tunnel just as well as a perfectly-sized one  -  the extra carriages just stick out the far end where nobody can see them. The only subtlety: the animation spreads its duration across the <em>full</em> offset range, so the visible drawing finishes slightly before the animation clock runs out. With <code>ease</code> timing this trailing pause is imperceptible.</p>
+  </div>
+
+  <div class="demo">
+    <svg width="700" height="560" viewBox="0 0 420 310">
+      <rect width="420" height="310" fill="var(--demo-svg-bg)"/>
+
+      <!-- Title -->
+      <text x="210" y="16" text-anchor="middle" font-size="10" font-weight="bold" fill="var(--text-heading)">The train &amp; tunnel: over-estimated dasharray</text>
+
+      <!-- The tunnel (visible path region) -->
+      <rect x="140" y="30" width="180" height="36" rx="6" fill="var(--bg-surface)" stroke="var(--border)" stroke-width="1.5"/>
+      <text x="230" y="52" text-anchor="middle" font-size="9" fill="var(--muted)" font-weight="600">TUNNEL (visible path: 200 units)</text>
+      <!-- Tunnel start/end labels -->
+      <text x="140" y="78" text-anchor="middle" font-size="8" fill="var(--muted)">start</text>
+      <text x="320" y="78" text-anchor="middle" font-size="8" fill="var(--muted)">end</text>
+      <!-- Direction arrow -->
+      <line x1="180" y1="24" x2="270" y2="24" stroke="var(--muted)" stroke-width="0.8" marker-end="url(#arrowhead)"/>
+      <defs><marker id="arrowhead" markerWidth="6" markerHeight="4" refX="5" refY="2" orient="auto"><path d="M0,0 L6,2 L0,4" fill="var(--muted)"/></marker></defs>
+      <text x="225" y="22" text-anchor="middle" font-size="7" fill="var(--muted)">train direction</text>
+
+      <!-- FRAME 1: offset = 300 -->
+      <text x="12" y="100" font-size="9" fill="var(--text-h3)" font-weight="bold">t = 0%</text>
+      <text x="12" y="110" font-size="7" fill="var(--muted)">offset: 300</text>
+      <!-- Tunnel outline -->
+      <rect x="140" y="95" width="180" height="18" rx="4" fill="var(--bg-surface)" stroke="var(--border)" stroke-width="0.5"/>
+      <!-- Ghost train to the left (kept within bounds) -->
+      <rect x="60" y="97" width="80" height="14" rx="3" fill="coral" opacity="0.15" stroke="coral" stroke-width="0.5" stroke-dasharray="2 2"/>
+      <!-- Labels below -->
+      <text x="230" y="126" text-anchor="middle" font-size="7" fill="var(--muted)">Tunnel empty  -  train hasn't reached it yet</text>
+      <text x="80" y="126" text-anchor="middle" font-size="7" fill="coral">train (waiting)</text>
+
+      <!-- FRAME 2: offset = 150 -->
+      <text x="12" y="152" font-size="9" fill="var(--text-h3)" font-weight="bold">t = 50%</text>
+      <text x="12" y="162" font-size="7" fill="var(--muted)">offset: 150</text>
+      <!-- Tunnel outline -->
+      <rect x="140" y="147" width="180" height="18" rx="4" fill="var(--bg-surface)" stroke="var(--border)" stroke-width="0.5"/>
+      <!-- Visible portion inside tunnel -->
+      <rect x="140" y="149" width="135" height="14" rx="3 0 0 3" fill="coral" opacity="0.8"/>
+      <!-- Ghost portion still outside left -->
+      <rect x="60" y="149" width="80" height="14" rx="3 0 0 3" fill="coral" opacity="0.15" stroke="coral" stroke-width="0.5" stroke-dasharray="2 2"/>
+      <!-- Labels below -->
+      <text x="207" y="178" text-anchor="middle" font-size="7" fill="coral" font-weight="bold">visible (path drawing)</text>
+      <text x="80" y="178" text-anchor="middle" font-size="7" fill="coral" opacity="0.6">hidden</text>
+
+      <!-- FRAME 3: offset = 100 (fully drawn!) -->
+      <text x="12" y="204" font-size="9" fill="var(--text-h3)" font-weight="bold">t = 67%</text>
+      <text x="12" y="214" font-size="7" fill="var(--muted)">offset: 100</text>
+      <!-- Tunnel outline -->
+      <rect x="140" y="199" width="180" height="18" rx="4" fill="var(--bg-surface)" stroke="var(--border)" stroke-width="0.5"/>
+      <!-- Full tunnel coverage -->
+      <rect x="140" y="201" width="180" height="14" rx="3" fill="coral" opacity="0.8"/>
+      <!-- Ghost excess to the left -->
+      <rect x="60" y="201" width="80" height="14" rx="3 0 0 3" fill="coral" opacity="0.15" stroke="coral" stroke-width="0.5" stroke-dasharray="2 2"/>
+      <!-- Labels below -->
+      <text x="230" y="230" text-anchor="middle" font-size="7" fill="#98c379" font-weight="bold">Fully drawn! Tunnel completely filled</text>
+      <text x="80" y="230" text-anchor="middle" font-size="7" fill="coral" opacity="0.6">excess</text>
+
+      <!-- FRAME 4: offset = 0 -->
+      <text x="12" y="256" font-size="9" fill="var(--text-h3)" font-weight="bold">t = 100%</text>
+      <text x="12" y="266" font-size="7" fill="var(--muted)">offset: 0</text>
+      <!-- Tunnel outline -->
+      <rect x="140" y="251" width="180" height="18" rx="4" fill="var(--bg-surface)" stroke="var(--border)" stroke-width="0.5"/>
+      <!-- Full tunnel coverage -->
+      <rect x="140" y="253" width="180" height="14" rx="3" fill="coral" opacity="0.8"/>
+      <!-- Ghost excess to the right -->
+      <rect x="320" y="253" width="80" height="14" rx="0 3 3 0" fill="coral" opacity="0.15" stroke="coral" stroke-width="0.5" stroke-dasharray="2 2"/>
+      <!-- Labels below -->
+      <text x="210" y="282" text-anchor="middle" font-size="7" fill="var(--muted)">Looks identical to t=67%  -  excess has passed through</text>
+      <text x="360" y="282" text-anchor="middle" font-size="7" fill="coral" opacity="0.6">excess</text>
+
+      <!-- Bracket: "no visible change" between frames 3 and 4 -->
+      <line x1="370" y1="202" x2="370" y2="262" stroke="#e5c07b" stroke-width="1.5"/>
+      <line x1="367" y1="202" x2="373" y2="202" stroke="#e5c07b" stroke-width="1.5"/>
+      <line x1="367" y1="262" x2="373" y2="262" stroke="#e5c07b" stroke-width="1.5"/>
+      <text x="380" y="228" font-size="7" fill="#e5c07b">no visible</text>
+      <text x="380" y="237" font-size="7" fill="#e5c07b">change</text>
+
+      <!-- Bottom summary -->
+      <text x="210" y="302" text-anchor="middle" font-size="8" fill="var(--muted)">Drawing starts immediately. Finishes visually before the animation clock runs out.</text>
+    </svg>
+    <p class="demo-caption">The train (dash) travels left-to-right. At t=67% the tunnel is full  -  the last 33% of animation time is invisible. No start delay; slight end pause.</p>
+  </div>
+
+  <h3>Segmented draw (simultaneous multi-point)</h3>
+  <p>The standard technique animates <code>stroke-dashoffset</code> (sliding one long dash into view). This variant is a <strong>different mechanism entirely</strong>  -  it animates <code>stroke-dasharray</code> itself, growing multiple dashes from zero width simultaneously:</p>
+
+  <table class="comparison-table">
+    <thead>
+      <tr><th></th><th>Standard draw</th><th>Segmented draw</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>What's animated</strong></td><td><code>stroke-dashoffset</code></td><td><code>stroke-dasharray</code></td></tr>
+      <tr><td><strong>What's static</strong></td><td>dasharray (one long dash + gap)</td><td>dashoffset (stays at 0)</td></tr>
+      <tr><td><strong>Mental model</strong></td><td>Sliding a fixed dash along the path</td><td>Growing many dashes outward from their positions</td></tr>
+      <tr><td><strong>Visual effect</strong></td><td>One draw head, start &rarr; finish</td><td>Multiple draw heads, all growing at once</td></tr>
+    </tbody>
+  </table>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;style&gt;
+  @keyframes segmented-draw {
+    from { stroke-dasharray: 0 50; }  /* zero-width dashes, 50-unit gaps */
+    to   { stroke-dasharray: 50 0; }  /* 50-unit dashes, zero gaps (solid) */
+  }
+  .segmented-path {
+    fill: none;
+    stroke: coral;
+    stroke-width: 3;
+    stroke-linecap: round;
+    animation: segmented-draw 2s ease forwards;
+  }
+&lt;/style&gt;
+
+&lt;svg viewBox="0 0 300 150"&gt;
+  &lt;path class="segmented-path"
+        d="M 20,75 C 60,10 120,140 160,75 C 200,10 260,140 280,75"/&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="300" height="150" viewBox="0 0 300 150" id="draw-demo-segmented">
+      <rect width="300" height="150" fill="var(--demo-svg-bg)"/>
+      <style>
+        @keyframes demo-segmented-draw {
+          from { stroke-dasharray: 0 50; }
+          to   { stroke-dasharray: 50 0; }
+        }
+        .demo-segmented-path {
+          fill: none;
+          stroke: coral;
+          stroke-width: 3;
+          stroke-linecap: round;
+          animation: demo-segmented-draw 2s ease forwards;
+        }
+      </style>
+      <path class="demo-segmented-path" d="M 20,75 C 60,10 120,140 160,75 C 200,10 260,140 280,75"/>
+    </svg>
+    <p class="demo-caption">The path appears to grow from multiple points at once. Each dash expands from zero width to fill its segment, all simultaneously.</p>
+    <div class="demo-controls">
+      <button onclick="replayDraw('draw-demo-segmented', '.demo-segmented-path')">Replay</button>
+    </div>
+  </div>
+
+  <p>How it works: the <code>dasharray</code> pattern repeats along the path. Animating from <code>0 50</code> (invisible point-dashes with 50-unit gaps) to <code>50 0</code> (50-unit dashes with no gaps) makes each segment grow outward from its starting position. The number of visible "draw points" is the path length divided by your segment size (here, 50 units).</p>
+
+  <p>You can control the feel by adjusting the segment size:</p>
+  <ul>
+    <li><strong>Larger segments</strong> (e.g. <code>0 100</code> &rarr; <code>100 0</code>)  -  fewer draw points, more like a standard draw with pauses</li>
+    <li><strong>Smaller segments</strong> (e.g. <code>0 20</code> &rarr; <code>20 0</code>)  -  many draw points, almost like the path materialises all at once</li>
+  </ul>
+
+  <div class="warning">
+    <strong>Segment size and the pathLength trick</strong>
+    <p>If your segment size doesn't divide evenly into the path length, the last segment will be shorter  -  which can look slightly uneven at the end. For circles and closed paths this is rarely noticeable. For open paths, there's a neat trick:</p>
+    <p>The <code>pathLength</code> attribute tells the browser: "for the purposes of dash calculations, treat this path as if it's <em>this many</em> units long." It doesn't change the shape or size of the path  -  it rescales the dash coordinate system. So a path that's actually 347.2 units long can declare <code>pathLength="100"</code>, and now <code>stroke-dasharray: 10</code> means "10% of the path" regardless of the real geometry.</p>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;!-- pathLength="100" means dasharray/dashoffset work in percentages --&gt;
+&lt;path pathLength="100"
+      stroke-dasharray="0 10"
+      d="M 20,80 C 60,10 140,10 180,80 S 300,150 340,80"&gt;
+  &lt;!-- Animating dasharray from "0 10" to "10 0" gives exactly 10 segments --&gt;
+&lt;/path&gt;
+
+&lt;!-- Also works for the standard draw technique: --&gt;
+&lt;path pathLength="1"
+      stroke-dasharray="1"
+      stroke-dashoffset="1"&gt;
+  &lt;!-- Animate stroke-dashoffset from 1 to 0. No getTotalLength() needed! --&gt;
+&lt;/path&gt;</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <strong>pathLength="1" is the ultimate shortcut</strong>
+    <p>For the standard stroke-drawing technique, set <code>pathLength="1"</code> on any path, then use <code>stroke-dasharray: 1; stroke-dashoffset: 1</code> and animate to <code>0</code>. The browser maps "1" to mean "the full path" regardless of actual length. No JavaScript, no <code>getTotalLength()</code>, no guessing. Works on <code>&lt;path&gt;</code>, <code>&lt;circle&gt;</code>, <code>&lt;line&gt;</code>, <code>&lt;rect&gt;</code>, <code>&lt;polyline&gt;</code>  -  any shape with a stroke.</p>
+  </div>
+
+  <h3>Multi-path staggered drawing</h3>
+  <p>The real magic happens when you stagger multiple paths with <code>animation-delay</code>:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;style&gt;
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+  .letter {
+    fill: none;
+    stroke: coral;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-dasharray: 200;
+    stroke-dashoffset: 200;
+    animation: draw 1s ease forwards;
+  }
+  .letter:nth-child(2) { animation-delay: 0.3s; stroke: #e5c07b; }
+  .letter:nth-child(3) { animation-delay: 0.6s; stroke: #98c379; }
+  .letter:nth-child(4) { animation-delay: 0.9s; stroke: #61afef; }
+&lt;/style&gt;
+
+&lt;svg viewBox="0 0 320 100"&gt;
+  &lt;path class="letter" d="M 40,30 C 60,25 70,30 70,40 C 70,55 30,55 30,65 C 30,75 45,80 60,75"/&gt;
+  &lt;path class="letter" d="M 90,25 L 110,80 L 130,25"/&gt;
+  &lt;path class="letter" d="M 180,40 C 170,25 145,25 145,50 C 145,75 170,80 180,65 L 180,55 L 165,55"/&gt;
+  &lt;path class="letter" d="M 210,25 L 210,60 M 210,72 L 210,75"/&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="320" height="100" viewBox="0 0 320 100" id="draw-demo-2">
+      <rect width="320" height="100" fill="var(--demo-svg-bg)"/>
+      <style>
+        @keyframes demo-draw-letter { to { stroke-dashoffset: 0; } }
+        .demo-letter {
+          fill: none;
+          stroke-width: 3;
+          stroke-linecap: round;
+          stroke-linejoin: round;
+          stroke-dasharray: 200;
+          stroke-dashoffset: 200;
+          animation: demo-draw-letter 1s ease forwards;
+        }
+        .demo-letter:nth-child(2) { animation-delay: 0s; stroke: coral; }
+        .demo-letter:nth-child(3) { animation-delay: 0.4s; stroke: #e5c07b; }
+        .demo-letter:nth-child(4) { animation-delay: 0.8s; stroke: #98c379; }
+        .demo-letter:nth-child(5) { animation-delay: 1.2s; stroke: #61afef; }
+      </style>
+      <!-- S -->
+      <path class="demo-letter" d="M 40,30 C 60,25 70,30 70,40 C 70,55 30,55 30,65 C 30,75 45,80 60,75"/>
+      <!-- V -->
+      <path class="demo-letter" d="M 90,25 L 110,80 L 130,25"/>
+      <!-- G -->
+      <path class="demo-letter" d="M 180,40 C 170,25 145,25 145,50 C 145,75 170,80 180,65 L 180,55 L 165,55"/>
+      <!-- ! -->
+      <path class="demo-letter" d="M 210,25 L 210,60 M 210,72 L 210,75"/>
+    </svg>
+    <p class="demo-caption">Each letter draws itself with a 0.4s stagger. The delay creates a sequential "handwriting" feel.</p>
+    <div class="demo-controls">
+      <button onclick="replayDraw('draw-demo-2', '.demo-letter')">Replay</button>
+    </div>
+  </div>
+
+  <h3>Draw + fill reveal</h3>
+  <p>A common pattern: draw the stroke first, then fade in the fill:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;style&gt;
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+  @keyframes fill-in { to { fill-opacity: 1; } }
+
+  .draw-and-fill {
+    fill: #61afef;
+    fill-opacity: 0;
+    stroke: #61afef;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 600;
+    stroke-dashoffset: 600;
+    animation:
+      draw 2s ease forwards,
+      fill-in 0.8s ease 1.8s forwards;
+  }
+&lt;/style&gt;
+
+&lt;svg viewBox="0 0 200 200"&gt;
+  &lt;!-- Star shape --&gt;
+  &lt;path class="draw-and-fill"
+        d="M100,20 L120,75 L180,75 L130,110 L150,170
+           L100,135 L50,170 L70,110 L20,75 L80,75 Z"/&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="200" height="200" viewBox="0 0 200 200" id="draw-demo-3">
+      <rect width="200" height="200" fill="var(--demo-svg-bg)"/>
+      <style>
+        @keyframes demo-draw-fill { to { stroke-dashoffset: 0; } }
+        @keyframes demo-fill-in { to { fill-opacity: 1; } }
+        .demo-draw-and-fill {
+          fill: #61afef;
+          fill-opacity: 0;
+          stroke: #61afef;
+          stroke-width: 2;
+          stroke-linecap: round;
+          stroke-linejoin: round;
+          stroke-dasharray: 600;
+          stroke-dashoffset: 600;
+          animation:
+            demo-draw-fill 2s ease forwards,
+            demo-fill-in 0.8s ease 1.8s forwards;
+        }
+      </style>
+      <!-- Star shape -->
+      <path class="demo-draw-and-fill" d="M100,20 L120,75 L180,75 L130,110 L150,170 L100,135 L50,170 L70,110 L20,75 L80,75 Z"/>
+    </svg>
+    <p class="demo-caption">Star draws its outline over 2s, then the fill fades in over 0.8s (starting at 1.8s via <code>animation-delay</code> in the shorthand).</p>
+    <div class="demo-controls">
+      <button onclick="replayDraw('draw-demo-3', '.demo-draw-and-fill')">Replay</button>
+    </div>
+  </div>
+
+  <div class="key-concept">
+    <strong>Multiple animations on one element</strong>
+    <p>Comma-separate multiple animation names in the <code>animation</code> shorthand to run them together (or staggered via delay). Each targets different properties, so they don't conflict. This is how you compose complex sequences  -  draw + fill, draw + colour change, draw + transform  -  without JavaScript.</p>
+  </div>
+
+  <h2>6. Combining CSS Animation with SVG Structure</h2>
+  <p>CSS animations become powerful when combined with SVG's structural features: <code>&lt;g&gt;</code> groups, <code>&lt;use&gt;</code> instances, and staggering via <code>nth-child</code>.</p>
+
+  <h3>Animating groups</h3>
+  <p>Apply an animation to a <code>&lt;g&gt;</code> and all its children move together  -  just like transforms on groups in <a href="02-transforms-and-grouping.html">Lesson 2</a>:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;style&gt;
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-10px); }
+  }
+  .floating-group {
+    animation: float 3s ease-in-out infinite;
+  }
+&lt;/style&gt;
+
+&lt;svg viewBox="0 0 200 200"&gt;
+  &lt;g class="floating-group"&gt;
+    &lt;rect x="70" y="70" width="60" height="60" fill="coral" rx="6"/&gt;
+    &lt;circle cx="100" cy="60" r="8" fill="#e5c07b"/&gt;
+  &lt;/g&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="200" height="200" viewBox="0 0 200 200">
+      <rect width="200" height="200" fill="var(--demo-svg-bg)"/>
+      <style>
+        @keyframes demo-float {
+          0%, 100% { transform: translateY(0); }
+          50%      { transform: translateY(-10px); }
+        }
+        .demo-floating-group {
+          animation: demo-float 3s ease-in-out infinite;
+        }
+      </style>
+      <g class="demo-floating-group">
+        <rect x="70" y="80" width="60" height="60" fill="coral" rx="6"/>
+        <circle cx="100" cy="70" r="8" fill="#e5c07b"/>
+      </g>
+    </svg>
+    <p class="demo-caption">The group floats as a unit. Both the rectangle and circle share the same vertical oscillation.</p>
+  </div>
+
+  <h3>Staggered child animations with nth-child</h3>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;style&gt;
+  @keyframes pop-in {
+    from { transform: scaleY(0); opacity: 0; }
+    to   { transform: scaleY(1); opacity: 1; }
+  }
+  .bar-chart rect {
+    transform-origin: bottom;
+    transform-box: fill-box;
+    animation: pop-in 0.4s ease-out backwards;
+  }
+  .bar-chart rect:nth-child(1) { animation-delay: 0s; }
+  .bar-chart rect:nth-child(2) { animation-delay: 0.1s; }
+  .bar-chart rect:nth-child(3) { animation-delay: 0.2s; }
+  .bar-chart rect:nth-child(4) { animation-delay: 0.3s; }
+  .bar-chart rect:nth-child(5) { animation-delay: 0.4s; }
+&lt;/style&gt;
+
+&lt;svg viewBox="0 0 300 150"&gt;
+  &lt;g class="bar-chart"&gt;
+    &lt;rect x="30" y="50" width="40" height="90" rx="3" fill="coral"/&gt;
+    &lt;rect x="85" y="30" width="40" height="110" rx="3" fill="#e5c07b"/&gt;
+    &lt;rect x="140" y="60" width="40" height="80" rx="3" fill="#98c379"/&gt;
+    &lt;rect x="195" y="20" width="40" height="120" rx="3" fill="#61afef"/&gt;
+    &lt;rect x="250" y="70" width="40" height="70" rx="3" fill="#c678dd"/&gt;
+  &lt;/g&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="300" height="150" viewBox="0 0 300 150" id="bar-chart-demo">
+      <rect width="300" height="150" fill="var(--demo-svg-bg)"/>
+      <style>
+        @keyframes demo-pop-in {
+          from { transform: scaleY(0); opacity: 0; }
+          to   { transform: scaleY(1); opacity: 1; }
+        }
+        .demo-bar-chart rect {
+          transform-origin: bottom;
+          transform-box: fill-box;
+          animation: demo-pop-in 0.4s ease-out backwards;
+        }
+        .demo-bar-chart rect:nth-child(2) { animation-delay: 0s; }
+        .demo-bar-chart rect:nth-child(3) { animation-delay: 0.1s; }
+        .demo-bar-chart rect:nth-child(4) { animation-delay: 0.2s; }
+        .demo-bar-chart rect:nth-child(5) { animation-delay: 0.3s; }
+        .demo-bar-chart rect:nth-child(6) { animation-delay: 0.4s; }
+      </style>
+      <g class="demo-bar-chart">
+        <rect width="300" height="150" fill="none"/><!-- spacer for nth-child -->
+        <rect x="30" y="50" width="40" height="90" rx="3" fill="coral"/>
+        <rect x="85" y="30" width="40" height="110" rx="3" fill="#e5c07b"/>
+        <rect x="140" y="60" width="40" height="80" rx="3" fill="#98c379"/>
+        <rect x="195" y="20" width="40" height="120" rx="3" fill="#61afef"/>
+        <rect x="250" y="70" width="40" height="70" rx="3" fill="#c678dd"/>
+      </g>
+    </svg>
+    <p class="demo-caption">Bars pop in from the bottom with staggered delays. <code>transform-origin: bottom</code> + <code>transform-box: fill-box</code> ensures <code>scaleY</code> grows upward from the bar's base.</p>
+    <div class="demo-controls">
+      <button onclick="replayDraw('bar-chart-demo', '.demo-bar-chart rect')">Replay</button>
+    </div>
+  </div>
+
+  <div class="key-concept">
+    <strong>animation-fill-mode: backwards</strong>
+    <p>When using <code>animation-delay</code>, the element is visible in its <em>final</em> state before the animation starts (which looks broken  -  bars appear then vanish then pop in). Setting <code>backwards</code> (or using the shorthand keyword) applies the <code>from</code> keyframe during the delay period, keeping elements invisible until their animation starts.</p>
+  </div>
+
+  <h2>7. CSS vs SMIL: When to Use Which</h2>
+  <p>Now that you know both systems, here's the practical decision framework:</p>
+
+  <table class="comparison-table">
+    <thead>
+      <tr><th>Use CSS when&hellip;</th><th>Use SMIL when&hellip;</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Animating CSS-compatible properties (opacity, transform, fill, stroke-*)</td><td>Animating non-CSS attributes (viewBox, d, points, r in older browsers)</td></tr>
+      <tr><td>You want GPU acceleration (transform, opacity)</td><td>You need motion along a path (<code>&lt;animateMotion&gt;</code>)</td></tr>
+      <tr><td>The SVG is inline in HTML and you're already writing CSS</td><td>The SVG is standalone (loaded via <code>&lt;img&gt;</code> or <code>&lt;object&gt;</code>)</td></tr>
+      <tr><td>You need hover/focus states with transitions</td><td>You need event-based timing (click to trigger a sequence)</td></tr>
+      <tr><td>You want to leverage CSS custom properties and media queries</td><td>You need the rotation centre to change mid-animation</td></tr>
+      <tr><td>Performance is critical (transform + opacity are composited)</td><td>You need additive animation (building on base values)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="key-concept">
+    <strong>They're not mutually exclusive</strong>
+    <p>You can mix CSS and SMIL on the same SVG  -  even the same element. Use CSS for what it's good at (transforms, opacity, hover states) and SMIL for what CSS can't do (path morphing, motion paths, attribute animation). The browser resolves both correctly. Just don't animate the <em>same property</em> with both systems simultaneously  -  that's a conflict the spec doesn't resolve predictably.</p>
+  </div>
+
+  <div class="warning">
+    <strong>SMIL deprecation: the full story</strong>
+    <p>Chrome briefly deprecated SMIL in 2015, but reversed that decision due to developer pushback. As of 2024, SMIL is fully supported in all browsers (Chrome, Firefox, Safari, Edge) and there are no active deprecation plans. The W3C considers it "in maintenance" (no new features), but existing features are stable. Use SMIL with confidence where it's the right tool.</p>
+  </div>
+
+  <h2>Quiz</h2>
+
+  <div class="quiz">
+    <h3>Question 1</h3>
+    <p>What is the default <code>transform-origin</code> for SVG elements in modern browsers (SVG 2)?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">50% 50% of the element's bounding box (its own centre)</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">0 0 of the element's bounding box (its top-left corner)</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">0 0 of the SVG viewport (the canvas top-left corner)</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">The element's cx/cy attributes if they exist</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz">
+    <h3>Question 2</h3>
+    <p>In the stroke drawing technique, what do you animate to make a path appear to draw itself?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">stroke-dasharray from 0 to the path length</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">stroke-dashoffset from the path length to 0</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">stroke-width from 0 to the desired width</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">path length from 0 to 1 using pathLength</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz">
+    <h3>Question 3</h3>
+    <p>What does <code>animation-fill-mode: backwards</code> do when combined with <code>animation-delay</code>?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Plays the animation in reverse after it completes</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Holds the final keyframe state after the animation ends</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">Applies the first keyframe styles during the delay period</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Resets the element to its original styles after the delay</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz">
+    <h3>Question 4</h3>
+    <p>Which of these SVG attributes can NOT be animated with CSS transitions (as of current browser support)?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">fill (colour of the shape)</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">stroke-dashoffset (dash position)</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">viewBox (the coordinate window)</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">opacity (transparency of the element)</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz">
+    <h3>Question 5</h3>
+    <p>What does <code>transform-box: fill-box</code> do on an SVG element?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Sets the fill colour to match the element's box model</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">Makes percentage transform-origin resolve against the element's own bounding box</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Clips the transform to stay within the element's bounds</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Forces the element to use border-box sizing for layout</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <h2>Exercises</h2>
+  <ol>
+    <li><strong>Logo draw-on</strong>  -  Find or create a simple logo made of 3&ndash;5 paths. Use the stroke drawing technique with staggered <code>animation-delay</code> to make each path draw sequentially. Add a fill reveal at the end. Use <code>getTotalLength()</code> to get exact lengths.</li>
+    <li><strong>Transform-origin debugging</strong>  -  Create a grid of 9 squares (3&times;3). Apply a rotation animation to all of them but with <em>different</em> <code>transform-origin</code> values: top-left, center, bottom-right, specific pixel coordinates. Observe how each one rotates differently despite identical <code>@keyframes</code>.</li>
+    <li><strong>Hover icon set</strong>  -  Build 4 SVG icons (use simple geometric shapes). Give each a different hover transition: one scales up, one changes stroke colour, one increases stroke-width, and one rotates 15 degrees. All should use <code>transition</code> (not <code>@keyframes</code>).</li>
+    <li><strong>Loading spinner variants</strong>  -  Create three different CSS-animated spinners using only circles: (a) rotating dashed circle, (b) pulsing opacity ring, (c) two counter-rotating arcs (use <code>stroke-dasharray</code> to make partial arcs, animate rotation in opposite directions).</li>
+    <li><strong>Bar chart entrance</strong>  -  Create a 7-bar chart where bars grow from the bottom with staggered delays. Use <code>scaleY</code> with <code>transform-origin: bottom</code> and <code>transform-box: fill-box</code>. Add a second animation that fades in data labels above each bar after all bars have appeared.</li>
+  </ol>
+
+  <div class="recommended">
+    <strong>Recommended resource:</strong>
+    <a href="https://css-tricks.com/svg-line-animation-works/">CSS-Tricks: How SVG Line Animation Works</a>  -  Jake Archibald's foundational article explaining the stroke-dashoffset technique with interactive diagrams. Also see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/transform-origin">MDN: transform-origin</a> for the full specification of how <code>transform-origin</code> resolves differently for SVG vs HTML. For a deep dive into which SVG properties are CSS-animatable, see the <a href="https://svgwg.org/svg2-draft/styling.html#PresentationAttributes">SVG 2 Styling spec</a>.
+  </div>
+  <div class="footer-nav">
+    <a href="10-smil-advanced.html">&larr; Prev: SMIL Advanced</a>
+    <a href="index.html">Index</a>
+    <a href="12-javascript-and-svg.html">Next: JavaScript + SVG &rarr;</a>
+  </div>
+
+    </main>
+  </div><!-- end .page-layout -->
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="scripts.js"></script>
+  <script>
+    // Replay button for stroke-draw demos
+    function replayDraw(svgId, selector) {
+      const svg = document.getElementById(svgId);
+      const paths = svg.querySelectorAll(selector);
+      paths.forEach(p => {
+        const clone = p.cloneNode(true);
+        p.parentNode.replaceChild(clone, p);
+      });
+    }
+  </script>
+</body>
+</html>

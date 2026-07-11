@@ -1,0 +1,23 @@
+/* ===========================
+   SVG Course — Course-Specific Styles
+   =========================== */
+
+/* SVG diagram variables */
+:root[data-theme="dark"] {
+  --svg-axis: #6b7280;
+  --svg-label: #8b92a0;
+  --svg-grid: #3e4451;
+  --demo-svg-bg: #2c313a;
+}
+
+:root[data-theme="light"] {
+  --svg-axis: #999;
+  --svg-label: #666;
+  --svg-grid: #e5e2d9;
+  --demo-svg-bg: #f3f2ed;
+}
+
+/* SVG demo canvas background */
+.demo svg {
+  background: var(--demo-svg-bg);
+}

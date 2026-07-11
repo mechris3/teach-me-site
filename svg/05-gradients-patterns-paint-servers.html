@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>SVG Gradients, Patterns and Paint Servers - Lesson 5 | Teach Me</title>
+  <meta name="description" content="Linear and radial gradients, repeating patterns, gradientUnits, objectBoundingBox vs userSpaceOnUse, and gradientTransform.">
+  <link rel="canonical" href="https://teachmeskills.dev/svg/05-gradients-patterns-paint-servers.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/svg/05-gradients-patterns-paint-servers.html">
+  <meta property="og:title" content="SVG Gradients, Patterns and Paint Servers - Lesson 5 | Teach Me">
+  <meta property="og:description" content="Linear and radial gradients, repeating patterns, gradientUnits, objectBoundingBox vs userSpaceOnUse, and gradientTransform.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="SVG Gradients, Patterns and Paint Servers - Lesson 5 | Teach Me">
+  <meta name="twitter:description" content="Linear and radial gradients, repeating patterns, gradientUnits, objectBoundingBox vs userSpaceOnUse, and gradientTransform.">
+  <link rel="stylesheet" href="/styles.css">
+ <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header">
+        <a href="index.html">SVG Course</a>
+      </div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-coordinate-system.html">1. Coordinate System</a></li>
+        <li><a href="02-transforms-and-grouping.html">2. Transforms &amp; Grouping</a></li>
+        <li><a href="03-basic-shapes-and-paths.html">3. Shapes &amp; Paths</a></li>
+        <li><a href="04-styling-presentation-attributes-vs-css.html">4. Styling &amp; CSS</a></li>
+        <li class="current"><a href="05-gradients-patterns-paint-servers.html">5. Gradients &amp; Patterns</a></li>
+        <li><a href="06-clipping-and-masking.html">6. Clipping &amp; Masking</a></li>
+        <li><a href="07-filters.html">7. Filters</a></li>
+        <li><a href="08-text-and-textpath.html">8. Text &amp; textPath</a></li>
+        <li><a href="09-smil-animation-fundamentals.html">9. SMIL Fundamentals</a></li>
+        <li><a href="10-smil-advanced.html">10. SMIL Advanced</a></li>
+        <li><a href="11-css-animation-of-svg.html">11. CSS Animation</a></li>
+        <li><a href="12-javascript-and-svg.html">12. JavaScript + SVG</a></li>
+        <li><a href="13-putting-it-together.html">13. Capstone Project</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="svg-elements-and-attributes.html">Elements &amp; Attributes</a></li>
+        <li><a href="svg-dom-methods.html">DOM Methods &amp; Interfaces</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 5</p>
+  <h1>Gradients, Patterns &amp; Paint Servers</h1>
+  <p>Previous lessons covered flat colour fills. Time to unlock the real power of SVG's painting model: <strong>paint servers</strong>. These let you fill and stroke with gradients and repeating patterns  -  defined once, referenced anywhere, and transformed independently of the shapes they paint.</p>
+
+  <h2>1. What Are Paint Servers?</h2>
+  <p>SVG's <code>fill</code> and <code>stroke</code> properties don't just accept colour values  -  they accept a <code>url(#id)</code> reference to a <strong>paint server</strong>. A paint server is any element defined in <code>&lt;defs&gt;</code> that produces colour data: gradients and patterns.</p>
+  <p>The term "server" is SVG spec language  -  the element "serves" paint to whichever elements reference it. You define it once, and any number of shapes can use it as their fill or stroke.</p>
+
+  <h3>The two key elements you'll see in every example</h3>
+  <ul>
+    <li><strong><code>&lt;defs&gt;</code></strong>  -  a container for reusable definitions. Nothing inside <code>&lt;defs&gt;</code> renders directly; it's a "library" of things that other elements reference. Think of it as a hidden storage area.</li>
+    <li><strong><code>&lt;linearGradient&gt;</code></strong> (or <code>&lt;radialGradient&gt;</code>, <code>&lt;pattern&gt;</code>)  -  the paint server definition itself, placed inside <code>&lt;defs&gt;</code> and given an <code>id</code>. Elements reference it via <code>fill="url(#id)"</code>.</li>
+  </ul>
+  <p>Here's the pattern you'll see throughout this lesson:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;svg viewBox="0 0 200 100"&gt;
+  &lt;defs&gt;
+    &lt;linearGradient id="myGrad"&gt;
+      &lt;stop offset="0%" stop-color="navy"/&gt;
+      &lt;stop offset="100%" stop-color="gold"/&gt;
+    &lt;/linearGradient&gt;
+  &lt;/defs&gt;
+
+  &lt;!-- Any element can reference the gradient --&gt;
+  &lt;rect fill="url(#myGrad)" x="10" y="10" width="80" height="80"/&gt;
+  &lt;circle fill="url(#myGrad)" cx="150" cy="50" r="40"/&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="100%" height="130" viewBox="0 0 200 100">
+      <defs>
+        <linearGradient id="intro-grad">
+          <stop offset="0%" stop-color="navy"/>
+          <stop offset="100%" stop-color="gold"/>
+        </linearGradient>
+      </defs>
+      <rect width="200" height="100" fill="var(--demo-svg-bg)"/>
+      <rect fill="url(#intro-grad)" x="10" y="10" width="80" height="80" rx="4"/>
+      <circle fill="url(#intro-grad)" cx="150" cy="50" r="40"/>
+    </svg>
+    <p class="demo-caption">Both shapes reference the same gradient (<code>#myGrad</code>). Each gets its own instance scaled to its bounding box (the default <code>objectBoundingBox</code> behaviour).</p>
+  </div>
+
+  <div class="key-concept">
+    <strong>Paint servers: define once, reference everywhere</strong>
+    <p>Paint servers are defined once in <code>&lt;defs&gt;</code> and referenced by any number of elements via <code>fill="url(#id)"</code> or <code>stroke="url(#id)"</code>. They're the SVG equivalent of CSS gradient backgrounds  -  but more powerful because they can be referenced by multiple elements and transformed independently.</p>
+  </div>
+
+  <h2>2. Linear Gradients</h2>
+  <p><code>&lt;linearGradient&gt;</code> creates a colour transition along a straight line  -  the <strong>gradient vector</strong>. You define the vector with <code>x1, y1</code> (start point) and <code>x2, y2</code> (end point), then place <code>&lt;stop&gt;</code> elements along it to define the colours.</p>
+
+  <h3>Stop elements</h3>
+  <ul>
+    <li><code>offset</code>  -  position along the gradient vector (0 to 1, or 0% to 100%)</li>
+    <li><code>stop-color</code>  -  the colour at that position</li>
+    <li><code>stop-opacity</code>  -  opacity at that position (defaults to 1)</li>
+  </ul>
+
+  <h3>Default orientation</h3>
+  <p>The default gradient vector is horizontal left-to-right: <code>x1="0" y1="0" x2="1" y2="0"</code>. Change the vector to change direction.</p>
+
+  <h3>Coordinate values for the gradient vector</h3>
+  <p>With <code>objectBoundingBox</code> (the default), 0 means the element's left/top edge and 1 means the right/bottom edge. But you're <strong>not limited to 0–1</strong>:</p>
+  <ul>
+    <li><code>x1="0.3" x2="0.7"</code>  -  the gradient only spans the middle 40% of the element. <code>spreadMethod</code> controls what happens outside that range.</li>
+    <li><code>x1="-0.5" x2="1.5"</code>  -  the gradient extends beyond the element; only the 0–1 portion is visible (like looking through a window at a larger gradient).</li>
+    <li><code>x1="0" x2="0.5"</code>  -  the gradient covers just the left half; the right half is filled according to <code>spreadMethod</code>.</li>
+  </ul>
+  <p>With <code>userSpaceOnUse</code>, the values are absolute coordinates in the user coordinate system  -  any number is valid (200, 500, -100, etc.).</p>
+  <p>Values between 0 and 1 are the normal case in <code>objectBoundingBox</code> mode, but going outside that range is legal and useful for compressing or offsetting the gradient within the element.</p>
+
+  <div class="demo">
+    <svg width="100%" height="200" viewBox="0 0 600 200">
+      <defs>
+        <linearGradient id="demo-horiz">
+          <stop offset="0%" stop-color="#e06c75"/>
+          <stop offset="100%" stop-color="#61afef"/>
+        </linearGradient>
+        <linearGradient id="demo-vert" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#98c379"/>
+          <stop offset="100%" stop-color="#c678dd"/>
+        </linearGradient>
+        <linearGradient id="demo-diag" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#e5c07b"/>
+          <stop offset="50%" stop-color="#e06c75"/>
+          <stop offset="100%" stop-color="#56b6c2"/>
+        </linearGradient>
+      </defs>
+      <rect width="600" height="200" fill="var(--demo-svg-bg)"/>
+      <rect x="20" y="30" width="160" height="120" rx="8" fill="url(#demo-horiz)"/>
+      <text x="100" y="175" font-size="11" fill="var(--muted)" text-anchor="middle">Horizontal (default)</text>
+      <rect x="220" y="30" width="160" height="120" rx="8" fill="url(#demo-vert)"/>
+      <text x="300" y="175" font-size="11" fill="var(--muted)" text-anchor="middle">Vertical (x2=0, y2=1)</text>
+      <rect x="420" y="30" width="160" height="120" rx="8" fill="url(#demo-diag)"/>
+      <text x="500" y="175" font-size="11" fill="var(--muted)" text-anchor="middle">Diagonal (x2=1, y2=1)</text>
+    </svg>
+    <p class="demo-caption">Three linear gradients: horizontal (default), vertical, and diagonal. The gradient vector direction determines the transition angle.</p>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;defs&gt;
+  &lt;!-- Horizontal: left to right (default) --&gt;
+  &lt;linearGradient id="horiz"&gt;
+    &lt;stop offset="0%" stop-color="#e06c75"/&gt;
+    &lt;stop offset="100%" stop-color="#61afef"/&gt;
+  &lt;/linearGradient&gt;
+
+  &lt;!-- Vertical: top to bottom --&gt;
+  &lt;linearGradient id="vert" x1="0" y1="0" x2="0" y2="1"&gt;
+    &lt;stop offset="0%" stop-color="#98c379"/&gt;
+    &lt;stop offset="100%" stop-color="#c678dd"/&gt;
+  &lt;/linearGradient&gt;
+
+  &lt;!-- Diagonal: top-left to bottom-right --&gt;
+  &lt;linearGradient id="diag" x1="0" y1="0" x2="1" y2="1"&gt;
+    &lt;stop offset="0%" stop-color="#e5c07b"/&gt;
+    &lt;stop offset="50%" stop-color="#e06c75"/&gt;
+    &lt;stop offset="100%" stop-color="#56b6c2"/&gt;
+  &lt;/linearGradient&gt;
+&lt;/defs&gt;</code></pre>
+  </div>
+
+  <h3>spreadMethod</h3>
+  <p>When the gradient vector doesn't cover the entire shape (you've offset it or shrunk it), <code>spreadMethod</code> controls what happens beyond the vector's endpoints:</p>
+  <ul>
+    <li><code>pad</code> (default)  -  the end colours extend to fill remaining space</li>
+    <li><code>reflect</code>  -  the gradient reverses direction and repeats (mirror effect)</li>
+    <li><code>repeat</code>  -  the gradient restarts from the beginning</li>
+  </ul>
+
+  <div class="demo">
+    <svg width="100%" height="160" viewBox="0 0 600 160">
+      <defs>
+        <linearGradient id="spread-pad" x1="0.3" y1="0" x2="0.7" y2="0" spreadMethod="pad">
+          <stop offset="0%" stop-color="#e06c75"/>
+          <stop offset="100%" stop-color="#61afef"/>
+        </linearGradient>
+        <linearGradient id="spread-reflect" x1="0.3" y1="0" x2="0.7" y2="0" spreadMethod="reflect">
+          <stop offset="0%" stop-color="#e06c75"/>
+          <stop offset="100%" stop-color="#61afef"/>
+        </linearGradient>
+        <linearGradient id="spread-repeat" x1="0.3" y1="0" x2="0.7" y2="0" spreadMethod="repeat">
+          <stop offset="0%" stop-color="#e06c75"/>
+          <stop offset="100%" stop-color="#61afef"/>
+        </linearGradient>
+      </defs>
+      <rect width="600" height="160" fill="var(--demo-svg-bg)"/>
+      <rect x="20" y="20" width="160" height="90" rx="6" fill="url(#spread-pad)"/>
+      <text x="100" y="135" font-size="11" fill="var(--muted)" text-anchor="middle">pad (default)</text>
+      <rect x="220" y="20" width="160" height="90" rx="6" fill="url(#spread-reflect)"/>
+      <text x="300" y="135" font-size="11" fill="var(--muted)" text-anchor="middle">reflect</text>
+      <rect x="420" y="20" width="160" height="90" rx="6" fill="url(#spread-repeat)"/>
+      <text x="500" y="135" font-size="11" fill="var(--muted)" text-anchor="middle">repeat</text>
+    </svg>
+    <p class="demo-caption">The gradient vector only covers the middle 40% of each rect. <code>spreadMethod</code> controls what happens outside it.</p>
+  </div>
+
+  <h2>3. Radial Gradients</h2>
+  <p><code>&lt;radialGradient&gt;</code> creates a colour transition radiating outward from a point. Instead of a line, you define a circle:</p>
+  <ul>
+    <li><code>cx, cy</code>  -  centre of the end circle (where the last stop sits at the outer edge)</li>
+    <li><code>r</code>  -  radius of that outer circle</li>
+    <li><code>fx, fy</code>  -  the focal point (where the first stop sits / the "light source")</li>
+    <li><code>fr</code> (SVG 2)  -  focal radius, creating ring-shaped gradients instead of point sources</li>
+  </ul>
+  <p>Same <code>&lt;stop&gt;</code> mechanism as linear gradients  -  offset, stop-color, stop-opacity all work identically.</p>
+
+  <h3>The sphere illusion</h3>
+  <p>Offsetting the focal point from the centre creates a convincing 3D sphere effect  -  the "highlight" appears where the focal point sits:</p>
+
+  <div class="demo">
+    <svg width="100%" height="200" viewBox="0 0 500 200">
+      <defs>
+        <radialGradient id="demo-radial-basic" cx="0.5" cy="0.5" r="0.5">
+          <stop offset="0%" stop-color="#61afef"/>
+          <stop offset="100%" stop-color="#1a3a5c"/>
+        </radialGradient>
+        <radialGradient id="demo-radial-sphere" cx="0.5" cy="0.5" r="0.5" fx="0.35" fy="0.3">
+          <stop offset="0%" stop-color="#fff"/>
+          <stop offset="30%" stop-color="#61afef"/>
+          <stop offset="100%" stop-color="#0d1f33"/>
+        </radialGradient>
+        <radialGradient id="demo-radial-ring" cx="0.5" cy="0.5" r="0.5" fx="0.5" fy="0.5" fr="0.2">
+          <stop offset="0%" stop-color="#e5c07b"/>
+          <stop offset="100%" stop-color="#e06c75"/>
+        </radialGradient>
+      </defs>
+      <rect width="500" height="200" fill="var(--demo-svg-bg)"/>
+      <circle cx="85" cy="100" r="65" fill="url(#demo-radial-basic)"/>
+      <text x="85" y="185" font-size="11" fill="var(--muted)" text-anchor="middle">Basic radial</text>
+      <circle cx="250" cy="100" r="65" fill="url(#demo-radial-sphere)"/>
+      <text x="250" y="185" font-size="11" fill="var(--muted)" text-anchor="middle">Offset focal point (3D sphere)</text>
+      <circle cx="415" cy="100" r="65" fill="url(#demo-radial-ring)"/>
+      <text x="415" y="185" font-size="11" fill="var(--muted)" text-anchor="middle">fr="0.2" (ring gradient, SVG 2)</text>
+    </svg>
+    <p class="demo-caption">Radial gradients: basic centred, offset focal point creating a sphere illusion, and a focal radius creating a ring effect.</p>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;defs&gt;
+  &lt;!-- 3D sphere: focal point offset to upper-left --&gt;
+  &lt;radialGradient id="sphere" cx="0.5" cy="0.5" r="0.5" fx="0.35" fy="0.3"&gt;
+    &lt;stop offset="0%" stop-color="#fff"/&gt;
+    &lt;stop offset="30%" stop-color="#61afef"/&gt;
+    &lt;stop offset="100%" stop-color="#0d1f33"/&gt;
+  &lt;/radialGradient&gt;
+&lt;/defs&gt;
+&lt;circle cx="100" cy="100" r="80" fill="url(#sphere)"/&gt;</code></pre>
+  </div>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <h2>4. gradientUnits  -  The Crucial Choice</h2>
+  <p>This is where most confusion with SVG gradients lives. The <code>gradientUnits</code> attribute determines <em>what coordinate system</em> the gradient vector (<code>x1, y1, x2, y2</code> or <code>cx, cy, r</code>) is expressed in:</p>
+
+  <h3>objectBoundingBox (default)</h3>
+  <p>Coordinates are 0&ndash;1, relative to the target element's bounding box. A gradient defined as <code>x1="0" y1="0" x2="1" y2="0"</code> goes from the element's left edge to its right edge  -  regardless of the element's actual size or position.</p>
+
+  <h3>userSpaceOnUse</h3>
+  <p>Coordinates are in the current user coordinate system (absolute positions). The gradient is fixed in space, and shapes are like windows looking onto it.</p>
+
+  <div class="key-concept">
+    <strong>Two mental models for gradient coordinates</strong>
+    <p><code>objectBoundingBox</code> = "the gradient scales with the shape" (usually what you want for independent elements). <code>userSpaceOnUse</code> = "the gradient is fixed in space and shapes are windows into it" (useful for tiling multiple shapes with one continuous gradient across all of them).</p>
+  </div>
+
+  <div class="demo">
+    <svg width="100%" height="220" viewBox="0 0 600 220">
+      <defs>
+        <linearGradient id="obb-grad">
+          <stop offset="0%" stop-color="#e06c75"/>
+          <stop offset="100%" stop-color="#61afef"/>
+        </linearGradient>
+        <linearGradient id="usu-grad" gradientUnits="userSpaceOnUse" x1="320" y1="0" x2="580" y2="0">
+          <stop offset="0%" stop-color="#e06c75"/>
+          <stop offset="100%" stop-color="#61afef"/>
+        </linearGradient>
+      </defs>
+      <rect width="600" height="220" fill="var(--demo-svg-bg)"/>
+      <!-- objectBoundingBox side -->
+      <text x="150" y="20" font-size="12" fill="var(--text)" text-anchor="middle" font-weight="bold">objectBoundingBox (default)</text>
+      <rect x="20" y="35" width="260" height="60" rx="6" fill="url(#obb-grad)"/>
+      <rect x="20" y="110" width="130" height="40" rx="6" fill="url(#obb-grad)"/>
+      <rect x="170" y="110" width="60" height="40" rx="6" fill="url(#obb-grad)"/>
+      <text x="150" y="175" font-size="10" fill="var(--muted)" text-anchor="middle">Each shape gets its own full gradient</text>
+      <!-- userSpaceOnUse side -->
+      <text x="450" y="20" font-size="12" fill="var(--text)" text-anchor="middle" font-weight="bold">userSpaceOnUse</text>
+      <rect x="320" y="35" width="260" height="60" rx="6" fill="url(#usu-grad)"/>
+      <rect x="320" y="110" width="130" height="40" rx="6" fill="url(#usu-grad)"/>
+      <rect x="470" y="110" width="60" height="40" rx="6" fill="url(#usu-grad)"/>
+      <text x="450" y="175" font-size="10" fill="var(--muted)" text-anchor="middle">All shapes share one continuous gradient</text>
+    </svg>
+    <p class="demo-caption"><strong>Left:</strong> objectBoundingBox  -  each element gets the full gradient independently. <strong>Right:</strong> userSpaceOnUse  -  shapes are windows into a single gradient positioned in absolute coordinates.</p>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;!-- objectBoundingBox: coordinates are 0-1, relative to each element --&gt;
+&lt;linearGradient id="obb" gradientUnits="objectBoundingBox"
+                x1="0" y1="0" x2="1" y2="0"&gt;
+  &lt;stop offset="0%" stop-color="red"/&gt;
+  &lt;stop offset="100%" stop-color="blue"/&gt;
+&lt;/linearGradient&gt;
+
+&lt;!-- userSpaceOnUse: coordinates are absolute pixel positions --&gt;
+&lt;linearGradient id="usu" gradientUnits="userSpaceOnUse"
+                x1="0" y1="0" x2="400" y2="0"&gt;
+  &lt;stop offset="0%" stop-color="red"/&gt;
+  &lt;stop offset="100%" stop-color="blue"/&gt;
+&lt;/linearGradient&gt;</code></pre>
+  </div>
+
+  <div class="warning">
+    <strong>objectBoundingBox fails on zero-dimension elements</strong>
+    <p>A horizontal <code>&lt;line&gt;</code> has zero height in its bounding box, so a vertical gradient in <code>objectBoundingBox</code> mode produces nothing  -  you're dividing by zero. Similarly, a vertical line has zero width. Use <code>gradientUnits="userSpaceOnUse"</code> for strokes on lines, or any element where one bounding-box dimension could be zero.</p>
+  </div>
+
+  <h2>5. gradientTransform</h2>
+  <p>You can rotate, scale, or skew the gradient independently of the shape it fills. The <code>gradientTransform</code> attribute uses the same transform syntax covered in <a href="02-transforms-and-grouping.html">Lesson 2</a>  -  <code>rotate()</code>, <code>scale()</code>, <code>translate()</code>, <code>skewX()</code>, <code>matrix()</code>.</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;linearGradient id="rotated" gradientTransform="rotate(45)"&gt;
+  &lt;stop offset="0%" stop-color="navy"/&gt;
+  &lt;stop offset="100%" stop-color="gold"/&gt;
+&lt;/linearGradient&gt;
+
+&lt;!-- The gradient is rotated 45 degrees, but the rect stays upright --&gt;
+&lt;rect fill="url(#rotated)" x="10" y="10" width="180" height="80"/&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="100%" height="160" viewBox="0 0 500 160">
+      <defs>
+        <linearGradient id="gt-none">
+          <stop offset="0%" stop-color="#1a237e"/>
+          <stop offset="100%" stop-color="#e5c07b"/>
+        </linearGradient>
+        <linearGradient id="gt-rot45" gradientTransform="rotate(45 0.5 0.5)">
+          <stop offset="0%" stop-color="#1a237e"/>
+          <stop offset="100%" stop-color="#e5c07b"/>
+        </linearGradient>
+        <linearGradient id="gt-rot90" gradientTransform="rotate(90 0.5 0.5)">
+          <stop offset="0%" stop-color="#1a237e"/>
+          <stop offset="100%" stop-color="#e5c07b"/>
+        </linearGradient>
+      </defs>
+      <rect width="500" height="160" fill="var(--demo-svg-bg)"/>
+      <rect x="20" y="20" width="130" height="100" rx="6" fill="url(#gt-none)"/>
+      <text x="85" y="140" font-size="10" fill="var(--muted)" text-anchor="middle">No transform</text>
+      <rect x="185" y="20" width="130" height="100" rx="6" fill="url(#gt-rot45)"/>
+      <text x="250" y="140" font-size="10" fill="var(--muted)" text-anchor="middle">rotate(45)</text>
+      <rect x="350" y="20" width="130" height="100" rx="6" fill="url(#gt-rot90)"/>
+      <text x="415" y="140" font-size="10" fill="var(--muted)" text-anchor="middle">rotate(90)</text>
+    </svg>
+    <p class="demo-caption">The same navy-to-gold gradient rotated with <code>gradientTransform</code>. The shapes don't move  -  only the gradient orientation changes.</p>
+  </div>
+
+  <p>When using <code>objectBoundingBox</code> units, the rotation centre for <code>rotate(angle)</code> defaults to (0,0) which is the element's top-left corner. Use the three-argument form <code>rotate(45, 0.5, 0.5)</code> to rotate around the element's centre.</p>
+
+  <h2>6. Patterns</h2>
+  <p><code>&lt;pattern&gt;</code> defines a small tile of SVG content that repeats to fill or stroke a target shape. Think of it as a mini SVG that tiles infinitely.</p>
+
+  <h3>Key attributes</h3>
+  <ul>
+    <li><code>x, y</code>  -  origin of the first tile</li>
+    <li><code>width, height</code>  -  size of each tile</li>
+    <li><code>viewBox</code>  -  internal coordinate system of the tile content</li>
+  </ul>
+
+  <h3>patternUnits</h3>
+  <p>Same choice as <code>gradientUnits</code>  -  controls how the tile's <code>x</code>, <code>y</code>, <code>width</code>, and <code>height</code> are interpreted:</p>
+  <ul>
+    <li><code>objectBoundingBox</code> (default)  -  tile dimensions are fractions (0&ndash;1) of the target element's bounding box</li>
+    <li><code>userSpaceOnUse</code>  -  tile dimensions are in absolute user coordinates</li>
+  </ul>
+
+  <h3>patternContentUnits</h3>
+  <p>A separate control for the coordinate system <em>inside</em> the tile  -  what coordinate system the shapes within the pattern use:</p>
+  <ul>
+    <li><code>userSpaceOnUse</code> (default)  -  content coordinates match the referencing element's space</li>
+    <li><code>objectBoundingBox</code>  -  content coordinates are 0&ndash;1 relative to the target element</li>
+  </ul>
+
+  <h3>patternTransform</h3>
+  <p>Rotates, scales, or skews the entire tiled pattern  -  same syntax as <code>gradientTransform</code>.</p>
+
+  <div class="demo">
+    <svg width="100%" height="200" viewBox="0 0 500 200">
+      <defs>
+        <pattern id="dots" patternUnits="userSpaceOnUse" width="20" height="20">
+          <circle cx="10" cy="10" r="3" fill="#61afef"/>
+        </pattern>
+        <pattern id="stripes" patternUnits="userSpaceOnUse" width="12" height="12" patternTransform="rotate(45)">
+          <rect width="6" height="12" fill="#e06c75"/>
+        </pattern>
+      </defs>
+      <rect width="500" height="200" fill="var(--demo-svg-bg)"/>
+      <rect x="20" y="20" width="200" height="160" rx="8" fill="url(#dots)" stroke="var(--border)" stroke-width="1"/>
+      <text x="120" y="195" font-size="11" fill="var(--muted)" text-anchor="middle">Dot pattern</text>
+      <rect x="270" y="20" width="200" height="160" rx="8" fill="url(#stripes)" stroke="var(--border)" stroke-width="1"/>
+      <text x="370" y="195" font-size="11" fill="var(--muted)" text-anchor="middle">Diagonal stripe pattern</text>
+    </svg>
+    <p class="demo-caption">A repeating dot pattern (left) and a diagonal stripe pattern using <code>patternTransform="rotate(45)"</code> (right).</p>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;defs&gt;
+  &lt;!-- Dot pattern: 20x20 tile with a centred circle --&gt;
+  &lt;pattern id="dots" patternUnits="userSpaceOnUse"
+           width="20" height="20"&gt;
+    &lt;circle cx="10" cy="10" r="3" fill="#61afef"/&gt;
+  &lt;/pattern&gt;
+
+  &lt;!-- Diagonal stripes: rotate the whole pattern 45 degrees --&gt;
+  &lt;pattern id="stripes" patternUnits="userSpaceOnUse"
+           width="12" height="12" patternTransform="rotate(45)"&gt;
+    &lt;rect width="6" height="12" fill="#e06c75"/&gt;
+  &lt;/pattern&gt;
+&lt;/defs&gt;
+
+&lt;rect fill="url(#dots)" width="200" height="150"/&gt;
+&lt;rect fill="url(#stripes)" x="220" width="200" height="150"/&gt;</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <strong>Patterns are mini SVGs that tile</strong>
+    <p>Patterns can contain any SVG content  -  shapes, text, groups, even references to other gradients or patterns. The tile defined by <code>width</code> and <code>height</code> repeats infinitely to fill the target element. Think of each tile as its own tiny SVG viewport.</p>
+  </div>
+
+  <h2>7. Practical Patterns</h2>
+  <p>Paint servers show up everywhere in real-world SVG work:</p>
+
+  <h3>Common uses</h3>
+  <ul>
+    <li><strong>Grid backgrounds</strong>  -  a pattern of thin lines creates graph-paper grids</li>
+    <li><strong>Hatching fills</strong>  -  rotated stripe patterns for technical/architectural diagrams</li>
+    <li><strong>Textured surfaces</strong>  -  noise-like patterns for organic textures</li>
+    <li><strong>Data visualisation</strong>  -  patterns as accessible alternatives to colour-only encoding</li>
+  </ul>
+
+  <h3>Pattern inheritance with href</h3>
+  <p>Gradients and patterns support <code>href</code> to inherit from another definition. This saves repeating stops or content:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;defs&gt;
+  &lt;!-- Base gradient with shared stops --&gt;
+  &lt;linearGradient id="base-grad"&gt;
+    &lt;stop offset="0%" stop-color="navy"/&gt;
+    &lt;stop offset="100%" stop-color="gold"/&gt;
+  &lt;/linearGradient&gt;
+
+  &lt;!-- Inherits stops from base-grad, but rotated --&gt;
+  &lt;linearGradient id="rotated-grad" href="#base-grad"
+                  gradientTransform="rotate(90 0.5 0.5)"/&gt;
+
+  &lt;!-- Inherits stops, different direction --&gt;
+  &lt;linearGradient id="vertical-grad" href="#base-grad"
+                  x1="0" y1="0" x2="0" y2="1"/&gt;
+&lt;/defs&gt;</code></pre>
+  </div>
+
+  <h3>Layering patterns</h3>
+  <p>You can layer multiple patterns by nesting SVG elements or using multiple shapes stacked with different pattern fills and partial opacity. Patterns themselves can also reference gradients as fills for their internal shapes, creating rich composites:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;defs&gt;
+  &lt;linearGradient id="tile-bg"&gt;
+    &lt;stop offset="0%" stop-color="#2c313a"/&gt;
+    &lt;stop offset="100%" stop-color="#3e4451"/&gt;
+  &lt;/linearGradient&gt;
+
+  &lt;pattern id="fancy" patternUnits="userSpaceOnUse" width="40" height="40"&gt;
+    &lt;!-- Pattern content can use gradients! --&gt;
+    &lt;rect width="40" height="40" fill="url(#tile-bg)"/&gt;
+    &lt;circle cx="20" cy="20" r="8" fill="#61afef" opacity="0.5"/&gt;
+  &lt;/pattern&gt;
+&lt;/defs&gt;</code></pre>
+  </div>
+
+  <h2>Quiz: Check Your Understanding</h2>
+
+  <div class="quiz" id="quiz1">
+    <h3>Question 1</h3>
+    <p>What does <code>gradientUnits="objectBoundingBox"</code> mean?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">Gradient coordinates are 0&ndash;1, relative to the target element's bounding box</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Gradient coordinates are in absolute pixel values</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">The gradient is fixed in the SVG's root coordinate system</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">The gradient inherits the element's transform</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz2">
+    <h3>Question 2</h3>
+    <p>How do you make a linear gradient go from top to bottom?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Set <code>x1="0" y1="0" x2="1" y2="0"</code>  -  horizontal axis covers vertical</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">Set <code>x1="0" y1="0" x2="0" y2="1"</code>  -  the vector points straight down</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Use <code>gradientTransform="vertical"</code></div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Set <code>direction="vertical"</code> on the linearGradient element</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz3">
+    <h3>Question 3</h3>
+    <p>What's the difference between <code>patternUnits</code> and <code>patternContentUnits</code>?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">They're the same thing  -  just aliases for backwards compatibility</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">patternUnits controls rotation; patternContentUnits controls scale</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">patternUnits controls how the tile's position/size (x, y, width, height) is interpreted; patternContentUnits controls the coordinate system for content inside the tile</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">patternUnits applies to the fill; patternContentUnits applies to the stroke</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <h2>Hands-On Exercise</h2>
+  <p>Build these from scratch to cement the concepts:</p>
+  <ol>
+    <li><strong>Navy-to-gold linear gradient:</strong> Create a <code>&lt;linearGradient&gt;</code> that transitions from navy to gold. Apply it as the fill of a large <code>&lt;rect&gt;</code> (e.g. 400&times;200).</li>
+    <li><strong>3D sphere:</strong> Create a <code>&lt;radialGradient&gt;</code> with an offset focal point (<code>fx</code>/<code>fy</code> different from <code>cx</code>/<code>cy</code>) to simulate a 3D sphere. Use white &rarr; colour &rarr; dark stops.</li>
+    <li><strong>Repeating dot pattern:</strong> Create a <code>&lt;pattern&gt;</code> with a small circle centred in each tile. Apply it as the fill of a rect. Experiment with tile size to control density.</li>
+    <li><strong>Rotated gradient:</strong> Take your navy-to-gold gradient and use <code>gradientTransform="rotate(45, 0.5, 0.5)"</code> to rotate it 45 degrees. Verify the shape itself doesn't rotate.</li>
+  </ol>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;svg width="600" height="500" viewBox="0 0 600 500" xmlns="http://www.w3.org/2000/svg"&gt;
+  &lt;defs&gt;
+    &lt;!-- 1. Navy to gold linear gradient --&gt;
+    &lt;linearGradient id="ex-navy-gold"&gt;
+      &lt;stop offset="0%" stop-color="navy"/&gt;
+      &lt;stop offset="100%" stop-color="gold"/&gt;
+    &lt;/linearGradient&gt;
+
+    &lt;!-- 2. 3D sphere radial gradient --&gt;
+    &lt;radialGradient id="ex-sphere" cx="0.5" cy="0.5" r="0.5" fx="0.35" fy="0.3"&gt;
+      &lt;stop offset="0%" stop-color="#fff"/&gt;
+      &lt;stop offset="35%" stop-color="#4a90d9"/&gt;
+      &lt;stop offset="100%" stop-color="#0a1628"/&gt;
+    &lt;/radialGradient&gt;
+
+    &lt;!-- 3. Dot pattern --&gt;
+    &lt;pattern id="ex-dots" patternUnits="userSpaceOnUse" width="24" height="24"&gt;
+      &lt;circle cx="12" cy="12" r="4" fill="coral"/&gt;
+    &lt;/pattern&gt;
+
+    &lt;!-- 4. Rotated gradient (inherits stops from #ex-navy-gold) --&gt;
+    &lt;linearGradient id="ex-rotated" href="#ex-navy-gold"
+                    gradientTransform="rotate(45, 0.5, 0.5)"/&gt;
+  &lt;/defs&gt;
+
+  &lt;!-- 1. Linear gradient rect --&gt;
+  &lt;rect x="20" y="20" width="260" height="120" rx="6" fill="url(#ex-navy-gold)"/&gt;
+
+  &lt;!-- 2. 3D sphere --&gt;
+  &lt;circle cx="450" cy="80" r="70" fill="url(#ex-sphere)"/&gt;
+
+  &lt;!-- 3. Dot pattern --&gt;
+  &lt;rect x="20" y="180" width="260" height="120" rx="6"
+        fill="url(#ex-dots)" stroke="#888" stroke-width="1"/&gt;
+
+  &lt;!-- 4. Rotated gradient --&gt;
+  &lt;rect x="320" y="180" width="260" height="120" rx="6"
+        fill="url(#ex-rotated)"/&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <div class="recommended">
+    <strong>Recommended resource:</strong>
+    <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Gradients">MDN: SVG Gradients Tutorial</a>  -  Clear walkthrough of linear and radial gradients with interactive examples. Also see <a href="https://www.sarasoueidan.com/blog/svg-coordinate-systems/">Sara Soueidan's SVG coordinate systems article</a> for deep coverage of how gradientUnits and patternUnits interact with the coordinate system.
+  </div>
+  <div class="footer-nav">
+    <a href="04-styling-presentation-attributes-vs-css.html">&larr; Prev: Styling: Presentation Attributes vs CSS</a>
+    <a href="index.html">Index</a>
+    <a href="06-clipping-and-masking.html">Next: Clipping &amp; Masking &rarr;</a>
+  </div>
+
+    </main>
+  </div><!-- end .page-layout -->
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="scripts.js"></script>
+</body>
+</html>

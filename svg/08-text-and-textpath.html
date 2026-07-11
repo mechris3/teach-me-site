@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>SVG Text and textPath - Lesson 8 | Teach Me</title>
+  <meta name="description" content="SVG text positioning, text-anchor, dominant-baseline, tspan, textPath for text on curves, font loading, and foreignObject.">
+  <link rel="canonical" href="https://teachmeskills.dev/svg/08-text-and-textpath.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/svg/08-text-and-textpath.html">
+  <meta property="og:title" content="SVG Text and textPath - Lesson 8 | Teach Me">
+  <meta property="og:description" content="SVG text positioning, text-anchor, dominant-baseline, tspan, textPath for text on curves, font loading, and foreignObject.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="SVG Text and textPath - Lesson 8 | Teach Me">
+  <meta name="twitter:description" content="SVG text positioning, text-anchor, dominant-baseline, tspan, textPath for text on curves, font loading, and foreignObject.">
+  <link rel="stylesheet" href="/styles.css">
+ <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header">
+        <a href="index.html">SVG Course</a>
+      </div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-coordinate-system.html">1. Coordinate System</a></li>
+        <li><a href="02-transforms-and-grouping.html">2. Transforms &amp; Grouping</a></li>
+        <li><a href="03-basic-shapes-and-paths.html">3. Shapes &amp; Paths</a></li>
+        <li><a href="04-styling-presentation-attributes-vs-css.html">4. Styling &amp; CSS</a></li>
+        <li><a href="05-gradients-patterns-paint-servers.html">5. Gradients &amp; Patterns</a></li>
+        <li><a href="06-clipping-and-masking.html">6. Clipping &amp; Masking</a></li>
+        <li><a href="07-filters.html">7. Filters</a></li>
+        <li class="current"><a href="08-text-and-textpath.html">8. Text &amp; textPath</a></li>
+        <li><a href="09-smil-animation-fundamentals.html">9. SMIL Fundamentals</a></li>
+        <li><a href="10-smil-advanced.html">10. SMIL Advanced</a></li>
+        <li><a href="11-css-animation-of-svg.html">11. CSS Animation</a></li>
+        <li><a href="12-javascript-and-svg.html">12. JavaScript + SVG</a></li>
+        <li><a href="13-putting-it-together.html">13. Capstone Project</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="svg-elements-and-attributes.html">Elements &amp; Attributes</a></li>
+        <li><a href="svg-dom-methods.html">DOM Methods &amp; Interfaces</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 8</p>
+  <h1>Text &amp; textPath</h1>
+  <p>SVG text is fundamentally different from HTML text. In HTML, text <em>flows</em>  -  it wraps, it fills containers, it responds to layout. In SVG, text is <strong>positioned</strong>  -  each glyph is placed at explicit coordinates within the same coordinate system your shapes use. This makes SVG text incredibly precise (you can place individual characters exactly where you want them) but also means there's no automatic line wrapping or paragraph flow.</p>
+
+  <p>This lesson covers the three text elements (<code>&lt;text&gt;</code>, <code>&lt;tspan&gt;</code>, <code>&lt;textPath&gt;</code>), the positioning and alignment attributes that control where glyphs land, and how text interacts with SVG features covered in earlier lessons  -  <a href="05-gradients-patterns-paint-servers.html">paint servers</a>, <a href="06-clipping-and-masking.html">clipping/masking</a>, and <a href="07-filters.html">filters</a>.</p>
+
+  <h2>1. The &lt;text&gt; Element</h2>
+  <p>The <code>&lt;text&gt;</code> element is SVG's equivalent of a text node. It places a string of characters at a point in the coordinate system. The key attributes:</p>
+
+  <table class="comparison-table">
+    <thead>
+      <tr><th>Attribute</th><th>Purpose</th><th>Default</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>x</code></td><td>Horizontal position of the first glyph's anchor point</td><td><code>0</code></td></tr>
+      <tr><td><code>y</code></td><td>Vertical position of the first glyph's baseline</td><td><code>0</code></td></tr>
+      <tr><td><code>dx</code></td><td>Relative horizontal offset (can be a list for per-character shifts)</td><td><code>0</code></td></tr>
+      <tr><td><code>dy</code></td><td>Relative vertical offset (can be a list for per-character shifts)</td><td><code>0</code></td></tr>
+      <tr><td><code>rotate</code></td><td>Rotation of individual glyphs (degrees; can be a list)</td><td>none</td></tr>
+      <tr><td><code>textLength</code></td><td>Desired total text length  -  browser adjusts spacing/glyphs to fit</td><td>auto</td></tr>
+      <tr><td><code>lengthAdjust</code></td><td>How to fit: <code>spacing</code> (adjust gaps) or <code>spacingAndGlyphs</code> (stretch glyphs too)</td><td><code>spacing</code></td></tr>
+    </tbody>
+  </table>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;svg viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg"&gt;
+  &lt;text x="10" y="50" font-size="24" fill="coral"&gt;
+    Hello, SVG!
+  &lt;/text&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="400" height="100" viewBox="0 0 400 100">
+      <rect width="400" height="100" fill="var(--demo-svg-bg)"/>
+      <!-- baseline guide -->
+      <line x1="0" y1="50" x2="400" y2="50" stroke="var(--svg-grid)" stroke-dasharray="4 2"/>
+      <text x="10" y="50" font-size="24" fill="coral" font-family="sans-serif">Hello, SVG!</text>
+      <circle cx="10" cy="50" r="3" fill="var(--accent)"/>
+      <text x="10" y="70" font-size="9" fill="var(--muted)">anchor point (10, 50)</text>
+    </svg>
+    <p class="demo-caption">The blue dot marks the anchor point (x, y). The dashed line is the baseline  -  notice how text sits <em>on top</em> of it.</p>
+  </div>
+
+  <div class="key-concept">
+    <strong>y positions the baseline, not the top</strong>
+    <p>Unlike CSS where <code>top</code> refers to the top edge of a box, SVG's <code>y</code> attribute on text sets the <strong>alphabetic baseline</strong>. The glyphs extend <em>above</em> this line. This is the single most common source of confusion with SVG text  -  if you set <code>y="0"</code>, your text will be clipped because it renders above the viewport.</p>
+  </div>
+
+  <h2>2. Horizontal Alignment: text-anchor</h2>
+  <p>The <code>text-anchor</code> attribute (or CSS property) controls how text is aligned relative to its <code>x</code> position. Think of it as the text equivalent of CSS <code>text-align</code>, but anchored to a specific coordinate rather than a box edge.</p>
+
+  <table class="comparison-table">
+    <thead>
+      <tr><th>Value</th><th>Behaviour</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>start</code></td><td>Text flows to the <strong>right</strong> of the anchor point (LTR). Default.</td></tr>
+      <tr><td><code>middle</code></td><td>Text is <strong>centred</strong> on the anchor point.</td></tr>
+      <tr><td><code>end</code></td><td>Text flows to the <strong>left</strong>  -  the anchor is the end of the string.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;svg viewBox="0 0 400 140" xmlns="http://www.w3.org/2000/svg"&gt;
+  &lt;!-- Vertical guide at x=200 --&gt;
+  &lt;line x1="200" y1="0" x2="200" y2="140"
+        stroke="grey" stroke-dasharray="4 2"/&gt;
+
+  &lt;text x="200" y="40" text-anchor="start"
+        font-size="18" fill="coral"&gt;start&lt;/text&gt;
+  &lt;text x="200" y="75" text-anchor="middle"
+        font-size="18" fill="coral"&gt;middle&lt;/text&gt;
+  &lt;text x="200" y="110" text-anchor="end"
+        font-size="18" fill="coral"&gt;end&lt;/text&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="400" height="140" viewBox="0 0 400 140">
+      <rect width="400" height="140" fill="var(--demo-svg-bg)"/>
+      <line x1="200" y1="0" x2="200" y2="140" stroke="var(--svg-grid)" stroke-dasharray="4 2"/>
+      <circle cx="200" cy="40" r="3" fill="var(--accent)"/>
+      <circle cx="200" cy="75" r="3" fill="var(--accent)"/>
+      <circle cx="200" cy="110" r="3" fill="var(--accent)"/>
+      <text x="200" y="40" text-anchor="start" font-size="18" fill="coral" font-family="sans-serif">start</text>
+      <text x="200" y="75" text-anchor="middle" font-size="18" fill="coral" font-family="sans-serif">middle</text>
+      <text x="200" y="110" text-anchor="end" font-size="18" fill="coral" font-family="sans-serif">end</text>
+    </svg>
+    <p class="demo-caption">All three texts share x="200" (blue dots). <code>text-anchor</code> determines which part of the string sits at that coordinate.</p>
+  </div>
+
+  <h2>3. Vertical Alignment: dominant-baseline</h2>
+  <p>While <code>text-anchor</code> handles the horizontal axis, <code>dominant-baseline</code> controls where the text sits <em>vertically</em> relative to the <code>y</code> coordinate. This is the attribute that solves the "my text is above the viewport" problem.</p>
+
+  <table class="comparison-table">
+    <thead>
+      <tr><th>Value</th><th>Behaviour</th><th>Use case</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>auto</code></td><td>Same as <code>alphabetic</code> for horizontal text</td><td>Default  -  text sits on the baseline</td></tr>
+      <tr><td><code>alphabetic</code></td><td>Bottom of most Latin glyphs sits on <code>y</code></td><td>Normal prose text</td></tr>
+      <tr><td><code>hanging</code></td><td>Top of capital letters aligns with <code>y</code></td><td>When <code>y</code> should be the top edge</td></tr>
+      <tr><td><code>middle</code></td><td>Vertical midpoint of the em-box aligns with <code>y</code></td><td>Centring text on a coordinate</td></tr>
+      <tr><td><code>central</code></td><td>Like <code>middle</code> but uses the central baseline (for CJK)</td><td>Multi-script centering</td></tr>
+      <tr><td><code>text-top</code></td><td>Top of the em-box aligns with <code>y</code></td><td>Precise top alignment</td></tr>
+      <tr><td><code>text-bottom</code></td><td>Bottom of the em-box aligns with <code>y</code></td><td>Precise bottom alignment</td></tr>
+    </tbody>
+  </table>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;svg viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg"&gt;
+  &lt;line x1="0" y1="60" x2="400" y2="60"
+        stroke="grey" stroke-dasharray="4 2"/&gt;
+
+  &lt;text x="20" y="60" dominant-baseline="auto"
+        font-size="16" fill="coral"&gt;auto&lt;/text&gt;
+  &lt;text x="100" y="60" dominant-baseline="hanging"
+        font-size="16" fill="#61afef"&gt;hanging&lt;/text&gt;
+  &lt;text x="210" y="60" dominant-baseline="middle"
+        font-size="16" fill="#98c379"&gt;middle&lt;/text&gt;
+  &lt;text x="310" y="60" dominant-baseline="text-top"
+        font-size="16" fill="#e5c07b"&gt;text-top&lt;/text&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="400" height="120" viewBox="0 0 400 120">
+      <rect width="400" height="120" fill="var(--demo-svg-bg)"/>
+      <line x1="0" y1="60" x2="400" y2="60" stroke="var(--svg-grid)" stroke-dasharray="4 2"/>
+      <text x="20" y="60" dominant-baseline="auto" font-size="16" fill="coral" font-family="sans-serif">auto</text>
+      <text x="100" y="60" dominant-baseline="hanging" font-size="16" fill="#61afef" font-family="sans-serif">hanging</text>
+      <text x="210" y="60" dominant-baseline="middle" font-size="16" fill="#98c379" font-family="sans-serif">middle</text>
+      <text x="310" y="60" dominant-baseline="text-top" font-size="16" fill="#e5c07b" font-family="sans-serif">text-top</text>
+    </svg>
+    <p class="demo-caption">All four texts share y="60" (the dashed line). <code>dominant-baseline</code> controls which part of the glyph sits at that y.</p>
+  </div>
+
+  <div class="key-concept">
+    <strong>Centering text on a point</strong>
+    <p>To perfectly centre text at a coordinate (e.g., labelling a circle), combine <code>text-anchor="middle"</code> with <code>dominant-baseline="middle"</code>. This centres horizontally <em>and</em> vertically  -  the equivalent of <code>display: flex; align-items: center; justify-content: center</code> in CSS, but for a single point.</p>
+  </div>
+
+  <h2>4. The &lt;tspan&gt; Element</h2>
+  <p><code>&lt;tspan&gt;</code> is to SVG text what <code>&lt;span&gt;</code> is to HTML  -  it marks up a <em>sub-portion</em> of text so you can style or reposition it independently. It must be a child of <code>&lt;text&gt;</code> or another <code>&lt;tspan&gt;</code>.</p>
+
+  <h3>Styling sub-portions</h3>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;svg viewBox="0 0 400 80" xmlns="http://www.w3.org/2000/svg"&gt;
+  &lt;text x="10" y="45" font-size="20" fill="var(--text)"&gt;
+    This is &lt;tspan fill="#e06c75" font-weight="bold"&gt;bold and red&lt;/tspan&gt;
+    and this is normal.
+  &lt;/text&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="400" height="80" viewBox="0 0 400 80">
+      <rect width="400" height="80" fill="var(--demo-svg-bg)"/>
+      <text x="10" y="45" font-size="20" fill="var(--text)" font-family="sans-serif">This is <tspan fill="#e06c75" font-weight="bold">bold and red</tspan> and this is normal.</text>
+    </svg>
+    <p class="demo-caption"><code>&lt;tspan&gt;</code> changes fill and weight mid-string without breaking text flow.</p>
+  </div>
+
+  <h3>Per-character positioning with dx/dy</h3>
+  <p>The <code>dx</code> and <code>dy</code> attributes accept a <strong>space-separated list of values</strong>, one per character. Each value shifts that character relative to where it would naturally sit. This lets you create manual kerning or wave effects.</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;svg viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg"&gt;
+  &lt;text x="30" y="50" font-size="28" fill="coral"&gt;
+    &lt;tspan dy="0 -8 -14 -8 0 8 14 8 0"&gt;WAVE TEXT&lt;/tspan&gt;
+  &lt;/text&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="400" height="100" viewBox="0 0 400 100">
+      <rect width="400" height="100" fill="var(--demo-svg-bg)"/>
+      <text x="30" y="60" font-size="28" fill="coral" font-family="sans-serif"><tspan dy="0 -8 -14 -8 0 8 14 8 0">WAVE TEXT</tspan></text>
+    </svg>
+    <p class="demo-caption">Each value in <code>dy</code> shifts one character vertically relative to the previous.</p>
+  </div>
+
+  <div class="warning">
+    <strong>dy lists vs textPath for wave effects</strong>
+    <p>The key difference is <strong>glyph orientation</strong>. A <code>dy</code> list shifts each character's <em>position</em> but every glyph stays perfectly upright  -  an "l" always points straight up. With <code>&lt;textPath&gt;</code>, each glyph <em>rotates to stay tangent</em> to the curve at its anchor point  -  letters lean into the path like carriages on a railway track. For text that should genuinely follow a curve, <code>&lt;textPath&gt;</code> looks natural; <code>dy</code> displacement looks like letters bouncing on a trampoline. Reserve <code>dy</code> lists for micro-adjustments, manual kerning, or jitter effects where you explicitly don't want rotation.</p>
+  </div>
+
+  <h3>Multi-line text with tspan</h3>
+  <p>SVG has <strong>no automatic line wrapping</strong>. To simulate multiple lines, use <code>&lt;tspan&gt;</code> elements with <code>x</code> (to reset to the left) and <code>dy</code> (to move down by the line height):</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;svg viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg"&gt;
+  &lt;text x="20" font-size="18" fill="coral"&gt;
+    &lt;tspan x="20" y="30"&gt;First line of text&lt;/tspan&gt;
+    &lt;tspan x="20" dy="1.4em"&gt;Second line of text&lt;/tspan&gt;
+    &lt;tspan x="20" dy="1.4em"&gt;Third line of text&lt;/tspan&gt;
+  &lt;/text&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="400" height="120" viewBox="0 0 400 120">
+      <rect width="400" height="120" fill="var(--demo-svg-bg)"/>
+      <text x="20" font-size="18" fill="coral" font-family="sans-serif">
+        <tspan x="20" y="30">First line of text</tspan>
+        <tspan x="20" dy="1.4em">Second line of text</tspan>
+        <tspan x="20" dy="1.4em">Third line of text</tspan>
+      </text>
+    </svg>
+    <p class="demo-caption">Setting <code>x</code> on each <code>&lt;tspan&gt;</code> resets the horizontal position. <code>dy="1.4em"</code> creates line spacing.</p>
+  </div>
+
+  <div class="warning">
+    <strong>No automatic text wrapping</strong>
+    <p>SVG 1.1 has no built-in word wrap. SVG 2 adds <code>inline-size</code> for auto-wrapping, but browser support is still incomplete (Chrome/Edge support it; Firefox/Safari partial as of 2026). For cross-browser multi-line text, use the <code>&lt;tspan&gt;</code> technique above, or embed HTML via <code>&lt;foreignObject&gt;</code>.</p>
+  </div>
+
+  <h2>5. Font Properties</h2>
+  <p>SVG text supports the same font properties as CSS. These can be set as <strong>presentation attributes</strong> on the element or via CSS (which takes precedence per the <a href="04-styling-presentation-attributes-vs-css.html">cascade rules covered in Lesson 4</a>).</p>
+
+  <table class="comparison-table">
+    <thead>
+      <tr><th>Property/Attribute</th><th>Purpose</th><th>Example</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>font-family</code></td><td>Typeface stack</td><td><code>"Georgia, serif"</code></td></tr>
+      <tr><td><code>font-size</code></td><td>Glyph size (user units, px, em, %)</td><td><code>24</code></td></tr>
+      <tr><td><code>font-weight</code></td><td>Boldness</td><td><code>bold</code> or <code>700</code></td></tr>
+      <tr><td><code>font-style</code></td><td>Italic / oblique</td><td><code>italic</code></td></tr>
+      <tr><td><code>font-variant</code></td><td>Small-caps, etc.</td><td><code>small-caps</code></td></tr>
+      <tr><td><code>font-stretch</code></td><td>Condensed / expanded</td><td><code>condensed</code></td></tr>
+      <tr><td><code>letter-spacing</code></td><td>Space between characters</td><td><code>2</code></td></tr>
+      <tr><td><code>word-spacing</code></td><td>Space between words</td><td><code>5</code></td></tr>
+      <tr><td><code>text-decoration</code></td><td>Underline / strikethrough</td><td><code>underline</code></td></tr>
+    </tbody>
+  </table>
+
+  <div class="key-concept">
+    <strong>font-size in SVG uses the user coordinate system</strong>
+    <p>A <code>font-size="24"</code> means 24 <em>user units</em>  -  the same units your shapes use. If your viewBox is 400 units wide and the viewport is 800px wide, that "24" becomes 48 screen pixels. The font scales with the viewBox just like everything else in SVG. This is why SVG text stays crisp at any zoom level.</p>
+  </div>
+
+  <h3>Loading custom fonts</h3>
+  <p>SVG uses the same <code>@font-face</code> mechanism as HTML. Place a <code>&lt;style&gt;</code> block inside your SVG and declare fonts exactly as you would in CSS:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;!-- Option 1: Google Fonts via @import --&gt;
+&lt;svg viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg"&gt;
+  &lt;style&gt;
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&amp;display=swap');
+  &lt;/style&gt;
+  &lt;text x="200" y="60" text-anchor="middle"
+        font-family="Playfair Display" font-size="32"
+        fill="coral"&gt;Custom Font&lt;/text&gt;
+&lt;/svg&gt;
+
+&lt;!-- Option 2: Self-hosted @font-face --&gt;
+&lt;svg viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg"&gt;
+  &lt;style&gt;
+    @font-face {
+      font-family: 'MyFont';
+      src: url('./fonts/myfont.woff2') format('woff2');
+    }
+  &lt;/style&gt;
+  &lt;text x="20" y="60" font-family="MyFont"
+        font-size="28" fill="coral"&gt;Self-hosted&lt;/text&gt;
+&lt;/svg&gt;
+
+&lt;!-- Option 3: Base64-embedded (fully self-contained) --&gt;
+&lt;svg viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg"&gt;
+  &lt;style&gt;
+    @font-face {
+      font-family: 'Embedded';
+      src: url(data:font/woff2;base64,d09GMgABA...) format('woff2');
+    }
+  &lt;/style&gt;
+  &lt;text x="20" y="60" font-family="Embedded"
+        font-size="28" fill="coral"&gt;No network requests&lt;/text&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <strong>Font loading depends on how the SVG is embedded</strong>
+    <p>The rules change based on context:</p>
+    <ul style="margin-top:0.5rem;">
+      <li><strong>Inline SVG in HTML</strong>  -  inherits the page's <code>@font-face</code> rules automatically. No need to redeclare.</li>
+      <li><strong><code>&lt;object&gt;</code>, <code>&lt;iframe&gt;</code>, <code>&lt;embed&gt;</code></strong>  -  the SVG loads as a full document. External font URLs work fine.</li>
+      <li><strong><code>&lt;img&gt;</code> tag</strong>  -  blocks all external fetches for security. Only base64-embedded fonts work here.</li>
+      <li><strong>CSS <code>background-image</code></strong>  -  same restrictions as <code>&lt;img&gt;</code>.</li>
+    </ul>
+  </div>
+
+  <div class="warning">
+    <strong>Self-contained SVGs need embedded fonts</strong>
+    <p>For self-contained animated SVGs, external font URLs create a dependency on network availability. The robust approach is to <strong>subset the font</strong> (include only the characters you use) and embed it as base64. Tools like <a href="https://github.com/fonttools/fonttools">fonttools/pyftsubset</a> or <a href="https://transfonter.org/">Transfonter</a> can subset and base64-encode in one step. A subsetted display font for a few words typically adds only 5&ndash;15 KB.</p>
+  </div>
+
+  <h3>Text as paint target</h3>
+  <p>Text can be filled and stroked just like shapes. This means you can apply <a href="05-gradients-patterns-paint-servers.html">gradients, patterns</a>, and even <a href="06-clipping-and-masking.html">use text as a clip path</a>:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;svg viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg"&gt;
+  &lt;defs&gt;
+    &lt;linearGradient id="text-grad" x1="0%" y1="0%" x2="100%" y2="0%"&gt;
+      &lt;stop offset="0%" stop-color="#e06c75"/&gt;
+      &lt;stop offset="50%" stop-color="#e5c07b"/&gt;
+      &lt;stop offset="100%" stop-color="#61afef"/&gt;
+    &lt;/linearGradient&gt;
+  &lt;/defs&gt;
+  &lt;text x="200" y="65" text-anchor="middle" font-size="48"
+        font-weight="bold" fill="url(#text-grad)"
+        stroke="#333" stroke-width="1"&gt;GRADIENT&lt;/text&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="400" height="100" viewBox="0 0 400 100">
+      <rect width="400" height="100" fill="var(--demo-svg-bg)"/>
+      <defs>
+        <linearGradient id="text-grad-demo" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#e06c75"/>
+          <stop offset="50%" stop-color="#e5c07b"/>
+          <stop offset="100%" stop-color="#61afef"/>
+        </linearGradient>
+      </defs>
+      <text x="200" y="65" text-anchor="middle" font-size="48" font-weight="bold" fill="url(#text-grad-demo)" stroke="#333" stroke-width="1" font-family="sans-serif">GRADIENT</text>
+    </svg>
+    <p class="demo-caption">Text filled with a linear gradient and stroked  -  treated exactly like any other shape.</p>
+  </div>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <h2>6. The &lt;textPath&gt; Element</h2>
+  <p>This is where SVG text gets exciting for animation work. <code>&lt;textPath&gt;</code> renders text <em>along the contour of a path</em>. The glyphs follow the curves, rotate to stay tangent to the path, and can be offset along it.</p>
+
+  <div class="key-concept">
+    <strong>textPath renders glyphs along a path's stroke</strong>
+    <p>The path itself is usually hidden (placed in <code>&lt;defs&gt;</code>). The text's baseline follows the path's contour  -  each glyph rotates to remain perpendicular to the path at its position. The <code>startOffset</code> attribute slides the text along the path like a slider.</p>
+  </div>
+
+  <h3>Basic usage</h3>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"&gt;
+  &lt;defs&gt;
+    &lt;path id="curve" d="M 30,150 Q 200,20 370,150" fill="none"/&gt;
+  &lt;/defs&gt;
+
+  &lt;!-- Show the path for reference --&gt;
+  &lt;use href="#curve" stroke="grey" stroke-dasharray="4 2"/&gt;
+
+  &lt;text font-size="18" fill="coral"&gt;
+    &lt;textPath href="#curve"&gt;
+      Text flowing along a quadratic curve
+    &lt;/textPath&gt;
+  &lt;/text&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="400" height="200" viewBox="0 0 400 200">
+      <rect width="400" height="200" fill="var(--demo-svg-bg)"/>
+      <defs>
+        <path id="demo-curve" d="M 30,150 Q 200,20 370,150" fill="none"/>
+      </defs>
+      <use href="#demo-curve" stroke="var(--svg-grid)" stroke-dasharray="4 2" fill="none"/>
+      <text font-size="18" fill="coral" font-family="sans-serif">
+        <textPath href="#demo-curve">Text flowing along a quadratic curve</textPath>
+      </text>
+    </svg>
+    <p class="demo-caption">The text's baseline follows the arc of the quadratic B&eacute;zier. Each glyph rotates to stay tangent.</p>
+  </div>
+
+  <h3>textPath attributes</h3>
+  <table class="comparison-table">
+    <thead>
+      <tr><th>Attribute</th><th>Purpose</th><th>Default</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>href</code></td><td>Reference to a <code>&lt;path&gt;</code> element (by ID)</td><td>required</td></tr>
+      <tr><td><code>startOffset</code></td><td>Distance along the path where text begins (length, %, or number)</td><td><code>0</code></td></tr>
+      <tr><td><code>method</code></td><td><code>align</code> (glyphs rotate to tangent) or <code>stretch</code> (glyphs distort to fit)</td><td><code>align</code></td></tr>
+      <tr><td><code>spacing</code></td><td><code>auto</code> or <code>exact</code>  -  how inter-glyph spacing is handled on curves</td><td><code>exact</code></td></tr>
+      <tr><td><code>side</code></td><td><code>left</code> or <code>right</code>  -  which side of the path the text renders on</td><td><code>left</code></td></tr>
+      <tr><td><code>textLength</code></td><td>Desired total length of the text (overrides natural length)</td><td>auto</td></tr>
+      <tr><td><code>lengthAdjust</code></td><td>How to fit: <code>spacing</code> or <code>spacingAndGlyphs</code></td><td><code>spacing</code></td></tr>
+    </tbody>
+  </table>
+
+  <h3>startOffset  -  sliding text along a path</h3>
+  <p><code>startOffset</code> is the key to animating text on a path. It defines where the first character begins, measured from the start of the path. When animated, it creates a scrolling-marquee effect along the curve.</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"&gt;
+  &lt;defs&gt;
+    &lt;path id="oval" d="M 50,100 A 150,60 0 1 1 350,100 A 150,60 0 1 1 50,100"
+          fill="none"/&gt;
+  &lt;/defs&gt;
+
+  &lt;text font-size="16" fill="#61afef"&gt;
+    &lt;textPath href="#oval" startOffset="0%"&gt;
+      Orbiting text along an ellipse &amp;mdash; SMIL can animate startOffset!
+      &lt;animate attributeName="startOffset" from="0%" to="100%"
+               dur="8s" repeatCount="indefinite"/&gt;
+    &lt;/textPath&gt;
+  &lt;/text&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="400" height="200" viewBox="0 0 400 200">
+      <rect width="400" height="200" fill="var(--demo-svg-bg)"/>
+      <defs>
+        <path id="demo-oval" d="M 50,100 A 150,60 0 1 1 350,100 A 150,60 0 1 1 50,100" fill="none"/>
+      </defs>
+      <use href="#demo-oval" stroke="var(--svg-grid)" stroke-dasharray="4 2" fill="none"/>
+      <text font-size="16" fill="#61afef" font-family="sans-serif">
+        <textPath href="#demo-oval" startOffset="0%">Orbiting text along an ellipse - SMIL can animate startOffset!<animate attributeName="startOffset" from="0%" to="100%" dur="8s" repeatCount="indefinite"/></textPath>
+      </text>
+    </svg>
+    <p class="demo-caption">A live SMIL animation  -  <code>startOffset</code> cycles from 0% to 100%, making text orbit the ellipse. This is a good example of a self-contained, declarative SVG animation.</p>
+  </div>
+
+  <h3>Circular text (a common pattern)</h3>
+  <p>A full circle path lets you wrap text around a badge or logo. Combine with <code>text-anchor="middle"</code> and <code>startOffset="50%"</code> to centre the text at the top of the circle:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg"&gt;
+  &lt;defs&gt;
+    &lt;path id="circle-path"
+          d="M 150,50 A 100,100 0 1 1 149.99,50" fill="none"/&gt;
+  &lt;/defs&gt;
+
+  &lt;circle cx="150" cy="150" r="100" fill="none"
+          stroke="grey" stroke-dasharray="4 2"/&gt;
+
+  &lt;text font-size="18" fill="coral" text-anchor="middle"&gt;
+    &lt;textPath href="#circle-path" startOffset="50%"&gt;
+      CIRCULAR TEXT DEMO
+    &lt;/textPath&gt;
+  &lt;/text&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="300" height="300" viewBox="0 0 300 300">
+      <rect width="300" height="300" fill="var(--demo-svg-bg)"/>
+      <defs>
+        <path id="demo-circle-path" d="M 150,50 A 100,100 0 1 1 149.99,50" fill="none"/>
+      </defs>
+      <circle cx="150" cy="150" r="100" fill="none" stroke="var(--svg-grid)" stroke-dasharray="4 2"/>
+      <text font-size="18" fill="coral" text-anchor="middle" font-family="sans-serif">
+        <textPath href="#demo-circle-path" startOffset="50%">CIRCULAR TEXT DEMO</textPath>
+      </text>
+    </svg>
+    <p class="demo-caption">Text centred at the top of a circle. The path starts at 12 o'clock; <code>startOffset="50%"</code> combined with <code>text-anchor="middle"</code> centres the string there.</p>
+  </div>
+
+  <h2>7. textLength and lengthAdjust</h2>
+  <p>The <code>textLength</code> attribute tells the browser how long the text <em>should</em> be. If the natural rendering is shorter or longer, the browser adjusts to fit. <code>lengthAdjust</code> controls <em>how</em> it adjusts.</p>
+
+  <table class="comparison-table">
+    <thead>
+      <tr><th>lengthAdjust value</th><th>What gets adjusted</th><th>Visual effect</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>spacing</code></td><td>Only the gaps between glyphs</td><td>Characters keep their shape; tracking changes</td></tr>
+      <tr><td><code>spacingAndGlyphs</code></td><td>Both gaps and glyph widths</td><td>Characters stretch or compress horizontally</td></tr>
+    </tbody>
+  </table>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;svg viewBox="0 0 400 160" xmlns="http://www.w3.org/2000/svg"&gt;
+  &lt;!-- Natural length --&gt;
+  &lt;text x="20" y="35" font-size="20" fill="coral"&gt;Stretched&lt;/text&gt;
+
+  &lt;!-- spacing only --&gt;
+  &lt;text x="20" y="75" font-size="20" fill="#61afef"
+        textLength="350" lengthAdjust="spacing"&gt;Stretched&lt;/text&gt;
+
+  &lt;!-- spacing and glyphs --&gt;
+  &lt;text x="20" y="115" font-size="20" fill="#98c379"
+        textLength="350" lengthAdjust="spacingAndGlyphs"&gt;Stretched&lt;/text&gt;
+
+  &lt;text x="20" y="150" font-size="10" fill="grey"&gt;
+    Top: natural | Middle: spacing | Bottom: spacingAndGlyphs
+  &lt;/text&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="400" height="160" viewBox="0 0 400 160">
+      <rect width="400" height="160" fill="var(--demo-svg-bg)"/>
+      <text x="20" y="35" font-size="20" fill="coral" font-family="sans-serif">Stretched</text>
+      <text x="20" y="75" font-size="20" fill="#61afef" font-family="sans-serif" textLength="350" lengthAdjust="spacing">Stretched</text>
+      <text x="20" y="115" font-size="20" fill="#98c379" font-family="sans-serif" textLength="350" lengthAdjust="spacingAndGlyphs">Stretched</text>
+      <text x="20" y="150" font-size="10" fill="var(--muted)" font-family="sans-serif">Top: natural | Middle: spacing only | Bottom: spacingAndGlyphs</text>
+    </svg>
+    <p class="demo-caption">All three say "Stretched" at the same font-size. <code>textLength="350"</code> forces them wider; <code>lengthAdjust</code> controls whether glyphs distort.</p>
+  </div>
+
+  <h2>8. The rotate Attribute</h2>
+  <p>The <code>rotate</code> attribute on <code>&lt;text&gt;</code> or <code>&lt;tspan&gt;</code> rotates <em>individual glyphs</em> (not the entire text block). Like <code>dx</code>/<code>dy</code>, it accepts a list of values  -  one per character. If fewer values than characters, the last value applies to all remaining characters.</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;svg viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg"&gt;
+  &lt;!-- Values are degrees (no unit suffix). Positive = clockwise. --&gt;
+  &lt;text x="30" y="60" font-size="28" fill="coral"
+        rotate="0 5 10 15 20 25 30 25 20 15 10 5 0"&gt;TUMBLING TEXT&lt;/text&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="400" height="100" viewBox="0 0 400 100">
+      <rect width="400" height="100" fill="var(--demo-svg-bg)"/>
+      <text x="30" y="60" font-size="28" fill="coral" font-family="sans-serif" rotate="0 5 10 15 20 25 30 25 20 15 10 5 0">TUMBLING TEXT</text>
+    </svg>
+    <p class="demo-caption">Each character tilts independently. Combine small random <code>rotate</code> values with small <code>dy</code> jitters to simulate handwriting  -  characters that are slightly wonky and uneven, like real pen strokes.</p>
+  </div>
+
+  <div class="warning">
+    <strong>rotate vs transform</strong>
+    <p>Don't confuse the <code>rotate</code> attribute with a <code>transform="rotate(...)"</code> on the text element. The attribute rotates each glyph <em>individually around its own position</em>; the transform rotates the <em>entire text block</em> around a point. They serve very different purposes.</p>
+  </div>
+
+  <h2>9. Text and Transforms</h2>
+  <p>Everything from <a href="02-transforms-and-grouping.html">Lesson 2</a> applies to text. You can translate, rotate, scale, and skew text elements using the <code>transform</code> attribute. A particularly useful pattern is combining text with <code>&lt;g&gt;</code> transforms for layout:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"&gt;
+  &lt;!-- Vertical text via rotation --&gt;
+  &lt;text x="0" y="0" font-size="16" fill="coral"
+        transform="translate(30, 180) rotate(-90)"&gt;
+    Vertical label
+  &lt;/text&gt;
+
+  &lt;!-- Scaled text --&gt;
+  &lt;text x="80" y="100" font-size="16" fill="#61afef"
+        transform="scale(1, 2)"&gt;Tall text&lt;/text&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="400" height="200" viewBox="0 0 400 200">
+      <rect width="400" height="200" fill="var(--demo-svg-bg)"/>
+      <text x="0" y="0" font-size="16" fill="coral" font-family="sans-serif" transform="translate(30, 180) rotate(-90)">Vertical label</text>
+      <text x="80" y="50" font-size="16" fill="#61afef" font-family="sans-serif" transform="translate(0, 0) scale(1, 2)">Tall text</text>
+      <text x="250" y="100" font-size="20" fill="#e5c07b" font-family="sans-serif" transform="rotate(15, 250, 100)">Tilted</text>
+    </svg>
+    <p class="demo-caption">Transforms on text work identically to transforms on shapes  -  they manipulate the coordinate system.</p>
+  </div>
+
+  <h2>10. Text and Other SVG Features</h2>
+  <p>Text elements participate fully in SVG's rendering pipeline. You can:</p>
+  <ul>
+    <li><strong>Clip with text</strong>  -  use <code>&lt;text&gt;</code> inside a <code>&lt;clipPath&gt;</code> to clip images/shapes to the letterforms</li>
+    <li><strong>Mask with text</strong>  -  text luminance drives alpha in a <code>&lt;mask&gt;</code></li>
+    <li><strong>Filter text</strong>  -  apply any filter from <a href="07-filters.html">Lesson 7</a> to text</li>
+    <li><strong>Fill with patterns</strong>  -  <code>fill="url(#pattern)"</code> works on text</li>
+    <li><strong>Animate text</strong>  -  SMIL <code>&lt;animate&gt;</code> on text attributes (coming in Lesson 9)</li>
+  </ul>
+
+  <h3>Text as a clipping path</h3>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;svg viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg"&gt;
+  &lt;defs&gt;
+    &lt;clipPath id="text-clip"&gt;
+      &lt;text x="200" y="80" text-anchor="middle"
+            font-size="60" font-weight="bold"&gt;CLIPPED&lt;/text&gt;
+    &lt;/clipPath&gt;
+    &lt;linearGradient id="clip-bg" x1="0%" y1="0%" x2="100%" y2="100%"&gt;
+      &lt;stop offset="0%" stop-color="#e06c75"/&gt;
+      &lt;stop offset="100%" stop-color="#61afef"/&gt;
+    &lt;/linearGradient&gt;
+  &lt;/defs&gt;
+
+  &lt;rect width="400" height="120" fill="url(#clip-bg)"
+        clip-path="url(#text-clip)"/&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="400" height="120" viewBox="0 0 400 120">
+      <rect width="400" height="120" fill="var(--demo-svg-bg)"/>
+      <defs>
+        <clipPath id="demo-text-clip">
+          <text x="200" y="80" text-anchor="middle" font-size="60" font-weight="bold" font-family="sans-serif">CLIPPED</text>
+        </clipPath>
+        <linearGradient id="demo-clip-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#e06c75"/>
+          <stop offset="100%" stop-color="#61afef"/>
+        </linearGradient>
+      </defs>
+      <rect width="400" height="120" fill="url(#demo-clip-bg)" clip-path="url(#demo-text-clip)"/>
+    </svg>
+    <p class="demo-caption">A gradient rectangle clipped to text letterforms. The text itself isn't rendered  -  it's used purely as a geometric clipping shape.</p>
+  </div>
+
+  <h2>11. Accessibility and Semantics</h2>
+  <p>SVG text is <strong>selectable and searchable</strong> by default  -  unlike text in Canvas or rasterised images. Screen readers can read it. Search engines can index it. This is one of SVG's great advantages for text in graphics.</p>
+
+  <p>However, there are a few things to be aware of:</p>
+  <ul>
+    <li><code>&lt;title&gt;</code> and <code>&lt;desc&gt;</code> on the parent <code>&lt;svg&gt;</code> provide accessible names and descriptions for the entire graphic.</li>
+    <li>Decorative text (logos, artistic effects) that duplicates information available elsewhere should have <code>aria-hidden="true"</code>.</li>
+    <li>Text inside <code>&lt;clipPath&gt;</code> or <code>&lt;mask&gt;</code> is never rendered and thus not accessible  -  ensure the visible text or an ARIA label conveys the same information.</li>
+  </ul>
+
+  <h2>12. Common Patterns &amp; Recipes</h2>
+
+  <h3>Centred label inside a shape</h3>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"&gt;
+  &lt;circle cx="100" cy="100" r="80" fill="#282c34" stroke="#61afef"/&gt;
+  &lt;text x="100" y="100"
+        text-anchor="middle" dominant-baseline="middle"
+        font-size="20" fill="#e0e4eb"&gt;Centred&lt;/text&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="200" height="200" viewBox="0 0 200 200">
+      <rect width="200" height="200" fill="var(--demo-svg-bg)"/>
+      <circle cx="100" cy="100" r="80" fill="var(--bg-raised)" stroke="var(--accent)"/>
+      <text x="100" y="100" text-anchor="middle" dominant-baseline="middle" font-size="20" fill="var(--text)" font-family="sans-serif">Centred</text>
+    </svg>
+    <p class="demo-caption">The most common pattern: <code>text-anchor="middle"</code> + <code>dominant-baseline="middle"</code> centres text at a point.</p>
+  </div>
+
+  <h3>Animated typing effect with textLength</h3>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;svg viewBox="0 0 400 80" xmlns="http://www.w3.org/2000/svg"&gt;
+  &lt;text x="20" y="50" font-size="24" fill="coral"
+        textLength="0" lengthAdjust="spacing"&gt;
+    Hello, World!
+    &lt;animate attributeName="textLength"
+             from="0" to="300" dur="3s"
+             fill="freeze"/&gt;
+  &lt;/text&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="400" height="80" viewBox="0 0 400 80">
+      <rect width="400" height="80" fill="var(--demo-svg-bg)"/>
+      <text x="20" y="50" font-size="24" fill="coral" font-family="sans-serif" textLength="0" lengthAdjust="spacing">Hello, World!<animate attributeName="textLength" from="0" to="300" dur="3s" fill="freeze" repeatCount="indefinite"/></text>
+    </svg>
+    <p class="demo-caption">Animating <code>textLength</code> from 0 expands the text character spacing  -  a reveal effect using pure SMIL.</p>
+  </div>
+
+  <h2>13. &lt;foreignObject&gt;  -  Embedding HTML in SVG</h2>
+  <p>When SVG's text system isn't enough (you need word wrap, rich formatting, form inputs), <code>&lt;foreignObject&gt;</code> lets you embed arbitrary HTML inside an SVG document:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"&gt;
+  &lt;!-- SVG content --&gt;
+  &lt;rect width="400" height="200" rx="10" fill="#282c34"/&gt;
+
+  &lt;!-- Embedded HTML with auto word-wrapping --&gt;
+  &lt;foreignObject x="20" y="20" width="360" height="160"&gt;
+    &lt;div xmlns="http://www.w3.org/1999/xhtml"
+         style="color: #e0e4eb; font: 14px sans-serif;"&gt;
+      &lt;h3 style="margin: 0 0 8px;"&gt;Rich HTML content&lt;/h3&gt;
+      &lt;p&gt;This text wraps automatically, supports
+         &lt;strong&gt;bold&lt;/strong&gt;, &lt;em&gt;italic&lt;/em&gt;, links,
+         and any HTML you want.&lt;/p&gt;
+    &lt;/div&gt;
+  &lt;/foreignObject&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="400" height="200" viewBox="0 0 400 200">
+      <rect width="400" height="200" rx="10" fill="var(--bg-raised)"/>
+      <foreignObject x="20" y="20" width="360" height="160">
+        <div xmlns="http://www.w3.org/1999/xhtml" style="color: var(--text); font: 14px sans-serif;">
+          <h3 style="margin: 0 0 8px; color: var(--text-heading);">Rich HTML content</h3>
+          <p style="margin: 0;">This text wraps automatically, supports <strong>bold</strong>, <em>italic</em>, and any HTML you want. It flows like a normal paragraph  -  something SVG's <code>&lt;text&gt;</code> element cannot do.</p>
+        </div>
+      </foreignObject>
+    </svg>
+    <p class="demo-caption"><code>&lt;foreignObject&gt;</code> embeds a full HTML rendering context inside the SVG. The text wraps naturally.</p>
+  </div>
+
+  <table class="comparison-table">
+    <thead>
+      <tr><th>Attribute</th><th>Purpose</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>x</code>, <code>y</code></td><td>Position of the HTML viewport within the SVG</td></tr>
+      <tr><td><code>width</code>, <code>height</code></td><td>Size of the HTML rendering area</td></tr>
+    </tbody>
+  </table>
+
+  <div class="warning">
+    <strong>foreignObject limitations</strong>
+    <p><code>&lt;foreignObject&gt;</code> is powerful but has constraints: it doesn't work in SVGs loaded via <code>&lt;img&gt;</code> (blocked for security), it can't be animated with SMIL, and its content can't be clipped/masked by SVG clip paths. It's best used in inline SVGs or <code>&lt;object&gt;</code>-embedded SVGs where you need HTML layout capabilities (paragraphs, form controls, iframes).</p>
+  </div>
+
+  <h2>14. The SVG &lt;a&gt; Element</h2>
+  <p>SVG has its own <code>&lt;a&gt;</code> element  -  it works like the HTML anchor but wraps graphical content instead of text:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;svg viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg"&gt;
+  &lt;a href="https://developer.mozilla.org/en-US/docs/Web/SVG"&gt;
+    &lt;rect x="20" y="15" width="160" height="50" rx="8"
+          fill="#61afef"/&gt;
+    &lt;text x="100" y="47" text-anchor="middle"
+          font-size="16" fill="white"&gt;MDN SVG Docs&lt;/text&gt;
+  &lt;/a&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <div class="demo">
+    <svg width="200" height="80" viewBox="0 0 200 80">
+      <rect width="200" height="80" fill="var(--demo-svg-bg)"/>
+      <a href="https://developer.mozilla.org/en-US/docs/Web/SVG" target="_blank">
+        <rect x="20" y="15" width="160" height="50" rx="8" fill="#61afef"/>
+        <text x="100" y="47" text-anchor="middle" font-size="16" fill="white" font-family="sans-serif">MDN SVG Docs</text>
+      </a>
+    </svg>
+    <p class="demo-caption">Click the button  -  it's a real link (opens MDN in a new tab). The <code>&lt;a&gt;</code> wraps the rect and text, making both clickable.</p>
+  </div>
+
+  <p>The SVG <code>&lt;a&gt;</code> supports <code>href</code>, <code>target</code>, and <code>download</code>  -  same as HTML. It's <strong>natively focusable</strong> (keyboard-navigable with Tab) without needing <code>tabindex</code>. Its children get a pointer cursor automatically.</p>
+
+  <div class="key-concept">
+    <strong>When to use SVG &lt;a&gt; vs HTML &lt;a&gt;</strong>
+    <p>Use SVG's <code>&lt;a&gt;</code> when you want graphical SVG elements to be clickable links <em>within</em> the SVG itself (especially for standalone .svg files). For inline SVGs in HTML, you could also wrap the entire <code>&lt;svg&gt;</code> in an HTML <code>&lt;a&gt;</code> instead. The SVG <code>&lt;a&gt;</code> gives finer control  -  different shapes within one SVG can link to different URLs.</p>
+  </div>
+
+  <h2>Quiz</h2>
+
+  <div class="quiz">
+    <h3>Question 1</h3>
+    <p>What does the <code>y</code> attribute on a <code>&lt;text&gt;</code> element position?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">The top edge of the tallest glyph</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">The alphabetic baseline of the text</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">The vertical centre of the em-box</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">The bottom edge of descender glyphs</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz">
+    <h3>Question 2</h3>
+    <p>To perfectly centre text at a coordinate point, which combination of attributes do you need?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">text-anchor="start" and dominant-baseline="hanging"</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">text-anchor="middle" and dominant-baseline="auto"</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">text-anchor="middle" and dominant-baseline="middle"</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">text-anchor="end" and dominant-baseline="central"</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz">
+    <h3>Question 3</h3>
+    <p>What does <code>startOffset="50%"</code> on a <code>&lt;textPath&gt;</code> do?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Scales the text to half its normal size</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Skips the first half of the text string</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">Starts rendering text at the midpoint of the referenced path</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Offsets the text 50% perpendicular to the path</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz">
+    <h3>Question 4</h3>
+    <p>How do you create multi-line text in SVG 1.1 (cross-browser)?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Use the white-space: pre-wrap CSS property on the text element</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">Use multiple tspan elements with x (to reset) and dy (to advance)</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Insert newline characters directly into the text content</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Set the inline-size attribute on the text element for wrapping</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz">
+    <h3>Question 5</h3>
+    <p>What is the difference between <code>lengthAdjust="spacing"</code> and <code>lengthAdjust="spacingAndGlyphs"</code>?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">spacing adjusts word gaps; spacingAndGlyphs adjusts letter gaps</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">spacing only changes inter-glyph gaps; spacingAndGlyphs also stretches the glyphs themselves</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">spacing works on single lines; spacingAndGlyphs works on multiline text</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">spacing preserves text-anchor; spacingAndGlyphs ignores text-anchor</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <h2>Exercises</h2>
+  <p>Try these in your editor or a CodePen to build muscle memory:</p>
+  <ol>
+    <li><strong>Label a bar chart</strong>  -  Create three horizontal <code>&lt;rect&gt;</code> bars and place centred text labels inside each one using <code>text-anchor="middle"</code> and <code>dominant-baseline="middle"</code>.</li>
+    <li><strong>Badge text</strong>  -  Create a circular badge with text wrapping around the top ("CERTIFIED") and bottom ("PREMIUM") using two <code>&lt;textPath&gt;</code> elements on circle paths. Hint: use <code>side="right"</code> or flip the path direction for bottom text.</li>
+    <li><strong>Animated marquee</strong>  -  Put text on a straight horizontal path and animate <code>startOffset</code> from <code>100%</code> to <code>-100%</code> with SMIL for a ticker-tape effect.</li>
+    <li><strong>Text clipping</strong>  -  Use bold text as a <code>&lt;clipPath&gt;</code> and clip an image or animated gradient through the letterforms.</li>
+    <li><strong>Wave text</strong>  -  Use <code>dy</code> with a sinusoidal pattern of values to make text undulate. Try animating the <code>dy</code> values for a "breathing" wave effect.</li>
+  </ol>
+
+  <div class="recommended">
+    <strong>Recommended resource:</strong>
+    <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Texts">MDN: SVG Text Tutorial</a>  -  Concise walkthrough of <code>&lt;text&gt;</code>, <code>&lt;tspan&gt;</code>, and <code>&lt;textPath&gt;</code> with live examples. The <a href="https://www.w3.org/TR/SVG11/text.html">W3C SVG 1.1 Text chapter</a> is the definitive reference for edge cases and formal definitions.
+  </div>
+  <div class="footer-nav">
+    <a href="07-filters.html">&larr; Prev: Filters</a>
+    <a href="index.html">Index</a>
+    <a href="09-smil-animation-fundamentals.html">Next: SMIL Animation Fundamentals &rarr;</a>
+  </div>
+
+    </main>
+  </div><!-- end .page-layout -->
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="scripts.js"></script>
+</body>
+</html>
