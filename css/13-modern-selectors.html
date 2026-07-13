@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>Modern Selectors - Lesson 13 | Teach Me</title>
+  <meta name="description" content="Master modern CSS pseudo-class functions :has(), :is(), :where(), and :not() for powerful conditional selection, concise selector lists, and precise specificity control.">
+  <link rel="canonical" href="https://teachmeskills.dev/css/13-modern-selectors.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/css/13-modern-selectors.html">
+  <meta property="og:title" content="Modern Selectors - Lesson 13 | Teach Me">
+  <meta property="og:description" content="Master modern CSS pseudo-class functions :has(), :is(), :where(), and :not() for powerful conditional selection, concise selector lists, and precise specificity control.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Modern Selectors - Lesson 13 | Teach Me">
+  <meta name="twitter:description" content="Master modern CSS pseudo-class functions :has(), :is(), :where(), and :not() for powerful conditional selection, concise selector lists, and precise specificity control.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .has-demo-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 0.75rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .has-demo-card:has(img) {
+      border-color: var(--accent);
+      box-shadow: 0 2px 8px rgba(58, 134, 255, 0.1);
+    }
+
+    .has-demo-card:has(:checked) {
+      background: #e8f8f5; color: #1a1a2e;
+      border-color: #2a9d8f;
+    }
+
+    .has-demo-card img {
+      width: 100%;
+      height: 40px;
+      object-fit: cover;
+      border-radius: 4px;
+      background: var(--accent);
+    }
+
+    .is-demo :is(h3, h4, h5) {
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+
+    .is-demo :is(.intro, .summary) {
+      font-style: italic;
+      color: #555;
+    }
+
+    .where-demo :where(h3, h4, h5) {
+      color: #e76f51;
+      margin-bottom: 0.5rem;
+    }
+
+    .where-demo h3 {
+      color: #2a9d8f;
+    }
+
+    .not-demo .item {
+      padding: 0.5rem 0.75rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.85rem;
+    }
+
+    .not-demo .item:not(:last-child) {
+      margin-bottom: 0;
+    }
+
+    .not-demo .item:not(.disabled) {
+      color: var(--text);
+    }
+
+    .not-demo .item.disabled {
+      color: #aaa;
+      text-decoration: line-through;
+    }
+
+    .combine-demo article:has(> img):not(.featured) {
+      opacity: 0.7;
+    }
+
+    .combine-demo article {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.75rem;
+      margin-bottom: 0.5rem;
+      font-size: 0.8rem;
+    }
+
+    .combine-demo article.featured {
+      border-color: var(--accent);
+      border-width: 2px;
+    }
+
+    .combine-demo img {
+      width: 100%;
+      height: 30px;
+      background: var(--accent);
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header">
+        <a href="index.html">CSS Course</a>
+      </div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-custom-properties-fundamentals.html">1. Custom Properties</a></li>
+        <li><a href="02-registered-custom-properties.html">2. @property</a></li>
+        <li><a href="03-css-value-functions.html">3. Value Functions</a></li>
+        <li><a href="04-custom-css-functions.html">4. Custom Functions</a></li>
+        <li><a href="05-advanced-attr.html">5. Advanced attr()</a></li>
+        <li><a href="06-transitions.html">6. Transitions</a></li>
+        <li><a href="07-animations.html">7. Animations</a></li>
+        <li><a href="08-flexbox.html">8. Flexbox</a></li>
+        <li><a href="09-grid.html">9. Grid</a></li>
+        <li><a href="10-container-queries.html">10. Container Queries</a></li>
+        <li><a href="11-cascade-layers.html">11. Cascade Layers</a></li>
+        <li><a href="12-css-nesting.html">12. CSS Nesting</a></li>
+        <li class="current"><a href="13-modern-selectors.html">13. Modern Selectors</a></li>
+        <li><a href="14-the-cascade.html">14. The Cascade</a></li>
+        <li><a href="15-logical-properties.html">15. Logical Properties</a></li>
+        <li><a href="16-view-transitions.html">16. View Transitions</a></li>
+        <li><a href="17-anchor-positioning.html">17. Anchor Positioning</a></li>
+        <li><a href="18-advanced-colour.html">18. Advanced Colour</a></li>
+        <li><a href="19-scope.html">19. @scope</a></li>
+        <li><a href="20-selectors-deep-dive.html">20. Selectors Deep-Dive</a></li>
+        <li><a href="21-theming-deep-dive.html">21. Theming Deep-Dive</a></li>
+        <li><a href="22-responsive-design-patterns.html">22. Responsive Patterns</a></li>
+        <li><a href="23-scroll-driven-animations.html">23. Scroll-Driven Animations</a></li>
+        <li><a href="24-capstone-product-landing-page.html">24. Capstone Project</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="css-anatomy.html">CSS Anatomy</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+  <p class="lesson-num">Lesson 13</p>
+  <h1>Modern Selectors - <code>:has()</code>, <code>:is()</code>, <code>:where()</code>, <code>:not()</code></h1>
+
+  <p>These four pseudo-class functions transform what's possible with CSS selectors. They let you select based on what an element <em>contains</em>, simplify repetitive selector lists, control specificity precisely, and exclude elements from matching.</p>
+
+  <h2>The mental model</h2>
+
+  <table style="width: 100%; border-collapse: collapse; font-size: 0.82rem; margin: 1.5rem 0;">
+    <thead>
+      <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+        <th style="padding: 0.5rem;">Selector</th>
+        <th style="padding: 0.5rem;">What it does</th>
+        <th style="padding: 0.5rem;">Specificity</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 0.4rem 0.5rem;"><code>:has()</code></td>
+        <td style="padding: 0.4rem 0.5rem;">Select an element based on what's <em>inside</em> it (the "parent selector")</td>
+        <td style="padding: 0.4rem 0.5rem;">Specificity of its most specific argument</td>
+      </tr>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 0.4rem 0.5rem;"><code>:is()</code></td>
+        <td style="padding: 0.4rem 0.5rem;">Match any of a list of selectors (OR logic, shorthand)</td>
+        <td style="padding: 0.4rem 0.5rem;">Specificity of its most specific argument</td>
+      </tr>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 0.4rem 0.5rem;"><code>:where()</code></td>
+        <td style="padding: 0.4rem 0.5rem;">Same as :is() but with zero specificity</td>
+        <td style="padding: 0.4rem 0.5rem;"><strong>Always 0</strong></td>
+      </tr>
+      <tr>
+        <td style="padding: 0.4rem 0.5rem;"><code>:not()</code></td>
+        <td style="padding: 0.4rem 0.5rem;">Exclude elements that match the argument</td>
+        <td style="padding: 0.4rem 0.5rem;">Specificity of its argument</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="key-concept">
+    <p><strong>The specificity rule for all of these:</strong> The pseudo-class itself contributes nothing. The specificity comes from its <em>argument</em> - specifically, the most specific selector in the argument list. <code>:where()</code> is the exception: it always contributes zero, making it ideal for defaults you want to be easily overridable.</p>
+  </div>
+
+  <h2><code>:has()</code> - the parent selector CSS never had</h2>
+
+  <p>Before <code>:has()</code>, CSS could only style elements based on their ancestors, never based on their children. You couldn't say "style this div IF it contains an image." Now you can:</p>
+
+  <div class="demo">
+    <p class="demo-caption">The first card has an image inside it - :has(img) gives it a blue border. The second card doesn't.</p>
+    <div class="has-demo-card">
+      <img alt="placeholder">
+      <p style="font-size: 0.8rem; margin-top: 0.5rem;">Card with image &rarr; styled by :has(img)</p>
+    </div>
+    <div class="has-demo-card">
+      <p style="font-size: 0.8rem;">Card without image &rarr; no :has(img) match</p>
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;!-- HTML --&gt;
+&lt;div class="card"&gt;
+  &lt;img src="..."&gt;
+  &lt;p&gt;Card with image&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="card"&gt;
+  &lt;p&gt;Card without image&lt;/p&gt;
+&lt;/div&gt;
+
+/* Style the CARD based on whether it CONTAINS an image */
+.card:has(img) {
+  border-color: blue;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}</code></pre>
+  </div>
+
+  <h3>:has() with form states</h3>
+
+  <div class="demo">
+    <p class="demo-caption">Check the checkbox - the card changes background via :has(:checked)</p>
+    <div class="has-demo-card">
+      <label style="font-size: 0.85rem; cursor: pointer;">
+        <input type="checkbox"> Accept terms
+      </label>
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;!-- HTML --&gt;
+&lt;div class="card"&gt;
+  &lt;label&gt;&lt;input type="checkbox"&gt; Accept terms&lt;/label&gt;
+&lt;/div&gt;
+
+/* Card reacts to checkbox state INSIDE it */
+.card:has(:checked) {
+  background: #e8f8f5; color: #1a1a2e;
+  border-color: teal;
+}</code></pre>
+  </div>
+
+  <h3>:has() with combinators</h3>
+
+  <p><code>:has()</code> accepts any valid selector as its argument, including combinators:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* Direct child only */
+.card:has(&gt; img) { }        /* card with img as direct child */
+
+/* Sibling */
+h2:has(+ p) { }             /* h2 immediately followed by a p */
+
+/* Descendant at any depth */
+.form:has(:invalid) { }     /* form containing any invalid input */
+
+/* Multiple conditions */
+.card:has(img):has(h2) { }  /* card with BOTH img AND h2 inside */</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <p><strong>:has() is not just a parent selector.</strong> It's a "conditional selector" - it lets any element's styling depend on the state or content of its relatives. This replaces many patterns that previously required JavaScript (like styling a form when any field is invalid).</p>
+  </div>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <h2><code>:is()</code> - selector list shorthand</h2>
+
+  <p><code>:is()</code> matches any element that matches any of its arguments. It's a way to avoid repeating the same context for multiple selectors:</p>
+
+  <div class="demo">
+    <p class="demo-caption">All headings inside .article are blue - one rule instead of three</p>
+    <div class="is-demo">
+      <h3>Heading 3</h3>
+      <h4>Heading 4</h4>
+      <h5>Heading 5</h5>
+      <p class="intro">Intro paragraph (italic via :is(.intro, .summary))</p>
+      <p>Normal paragraph</p>
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;!-- HTML --&gt;
+&lt;div class="article"&gt;
+  &lt;h3&gt;Heading 3&lt;/h3&gt;
+  &lt;h4&gt;Heading 4&lt;/h4&gt;
+  &lt;h5&gt;Heading 5&lt;/h5&gt;
+  &lt;p class="intro"&gt;Intro&lt;/p&gt;
+  &lt;p&gt;Normal&lt;/p&gt;
+&lt;/div&gt;
+
+/* Without :is() - repetitive */
+.article h3, .article h4, .article h5 { color: blue; }
+
+/* With :is() - concise */
+.article :is(h3, h4, h5) { color: blue; }
+
+/* Also works for class lists */
+.article :is(.intro, .summary) { font-style: italic; }</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <p><strong>Specificity of :is():</strong> Takes the specificity of its <em>most specific argument</em>. So <code>:is(h3, .title, #main)</code> has the specificity of <code>#main</code> (1,0,0) - even when matching an <code>h3</code>. This can surprise you. If you want zero specificity, use <code>:where()</code> instead.</p>
+  </div>
+
+  <h2><code>:where()</code> - :is() with zero specificity</h2>
+
+  <p><code>:where()</code> is functionally identical to <code>:is()</code> - it matches the same elements. The only difference: <strong>it always contributes zero specificity.</strong></p>
+
+  <div class="demo">
+    <p class="demo-caption">:where(h3, h4, h5) sets colour to coral - but a simple h3 selector overrides it (green) because :where has zero specificity</p>
+    <div class="where-demo">
+      <h3>I'm green (h3 selector beats :where)</h3>
+      <h4>I'm coral (:where wins - no competing rule)</h4>
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;!-- HTML --&gt;
+&lt;div class="article"&gt;
+  &lt;h3&gt;I'm green&lt;/h3&gt;
+  &lt;h4&gt;I'm coral&lt;/h4&gt;
+&lt;/div&gt;
+
+/* :where has ZERO specificity - easily overridden */
+.article :where(h3, h4, h5) { color: coral; }
+
+/* This wins because (0,0,1) > (0,0,0) */
+.article h3 { color: green; }</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <p><strong>When to use :where() vs :is():</strong></p>
+    <ul>
+      <li><code>:is()</code> - when you want the selector list to carry normal specificity (component styles, things you want to "stick")</li>
+      <li><code>:where()</code> - when you want zero specificity (resets, defaults, library styles that users should easily override). Perfect for use inside <code>@layer</code> reset/base layers.</li>
+    </ul>
+  </div>
+
+  <h2><code>:not()</code> - exclusion</h2>
+
+  <p><code>:not()</code> matches elements that do NOT match the argument:</p>
+
+  <div class="demo">
+    <p class="demo-caption">All items except .disabled are full colour. The last item has no bottom border via :not(:last-child).</p>
+    <div class="not-demo">
+      <div class="item">Active item</div>
+      <div class="item">Active item</div>
+      <div class="item disabled">Disabled item (excluded by :not(.disabled))</div>
+      <div class="item">Last item (no bottom border via :not(:last-child))</div>
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;!-- HTML --&gt;
+&lt;div class="list"&gt;
+  &lt;div class="item"&gt;Active&lt;/div&gt;
+  &lt;div class="item"&gt;Active&lt;/div&gt;
+  &lt;div class="item disabled"&gt;Disabled&lt;/div&gt;
+  &lt;div class="item"&gt;Last&lt;/div&gt;
+&lt;/div&gt;
+
+/* Style all items except disabled ones */
+.item:not(.disabled) { color: black; }
+
+/* Border on all except last (replaces the margin-bottom-on-all + override-last pattern) */
+.item:not(:last-child) { border-bottom: 1px solid #eee; }</code></pre>
+  </div>
+
+  <p><code>:not()</code> now accepts complex selectors (multiple arguments):</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* Exclude multiple things */
+.item:not(.disabled, .hidden) { }
+
+/* Exclude elements with a specific child (combined with :has) */
+.card:not(:has(img)) { }  /* cards WITHOUT images */</code></pre>
+  </div>
+
+  <h2>Combining them</h2>
+
+  <p>These selectors compose naturally - you can chain and nest them:</p>
+
+  <div class="demo">
+    <p class="demo-caption">Articles with images that aren't .featured get reduced opacity</p>
+    <div class="combine-demo">
+      <article class="featured"><img alt="">Featured article with image (full opacity)</article>
+      <article><img alt="">Non-featured article with image (reduced opacity)</article>
+      <article>Article without image (full opacity - doesn't match :has(img))</article>
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;!-- HTML --&gt;
+&lt;article class="featured"&gt;&lt;img&gt;Featured&lt;/article&gt;
+&lt;article&gt;&lt;img&gt;Non-featured with image&lt;/article&gt;
+&lt;article&gt;No image&lt;/article&gt;
+
+/* Chaining :has() and :not() */
+article:has(&gt; img):not(.featured) {
+  opacity: 0.7;
+  /* Matches articles that HAVE a direct child img
+     but are NOT .featured */
+}</code></pre>
+  </div>
+
+  <h2>Specificity summary</h2>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* Specificity examples: */
+:is(.card, #main)        → (1, 0, 0)  /* takes #main's specificity */
+:where(.card, #main)     → (0, 0, 0)  /* always zero */
+:not(.disabled)          → (0, 1, 0)  /* specificity of .disabled */
+:has(> img)              → (0, 0, 1)  /* specificity of img */
+:has(.card > .title)     → (0, 2, 0)  /* specificity of .card > .title */</code></pre>
+  </div>
+
+  <h2>Browser support</h2>
+
+  <ul>
+    <li><code>:has()</code> - Chrome 105+, Safari 15.4+, Firefox 121+</li>
+    <li><code>:is()</code> - Chrome 88+, Safari 14+, Firefox 78+</li>
+    <li><code>:where()</code> - Chrome 88+, Safari 14+, Firefox 78+</li>
+    <li><code>:not()</code> (with complex selectors) - Chrome 88+, Safari 9+, Firefox 84+</li>
+  </ul>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <h2>Retrieval check</h2>
+
+  <div class="quiz" id="quiz1">
+    <h3>Question 1</h3>
+    <p>What does :has() let you do that was previously impossible in CSS?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Select elements by their class name</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">Style an element based on what's inside it (its children/descendants)</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Apply styles only on hover</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Select elements by their position in the DOM</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz2">
+    <h3>Question 2</h3>
+    <p>What's the specificity of :where(.card, #main, .title)?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">(1, 0, 0) - takes #main's specificity</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">(0, 2, 0) - sum of class selectors</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">(0, 0, 0) - :where() is always zero</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">(0, 1, 0) - average of arguments</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz3">
+    <h3>Question 3</h3>
+    <p>What's the specificity of :is(.card, #main)?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">(1, 0, 0) - takes the most specific argument (#main)</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">(0, 0, 0) - :is() has zero specificity</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">(0, 1, 0) - uses .card's specificity</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">(1, 1, 0) - sum of both</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz4">
+    <h3>Question 4</h3>
+    <p>You want to style a form differently when any of its inputs are invalid. Which selector?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">form:not(:valid)</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">form:has(:invalid)</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">form:is(:invalid)</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">form > :invalid</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz5">
+    <h3>Question 5</h3>
+    <p>When should you use :where() instead of :is()?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">When you need higher specificity</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">When targeting multiple elements at once</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">When you want zero specificity so styles are easily overridden (resets, defaults)</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">When the selector list contains IDs</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="recommended">
+    <strong>Recommended resources:</strong>
+    <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:has">MDN - :has()</a> |
+    <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:is">MDN - :is()</a> |
+    <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:where">MDN - :where()</a> |
+    <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:not">MDN - :not()</a>
+  </div>
+
+  <div class="footer-nav">
+    <a href="12-css-nesting.html">&larr; Prev: CSS Nesting</a>
+    <a href="index.html">Index</a>
+    <a href="14-the-cascade.html">Next: The Cascade &rarr;</a>
+  </div>
+
+    </main>
+  </div>
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

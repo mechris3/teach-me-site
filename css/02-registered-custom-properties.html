@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>@property Registered Custom Properties - Lesson 2 | Teach Me</title>
+  <meta name="description" content="Register custom properties with @property for type safety, controlled inheritance, and the ability to animate values that were previously impossible to transition.">
+  <link rel="canonical" href="https://teachmeskills.dev/css/02-registered-custom-properties.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/css/02-registered-custom-properties.html">
+  <meta property="og:title" content="@property Registered Custom Properties - Lesson 2 | Teach Me">
+  <meta property="og:description" content="Register custom properties with @property for type safety, controlled inheritance, and the ability to animate values that were previously impossible to transition.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="@property Registered Custom Properties - Lesson 2 | Teach Me">
+  <meta name="twitter:description" content="Register custom properties with @property for type safety, controlled inheritance, and the ability to animate values that were previously impossible to transition.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Demo: Animating a hue */
+    @property --hue {
+      syntax: "<number>";
+      inherits: false;
+      initial-value: 220;
+    }
+
+    .hue-box {
+      width: 100%;
+      height: 80px;
+      border-radius: 8px;
+      background: oklch(0.7 0.15 var(--hue));
+      transition: --hue 0.8s ease-in-out;
+      cursor: pointer;
+    }
+
+    .hue-box:hover {
+      --hue: 340;
+    }
+
+    /* Demo: Animating a gradient stop */
+    @property --stop {
+      syntax: "<percentage>";
+      inherits: false;
+      initial-value: 30%;
+    }
+
+    .gradient-stop-box {
+      width: 100%;
+      height: 80px;
+      border-radius: 8px;
+      background: linear-gradient(to right, var(--accent, #3a86ff) var(--stop), transparent var(--stop));
+      transition: --stop 0.6s ease-in-out;
+      cursor: pointer;
+    }
+
+    .gradient-stop-box:hover {
+      --stop: 80%;
+    }
+
+    /* Demo: inherits false */
+    @property --card-accent {
+      syntax: "<color>";
+      inherits: false;
+      initial-value: #3a86ff;
+    }
+
+    .parent-card {
+      --card-accent: #e76f51;
+      border: 3px solid var(--card-accent);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .child-card {
+      border: 3px solid var(--card-accent);
+      border-radius: 6px;
+      padding: 0.75rem;
+      margin-top: 0.75rem;
+    }
+
+    /* Demo: type safety */
+    @property --safe-size {
+      syntax: "<length>";
+      inherits: false;
+      initial-value: 16px;
+    }
+
+    .type-demo {
+      padding: var(--safe-size);
+      background: #e8f8f5; color: #1a1a2e;
+      border-radius: 6px;
+    }
+
+    .type-demo.invalid-attempt {
+      --safe-size: banana;
+    }
+
+    /* Comparison: unregistered vs registered transition */
+    .no-register-box {
+      --bg-color: #3a86ff;
+      width: 100%;
+      height: 80px;
+      border-radius: 8px;
+      background: var(--bg-color);
+      transition: --bg-color 0.8s ease-in-out;
+      cursor: pointer;
+    }
+
+    .no-register-box:hover {
+      --bg-color: #e76f51;
+    }
+
+    .comparison-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+
+    .comparison-row > div {
+      text-align: center;
+    }
+
+    .comparison-row .label {
+      font-size: 0.8rem;
+      color: var(--muted, #666);
+      margin-top: 0.5rem;
+    }
+
+    @property --reg-color {
+      syntax: "<color>";
+      inherits: false;
+      initial-value: #3a86ff;
+    }
+
+    .registered-box {
+      width: 100%;
+      height: 80px;
+      border-radius: 8px;
+      background: var(--reg-color);
+      transition: --reg-color 0.8s ease-in-out;
+      cursor: pointer;
+    }
+
+    .registered-box:hover {
+      --reg-color: #e76f51;
+    }
+
+    @media (max-width: 600px) {
+      .comparison-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header">
+        <a href="index.html">CSS Course</a>
+      </div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-custom-properties-fundamentals.html">1. Custom Properties</a></li>
+        <li class="current"><a href="02-registered-custom-properties.html">2. @property</a></li>
+        <li><a href="03-css-value-functions.html">3. Value Functions</a></li>
+        <li><a href="04-custom-css-functions.html">4. Custom Functions</a></li>
+        <li><a href="05-advanced-attr.html">5. Advanced attr()</a></li>
+        <li><a href="06-transitions.html">6. Transitions</a></li>
+        <li><a href="07-animations.html">7. Animations</a></li>
+        <li><a href="08-flexbox.html">8. Flexbox</a></li>
+        <li><a href="09-grid.html">9. Grid</a></li>
+        <li><a href="10-container-queries.html">10. Container Queries</a></li>
+        <li><a href="11-cascade-layers.html">11. Cascade Layers</a></li>
+        <li><a href="12-css-nesting.html">12. CSS Nesting</a></li>
+        <li><a href="13-modern-selectors.html">13. Modern Selectors</a></li>
+        <li><a href="14-the-cascade.html">14. The Cascade</a></li>
+        <li><a href="15-logical-properties.html">15. Logical Properties</a></li>
+        <li><a href="16-view-transitions.html">16. View Transitions</a></li>
+        <li><a href="17-anchor-positioning.html">17. Anchor Positioning</a></li>
+        <li><a href="18-advanced-colour.html">18. Advanced Colour</a></li>
+        <li><a href="19-scope.html">19. @scope</a></li>
+        <li><a href="20-selectors-deep-dive.html">20. Selectors Deep-Dive</a></li>
+        <li><a href="21-theming-deep-dive.html">21. Theming Deep-Dive</a></li>
+        <li><a href="22-responsive-design-patterns.html">22. Responsive Patterns</a></li>
+        <li><a href="23-scroll-driven-animations.html">23. Scroll-Driven Animations</a></li>
+        <li><a href="24-capstone-product-landing-page.html">24. Capstone Project</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="css-anatomy.html">CSS Anatomy</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 2</p>
+  <h1><code>@property</code>  -  Registered Custom Properties</h1>
+
+  <p>In <a href="01-custom-properties-fundamentals.html">Lesson 1</a>, custom properties were introduced as untyped  -  the browser treats them as raw token strings until substitution. This has a real consequence: <strong>you can't animate them.</strong></p>
+
+  <p>The browser doesn't know if <code>--foo</code> holds a colour, a length, or a sentence. Without type information, it can't interpolate between two values  -  it can only do a hard swap at 50% of a transition.</p>
+
+  <h2>The problem: transitioning an unregistered property</h2>
+
+  <div class="demo">
+    <p class="demo-caption">Hover both boxes  -  same transition CSS, different results</p>
+    <div class="comparison-row">
+      <div>
+        <div class="no-register-box"></div>
+        <p class="label">Unregistered: hard swap (flips at 50%)</p>
+      </div>
+      <div>
+        <div class="registered-box"></div>
+        <p class="label">Registered as &lt;color&gt;: smooth transition</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* Unregistered  -  browser can't interpolate, hard swap */
+.no-register-box {
+  --bg-color: #3a86ff;
+  background: var(--bg-color);
+  transition: --bg-color 0.8s ease-in-out;
+}
+.no-register-box:hover { --bg-color: #e76f51; }
+
+/* Registered  -  browser knows it's a &lt;color&gt;, smooth transition */
+@property --reg-color {
+  syntax: "&lt;color&gt;";
+  inherits: false;
+  initial-value: #3a86ff;
+}
+.registered-box {
+  background: var(--reg-color);
+  transition: --reg-color 0.8s ease-in-out;
+}
+.registered-box:hover { --reg-color: #e76f51; }</code></pre>
+  </div>
+
+  <p>Both boxes use the same pattern  -  set a custom property, transition it on hover. But only the registered one transitions smoothly. The unregistered one snaps.</p>
+
+  <h2>The solution: <code>@property</code></h2>
+
+  <p>The <code>@property</code> at-rule lets you <em>register</em> a custom property with three required pieces of information:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>@property --reg-color {
+  syntax: "&lt;color&gt;";       /* 1. What TYPE of value this holds */
+  inherits: false;          /* 2. Does it cascade to children? */
+  initial-value: #3a86ff;   /* 3. Default when not explicitly set */
+}</code></pre>
+  </div>
+
+  <p>Once registered, the browser knows <code>--reg-color</code> is a colour. It can interpolate between colour values, so transitions and animations work.</p>
+
+  <div class="key-concept">
+    <strong>Registration gives the browser three things it needs:</strong> a type (so it knows how to interpolate), an inheritance rule (so it knows where the value comes from), and a guaranteed initial value (so it's never undefined).
+  </div>
+
+  <h2>The three descriptors</h2>
+
+  <h3>1. <code>syntax</code></h3>
+
+  <p>Defines what values are valid. Uses CSS value definition syntax in a string:</p>
+
+  <ul>
+    <li><code>"&lt;color&gt;"</code>  -  any colour value</li>
+    <li><code>"&lt;length&gt;"</code>  -  e.g. 16px, 2rem, 100vh</li>
+    <li><code>"&lt;number&gt;"</code>  -  unitless number</li>
+    <li><code>"&lt;percentage&gt;"</code>  -  e.g. 50%</li>
+    <li><code>"&lt;length-percentage&gt;"</code>  -  either a length or a percentage</li>
+    <li><code>"&lt;integer&gt;"</code>  -  whole numbers only</li>
+    <li><code>"&lt;angle&gt;"</code>  -  e.g. 45deg, 0.5turn</li>
+    <li><code>"&lt;time&gt;"</code>  -  e.g. 300ms, 1s</li>
+    <li><code>"&lt;image&gt;"</code>  -  gradients, url() images</li>
+    <li><code>"&lt;transform-function&gt;"</code>  -  rotate(), scale(), etc.</li>
+    <li><code>"&lt;transform-list&gt;"</code>  -  multiple transforms</li>
+    <li><code>"&lt;custom-ident&gt;"</code>  -  a keyword you define</li>
+    <li><code>"*"</code>  -  any value (universal, but loses interpolation)</li>
+  </ul>
+
+  <p>You can combine types with <code>|</code> for alternatives, append <code>#</code> for comma-separated lists, or <code>+</code> for space-separated lists:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>@property --flexible {
+  syntax: "&lt;length&gt; | &lt;percentage&gt;";  /* accepts either */
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --color-list {
+  syntax: "&lt;color&gt;#";  /* comma-separated list of colours */
+  inherits: true;
+  initial-value: red, blue;
+}
+
+@property --spacing {
+  syntax: "&lt;length&gt;+";  /* space-separated list of lengths */
+  inherits: false;
+  initial-value: 1rem 2rem;
+}</code></pre>
+  </div>
+
+  <h3>2. <code>inherits</code></h3>
+
+  <p>Either <code>true</code> or <code>false</code>.</p>
+
+  <p>Recall from Lesson 1: unregistered custom properties <em>always</em> inherit. Registration gives you the choice to stop that.</p>
+
+  <div class="demo">
+    <p class="demo-caption">--card-accent registered with inherits: false</p>
+    <div class="parent-card">
+      <strong>Parent:</strong> --card-accent set to orange (#e76f51)
+      <div class="child-card">
+        <strong>Child:</strong> uses var(--card-accent) but gets the <em>initial-value</em> (#3a86ff, blue)  -  not the parent's orange. Because inherits is false.
+      </div>
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>@property --card-accent {
+  syntax: "&lt;color&gt;";
+  inherits: false;         /* children don't get parent's value */
+  initial-value: #3a86ff;  /* they get this instead */
+}
+
+.parent-card { --card-accent: #e76f51; border: 3px solid var(--card-accent); }
+.child-card  { border: 3px solid var(--card-accent); }  /* gets blue (initial-value)! */</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <strong>When to use <code>inherits: false</code>:</strong> component-level properties that should reset per-component, not leak from parents. Think of it as creating a property that behaves like <code>padding</code> (doesn't inherit) rather than <code>color</code> (does inherit).
+  </div>
+
+  <h3>3. <code>initial-value</code></h3>
+
+  <p>The guaranteed default. Used when:</p>
+  <ul>
+    <li>The property isn't explicitly set on the element (and <code>inherits: false</code>)</li>
+    <li>The property isn't set anywhere in the ancestor chain (and <code>inherits: true</code>)</li>
+    <li>An invalid value is assigned  -  it falls back to the initial value instead of becoming broken</li>
+  </ul>
+
+  <p>Must be a valid value per the <code>syntax</code>. Required unless syntax is <code>"*"</code>.</p>
+
+  <h2>Type safety: invalid values fall back gracefully</h2>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>@property --safe-size {
+  syntax: "&lt;length&gt;";
+  inherits: false;
+  initial-value: 16px;
+}
+
+.box {
+  --safe-size: banana;  /* invalid for &lt;length&gt; */
+  padding: var(--safe-size);  /* gets 16px (initial-value), not broken */
+}</code></pre>
+  </div>
+
+  <p>Compare this to unregistered properties: if you set an unregistered <code>--size: banana</code> and use it in <code>padding: var(--size)</code>, the padding declaration becomes invalid at computed-value time and you get the inherited value (or the property's own initial value)  -  which is often <code>0</code>. Much harder to debug.</p>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <h2>The big unlock: animating custom properties</h2>
+
+  <p>This is the killer feature. With registration, you can transition or animate things that were previously impossible in pure CSS:</p>
+
+  <h3>Transitioning a hue value</h3>
+
+  <div class="demo">
+    <p class="demo-caption">Hover to transition --hue from 220 to 340 (smooth interpolation through the colour space)</p>
+    <div class="hue-box"></div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>@property --hue {
+  syntax: "&lt;number&gt;";
+  inherits: false;
+  initial-value: 220;
+}
+
+.hue-box {
+  background: oklch(0.7 0.15 var(--hue));
+  transition: --hue 0.8s ease-in-out;
+}
+
+.hue-box:hover {
+  --hue: 340;
+}</code></pre>
+  </div>
+
+  <h3>Animating a gradient stop position</h3>
+
+  <p>You can't transition a gradient directly  -  the browser sees the whole <code>linear-gradient(...)</code> as a single value. But if you pull out the <em>stop position</em> into a registered property, you can animate just that number:</p>
+
+  <div class="demo">
+    <p class="demo-caption">Hover to animate the gradient stop from 30% to 80%</p>
+    <div class="gradient-stop-box"></div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>@property --stop {
+  syntax: "&lt;percentage&gt;";
+  inherits: false;
+  initial-value: 30%;
+}
+
+.gradient-stop-box {
+  background: linear-gradient(to right, blue var(--stop), transparent var(--stop));
+  transition: --stop 0.6s ease-in-out;
+}
+
+.gradient-stop-box:hover {
+  --stop: 80%;
+}</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <strong>The pattern:</strong> extract any numeric part of a "non-animatable" value into a registered custom property. Then transition the property instead of the shorthand. Works for gradient positions, colour channels, clip-path values, individual transform components  -  anything with a number inside.
+  </div>
+
+  <h2>Browser support</h2>
+
+  <p><code>@property</code> is supported in Chrome/Edge 85+, Safari 16.4+, and Firefox 128+. As of mid-2025, it's safe for production with a reasonable fallback (the property just acts unregistered in older browsers  -  no animation, but no breakage).</p>
+
+  <h2>Quiz</h2>
+
+  <div class="quiz" id="quiz1">
+    <h3>Question 1</h3>
+    <p>Why can't you transition an unregistered custom property?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">The browser blocks transitions on -- properties</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">The browser doesn't know the type, so can't interpolate</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Transitions only work on standard CSS properties</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">You need to add will-change for custom properties</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz2">
+    <h3>Question 2</h3>
+    <p>What are the three required descriptors in an @property rule?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">name, type, default</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">syntax, cascade, fallback</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">syntax, inherits, initial-value</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">type, scope, initial-value</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz3">
+    <h3>Question 3</h3>
+    <p>You register --size with syntax "&lt;length&gt;" and initial-value 16px. Someone sets --size: red. What does var(--size) resolve to?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">red  -  the browser doesn't validate</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">0px  -  invalid values become zero</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">16px  -  falls back to initial-value</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">nothing  -  the declaration is dropped</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz4">
+    <h3>Question 4</h3>
+    <p>You want to animate a gradient's colour stop from 20% to 80%. What syntax do you register the property with?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">syntax: "&lt;gradient&gt;";</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">syntax: "&lt;percentage&gt;";</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">syntax: "&lt;number&gt;";</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">syntax: "&lt;length&gt;";</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz5">
+    <h3>Question 5</h3>
+    <p>A property is registered with inherits: false. A parent sets it to orange. A child reads it with var(). What does the child get?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">orange  -  custom properties always inherit</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">the initial-value  -  inherits: false blocks it</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">transparent  -  no value means transparent</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">an error  -  you must set it on every element</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <div class="recommended">
+    <strong>Recommended resources:</strong>
+    <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Properties_and_values_API/Registering_properties">MDN  -  Registering custom properties in CSS</a> |
+    <a href="https://web.dev/blog/interop-2025">Interop 2025</a>  -  confirms @property is a cross-browser priority.
+  </div>
+
+  <div class="footer-nav">
+    <a href="01-custom-properties-fundamentals.html">&larr; Prev: Custom Properties</a>
+    <a href="index.html">Index</a>
+    <a href="03-css-value-functions.html">Next: Value Functions &rarr;</a>
+  </div>
+
+    </main>
+  </div>
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

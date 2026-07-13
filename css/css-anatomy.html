@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>CSS Anatomy Reference | Teach Me</title>
+  <meta name="description" content="A reference for all CSS punctuation, prefixes, symbols, and structural elements - selectors, combinators, at-rules, custom properties, and more.">
+  <link rel="canonical" href="https://teachmeskills.dev/css/css-anatomy.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/css/css-anatomy.html">
+  <meta property="og:title" content="CSS Anatomy Reference | Teach Me">
+  <meta property="og:description" content="A reference for all CSS punctuation, prefixes, symbols, and structural elements - selectors, combinators, at-rules, custom properties, and more.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="CSS Anatomy Reference | Teach Me">
+  <meta name="twitter:description" content="A reference for all CSS punctuation, prefixes, symbols, and structural elements - selectors, combinators, at-rules, custom properties, and more.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .symbol { font-family: var(--mono, 'SF Mono', 'Fira Code', 'Consolas', monospace); font-size: 1.1em; color: var(--accent, #3a86ff); font-weight: 700; min-width: 3rem; display: inline-block; }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header">
+        <a href="index.html">CSS Course</a>
+      </div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-custom-properties-fundamentals.html">1. Custom Properties</a></li>
+        <li><a href="02-registered-custom-properties.html">2. @property</a></li>
+        <li><a href="03-css-value-functions.html">3. Value Functions</a></li>
+        <li><a href="04-custom-css-functions.html">4. Custom Functions</a></li>
+        <li><a href="05-advanced-attr.html">5. Advanced attr()</a></li>
+        <li><a href="06-transitions.html">6. Transitions</a></li>
+        <li><a href="07-animations.html">7. Animations</a></li>
+        <li><a href="08-flexbox.html">8. Flexbox</a></li>
+        <li><a href="09-grid.html">9. Grid</a></li>
+        <li><a href="10-container-queries.html">10. Container Queries</a></li>
+        <li><a href="11-cascade-layers.html">11. Cascade Layers</a></li>
+        <li><a href="12-css-nesting.html">12. CSS Nesting</a></li>
+        <li><a href="13-modern-selectors.html">13. Modern Selectors</a></li>
+        <li><a href="14-the-cascade.html">14. The Cascade</a></li>
+        <li><a href="15-logical-properties.html">15. Logical Properties</a></li>
+        <li><a href="16-view-transitions.html">16. View Transitions</a></li>
+        <li><a href="17-anchor-positioning.html">17. Anchor Positioning</a></li>
+        <li><a href="18-advanced-colour.html">18. Advanced Colour</a></li>
+        <li><a href="19-scope.html">19. @scope</a></li>
+        <li><a href="20-selectors-deep-dive.html">20. Selectors Deep-Dive</a></li>
+        <li><a href="21-theming-deep-dive.html">21. Theming Deep-Dive</a></li>
+        <li><a href="22-responsive-design-patterns.html">22. Responsive Patterns</a></li>
+        <li><a href="23-scroll-driven-animations.html">23. Scroll-Driven Animations</a></li>
+        <li><a href="24-capstone-product-landing-page.html">24. Capstone Project</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li class="current"><a href="css-anatomy.html">CSS Anatomy</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+  <h1>CSS Anatomy - Symbols, Structure &amp; Terminology</h1>
+
+  <p class="subtitle">A reference for all the punctuation, prefixes, and structural elements of CSS.</p>
+
+  <h2>The anatomy of a CSS rule</h2>
+
+  <svg viewBox="0 0 700 280" style="width: 100%; margin: 1.5rem auto; display: block;" aria-label="Anatomy of a CSS rule showing selector, declarations, properties, values, and declaration block">
+    <!-- Background -->
+    <rect width="700" height="280" fill="var(--demo-bg, #f9f8f3)" rx="6"/>
+
+    <!-- Rule border -->
+    <rect x="20" y="20" width="660" height="240" rx="6" fill="none" stroke="var(--accent, #1a73e8)" stroke-width="2"/>
+    <text x="35" y="14" font-size="10" font-weight="700" fill="var(--accent, #1a73e8)" font-family="monospace">RULE</text>
+
+    <!-- The CSS code line -->
+    <text x="40" y="65" font-size="13" font-family="monospace" fill="var(--text, #111)">.card:hover > .title::before</text>
+    <text x="320" y="65" font-size="13" font-family="monospace" fill="var(--muted, #666)">{</text>
+    <text x="345" y="65" font-size="13" font-family="monospace" fill="#c0392b">color</text>
+    <text x="390" y="65" font-size="13" font-family="monospace" fill="var(--text, #111)">:</text>
+    <text x="400" y="65" font-size="13" font-family="monospace" fill="#2a9d8f">red</text>
+    <text x="425" y="65" font-size="13" font-family="monospace" fill="var(--muted, #666)">;</text>
+    <text x="450" y="65" font-size="13" font-family="monospace" fill="#c0392b">margin</text>
+    <text x="510" y="65" font-size="13" font-family="monospace" fill="var(--text, #111)">:</text>
+    <text x="520" y="65" font-size="13" font-family="monospace" fill="#2a9d8f">0 auto</text>
+    <text x="572" y="65" font-size="13" font-family="monospace" fill="var(--muted, #666)">;</text>
+    <text x="590" y="65" font-size="13" font-family="monospace" fill="var(--muted, #666)">}</text>
+
+    <!-- Selector bracket -->
+    <line x1="40" y1="78" x2="295" y2="78" stroke="var(--accent, #1a73e8)" stroke-width="2"/>
+    <line x1="40" y1="78" x2="40" y2="83" stroke="var(--accent, #1a73e8)" stroke-width="2"/>
+    <line x1="295" y1="78" x2="295" y2="83" stroke="var(--accent, #1a73e8)" stroke-width="2"/>
+    <text x="167" y="100" font-size="11" font-weight="700" fill="var(--accent, #1a73e8)" text-anchor="middle" font-family="monospace">SELECTOR</text>
+
+    <!-- Declaration 1 bracket (color: red) -->
+    <line x1="345" y1="78" x2="435" y2="78" stroke="#e76f51" stroke-width="2"/>
+    <line x1="345" y1="78" x2="345" y2="83" stroke="#e76f51" stroke-width="2"/>
+    <line x1="435" y1="78" x2="435" y2="83" stroke="#e76f51" stroke-width="2"/>
+    <text x="390" y="100" font-size="10" font-weight="700" fill="#e76f51" text-anchor="middle" font-family="monospace">DECLARATION</text>
+
+    <!-- Declaration 2 bracket (margin: 0 auto) -->
+    <line x1="450" y1="78" x2="582" y2="78" stroke="#e76f51" stroke-width="2"/>
+    <line x1="450" y1="78" x2="450" y2="83" stroke="#e76f51" stroke-width="2"/>
+    <line x1="582" y1="78" x2="582" y2="83" stroke="#e76f51" stroke-width="2"/>
+    <text x="516" y="100" font-size="10" font-weight="700" fill="#e76f51" text-anchor="middle" font-family="monospace">DECLARATION</text>
+
+    <!-- Property/Value breakdown under declaration 1 -->
+    <line x1="345" y1="115" x2="390" y2="115" stroke="#c0392b" stroke-width="1.5"/>
+    <line x1="345" y1="115" x2="345" y2="119" stroke="#c0392b" stroke-width="1.5"/>
+    <line x1="390" y1="115" x2="390" y2="119" stroke="#c0392b" stroke-width="1.5"/>
+    <text x="367" y="133" font-size="9" font-weight="600" fill="#c0392b" text-anchor="middle" font-family="monospace">PROPERTY</text>
+
+    <line x1="400" y1="115" x2="425" y2="115" stroke="#2a9d8f" stroke-width="1.5"/>
+    <line x1="400" y1="115" x2="400" y2="119" stroke="#2a9d8f" stroke-width="1.5"/>
+    <line x1="425" y1="115" x2="425" y2="119" stroke="#2a9d8f" stroke-width="1.5"/>
+    <text x="412" y="133" font-size="9" font-weight="600" fill="#2a9d8f" text-anchor="middle" font-family="monospace">VALUE</text>
+
+    <!-- Declaration block bracket -->
+    <line x1="320" y1="155" x2="600" y2="155" stroke="#6c5ce7" stroke-width="2"/>
+    <line x1="320" y1="155" x2="320" y2="160" stroke="#6c5ce7" stroke-width="2"/>
+    <line x1="600" y1="155" x2="600" y2="160" stroke="#6c5ce7" stroke-width="2"/>
+    <text x="460" y="175" font-size="11" font-weight="700" fill="#6c5ce7" text-anchor="middle" font-family="monospace">DECLARATION BLOCK</text>
+    <text x="460" y="190" font-size="9" fill="var(--muted, #666)" text-anchor="middle" font-family="monospace">(everything between { })</text>
+
+    <!-- Legend -->
+    <rect x="40" y="210" width="620" height="40" rx="4" fill="var(--bg-raised, #f3f2ed)" stroke="var(--border, #ddd)"/>
+    <rect x="55" y="225" width="8" height="8" rx="1" fill="var(--accent, #1a73e8)"/>
+    <text x="68" y="233" font-size="9" fill="var(--text, #111)" font-family="monospace">Selector</text>
+    <rect x="140" y="225" width="8" height="8" rx="1" fill="#e76f51"/>
+    <text x="153" y="233" font-size="9" fill="var(--text, #111)" font-family="monospace">Declaration</text>
+    <rect x="245" y="225" width="8" height="8" rx="1" fill="#c0392b"/>
+    <text x="258" y="233" font-size="9" fill="var(--text, #111)" font-family="monospace">Property</text>
+    <rect x="330" y="225" width="8" height="8" rx="1" fill="#2a9d8f"/>
+    <text x="343" y="233" font-size="9" fill="var(--text, #111)" font-family="monospace">Value</text>
+    <rect x="400" y="225" width="8" height="8" rx="1" fill="#6c5ce7"/>
+    <text x="413" y="233" font-size="9" fill="var(--text, #111)" font-family="monospace">Declaration Block</text>
+  </svg>
+
+  <table>
+    <thead>
+      <tr><th>Term</th><th>What it is</th><th>Example</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Rule</td><td>A selector + declaration block together</td><td><code>.card { color: red; }</code></td></tr>
+      <tr><td>Selector</td><td>What to target</td><td><code>.card:hover > .title</code></td></tr>
+      <tr><td>Declaration block</td><td>Everything between <code>{ }</code></td><td><code>{ color: red; margin: 0; }</code></td></tr>
+      <tr><td>Declaration</td><td>One property-value pair</td><td><code>color: red;</code></td></tr>
+      <tr><td>Property</td><td>What to style</td><td><code>color</code></td></tr>
+      <tr><td>Value</td><td>How to style it</td><td><code>red</code></td></tr>
+    </tbody>
+  </table>
+
+  <h2>Selector anatomy</h2>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>  #main   .card   :hover   >   .title   ::before   [data-v]
+  ├──┤    ├───┤   ├────┤   │   ├────┤   ├──────┤   ├──────┤
+   ID     CLASS   PSEUDO  COMB  CLASS   PSEUDO    ATTRIBUTE
+                  CLASS   INATOR        ELEMENT   SELECTOR</code></pre>
+  </div>
+
+  <table>
+    <thead>
+      <tr><th>Selector type</th><th>Syntax</th><th>Example</th><th>Specificity column</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Universal</td><td><code>*</code></td><td><code>* { margin: 0; }</code></td><td>(0, 0, 0)</td></tr>
+      <tr><td>Element (type)</td><td><code>element</code></td><td><code>h1</code>, <code>div</code>, <code>p</code></td><td>C (elements)</td></tr>
+      <tr><td>Class</td><td><code>.name</code></td><td><code>.card</code>, <code>.active</code></td><td>B (classes)</td></tr>
+      <tr><td>ID</td><td><code>#name</code></td><td><code>#main</code>, <code>#header</code></td><td>A (IDs)</td></tr>
+      <tr><td>Attribute</td><td><code>[attr]</code> or <code>[attr=val]</code></td><td><code>[type="email"]</code></td><td>B (classes)</td></tr>
+      <tr><td>Pseudo-class</td><td><code>:name</code></td><td><code>:hover</code>, <code>:focus</code>, <code>:not()</code></td><td>B (classes)</td></tr>
+      <tr><td>Pseudo-element</td><td><code>::name</code></td><td><code>::before</code>, <code>::after</code></td><td>C (elements)</td></tr>
+    </tbody>
+  </table>
+
+  <h2>CSS symbols - what each punctuation means</h2>
+
+  <h3><span class="symbol">.</span> Dot - class selector</h3>
+  <p>Selects elements by class name. <code>.card</code> matches <code>&lt;div class="card"&gt;</code>.</p>
+
+  <h3><span class="symbol">#</span> Hash - ID selector</h3>
+  <p>Selects a single element by ID. <code>#main</code> matches <code>&lt;div id="main"&gt;</code>. Highest specificity of any selector.</p>
+
+  <h3><span class="symbol">:</span> Single colon - pseudo-class</h3>
+  <p>Selects an element in a particular <strong>state</strong> or <strong>position</strong>. The element itself exists in the DOM - the pseudo-class is a condition on it.</p>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>:hover        /* mouse is over it */
+:focus        /* it has keyboard focus */
+:first-child  /* it's the first child of its parent */
+:not(.x)      /* it does NOT match .x */
+:has(.x)      /* it contains .x */
+:is(.a, .b)   /* it matches .a OR .b */
+:where(.a)    /* same as :is but zero specificity */
+:nth-child(2) /* it's the 2nd child */
+:checked      /* checkbox/radio is checked */
+:invalid      /* form field fails validation */</code></pre>
+  </div>
+
+  <h3><span class="symbol">::</span> Double colon - pseudo-element</h3>
+  <p>Targets something the browser <strong>generates</strong> that doesn't exist as a real DOM element. You're styling a "virtual" piece of the element.</p>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>::before           /* generated content before the element's content */
+::after            /* generated content after the element's content */
+::placeholder      /* placeholder text in inputs */
+::selection        /* text the user has highlighted */
+::view-transition-old(name)  /* snapshot of old state during view transition */
+::view-transition-new(name)  /* snapshot of new state during view transition */</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <p><strong>: vs :: - the mental model:</strong> Single colon = state/condition of a real element. Double colon = a generated virtual element that doesn't exist in your HTML. Historically, <code>:before</code> worked (single colon), but the double colon is the correct modern syntax.</p>
+  </div>
+
+  <h3><span class="symbol">--</span> Double hyphen - custom property (variable) or custom name</h3>
+  <p>The <code>--</code> prefix marks something as user-defined. The spec reserves this prefix so your names never collide with current or future CSS properties.</p>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* Custom properties (variables) */
+--color-primary: #3a86ff;        /* declaration */
+color: var(--color-primary);     /* usage */
+
+/* Custom names for other features */
+anchor-name: --my-button;        /* anchor positioning */
+view-transition-name: --hero;    /* view transitions (-- optional here) */
+@function --double(--value) {}   /* custom function name */
+@property --size {}              /* registered property */</code></pre>
+  </div>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <h3><span class="symbol">@</span> At-sign - at-rule</h3>
+  <p>Introduces a <strong>structural rule</strong> or <strong>directive</strong> - something that controls how CSS is applied rather than styling an element directly.</p>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* Conditional rules - apply styles under conditions */
+@media (width &lt; 768px) { }       /* viewport condition */
+@container (min-width: 400px) { } /* container condition */
+@supports (display: grid) { }    /* feature detection */
+
+/* Structural rules - define CSS structure */
+@layer reset, base, components;   /* cascade layer order */
+@layer base { }                   /* add styles to a layer */
+@import url("file.css");          /* import another stylesheet */
+
+/* Definitions - define reusable things */
+@keyframes spin { }               /* animation sequence */
+@function --name() { }            /* custom function */
+@property --size { }              /* registered custom property */
+@font-face { }                    /* custom font */
+
+/* Configuration */
+@view-transition { navigation: auto; }  /* opt into view transitions */
+@position-try --below { }         /* anchor positioning fallback */
+@scope (.card) { }                /* style scoping */</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <p><strong>@ = "meta-level CSS."</strong> Regular rules say "style this element like that." At-rules say "here's a condition/structure/definition that governs how other rules work." They never directly style an element - they create context for rules that do.</p>
+  </div>
+
+  <h3><span class="symbol">&amp;</span> Ampersand - parent selector (in nesting)</h3>
+  <p>Inside a nested rule, <code>&amp;</code> represents the outer/parent selector. Used to compose selectors.</p>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>.card {
+  & .title { }     /* → .card .title (descendant) */
+  &:hover { }      /* → .card:hover (pseudo-class on parent) */
+  &.featured { }   /* → .card.featured (compound - same element) */
+}</code></pre>
+  </div>
+
+  <h3><span class="symbol">&gt;</span> <span class="symbol">+</span> <span class="symbol">~</span> <span class="symbol">(space)</span> - combinators</h3>
+  <p>Combinators define the <strong>relationship</strong> between two selector parts:</p>
+  <table>
+    <thead>
+      <tr><th>Combinator</th><th>Means</th><th>Example</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>(space)</code></td><td>Descendant (any depth)</td><td><code>.card .title</code> - .title anywhere inside .card</td></tr>
+      <tr><td><code>&gt;</code></td><td>Direct child only</td><td><code>.card > .title</code> - .title that's a direct child of .card</td></tr>
+      <tr><td><code>+</code></td><td>Adjacent sibling (next)</td><td><code>h2 + p</code> - the first p immediately after an h2</td></tr>
+      <tr><td><code>~</code></td><td>General sibling (any after)</td><td><code>h2 ~ p</code> - any p that comes after an h2 (same parent)</td></tr>
+    </tbody>
+  </table>
+
+  <h3><span class="symbol">!</span> - !important</h3>
+  <p>Placed after a value to escalate it above normal cascade resolution. Jumps to a higher tier in the cascade (above layers and specificity).</p>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>color: red !important;  /* wins over any normal declaration regardless of specificity */</code></pre>
+  </div>
+
+  <h3><span class="symbol">[]</span> Square brackets - attribute selector</h3>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>[data-v]           /* has the attribute at all */
+[type="email"]     /* attribute equals value */
+[class~="card"]    /* attribute word list contains "card" */
+[href^="https"]    /* attribute starts with "https" */
+[src$=".png"]      /* attribute ends with ".png" */
+[data*="user"]     /* attribute contains "user" anywhere */</code></pre>
+  </div>
+
+  <h2>Quick symbol cheat sheet</h2>
+
+  <table>
+    <thead>
+      <tr><th>Symbol</th><th>Context</th><th>Meaning</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>.</code></td><td>Selector</td><td>Class</td></tr>
+      <tr><td><code>#</code></td><td>Selector</td><td>ID</td></tr>
+      <tr><td><code>:</code></td><td>Selector</td><td>Pseudo-class (state/condition)</td></tr>
+      <tr><td><code>::</code></td><td>Selector</td><td>Pseudo-element (generated content)</td></tr>
+      <tr><td><code>--</code></td><td>Name prefix</td><td>User-defined (custom property, function, anchor, etc.)</td></tr>
+      <tr><td><code>@</code></td><td>Rule start</td><td>At-rule (structural/conditional/definition)</td></tr>
+      <tr><td><code>&</code></td><td>Nesting</td><td>Parent selector reference</td></tr>
+      <tr><td><code>></code></td><td>Selector</td><td>Direct child combinator</td></tr>
+      <tr><td><code>+</code></td><td>Selector</td><td>Adjacent sibling combinator</td></tr>
+      <tr><td><code>~</code></td><td>Selector</td><td>General sibling combinator</td></tr>
+      <tr><td><code>(space)</code></td><td>Selector</td><td>Descendant combinator</td></tr>
+      <tr><td><code>[]</code></td><td>Selector</td><td>Attribute selector</td></tr>
+      <tr><td><code>!</code></td><td>Value suffix</td><td>!important escalation</td></tr>
+      <tr><td><code>*</code></td><td>Selector</td><td>Universal selector (match anything)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="footer-nav">
+    <a href="index.html">&larr; Back to Course Index</a>
+    <span></span>
+    <span></span>
+  </div>
+
+    </main>
+  </div>
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

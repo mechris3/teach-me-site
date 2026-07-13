@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>View Transitions - Lesson 16 | Teach Me</title>
+  <meta name="description" content="Learn CSS View Transitions API for animating between DOM states including same-document transitions, cross-document navigation, and shared element morphing.">
+  <link rel="canonical" href="https://teachmeskills.dev/css/16-view-transitions.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/css/16-view-transitions.html">
+  <meta property="og:title" content="View Transitions - Lesson 16 | Teach Me">
+  <meta property="og:description" content="Learn CSS View Transitions API for animating between DOM states including same-document transitions, cross-document navigation, and shared element morphing.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="View Transitions - Lesson 16 | Teach Me">
+  <meta name="twitter:description" content="Learn CSS View Transitions API for animating between DOM states including same-document transitions, cross-document navigation, and shared element morphing.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .demo-btn { font-family: var(--sans); font-size: 0.8rem; padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: 4px; background: white; color: #1a1a2e; cursor: pointer; margin-bottom: 0.75rem; transition: border-color 0.15s; }
+    .demo-btn:hover { border-color: var(--accent); }
+
+    .vt-container { padding: 1rem; border-radius: 8px; min-height: 120px; display: flex; align-items: center; justify-content: center; transition: background 0.3s; color: #1a1a2e; }
+    .vt-container.state-a { background: #bdd4ff; }
+    .vt-container.state-b { background: #ffd4b8; }
+    .vt-card { background: white; color: #1a1a2e; border: 1px solid var(--border); border-radius: 8px; padding: 1rem; text-align: center; font-size: 0.85rem; view-transition-name: demo-card; }
+
+    .vt-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+    .vt-thumb { aspect-ratio: 1; border-radius: 6px; cursor: pointer; transition: transform 0.15s; }
+    .vt-thumb:hover { transform: scale(1.05); }
+    .vt-thumb:nth-child(1) { background: var(--accent); view-transition-name: thumb-1; }
+    .vt-thumb:nth-child(2) { background: #e76f51; view-transition-name: thumb-2; }
+    .vt-thumb:nth-child(3) { background: #2a9d8f; view-transition-name: thumb-3; }
+    .vt-expanded { width: 100%; height: 120px; border-radius: 8px; display: none; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 0.9rem; }
+
+    .slide-panel { background: #f0f7ff; color: #1a1a2e; padding: 1rem; border-radius: 6px; min-height: 60px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; view-transition-name: slide-demo; }
+
+    .vt-list { display: flex; flex-direction: column; gap: 0.5rem; }
+    .vt-list-item { background: var(--accent); color: white; padding: 0.75rem 1rem; border-radius: 6px; font-size: 0.8rem; font-weight: 600; }
+    .vt-list-item:nth-child(1) { view-transition-name: list-item-1; }
+    .vt-list-item:nth-child(2) { view-transition-name: list-item-2; }
+    .vt-list-item:nth-child(3) { view-transition-name: list-item-3; }
+    .vt-list-item:nth-child(4) { view-transition-name: list-item-4; }
+
+    ::view-transition-old(demo-card) { animation: fade-out 0.3s ease; }
+    ::view-transition-new(demo-card) { animation: fade-in 0.3s ease; }
+    ::view-transition-old(slide-demo) { animation: slide-out-left 0.3s ease forwards; }
+    ::view-transition-new(slide-demo) { animation: slide-in-right 0.3s ease forwards; }
+    ::view-transition-old(tab-demo) { animation: slide-out-left 0.25s ease forwards; }
+    ::view-transition-new(tab-demo) { animation: slide-in-right 0.25s ease forwards; }
+
+    @keyframes fade-out { to { opacity: 0; } }
+    @keyframes fade-in { from { opacity: 0; } }
+    @keyframes slide-out-left { to { transform: translateX(-100%); opacity: 0; } }
+    @keyframes slide-in-right { from { transform: translateX(100%); opacity: 0; } }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header">
+        <a href="index.html">CSS Course</a>
+      </div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-custom-properties-fundamentals.html">1. Custom Properties</a></li>
+        <li><a href="02-registered-custom-properties.html">2. @property</a></li>
+        <li><a href="03-css-value-functions.html">3. Value Functions</a></li>
+        <li><a href="04-custom-css-functions.html">4. Custom Functions</a></li>
+        <li><a href="05-advanced-attr.html">5. Advanced attr()</a></li>
+        <li><a href="06-transitions.html">6. Transitions</a></li>
+        <li><a href="07-animations.html">7. Animations</a></li>
+        <li><a href="08-flexbox.html">8. Flexbox</a></li>
+        <li><a href="09-grid.html">9. Grid</a></li>
+        <li><a href="10-container-queries.html">10. Container Queries</a></li>
+        <li><a href="11-cascade-layers.html">11. Cascade Layers</a></li>
+        <li><a href="12-css-nesting.html">12. CSS Nesting</a></li>
+        <li><a href="13-modern-selectors.html">13. Modern Selectors</a></li>
+        <li><a href="14-the-cascade.html">14. The Cascade</a></li>
+        <li><a href="15-logical-properties.html">15. Logical Properties</a></li>
+        <li class="current"><a href="16-view-transitions.html">16. View Transitions</a></li>
+        <li><a href="17-anchor-positioning.html">17. Anchor Positioning</a></li>
+        <li><a href="18-advanced-colour.html">18. Advanced Colour</a></li>
+        <li><a href="19-scope.html">19. @scope</a></li>
+        <li><a href="20-selectors-deep-dive.html">20. Selectors Deep-Dive</a></li>
+        <li><a href="21-theming-deep-dive.html">21. Theming Deep-Dive</a></li>
+        <li><a href="22-responsive-design-patterns.html">22. Responsive Patterns</a></li>
+        <li><a href="23-scroll-driven-animations.html">23. Scroll-Driven Animations</a></li>
+        <li><a href="24-capstone-product-landing-page.html">24. Capstone Project</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="css-anatomy.html">CSS Anatomy</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+  <p class="lesson-num">Lesson 16</p>
+  <h1>View Transitions - Animating Between States</h1>
+
+  <p>View transitions let you animate between two DOM states - whether that's toggling a UI panel, navigating between pages, or reordering a list. The browser snapshots the "before" state, you make the DOM change, and then it animates from the snapshot to the new state. The result is smooth, app-like transitions with very little code.</p>
+
+  <h2>The mental model</h2>
+
+  <p>A view transition works in three phases:</p>
+
+  <ol>
+    <li><strong>Snapshot</strong> - the browser captures an image of the current state (the "old" view)</li>
+    <li><strong>DOM update</strong> - you make your changes (swap content, toggle classes, navigate)</li>
+    <li><strong>Animate</strong> - the browser crossfades from the snapshot to the new state, with optional custom animations</li>
+  </ol>
+
+  <div class="key-concept">
+    <p><strong>Key concept:</strong> The browser does the heavy lifting. You don't manually animate properties between states. You say "I'm about to change something" &rarr; change it &rarr; the browser figures out how to animate the difference. It's declarative animation of state changes.</p>
+  </div>
+
+  <h2>Two types of view transitions</h2>
+
+  <ul>
+    <li><strong>Same-document (SPA)</strong> - triggered with <code>document.startViewTransition()</code> in JavaScript. For single-page apps where you're updating the DOM without a full navigation.</li>
+    <li><strong>Cross-document (MPA)</strong> - triggered automatically on navigation between pages that both opt in with <code>@view-transition { navigation: auto; }</code>. For multi-page apps and traditional websites.</li>
+  </ul>
+
+  <h2>Same-document transitions (SPA)</h2>
+
+  <p>The simplest usage - wrap a DOM change in <code>document.startViewTransition()</code>:</p>
+
+  <div class="demo">
+    <p class="demo-caption">Click the button - the card crossfades between two states via view transition</p>
+    <button class="demo-btn" onclick="toggleCard()">Toggle state</button>
+    <div class="vt-container state-a" id="vtContainer">
+      <div class="vt-card" id="vtCard">State A - blue background</div>
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>.card {
+  view-transition-name: demo-card;
+}
+
+::view-transition-old(demo-card) {
+  animation: fade-out 0.3s ease;
+}
+::view-transition-new(demo-card) {
+  animation: fade-in 0.3s ease;
+}
+
+// JavaScript - wrap the DOM change
+function toggleCard() {
+  document.startViewTransition(() =&gt; {
+    container.classList.toggle('state-a', isStateA);
+    container.classList.toggle('state-b', !isStateA);
+    card.textContent = isStateA ? 'State A' : 'State B';
+  });
+}</code></pre>
+  </div>
+
+  <h3>How it works - the full timeline</h3>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>TIME ──────────────────────────────────────────────────────────────────────►
+
+PHASE 1: CAPTURE OLD STATE
+  - Browser FREEZES rendering
+  - Captures bitmap snapshots of elements with view-transition-name
+  - User sees: frozen page
+
+PHASE 2: UPDATE THE DOM
+  - Your callback() runs - make all DOM changes here
+  - Browser renders new DOM state off-screen
+  - transition.updateCallbackDone resolves
+
+PHASE 3: CREATE PSEUDO-ELEMENTS
+  - Browser creates ::view-transition tree
+  - transition.ready resolves
+
+PHASE 4: ANIMATE
+  - Default: old fades out, new fades in
+  - Same-named elements: group morphs position/size
+  - Page NOT interactive during animation
+
+PHASE 5: CLEANUP
+  - Pseudo-elements removed
+  - New DOM revealed and interactive
+  - transition.finished resolves</code></pre>
+  </div>
+
+  <h3>Key details to note</h3>
+
+  <ul>
+    <li><strong>The page is NOT interactive during the animation.</strong> The user sees images (snapshots), not the real DOM. Keep transitions short (0.2-0.5s).</li>
+    <li><strong>The DOM change is instant.</strong> Your callback runs synchronously - the new DOM exists immediately. The animation is purely visual over the top.</li>
+    <li><strong>If your callback is async (returns a Promise), the browser waits.</strong> Useful if you need to fetch data before showing the new state.</li>
+    <li><strong>"Same name" elements get a morph, not a crossfade.</strong> The <code>::view-transition-group</code> smoothly interpolates width, height, and transform between old and new positions.</li>
+  </ul>
+
+  <div class="key-concept">
+    <p><strong>The magic:</strong> During the animation, the user sees an image (the snapshot), not the actual DOM. This means the DOM change can be instant and jarring - the view transition smooths it visually. Even a complete content swap looks elegant.</p>
+  </div>
+
+  <h2><code>view-transition-name</code> - identifying elements across states</h2>
+
+  <p>This is the core CSS property. It tells the browser: "this element in the old state corresponds to this element in the new state - animate between them."</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>.card {
+  view-transition-name: hero-card;  /* must be unique on the page */
+}
+
+.avatar {
+  view-transition-name: user-avatar;
+}
+
+/* RULE: each name must be unique per page.
+   Two elements with the same name = error */</code></pre>
+  </div>
+
+  <h2>Live demo: shared element transition</h2>
+
+  <div class="demo">
+    <p class="demo-caption">Click a thumbnail - it expands into a full-width panel (shared element transition)</p>
+    <div id="thumbGrid" class="vt-grid">
+      <div class="vt-thumb" onclick="expandThumb(0)"></div>
+      <div class="vt-thumb" onclick="expandThumb(1)"></div>
+      <div class="vt-thumb" onclick="expandThumb(2)"></div>
+    </div>
+    <div class="vt-expanded" id="expandedView" onclick="collapseThumb()">
+      Click to close
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* The key: both the thumbnail and the expanded view share
+   the same view-transition-name. The browser morphs between them. */
+
+.thumb:nth-child(1) { view-transition-name: thumb-1; }
+.expanded         { view-transition-name: thumb-1; }  /* same name! */
+
+// JS
+function expandThumb(index) {
+  document.startViewTransition(() =&gt; {
+    grid.style.display = 'none';
+    expanded.style.display = 'flex';
+    expanded.style.viewTransitionName = `thumb-${index + 1}`;
+  });
+}</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <p><strong>Shared elements must have the same <code>view-transition-name</code> in both states.</strong> The browser matches old&rarr;new by name. When it finds a match, instead of crossfading, it morphs: smoothly interpolating position, size, and opacity between the old and new locations.</p>
+  </div>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <h2>The pseudo-element tree</h2>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>::view-transition
+├── ::view-transition-group(name)
+│   ├── ::view-transition-image-pair(name)
+│   │   ├── ::view-transition-old(name)   ← the "before" snapshot
+│   │   └── ::view-transition-new(name)   ← the "after" snapshot
+
+/* Target by name: */
+::view-transition-old(demo-card) { }   ← "old snapshot OF demo-card"
+::view-transition-new(demo-card) { }   ← "new snapshot OF demo-card"
+
+/* Special values: */
+::view-transition-old(root)  { }       ← the whole-page transition
+::view-transition-group(*)   { }       ← ALL named transitions</code></pre>
+  </div>
+
+  <h2>Custom slide animation</h2>
+
+  <div class="demo">
+    <p class="demo-caption">Custom animation: the old state slides out left, the new state slides in from the right</p>
+    <button class="demo-btn" onclick="toggleSlide()">Toggle with slide</button>
+    <div style="overflow: hidden; border-radius: 6px;">
+      <div id="slideContainer" class="slide-panel">
+        Panel A content
+      </div>
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>.slide-panel {
+  view-transition-name: slide-demo;
+}
+
+::view-transition-old(slide-demo) {
+  animation: slide-out-left 0.3s ease forwards;
+}
+::view-transition-new(slide-demo) {
+  animation: slide-in-right 0.3s ease forwards;
+}
+
+@keyframes slide-out-left {
+  to { transform: translateX(-100%); opacity: 0; }
+}
+@keyframes slide-in-right {
+  from { transform: translateX(100%); opacity: 0; }
+}</code></pre>
+  </div>
+
+  <h2>Cross-document transitions (MPA)</h2>
+
+  <p>For traditional multi-page navigations (clicking links that load a new HTML page), you can opt in with a CSS at-rule - no JavaScript needed:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* Add to BOTH pages (source and destination) */
+@view-transition {
+  navigation: auto;
+}
+
+/* Elements with matching view-transition-name on both pages
+   will morph between positions during navigation */
+.page-header {
+  view-transition-name: header;
+}
+
+.hero-image {
+  view-transition-name: hero;
+}</code></pre>
+  </div>
+
+  <h2>List reordering with view transitions</h2>
+
+  <div class="demo">
+    <p class="demo-caption">Click to shuffle - items animate to new positions via view transitions</p>
+    <button class="demo-btn" onclick="shuffleList()">Shuffle list</button>
+    <div class="vt-list" id="vtList">
+      <div class="vt-list-item">Item 1</div>
+      <div class="vt-list-item" style="background: #e76f51;">Item 2</div>
+      <div class="vt-list-item" style="background: #2a9d8f;">Item 3</div>
+      <div class="vt-list-item" style="background: #6c5ce7;">Item 4</div>
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* Each item needs a unique view-transition-name */
+.item:nth-child(1) { view-transition-name: item-1; }
+.item:nth-child(2) { view-transition-name: item-2; }
+.item:nth-child(3) { view-transition-name: item-3; }
+.item:nth-child(4) { view-transition-name: item-4; }
+
+// JS - shuffle and let view transitions handle the animation
+function shuffleList() {
+  document.startViewTransition(() =&gt; {
+    const items = [...list.children];
+    items.sort(() =&gt; Math.random() - 0.5);
+    items.forEach(item =&gt; list.appendChild(item));
+  });
+}</code></pre>
+  </div>
+
+  <h2>Tab switching with slide</h2>
+
+  <div class="demo">
+    <p class="demo-caption">Click tabs - content slides between panels</p>
+    <div style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem;">
+      <button class="demo-btn" onclick="switchDemoTab('A')">Tab A</button>
+      <button class="demo-btn" onclick="switchDemoTab('B')">Tab B</button>
+      <button class="demo-btn" onclick="switchDemoTab('C')">Tab C</button>
+    </div>
+    <div style="position: relative; overflow: hidden; border-radius: 6px;">
+      <div id="tabA" class="tab-demo-panel" style="background: #f0f7ff; color: #1a1a2e; padding: 1rem; font-size: 0.85rem; view-transition-name: tab-demo;">Tab A content - first panel</div>
+      <div id="tabB" class="tab-demo-panel" style="background: #fff3e0; color: #1a1a2e; padding: 1rem; font-size: 0.85rem; display: none;">Tab B content - second panel</div>
+      <div id="tabC" class="tab-demo-panel" style="background: #e8f8f5; color: #1a1a2e; padding: 1rem; font-size: 0.85rem; display: none;">Tab C content - third panel</div>
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>.panel.active {
+  display: block;
+  view-transition-name: tab-content;
+}
+
+::view-transition-old(tab-content) {
+  animation: slide-out-left 0.25s ease forwards;
+}
+::view-transition-new(tab-content) {
+  animation: slide-in-right 0.25s ease forwards;
+}
+
+// JavaScript - swap the .active class
+function switchTab(id) {
+  document.startViewTransition(() =&gt; {
+    document.querySelectorAll('.panel').forEach(p =&gt; p.classList.remove('active'));
+    document.getElementById('tab' + id).classList.add('active');
+  });
+}</code></pre>
+  </div>
+
+  <h2>Respecting reduced motion</h2>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* Always include this - disable view transition animations for users
+   who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}</code></pre>
+  </div>
+
+  <h2>Gotchas and limitations</h2>
+
+  <ul>
+    <li><strong>Unique names required.</strong> Two elements with the same <code>view-transition-name</code> on a page at the same time = error.</li>
+    <li><strong>Only works in the top-level document.</strong> View transitions don't work inside iframes.</li>
+    <li><strong>Snapshot is a flat image.</strong> During the animation, you can't interact with the page. Keep transitions short.</li>
+    <li><strong>Cross-document requires same origin.</strong> You can't animate transitions between different domains.</li>
+    <li><strong>Performance.</strong> The browser composites the snapshots on the GPU - so it's fast. But capturing large/complex pages can have a brief delay.</li>
+  </ul>
+
+  <h2>Browser support</h2>
+
+  <ul>
+    <li>Same-document (<code>startViewTransition</code>): Chrome 111+, Safari 18+, Firefox pending</li>
+    <li>Cross-document (<code>@view-transition</code>): Chrome 126+, Safari 18+, Firefox pending</li>
+    <li>Fully progressive - if unsupported, the DOM change still happens, just without animation</li>
+  </ul>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <h2>Retrieval check</h2>
+
+  <div class="quiz" id="quiz1">
+    <h3>Question 1</h3>
+    <p>What does view-transition-name do?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Triggers a view transition automatically on hover</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">Identifies an element so the browser can match it between old and new states</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Names a @keyframes animation for the transition</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Creates a snapshot of the element for caching</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz2">
+    <h3>Question 2</h3>
+    <p>What does the browser actually show during a view transition animation?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">The live DOM being modified in real time</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">Static image snapshots (pseudo-elements) of the old and new states</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">A canvas element with the transition painted on it</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">The new DOM with opacity transitioning from 0 to 1</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz3">
+    <h3>Question 3</h3>
+    <p>How do you trigger a same-document view transition?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Add transition: view 0.3s to the element</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Use the CSS @view-transition at-rule</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">Call document.startViewTransition(() =&gt; { /* DOM changes */ })</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Set view-transition: auto on the container</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz4">
+    <h3>Question 4</h3>
+    <p>Two elements on the same page have the same view-transition-name. What happens?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">They both animate together as one group</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">The second one overrides the first</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">The view transition fails - names must be unique per page</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">They crossfade between each other</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz5">
+    <h3>Question 5</h3>
+    <p>How do you enable view transitions for multi-page navigations (no JS)?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Add view-transition: auto to the body element</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">Add @view-transition { navigation: auto; } to both pages' CSS</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Include a &lt;meta name="view-transition"&gt; tag</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">It works automatically in all modern browsers</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="recommended">
+    <strong>Recommended resources:</strong>
+    <a href="https://developer.mozilla.org/en-US/docs/Web/API/View_Transition_API">MDN - View Transition API</a> |
+    <a href="https://developer.chrome.com/docs/web-platform/view-transitions">Chrome Developers - View Transitions</a> |
+    <a href="https://developer.chrome.com/docs/web-platform/view-transitions/cross-document">Chrome - Cross-document view transitions</a>
+  </div>
+
+  <div class="footer-nav">
+    <a href="15-logical-properties.html">&larr; Prev: Logical Properties</a>
+    <a href="index.html">Index</a>
+    <a href="17-anchor-positioning.html">Next: Anchor Positioning &rarr;</a>
+  </div>
+
+    </main>
+  </div>
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script>
+    // View transition demo functions
+    let isStateA = true;
+    function toggleCard() {
+      if (!document.startViewTransition) { toggleCardFallback(); return; }
+      document.startViewTransition(() => { toggleCardFallback(); });
+    }
+    function toggleCardFallback() {
+      isStateA = !isStateA;
+      const container = document.getElementById('vtContainer');
+      const card = document.getElementById('vtCard');
+      container.classList.toggle('state-a', isStateA);
+      container.classList.toggle('state-b', !isStateA);
+      card.textContent = isStateA ? 'State A - blue background' : 'State B - orange background';
+    }
+
+    function expandThumb(index) {
+      const grid = document.getElementById('thumbGrid');
+      const expanded = document.getElementById('expandedView');
+      const colors = ['var(--accent, #3a86ff)', '#e76f51', '#2a9d8f'];
+      const doIt = () => {
+        grid.style.display = 'none';
+        expanded.style.display = 'flex';
+        expanded.style.background = colors[index];
+        expanded.style.viewTransitionName = 'thumb-' + (index + 1);
+      };
+      if (document.startViewTransition) { document.startViewTransition(doIt); } else { doIt(); }
+    }
+    function collapseThumb() {
+      const grid = document.getElementById('thumbGrid');
+      const expanded = document.getElementById('expandedView');
+      const doIt = () => {
+        expanded.style.display = 'none';
+        expanded.style.viewTransitionName = '';
+        grid.style.display = '';
+      };
+      if (document.startViewTransition) { document.startViewTransition(doIt); } else { doIt(); }
+    }
+
+    let slideState = true;
+    function toggleSlide() {
+      slideState = !slideState;
+      const el = document.getElementById('slideContainer');
+      const doIt = () => { el.textContent = slideState ? 'Panel A content' : 'Panel B content'; };
+      if (document.startViewTransition) { document.startViewTransition(doIt); } else { doIt(); }
+    }
+
+    function shuffleList() {
+      const list = document.getElementById('vtList');
+      const doIt = () => {
+        const items = [...list.children];
+        items.sort(() => Math.random() - 0.5);
+        items.forEach(item => list.appendChild(item));
+      };
+      if (document.startViewTransition) { document.startViewTransition(doIt); } else { doIt(); }
+    }
+
+    function switchDemoTab(id) {
+      const panels = document.querySelectorAll('.tab-demo-panel');
+      const doIt = () => {
+        panels.forEach(p => { p.style.display = 'none'; p.style.viewTransitionName = ''; });
+        const active = document.getElementById('tab' + id);
+        active.style.display = 'block';
+        active.style.viewTransitionName = 'tab-demo';
+      };
+      if (document.startViewTransition) { document.startViewTransition(doIt); } else { doIt(); }
+    }
+  </script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

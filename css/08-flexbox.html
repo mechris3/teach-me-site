@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>Flexbox - Lesson 8 | Teach Me</title>
+  <meta name="description" content="Understand how the Flexbox algorithm works - flex-basis, flex-grow, flex-shrink, alignment, wrapping, and practical layout patterns.">
+  <link rel="canonical" href="https://teachmeskills.dev/css/08-flexbox.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/css/08-flexbox.html">
+  <meta property="og:title" content="Flexbox - Lesson 8 | Teach Me">
+  <meta property="og:description" content="Understand how the Flexbox algorithm works - flex-basis, flex-grow, flex-shrink, alignment, wrapping, and practical layout patterns.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Flexbox - Lesson 8 | Teach Me">
+  <meta name="twitter:description" content="Understand how the Flexbox algorithm works - flex-basis, flex-grow, flex-shrink, alignment, wrapping, and practical layout patterns.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .flex-container { display: flex; border: 2px solid var(--border); border-radius: 6px; padding: 0.5rem; gap: 0.5rem; margin-bottom: 0.75rem; min-height: 60px; align-items: stretch; }
+    .flex-item { background: var(--accent); color: white; padding: 0.5rem 0.75rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; display: flex; align-items: center; justify-content: center; text-align: center; }
+    .flex-item:nth-child(2) { background: #e76f51; }
+    .flex-item:nth-child(3) { background: #2a9d8f; }
+    .flex-item:nth-child(4) { background: #6c5ce7; }
+    .flex-col { flex-direction: column; min-height: 200px; }
+    .jc-start { justify-content: flex-start; }
+    .jc-center { justify-content: center; }
+    .jc-end { justify-content: flex-end; }
+    .jc-between { justify-content: space-between; }
+    .jc-around { justify-content: space-around; }
+    .jc-evenly { justify-content: space-evenly; }
+    .flex-col.jc-center { justify-content: center; }
+    .ai-stretch { align-items: stretch; min-height: 100px; }
+    .ai-start { align-items: flex-start; min-height: 100px; }
+    .ai-center { align-items: center; min-height: 100px; }
+    .ai-end { align-items: flex-end; min-height: 100px; }
+    .grow-none .flex-item { flex-grow: 0; }
+    .grow-equal .flex-item { flex-grow: 1; }
+    .grow-ratio .flex-item:nth-child(1) { flex-grow: 1; }
+    .grow-ratio .flex-item:nth-child(2) { flex-grow: 2; }
+    .grow-ratio .flex-item:nth-child(3) { flex-grow: 1; }
+    .shrink-demo .flex-item { width: 250px; flex-shrink: 1; }
+    .shrink-demo .flex-item:nth-child(2) { flex-shrink: 0; }
+    .basis-demo .flex-item:nth-child(1) { flex-basis: 100px; }
+    .basis-demo .flex-item:nth-child(2) { flex-basis: 200px; }
+    .basis-demo .flex-item:nth-child(3) { flex-basis: auto; }
+    .shorthand-demo .flex-item:nth-child(1) { flex: 1; }
+    .shorthand-demo .flex-item:nth-child(2) { flex: 2; }
+    .shorthand-demo .flex-item:nth-child(3) { flex: 1; }
+    .wrap-demo { flex-wrap: wrap; }
+    .wrap-demo .flex-item { flex: 1 1 150px; }
+    .gap-demo { gap: 1rem; }
+    .min-width-broken .flex-item { flex: 1; white-space: nowrap; }
+    .min-width-fixed .flex-item { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .label-row { font-size: 0.7rem; color: #666; margin-bottom: 0.25rem; }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header">
+        <a href="index.html">CSS Course</a>
+      </div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-custom-properties-fundamentals.html">1. Custom Properties</a></li>
+        <li><a href="02-registered-custom-properties.html">2. @property</a></li>
+        <li><a href="03-css-value-functions.html">3. Value Functions</a></li>
+        <li><a href="04-custom-css-functions.html">4. Custom Functions</a></li>
+        <li><a href="05-advanced-attr.html">5. Advanced attr()</a></li>
+        <li><a href="06-transitions.html">6. Transitions</a></li>
+        <li><a href="07-animations.html">7. Animations</a></li>
+        <li class="current"><a href="08-flexbox.html">8. Flexbox</a></li>
+        <li><a href="09-grid.html">9. Grid</a></li>
+        <li><a href="10-container-queries.html">10. Container Queries</a></li>
+        <li><a href="11-cascade-layers.html">11. Cascade Layers</a></li>
+        <li><a href="12-css-nesting.html">12. CSS Nesting</a></li>
+        <li><a href="13-modern-selectors.html">13. Modern Selectors</a></li>
+        <li><a href="14-the-cascade.html">14. The Cascade</a></li>
+        <li><a href="15-logical-properties.html">15. Logical Properties</a></li>
+        <li><a href="16-view-transitions.html">16. View Transitions</a></li>
+        <li><a href="17-anchor-positioning.html">17. Anchor Positioning</a></li>
+        <li><a href="18-advanced-colour.html">18. Advanced Colour</a></li>
+        <li><a href="19-scope.html">19. @scope</a></li>
+        <li><a href="20-selectors-deep-dive.html">20. Selectors Deep-Dive</a></li>
+        <li><a href="21-theming-deep-dive.html">21. Theming Deep-Dive</a></li>
+        <li><a href="22-responsive-design-patterns.html">22. Responsive Patterns</a></li>
+        <li><a href="23-scroll-driven-animations.html">23. Scroll-Driven Animations</a></li>
+        <li><a href="24-capstone-product-landing-page.html">24. Capstone Project</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="css-anatomy.html">CSS Anatomy</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 8</p>
+  <h1>Flexbox - How the Algorithm Works</h1>
+
+  <p>You've used Flexbox. But do you know <em>why</em> items end up the size they do? This lesson covers the mental model behind the flex algorithm - what actually happens when items compete for space.</p>
+
+  <h2>The core idea</h2>
+
+  <p>A flex container distributes space along a <strong>main axis</strong>. The algorithm runs in three steps:</p>
+
+  <ol>
+    <li><strong>Determine each item's base size</strong> (<code>flex-basis</code>)</li>
+    <li><strong>Calculate free space</strong> (container size - sum of base sizes)</li>
+    <li><strong>Distribute free space</strong> (if positive &rarr; <code>flex-grow</code>, if negative &rarr; <code>flex-shrink</code>)</li>
+  </ol>
+
+  <div class="key-concept">
+    <p><strong>Everything in Flexbox is about this question:</strong> "There's X pixels of space to distribute (or X pixels of overflow to absorb). How do we divide it among the items?"</p>
+  </div>
+
+  <h2>flex-direction - choosing the main axis</h2>
+
+  <div class="demo">
+    <p class="demo-caption">row (default) - main axis is horizontal</p>
+    <div class="flex-container">
+      <div class="flex-item">1</div>
+      <div class="flex-item">2</div>
+      <div class="flex-item">3</div>
+    </div>
+    <p class="demo-caption">column - main axis is vertical</p>
+    <div class="flex-container flex-col">
+      <div class="flex-item">1</div>
+      <div class="flex-item">2</div>
+      <div class="flex-item">3</div>
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>.row    { display: flex; flex-direction: row; }    /* default */
+.column { display: flex; flex-direction: column; }</code></pre>
+  </div>
+
+  <h2>justify-content vs align-items - it's about axes, not directions</h2>
+
+  <p>The common confusion: "justify is horizontal, align is vertical." That's only true in <code>flex-direction: row</code>. The real rule:</p>
+
+  <ul>
+    <li><code>justify-content</code> &rarr; distributes space along the <strong>main axis</strong> (the direction items flow)</li>
+    <li><code>align-items</code> &rarr; positions items along the <strong>cross axis</strong> (perpendicular to the flow)</li>
+  </ul>
+
+  <svg viewBox="0 0 700 310" style="width: 100%; max-width: 700px; margin: 1.5rem auto; display: block;" aria-label="Diagram showing flex-direction row vs column and how justify-content and align-items swap axes">
+    <!-- Background -->
+    <rect width="700" height="310" fill="var(--demo-bg, #f9f8f3)" rx="6"/>
+
+    <!-- ROW section -->
+    <text x="30" y="28" font-size="12" font-weight="700" fill="var(--text, #111)" font-family="monospace">flex-direction: row (default)</text>
+
+    <!-- Row box -->
+    <rect x="30" y="42" width="280" height="100" rx="4" fill="none" stroke="var(--border, #ddd)" stroke-width="2"/>
+    <!-- Horizontal arrow (BLUE = main axis in row) -->
+    <line x1="50" y1="65" x2="280" y2="65" stroke="var(--accent, #1a73e8)" stroke-width="2" marker-end="url(#arrow-flex)"/>
+    <text x="165" y="58" font-size="9" fill="var(--accent, #1a73e8)" text-anchor="middle" font-family="monospace">main axis (horizontal)</text>
+    <!-- Vertical arrow (CORAL = cross axis in row) -->
+    <line x1="55" y1="80" x2="55" y2="128" stroke="#e76f51" stroke-width="2" marker-end="url(#arrow-flex-cross)"/>
+    <text x="70" y="118" font-size="9" fill="#e76f51" font-family="monospace">cross axis (vertical)</text>
+
+    <!-- Row labels -->
+    <text x="30" y="168" font-size="10" fill="var(--accent, #1a73e8)" font-family="monospace" font-weight="600">justify-content → left/right</text>
+    <text x="30" y="185" font-size="10" fill="#e76f51" font-family="monospace" font-weight="600">align-items → top/bottom</text>
+
+    <!-- COLUMN section -->
+    <text x="390" y="28" font-size="12" font-weight="700" fill="var(--text, #111)" font-family="monospace">flex-direction: column</text>
+
+    <!-- Column box - SAME size and structure -->
+    <rect x="390" y="42" width="280" height="100" rx="4" fill="none" stroke="var(--border, #ddd)" stroke-width="2"/>
+    <!-- Horizontal arrow (CORAL = cross axis in column) -->
+    <line x1="410" y1="65" x2="640" y2="65" stroke="#e76f51" stroke-width="2" marker-end="url(#arrow-flex-cross)"/>
+    <text x="525" y="58" font-size="9" fill="#e76f51" text-anchor="middle" font-family="monospace">cross axis (horizontal)</text>
+    <!-- Vertical arrow (BLUE = main axis in column) -->
+    <line x1="415" y1="80" x2="415" y2="128" stroke="var(--accent, #1a73e8)" stroke-width="2" marker-end="url(#arrow-flex)"/>
+    <text x="430" y="118" font-size="9" fill="var(--accent, #1a73e8)" font-family="monospace">main axis (vertical)</text>
+
+    <!-- Column labels -->
+    <text x="390" y="168" font-size="10" fill="var(--accent, #1a73e8)" font-family="monospace" font-weight="600">justify-content → top/bottom (swapped!)</text>
+    <text x="390" y="185" font-size="10" fill="#e76f51" font-family="monospace" font-weight="600">align-items → left/right (swapped!)</text>
+
+    <!-- Key insight box -->
+    <rect x="30" y="210" width="640" height="80" rx="4" fill="var(--bg-raised, #f3f2ed)" stroke="var(--border, #ddd)"/>
+    <text x="350" y="237" font-size="11" fill="var(--text, #111)" text-anchor="middle" font-family="monospace" font-weight="700">The rule:</text>
+    <text x="350" y="258" font-size="10" fill="var(--accent, #1a73e8)" text-anchor="middle" font-family="monospace">justify-content = distribute along the main axis</text>
+    <text x="350" y="278" font-size="10" fill="#e76f51" text-anchor="middle" font-family="monospace">align-items = position along the cross axis</text>
+
+    <!-- Arrow markers -->
+    <defs>
+      <marker id="arrow-flex" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="var(--accent, #1a73e8)"/></marker>
+      <marker id="arrow-flex-cross" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#e76f51"/></marker>
+    </defs>
+  </svg>
+
+  <div class="demo">
+    <p class="demo-caption">ROW: justify-content: center &rarr; centers horizontally</p>
+    <div class="flex-container jc-center" style="min-height: 60px;">
+      <div class="flex-item">A</div><div class="flex-item">B</div><div class="flex-item">C</div>
+    </div>
+    <p class="demo-caption">COLUMN: justify-content: center &rarr; centers vertically (main axis is now vertical)</p>
+    <div class="flex-container flex-col jc-center" style="min-height: 180px;">
+      <div class="flex-item">A</div><div class="flex-item">B</div><div class="flex-item">C</div>
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* Row: justify-content works horizontally */
+.row { display: flex; flex-direction: row; justify-content: center; }
+
+/* Column: justify-content works VERTICALLY */
+.col { display: flex; flex-direction: column; justify-content: center; }</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <p><strong>Mental model:</strong> "justify" = "where along the line do items sit?" / "align" = "how do items behave perpendicular to that line?" These definitions hold regardless of direction.</p>
+  </div>
+
+  <h2>justify-content - all values demonstrated</h2>
+
+  <div class="demo">
+    <p class="demo-caption">flex-start (default)</p>
+    <div class="flex-container jc-start"><div class="flex-item">A</div><div class="flex-item">B</div><div class="flex-item">C</div></div>
+    <p class="demo-caption">center</p>
+    <div class="flex-container jc-center"><div class="flex-item">A</div><div class="flex-item">B</div><div class="flex-item">C</div></div>
+    <p class="demo-caption">flex-end</p>
+    <div class="flex-container jc-end"><div class="flex-item">A</div><div class="flex-item">B</div><div class="flex-item">C</div></div>
+    <p class="demo-caption">space-between</p>
+    <div class="flex-container jc-between"><div class="flex-item">A</div><div class="flex-item">B</div><div class="flex-item">C</div></div>
+    <p class="demo-caption">space-around</p>
+    <div class="flex-container jc-around"><div class="flex-item">A</div><div class="flex-item">B</div><div class="flex-item">C</div></div>
+    <p class="demo-caption">space-evenly</p>
+    <div class="flex-container jc-evenly"><div class="flex-item">A</div><div class="flex-item">B</div><div class="flex-item">C</div></div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>justify-content: flex-start;     /* pack to start */
+justify-content: center;         /* center items */
+justify-content: flex-end;       /* pack to end */
+justify-content: space-between;  /* first item at start, last at end, equal gaps between */
+justify-content: space-around;   /* equal space around each item (half-size at edges) */
+justify-content: space-evenly;   /* truly equal gaps everywhere */</code></pre>
+  </div>
+
+  <h2>align-items - positioning on the cross axis</h2>
+
+  <div class="demo">
+    <p class="demo-caption">stretch (default) - items fill the cross axis</p>
+    <div class="flex-container ai-stretch"><div class="flex-item">A</div><div class="flex-item">B</div><div class="flex-item">C</div></div>
+    <p class="demo-caption">flex-start - items at top</p>
+    <div class="flex-container ai-start"><div class="flex-item">A</div><div class="flex-item">B</div><div class="flex-item">C</div></div>
+    <p class="demo-caption">center - items centered vertically</p>
+    <div class="flex-container ai-center"><div class="flex-item">A</div><div class="flex-item">B</div><div class="flex-item">C</div></div>
+    <p class="demo-caption">flex-end - items at bottom</p>
+    <div class="flex-container ai-end"><div class="flex-item">A</div><div class="flex-item">B</div><div class="flex-item">C</div></div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>align-items: stretch;    /* fill height (default) */
+align-items: flex-start; /* top of container */
+align-items: center;     /* vertically centered */
+align-items: flex-end;   /* bottom of container */
+align-items: baseline;   /* align text baselines */</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <p><strong>The classic centering trick:</strong> <code>display: flex; justify-content: center; align-items: center;</code> - centers both axes. That's it. Works on any container.</p>
+  </div>
+
+  <h2>flex-basis - the starting size</h2>
+
+  <p><code>flex-basis</code> defines an item's <strong>ideal size before growing or shrinking</strong>. It's the answer to "how big would this be if there were no space pressure?"</p>
+
+  <div class="demo">
+    <p class="demo-caption">Three items: 100px, 200px, auto (auto = content width)</p>
+    <div class="flex-container basis-demo">
+      <div class="flex-item">basis: 100px</div>
+      <div class="flex-item">basis: 200px</div>
+      <div class="flex-item">basis: auto</div>
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>.item-1 { flex-basis: 100px; }  /* exactly 100px as starting point */
+.item-2 { flex-basis: 200px; }  /* exactly 200px */
+.item-3 { flex-basis: auto; }   /* use width/content size */</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <p><strong>flex-basis vs width:</strong> They look similar but differ. <code>flex-basis</code> is the starting point for the flex algorithm. <code>width</code> is a hard constraint (in non-flex contexts). In a flex container, <code>flex-basis</code> takes priority over <code>width</code> unless flex-basis is <code>auto</code> (then it falls back to width). <strong>Use flex-basis in flex layouts, not width.</strong></p>
+  </div>
+
+  <h2>flex-grow - distributing extra space</h2>
+
+  <p>When the total of all items' flex-basis values is <em>less</em> than the container width, there's leftover space. <code>flex-grow</code> decides how to distribute it.</p>
+
+  <p>The algorithm: calculate free space, then divide it proportionally by each item's grow factor.</p>
+
+  <div class="demo">
+    <p class="demo-caption">flex-grow: 0 (default) - items stay at their basis, free space is unused</p>
+    <div class="flex-container grow-none">
+      <div class="flex-item">grow: 0</div>
+      <div class="flex-item">grow: 0</div>
+      <div class="flex-item">grow: 0</div>
+    </div>
+    <p class="demo-caption">flex-grow: 1 on all - free space divided equally</p>
+    <div class="flex-container grow-equal">
+      <div class="flex-item">grow: 1</div>
+      <div class="flex-item">grow: 1</div>
+      <div class="flex-item">grow: 1</div>
+    </div>
+    <p class="demo-caption">flex-grow: 1, 2, 1 - middle item gets double the extra space</p>
+    <div class="flex-container grow-ratio">
+      <div class="flex-item">grow: 1</div>
+      <div class="flex-item">grow: 2</div>
+      <div class="flex-item">grow: 1</div>
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* No growth - items stay at flex-basis */
+.item { flex-grow: 0; }
+
+/* Equal growth - each gets same share of free space */
+.item { flex-grow: 1; }
+
+/* Proportional: item B gets 2/(1+2+1) = 50% of free space */
+.item-a { flex-grow: 1; }
+.item-b { flex-grow: 2; }
+.item-c { flex-grow: 1; }</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <p><strong>Critical detail:</strong> <code>flex-grow</code> distributes the <em>free space</em>, not the total width. If items have different basis sizes, grow: 1 on each means they each get the same <em>extra</em> space - they don't become equal width. For equal-width items, use <code>flex: 1</code> (which sets basis to 0).</p>
+  </div>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <h2>flex-shrink - absorbing overflow</h2>
+
+  <p>When the total of all items' flex-basis values is <em>more</em> than the container width, there's overflow. <code>flex-shrink</code> decides how much each item gives up.</p>
+
+  <div class="demo">
+    <p class="demo-caption">Three items with flex-basis: 250px in a narrow container. Middle item has shrink: 0 (refuses to shrink)</p>
+    <div class="flex-container shrink-demo">
+      <div class="flex-item">shrink: 1</div>
+      <div class="flex-item">shrink: 0</div>
+      <div class="flex-item">shrink: 1</div>
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* All items shrink equally (default) */
+.item { flex-shrink: 1; }
+
+/* This item won't shrink - others absorb all the overflow */
+.item-fixed { flex-shrink: 0; }
+
+/* This item shrinks twice as fast as others */
+.item-flexible { flex-shrink: 2; }</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <p><strong>Shrink is weighted by basis size.</strong> The actual amount each item shrinks is: <code>(shrink-factor &times; flex-basis) / sum(all shrink &times; basis) &times; overflow</code>. This means larger items give up more pixels even at the same shrink value - which usually feels fair.</p>
+  </div>
+
+  <h2>The flex shorthand - the three values together</h2>
+
+  <p><code>flex</code> is shorthand for <code>flex-grow</code>, <code>flex-shrink</code>, and <code>flex-basis</code>:</p>
+
+  <div class="demo">
+    <p class="demo-caption">flex: 1 / flex: 2 / flex: 1 - basis is 0, so total space is divided 1:2:1</p>
+    <div class="flex-container shorthand-demo">
+      <div class="flex-item">flex: 1</div>
+      <div class="flex-item">flex: 2</div>
+      <div class="flex-item">flex: 1</div>
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>flex: &lt;grow&gt; &lt;shrink&gt; &lt;basis&gt;;
+
+/* Common patterns: */
+flex: 0 1 auto;   /* default - don't grow, can shrink, basis is content/width */
+flex: 1;          /* same as flex: 1 1 0% - grow equally, basis is zero */
+flex: 1 0 200px;  /* grow from 200px, never shrink below it */
+flex: none;       /* same as flex: 0 0 auto - rigid, no flex at all */
+flex: auto;       /* same as flex: 1 1 auto - grow and shrink from content size */</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <p><strong>The most important thing about the shorthand:</strong> <code>flex: 1</code> sets basis to <code>0%</code>, not <code>auto</code>. This is why <code>flex: 1</code> makes items equal width - they all start from 0 and grow equally. <code>flex: 1 1 auto</code> (or <code>flex: auto</code>) starts from content size, so items with more content end up wider.</p>
+  </div>
+
+  <h2>flex-wrap - handling overflow gracefully</h2>
+
+  <p>By default, flex items squeeze onto one line (even if they overflow). <code>flex-wrap: wrap</code> lets them break into new lines:</p>
+
+  <div class="demo">
+    <p class="demo-caption">flex-wrap: wrap with flex: 1 1 150px - items wrap when they can't fit at 150px minimum</p>
+    <div class="flex-container wrap-demo">
+      <div class="flex-item">Item 1</div>
+      <div class="flex-item">Item 2</div>
+      <div class="flex-item">Item 3</div>
+      <div class="flex-item">Item 4</div>
+      <div class="flex-item">Item 5</div>
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>.container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.item {
+  flex: 1 1 150px;
+  /* Means: grow to fill space, shrink if needed, but start at 150px.
+     When 150px × items > container, items wrap to a new line. */
+}</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <p><strong>The responsive card pattern:</strong> <code>flex: 1 1 &lt;min-width&gt;</code> is the simplest responsive layout without media queries. Items fill the row, and when the row can't fit them at their basis, they wrap. Combined with <code>gap</code>, this handles most card grids.</p>
+  </div>
+
+  <h2>gap - spacing between items</h2>
+
+  <div class="demo">
+    <p class="demo-caption">gap: 1rem - consistent spacing without margin hacks</p>
+    <div class="flex-container gap-demo">
+      <div class="flex-item">A</div>
+      <div class="flex-item">B</div>
+      <div class="flex-item">C</div>
+      <div class="flex-item">D</div>
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>.container {
+  display: flex;
+  gap: 1rem;           /* both row and column gap */
+  /* or: */
+  row-gap: 1rem;       /* vertical gap (between wrapped rows) */
+  column-gap: 0.5rem;  /* horizontal gap (between items in a row) */
+}</code></pre>
+  </div>
+
+  <p><code>gap</code> replaced the old pattern of <code>margin-right</code> on items with a <code>:last-child</code> override. It only creates space <em>between</em> items, never on the edges.</p>
+
+  <h2>The min-width: auto gotcha</h2>
+
+  <p>This is the single most common Flexbox bug. By default, flex items have <code>min-width: auto</code>, which means they will <strong>never shrink below their content size</strong>. If an item has a long word or a <code>white-space: nowrap</code>, it can overflow the container even with <code>flex-shrink: 1</code>.</p>
+
+  <div class="demo">
+    <p class="demo-caption">Broken: long text overflows because min-width: auto prevents shrinking below content</p>
+    <div class="flex-container min-width-broken">
+      <div class="flex-item">Short</div>
+      <div class="flex-item">This text is very long and refuses to shrink below its natural content width</div>
+      <div class="flex-item">Short</div>
+    </div>
+    <p class="demo-caption" style="margin-top: 1rem;">Fixed: min-width: 0 + overflow: hidden</p>
+    <div class="flex-container min-width-fixed">
+      <div class="flex-item">Short</div>
+      <div class="flex-item">This text is very long but now truncates because min-width: 0 allows shrinking</div>
+      <div class="flex-item">Short</div>
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* The problem: */
+.item {
+  flex: 1;
+  white-space: nowrap;
+  /* min-width defaults to auto → won't shrink below content → overflows */
+}
+
+/* The fix: */
+.item {
+  flex: 1;
+  min-width: 0;              /* allow shrinking below content size */
+  overflow: hidden;          /* clip or truncate the overflow */
+  text-overflow: ellipsis;   /* show ... for truncated text */
+  white-space: nowrap;
+}</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <p><strong>Rule of thumb:</strong> Whenever a flex item contains text that might overflow, or a child element with a fixed/intrinsic width (images, tables, pre blocks), add <code>min-width: 0</code> to the flex item. Same applies to <code>min-height: 0</code> in column layouts.</p>
+  </div>
+
+  <h2>The algorithm step by step</h2>
+
+  <p>To summarise how the browser resolves flex item sizes:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>1. Set each item's "hypothetical main size" = flex-basis (or width if basis is auto)
+2. Sum all hypothetical sizes + gaps
+3. Compare to container size:
+   - If sum < container → FREE SPACE exists → distribute via flex-grow
+   - If sum > container → OVERFLOW exists → absorb via flex-shrink
+   - If sum = container → perfect fit, do nothing
+4. Apply min-width/max-width constraints
+   - If an item hits min-width, it stops shrinking
+   - Remaining overflow is redistributed to other items
+5. Position items via justify-content and align-items</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <p><strong>Step 4 is why layouts sometimes "break".</strong> You set flex-shrink: 1 on everything, but an item refuses to shrink because its min-width (auto = content size) prevents it. Fix: <code>min-width: 0</code>.</p>
+  </div>
+
+  <h2>Practical patterns</h2>
+
+  <h3>Sticky footer</h3>
+
+  <div class="demo">
+    <p class="demo-caption">Content pushes footer down; footer sticks to bottom if content is short</p>
+    <div style="display: flex; flex-direction: column; min-height: 200px; border: 2px solid var(--border); border-radius: 6px;">
+      <div style="padding: 0.75rem; background: #f0f7ff; color: #1a1a2e;">Header</div>
+      <div style="flex: 1; padding: 0.75rem;">Main content (flex: 1 fills remaining space)</div>
+      <div style="padding: 0.75rem; background: #fff3e0; color: #1a1a2e;">Footer (pushed to bottom)</div>
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.header { /* natural height */ }
+.main   { flex: 1; }  /* takes all remaining space */
+.footer { /* natural height, always at bottom */ }</code></pre>
+  </div>
+
+  <h3>Sidebar + content layout</h3>
+
+  <div class="demo">
+    <p class="demo-caption">Fixed sidebar, flexible main content</p>
+    <div style="display: flex; gap: 0.75rem; border: 2px solid var(--border); border-radius: 6px; padding: 0.5rem;">
+      <div style="flex: 0 0 120px; background: var(--accent); color: white; padding: 0.75rem; border-radius: 4px; font-size: 0.75rem;">Sidebar (flex: 0 0 120px)</div>
+      <div style="flex: 1; background: #e8f8f5; color: #1a1a2e; padding: 0.75rem; border-radius: 4px; font-size: 0.75rem;">Main content (flex: 1)</div>
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>.layout {
+  display: flex;
+  gap: 1rem;
+}
+
+.sidebar { flex: 0 0 250px; }  /* don't grow, don't shrink, fixed at 250px */
+.main    { flex: 1; }          /* fills remaining space */</code></pre>
+  </div>
+
+  <h3>Centering anything</h3>
+
+  <div class="demo">
+    <p class="demo-caption">Perfectly centered - horizontally and vertically</p>
+    <div style="display: flex; justify-content: center; align-items: center; height: 100px; border: 2px solid var(--border); border-radius: 6px;">
+      <div class="flex-item">Centered!</div>
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>.container {
+  display: flex;
+  justify-content: center;  /* horizontal */
+  align-items: center;      /* vertical */
+}</code></pre>
+  </div>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <h2>Retrieval check</h2>
+
+  <div class="quiz" id="quiz1">
+    <h3>Question 1</h3>
+    <p>What does flex-grow distribute?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">The total container width equally</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">The free space left after all items reach their flex-basis</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">The difference between min-width and max-width</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">The gap between items proportionally</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz2">
+    <h3>Question 2</h3>
+    <p>What's the difference between flex: 1 and flex: 1 1 auto?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">No difference - they're equivalent</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">flex: 1 sets basis to 0% (equal widths); flex: 1 1 auto uses content size as basis</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">flex: 1 prevents shrinking; flex: 1 1 auto allows it</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">flex: 1 only works in row direction</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz3">
+    <h3>Question 3</h3>
+    <p>A flex item with long text overflows its container despite flex-shrink: 1. What's the most likely fix?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Set flex-shrink: 99 to force it smaller</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Add overflow: scroll to the container</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">Add min-width: 0 to the item</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Set width: 0 on the item</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz4">
+    <h3>Question 4</h3>
+    <p>You want a fixed 250px sidebar that never grows or shrinks. What flex value?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">flex: 1 0 250px</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">flex: 0 0 250px</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">flex: 250px</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">flex: none 250px</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz5">
+    <h3>Question 5</h3>
+    <p>What does justify-content: space-between do with 3 items?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Equal gaps everywhere including edges</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">First item at start, last at end, equal gaps between them</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">All three items centered with gaps around them</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Items spread with half-gaps at the edges</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="recommended">
+    <strong>Recommended resources:</strong>
+    <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_flexible_box_layout">MDN - CSS Flexible Box Layout</a> |
+    <a href="https://css-tricks.com/snippets/css/a-guide-to-flexbox/">CSS-Tricks - A Complete Guide to Flexbox</a> |
+    <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_flexible_box_layout/Basic_concepts_of_flexbox">MDN - Basic concepts of Flexbox</a>
+  </div>
+
+  <div class="footer-nav">
+    <a href="07-animations.html">&larr; Prev: Animations</a>
+    <a href="index.html">Index</a>
+    <a href="09-grid.html">Next: Grid &rarr;</a>
+  </div>
+
+    </main>
+  </div>
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>CSS Value Functions - Lesson 3 | Teach Me</title>
+  <meta name="description" content="Master CSS value functions: calc, min, max, clamp, and color-mix. Build responsive, flexible designs that adapt without media queries.">
+  <link rel="canonical" href="https://teachmeskills.dev/css/03-css-value-functions.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/css/03-css-value-functions.html">
+  <meta property="og:title" content="CSS Value Functions - Lesson 3 | Teach Me">
+  <meta property="og:description" content="Master CSS value functions: calc, min, max, clamp, and color-mix. Build responsive, flexible designs that adapt without media queries.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="CSS Value Functions - Lesson 3 | Teach Me">
+  <meta name="twitter:description" content="Master CSS value functions: calc, min, max, clamp, and color-mix. Build responsive, flexible designs that adapt without media queries.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Demo: calc */
+    .calc-demo {
+      --sidebar: 250px;
+      display: flex;
+      gap: 0;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      height: 80px;
+    }
+
+    .calc-sidebar {
+      width: var(--sidebar);
+      background: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 0.8rem;
+      flex-shrink: 0;
+    }
+
+    .calc-main {
+      width: calc(100% - var(--sidebar));
+      background: #e8f8f5; color: #1a1a2e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+    }
+
+    /* Demo: clamp font */
+    .clamp-text {
+      font-size: clamp(1rem, 2.5vw + 0.5rem, 2.5rem);
+      line-height: 1.3;
+      padding: 1rem;
+      background: #f9f0ff; color: #1a1a2e;
+      border-radius: 6px;
+    }
+
+    /* Demo: min/max width */
+    .min-demo-box {
+      width: min(100%, 500px);
+      padding: 1rem;
+      background: #fff3e0; color: #1a1a2e;
+      border-radius: 6px;
+      font-size: 0.85rem;
+    }
+
+    /* Demo: color-mix */
+    .color-mix-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.5rem;
+      margin: 1rem 0;
+    }
+
+    .color-swatch {
+      height: 60px;
+      border-radius: 6px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 0.4rem;
+      font-size: 0.65rem;
+      color: white;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    }
+
+    .color-swatch:nth-child(1) { background: color-mix(in oklch, var(--accent), white 80%); }
+    .color-swatch:nth-child(2) { background: color-mix(in oklch, var(--accent), white 50%); }
+    .color-swatch:nth-child(3) { background: var(--accent); }
+    .color-swatch:nth-child(4) { background: color-mix(in oklch, var(--accent), black 30%); }
+    .color-swatch:nth-child(5) { background: color-mix(in oklch, var(--accent), black 60%); }
+
+    /* Demo: nested calc */
+    .nested-demo {
+      --base: 1rem;
+      --scale: 1.5;
+      padding: calc(var(--base) * var(--scale));
+      margin-top: 0.5rem;
+      background: #e8f8f5;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      color: #1a1a2e;
+    }
+
+    @media (max-width: 500px) {
+      .color-mix-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header">
+        <a href="index.html">CSS Course</a>
+      </div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-custom-properties-fundamentals.html">1. Custom Properties</a></li>
+        <li><a href="02-registered-custom-properties.html">2. @property</a></li>
+        <li class="current"><a href="03-css-value-functions.html">3. Value Functions</a></li>
+        <li><a href="04-custom-css-functions.html">4. Custom Functions</a></li>
+        <li><a href="05-advanced-attr.html">5. Advanced attr()</a></li>
+        <li><a href="06-transitions.html">6. Transitions</a></li>
+        <li><a href="07-animations.html">7. Animations</a></li>
+        <li><a href="08-flexbox.html">8. Flexbox</a></li>
+        <li><a href="09-grid.html">9. Grid</a></li>
+        <li><a href="10-container-queries.html">10. Container Queries</a></li>
+        <li><a href="11-cascade-layers.html">11. Cascade Layers</a></li>
+        <li><a href="12-css-nesting.html">12. CSS Nesting</a></li>
+        <li><a href="13-modern-selectors.html">13. Modern Selectors</a></li>
+        <li><a href="14-the-cascade.html">14. The Cascade</a></li>
+        <li><a href="15-logical-properties.html">15. Logical Properties</a></li>
+        <li><a href="16-view-transitions.html">16. View Transitions</a></li>
+        <li><a href="17-anchor-positioning.html">17. Anchor Positioning</a></li>
+        <li><a href="18-advanced-colour.html">18. Advanced Colour</a></li>
+        <li><a href="19-scope.html">19. @scope</a></li>
+        <li><a href="20-selectors-deep-dive.html">20. Selectors Deep-Dive</a></li>
+        <li><a href="21-theming-deep-dive.html">21. Theming Deep-Dive</a></li>
+        <li><a href="22-responsive-design-patterns.html">22. Responsive Patterns</a></li>
+        <li><a href="23-scroll-driven-animations.html">23. Scroll-Driven Animations</a></li>
+        <li><a href="24-capstone-product-landing-page.html">24. Capstone Project</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="css-anatomy.html">CSS Anatomy</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 3</p>
+  <h1>CSS Value Functions</h1>
+
+  <p>CSS has a family of functions you can use inside property values to compute results at runtime. You've certainly seen <code>calc()</code>, but the full set - <code>min()</code>, <code>max()</code>, <code>clamp()</code>, and <code>color-mix()</code> - lets you build responsive, flexible designs that adapt without media queries.</p>
+
+  <h2><code>calc()</code> - arithmetic in CSS</h2>
+
+  <p><code>calc()</code> evaluates a mathematical expression at runtime. The killer feature: you can mix units.</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* Subtract a fixed sidebar from a fluid container */
+.main { width: calc(100% - 250px); }
+
+/* Add a rem offset to a viewport unit */
+.hero { height: calc(100vh - 4rem); }
+
+/* Multiply a custom property */
+.box { padding: calc(var(--base-spacing) * 2); }</code></pre>
+  </div>
+
+  <p>Operators: <code>+</code> <code>-</code> <code>*</code> <code>/</code>. Two rules:</p>
+  <ul>
+    <li><code>+</code> and <code>-</code> <strong>must have spaces on both sides</strong>: <code>calc(100% -20px)</code> is invalid. Write <code>calc(100% - 20px)</code>.</li>
+    <li><code>*</code> and <code>/</code>: at least one operand must be a plain number. You can't do <code>calc(10px * 5px)</code> - that would give you "square pixels" which isn't a CSS unit.</li>
+  </ul>
+
+  <div class="demo">
+    <p class="demo-caption">Sidebar is 250px (fixed), main is calc(100% - 250px)</p>
+    <div class="calc-demo">
+      <div class="calc-sidebar">250px</div>
+      <div class="calc-main">calc(100% - 250px)</div>
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;!-- HTML --&gt;
+&lt;div class="calc-demo"&gt;
+  &lt;div class="calc-sidebar"&gt;250px&lt;/div&gt;
+  &lt;div class="calc-main"&gt;calc(100% - 250px)&lt;/div&gt;
+&lt;/div&gt;
+
+/* CSS */
+.calc-demo {
+  --sidebar: 250px;
+  display: flex;
+}
+
+.calc-sidebar {
+  width: var(--sidebar);
+  flex-shrink: 0;
+}
+
+.calc-main {
+  width: calc(100% - var(--sidebar));
+}</code></pre>
+  </div>
+
+  <h3>Nesting calc() and combining with var()</h3>
+
+  <p>You can nest <code>calc()</code> inside itself, though modern browsers also let you just use parentheses:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* These are equivalent: */
+width: calc(100% - calc(var(--sidebar) + 2rem));
+width: calc(100% - (var(--sidebar) + 2rem));</code></pre>
+  </div>
+
+  <p>Combined with custom properties, <code>calc()</code> becomes a mini expression language:</p>
+
+  <div class="demo">
+    <p class="demo-caption">Padding computed from --base × --scale</p>
+    <div class="nested-demo">
+      My padding is <code>calc(var(--base) * var(--scale))</code> = <code>calc(1rem * 1.5)</code> = 1.5rem
+    </div>
+  </div>
+
+  <h2><code>min()</code> - the smaller of two or more values</h2>
+
+  <p><code>min()</code> takes a comma-separated list of values and resolves to the <em>smallest</em>. Think of it as a cap - "this big, but no bigger."</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* Width is 100% of parent, but never more than 500px */
+.container { width: min(100%, 500px); }
+
+/* Font size is 5vw, capped at 3rem */
+.heading { font-size: min(5vw, 3rem); }</code></pre>
+  </div>
+
+  <div class="demo">
+    <p class="demo-caption">This box is min(100%, 500px) - resize the window to see it cap</p>
+    <div class="min-demo-box">I'll fill my parent up to 500px, then stop growing.</div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;!-- HTML --&gt;
+&lt;div class="min-demo-box"&gt;I'll fill my parent up to 500px, then stop growing.&lt;/div&gt;
+
+/* CSS */
+.min-demo-box {
+  width: min(100%, 500px);
+  padding: 1rem;
+  background: #fff3e0; color: #1a1a2e;
+  border-radius: 6px;
+}</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <p><strong>Mental model:</strong> <code>min()</code> sets an upper bound. "Be the smaller one" = "never exceed the larger one." It's like <code>max-width</code> but works anywhere, not just on width/height.</p>
+  </div>
+
+  <h2><code>max()</code> - the larger of two or more values</h2>
+
+  <p><code>max()</code> resolves to the <em>largest</em> value. It sets a floor - "at least this big."</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* Padding is 5% of container, but never less than 1rem */
+.card { padding: max(5%, 1rem); }
+
+/* Width shrinks with viewport, but never below 300px */
+.sidebar { width: max(30vw, 300px); }</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <p><strong>Mental model:</strong> <code>max()</code> sets a lower bound. "Be the bigger one" = "never go below the smaller one." It's like <code>min-width</code> but usable in any property.</p>
+  </div>
+
+  <h2><code>clamp()</code> - min, preferred, max in one</h2>
+
+  <p><code>clamp(MIN, PREFERRED, MAX)</code> is equivalent to <code>max(MIN, min(PREFERRED, MAX))</code>. It gives you a preferred value that can flex, with a floor and ceiling:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* Font scales with viewport, clamped between 1rem and 2.5rem */
+font-size: clamp(1rem, 2.5vw + 0.5rem, 2.5rem);
+
+/* Width is 80% of parent, but between 300px and 800px */
+width: clamp(300px, 80%, 800px);
+
+/* Padding is fluid, with sensible bounds */
+padding: clamp(1rem, 3vw, 3rem);</code></pre>
+  </div>
+
+  <div class="demo">
+    <p class="demo-caption">Resize the browser window - the text below scales fluidly between 1rem and 2.5rem</p>
+    <div class="clamp-text">
+      This text uses <code>font-size: clamp(1rem, 2.5vw + 0.5rem, 2.5rem)</code>. It grows with the viewport but never gets too small or too large.
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;!-- HTML --&gt;
+&lt;div class="clamp-text"&gt;This text scales fluidly...&lt;/div&gt;
+
+/* CSS */
+.clamp-text {
+  font-size: clamp(1rem, 2.5vw + 0.5rem, 2.5rem);
+  line-height: 1.3;
+  padding: 1rem;
+  background: #f9f0ff; color: #1a1a2e;
+  border-radius: 6px;
+}</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <p><strong>The preferred value is usually a fluid unit</strong> - <code>vw</code>, <code>%</code>, or a <code>calc()</code> expression mixing viewport and fixed units. The min/max are usually fixed values (<code>rem</code>, <code>px</code>) that define the comfort zone.</p>
+    <p>Common pattern for responsive type: <code>clamp(1rem, 0.5rem + 2vw, 2rem)</code>. The <code>0.5rem + 2vw</code> gives you a sensible growth rate.</p>
+  </div>
+
+  <h3>Reading <code>clamp()</code> - the three-part mnemonic</h3>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>clamp( floor , preferred , ceiling )
+       ↑            ↑           ↑
+  never smaller   ideal     never bigger</code></pre>
+  </div>
+
+  <p>Order matters: it's always <code>min, preferred, max</code>. If min > max, min wins (the floor always beats the ceiling).</p>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <h2><code>color-mix()</code> - blend two colours in CSS</h2>
+
+  <p>Previously you needed Sass or JS to create colour variations. <code>color-mix()</code> does it natively:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* Mix accent with white to lighten */
+background: color-mix(in oklch, var(--accent), white 50%);
+
+/* Mix accent with black to darken */
+background: color-mix(in oklch, var(--accent), black 30%);
+
+/* Mix two arbitrary colours */
+border-color: color-mix(in oklch, red, blue 40%);</code></pre>
+  </div>
+
+  <p>The syntax: <code>color-mix(in &lt;color-space&gt;, &lt;color1&gt;, &lt;color2&gt; &lt;percentage&gt;?)</code></p>
+
+  <p>The percentage says how much of colour2 to mix in. <code>white 50%</code> means "50% white, 50% of colour1".</p>
+
+  <h3>Colour spaces explained</h3>
+
+  <p>The <code>in &lt;color-space&gt;</code> part tells the browser <em>how</em> to move between the two colours. Think of it like choosing a route on a map - the start and end are the same, but the path (and what you see along the way) changes depending on the space.</p>
+
+  <h3>What is a colour space?</h3>
+
+  <p>A colour space is a system for representing colours as numbers. Different spaces model colour differently:</p>
+
+  <ul>
+    <li><strong>sRGB</strong> - the classic web colour space. Colours are defined by Red, Green, Blue channels (0-255 or 0%-100%). <code>rgb()</code>, <code>hex</code>, and named colours all live here. Mixing in sRGB interpolates each channel independently, which can produce dull, muddy midpoints - especially between saturated colours.</li>
+    <li><strong>HSL</strong> - Hue (0°-360°), Saturation (0%-100%), Lightness (0%-100%). More intuitive to think about than RGB, but <em>not perceptually uniform</em> - a 50% lightness yellow looks much brighter than a 50% lightness blue to your eye. Mixing here can produce unexpected saturation spikes.</li>
+    <li><strong>Lab / OKLab</strong> - designed to match human perception. Lightness is perceptually linear: L=50 genuinely looks "half as bright" as L=100. <code>oklab</code> is a corrected version of <code>lab</code> that fixes some issues at the extremes. Mixing in these spaces produces uniform, natural-looking transitions.</li>
+    <li><strong>LCH / OKLCH</strong> - the polar form of Lab/OKLab. Instead of a/b axes, you get <strong>L</strong>ightness, <strong>C</strong>hroma (saturation), and <strong>H</strong>ue (an angle). This is like HSL but perceptually uniform. <code>oklch</code> is the corrected version. <strong>This is generally the best space for mixing.</strong></li>
+  </ul>
+
+  <div class="key-concept">
+    <p><strong>Rule of thumb:</strong> Use <code>in oklch</code> for most mixing. It produces the most visually natural results because it respects how humans actually perceive colour. Fall back to <code>in srgb</code> if you need exact channel-level control or compatibility with legacy colour values.</p>
+  </div>
+
+  <h3>Comparison: mixing red and blue in different spaces</h3>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* Same mix, different paths */
+--srgb:  color-mix(in srgb, red, blue 50%);   /* dark muddy purple */
+--hsl:   color-mix(in hsl, red, blue 50%);    /* vivid magenta (hue rotation) */
+--oklab: color-mix(in oklab, red, blue 50%);  /* balanced purple */
+--oklch: color-mix(in oklch, red, blue 50%);  /* vibrant purple, preserves chroma */</code></pre>
+  </div>
+
+  <p>Why are these different? Because the "midpoint" between red and blue is in a different location depending on which coordinate system you're navigating through:</p>
+  <ul>
+    <li><strong>sRGB</strong> averages R/G/B channels → (128, 0, 128) → dark purple, low saturation in the middle</li>
+    <li><strong>HSL</strong> rotates the hue wheel (0° → 240°, midpoint is 300° magenta) and averages S/L → vivid but can overshoot saturation</li>
+    <li><strong>OKLab</strong> averages in a perceptual 3D space → natural-looking purple without muddiness</li>
+    <li><strong>OKLCH</strong> rotates through hue angle while preserving lightness and chroma → vibrant result that "feels right"</li>
+  </ul>
+
+  <h3>Practical examples in each space</h3>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* Lighten a brand colour - all valid, different results */
+--light-srgb:  color-mix(in srgb, var(--brand), white 40%);
+--light-hsl:   color-mix(in hsl, var(--brand), white 40%);
+--light-oklab: color-mix(in oklab, var(--brand), white 40%);
+--light-oklch: color-mix(in oklch, var(--brand), white 40%);
+
+/* Create a semi-transparent overlay */
+--overlay: color-mix(in srgb, black, transparent 50%);
+/* ↑ srgb is fine here - we're just adjusting opacity, not mixing hues */
+
+/* Blend two theme colours for a gradient midpoint */
+--mid: color-mix(in oklch, var(--primary), var(--secondary) 50%);
+
+/* Desaturate a colour (mix with its grey equivalent) */
+--muted: color-mix(in oklch, var(--brand), gray 40%);</code></pre>
+  </div>
+
+  <h3>When to use which space</h3>
+
+  <ul>
+    <li><code>in oklch</code> - default choice. Perceptually uniform, vibrant mixes, predictable lightness.</li>
+    <li><code>in oklab</code> - same quality as oklch but no hue angle; good when you don't need to think about hue rotation direction.</li>
+    <li><code>in srgb</code> - when you want channel-level control or are only adjusting opacity. Also useful for matching legacy colour tooling.</li>
+    <li><code>in hsl</code> - when you specifically want hue rotation effects (e.g. shifting a colour towards warm/cool). Be aware saturation can spike.</li>
+  </ul>
+
+  <div class="demo">
+    <p class="demo-caption">A tint scale from a single colour using color-mix(in oklch, accent, white/black)</p>
+    <div class="color-mix-grid">
+      <div class="color-swatch">80% white</div>
+      <div class="color-swatch">50% white</div>
+      <div class="color-swatch">base</div>
+      <div class="color-swatch">30% black</div>
+      <div class="color-swatch">60% black</div>
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* Generate a full tint scale from one token */
+:root { --accent: #3a86ff; }
+
+--tint-100: color-mix(in oklch, var(--accent), white 80%);
+--tint-300: color-mix(in oklch, var(--accent), white 50%);
+--tint-500: var(--accent);
+--tint-700: color-mix(in oklch, var(--accent), black 30%);
+--tint-900: color-mix(in oklch, var(--accent), black 60%);</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <p><strong>Practical win:</strong> define one brand colour as a custom property, then derive your entire palette using <code>color-mix()</code>. Change the brand colour and the whole palette updates. No build tools needed.</p>
+  </div>
+
+  <h2>All of these compose together</h2>
+
+  <p>The real power is combining these functions with custom properties:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>:root {
+  --min-font: 1rem;
+  --max-font: 2.5rem;
+  --fluid-rate: 2vw;
+  --brand: #3a86ff;
+}
+
+h1 {
+  font-size: clamp(var(--min-font), calc(0.5rem + var(--fluid-rate)), var(--max-font));
+  color: color-mix(in oklch, var(--brand), black 20%);
+  padding: max(1rem, 3vw);
+}</code></pre>
+  </div>
+
+  <p>Every value is responsive, bounded, and derived from tokens. No media queries required for the basics.</p>
+
+  <h2>Quick reference</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Function</th>
+        <th>Returns</th>
+        <th>Mental model</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>calc()</code></td>
+        <td>Computed value</td>
+        <td>Arithmetic, mix units</td>
+      </tr>
+      <tr>
+        <td><code>min()</code></td>
+        <td>Smallest value</td>
+        <td>Upper bound / cap</td>
+      </tr>
+      <tr>
+        <td><code>max()</code></td>
+        <td>Largest value</td>
+        <td>Lower bound / floor</td>
+      </tr>
+      <tr>
+        <td><code>clamp()</code></td>
+        <td>Bounded preferred</td>
+        <td>Floor + preferred + ceiling</td>
+      </tr>
+      <tr>
+        <td><code>color-mix()</code></td>
+        <td>Blended colour</td>
+        <td>Derive tints/shades from one token</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <h2>Quiz</h2>
+
+  <div class="quiz" id="quiz1">
+    <h3>Question 1</h3>
+    <p>What does min(100%, 600px) resolve to when the parent is 400px wide?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">400px - 100% of 400px is smaller than 600px</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">600px - min() picks the static value</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">100% - percentages always win over px</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">500px - it averages the two values</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz2">
+    <h3>Question 2</h3>
+    <p>In clamp(1rem, 5vw, 3rem), what happens when 5vw computes to 4rem?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">4rem - the preferred value is used as-is</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">3rem - it's capped at the maximum</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">1rem - preferred exceeds max so floor is used</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">5vw - viewport units are never clamped</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz3">
+    <h3>Question 3</h3>
+    <p>Why must + and - have spaces in calc()?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">It's just a style convention, both work</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">The parser can't distinguish minus sign from negative number without spaces</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Spaces activate hardware acceleration</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Only - needs spaces, + works without them</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz4">
+    <h3>Question 4</h3>
+    <p>You want to lighten a colour by 40% using color-mix. Which is correct?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">color-mix(in oklch, var(--c), lighten 40%)</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">color-mix(in oklch, var(--c), white 40%)</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">color-mix(oklch, var(--c), white 40%)</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">color-mix(var(--c), white, in oklch 40%)</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz5">
+    <h3>Question 5</h3>
+    <p>What colour space should you prefer for perceptually natural mixes?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">srgb - it's the web standard</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">hsl - designed for human perception</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">oklch - perceptually uniform</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">rgb - most widely supported</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="recommended">
+    <strong>Recommended resources:</strong>
+    <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/calc">MDN - calc()</a> |
+    <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/clamp">MDN - clamp()</a> |
+    <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/color-mix">MDN - color-mix()</a> |
+    <a href="https://utopia.fyi">Utopia</a> - a tool that generates fluid type/space scales using clamp().
+  </div>
+
+  <div class="footer-nav">
+    <a href="02-registered-custom-properties.html">&larr; Prev: @property</a>
+    <a href="index.html">Index</a>
+    <a href="04-custom-css-functions.html">Next: Custom Functions &rarr;</a>
+  </div>
+
+    </main>
+  </div>
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

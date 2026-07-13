@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>Anchor Positioning - Lesson 17 | Teach Me</title>
+  <meta name="description" content="Learn CSS Anchor Positioning to position elements relative to any other element using anchor-name, position-anchor, the anchor() function, and position-try fallbacks.">
+  <link rel="canonical" href="https://teachmeskills.dev/css/17-anchor-positioning.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/css/17-anchor-positioning.html">
+  <meta property="og:title" content="Anchor Positioning - Lesson 17 | Teach Me">
+  <meta property="og:description" content="Learn CSS Anchor Positioning to position elements relative to any other element using anchor-name, position-anchor, the anchor() function, and position-try fallbacks.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Anchor Positioning - Lesson 17 | Teach Me">
+  <meta name="twitter:description" content="Learn CSS Anchor Positioning to position elements relative to any other element using anchor-name, position-anchor, the anchor() function, and position-try fallbacks.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .anchor-area { position: relative; height: 200px; border: 1px solid var(--border); border-radius: 6px; overflow: visible; }
+    .anchor-target { anchor-name: --my-button; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--accent); color: white; padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.85rem; font-weight: 600; }
+    .anchor-tooltip { position: absolute; position-anchor: --my-button; bottom: anchor(top); left: anchor(center); translate: -50% 0; margin-bottom: 8px; background: #1a1a2e; color: white; padding: 0.4rem 0.75rem; border-radius: 4px; font-size: 0.75rem; white-space: nowrap; }
+    .anchor-tooltip::after { content: ''; position: absolute; top: 100%; left: 50%; translate: -50% 0; border: 5px solid transparent; border-top-color: #1a1a2e; }
+
+    .pa-anchor { anchor-name: --pa-target; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100px; height: 100px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.8rem; font-weight: 600; }
+    .pa-positioned { position: absolute; position-anchor: --pa-target; background: #e76f51; color: white; padding: 0.4rem 0.75rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; }
+
+    .drag-area { position: relative; height: 250px; border: 1px solid var(--border); border-radius: 6px; overflow: visible; touch-action: none; }
+    .drag-target { anchor-name: --drag-btn; position: absolute; top: 100px; left: 150px; background: var(--accent); color: white; padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: grab; user-select: none; }
+    .drag-target:active { cursor: grabbing; }
+    .drag-tooltip { position: absolute; position-anchor: --drag-btn; bottom: anchor(top); left: anchor(center); translate: -50% 0; margin-bottom: 8px; background: #1a1a2e; color: white; padding: 0.4rem 0.75rem; border-radius: 4px; font-size: 0.75rem; white-space: nowrap; pointer-events: none; }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header">
+        <a href="index.html">CSS Course</a>
+      </div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-custom-properties-fundamentals.html">1. Custom Properties</a></li>
+        <li><a href="02-registered-custom-properties.html">2. @property</a></li>
+        <li><a href="03-css-value-functions.html">3. Value Functions</a></li>
+        <li><a href="04-custom-css-functions.html">4. Custom Functions</a></li>
+        <li><a href="05-advanced-attr.html">5. Advanced attr()</a></li>
+        <li><a href="06-transitions.html">6. Transitions</a></li>
+        <li><a href="07-animations.html">7. Animations</a></li>
+        <li><a href="08-flexbox.html">8. Flexbox</a></li>
+        <li><a href="09-grid.html">9. Grid</a></li>
+        <li><a href="10-container-queries.html">10. Container Queries</a></li>
+        <li><a href="11-cascade-layers.html">11. Cascade Layers</a></li>
+        <li><a href="12-css-nesting.html">12. CSS Nesting</a></li>
+        <li><a href="13-modern-selectors.html">13. Modern Selectors</a></li>
+        <li><a href="14-the-cascade.html">14. The Cascade</a></li>
+        <li><a href="15-logical-properties.html">15. Logical Properties</a></li>
+        <li><a href="16-view-transitions.html">16. View Transitions</a></li>
+        <li class="current"><a href="17-anchor-positioning.html">17. Anchor Positioning</a></li>
+        <li><a href="18-advanced-colour.html">18. Advanced Colour</a></li>
+        <li><a href="19-scope.html">19. @scope</a></li>
+        <li><a href="20-selectors-deep-dive.html">20. Selectors Deep-Dive</a></li>
+        <li><a href="21-theming-deep-dive.html">21. Theming Deep-Dive</a></li>
+        <li><a href="22-responsive-design-patterns.html">22. Responsive Patterns</a></li>
+        <li><a href="23-scroll-driven-animations.html">23. Scroll-Driven Animations</a></li>
+        <li><a href="24-capstone-product-landing-page.html">24. Capstone Project</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="css-anatomy.html">CSS Anatomy</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+  <p class="lesson-num">Lesson 17</p>
+  <h1>Anchor Positioning - Position Relative to Any Element</h1>
+
+  <p>Traditional CSS positioning gives you three reference frames: the normal flow, a positioned parent (<code>position: relative</code>), or the viewport (<code>position: fixed</code>). But what if you want to position a tooltip relative to a button that's nowhere near it in the DOM? Previously: JavaScript. Now: <strong>CSS Anchor Positioning</strong>.</p>
+
+  <h2>The mental model</h2>
+
+  <p>Two roles:</p>
+  <ul>
+    <li><strong>Anchor</strong> - the element you're positioning relative TO (the reference point). It gets <code>anchor-name</code>.</li>
+    <li><strong>Positioned element</strong> - the element being placed (tooltip, popover, dropdown). It uses <code>position-anchor</code> and <code>anchor()</code> functions.</li>
+  </ul>
+
+  <div class="key-concept">
+    <p><strong>The breakthrough:</strong> The positioned element doesn't need to be inside or adjacent to the anchor in the DOM. It can be anywhere in the document - it references the anchor by name. This decouples visual position from DOM structure.</p>
+  </div>
+
+  <h2>Basic anchor positioning - tooltip above a button</h2>
+
+  <div class="demo">
+    <p class="demo-caption">The tooltip is positioned relative to the button using anchor() - no JS, no position: relative parent needed</p>
+    <div class="anchor-area">
+      <div class="anchor-target">I'm the anchor</div>
+      <div class="anchor-tooltip">Tooltip above the button</div>
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* Step 1: Name the anchor */
+.button {
+  anchor-name: --my-button;
+}
+
+/* Step 2: Position relative to it */
+.tooltip {
+  position: absolute;
+  position-anchor: --my-button;     /* which anchor to reference */
+  bottom: anchor(top);              /* my bottom edge = anchor's top edge */
+  left: anchor(center);             /* my left edge = anchor's horizontal center */
+  translate: -50% 0;                /* shift left by half my width (center me) */
+  margin-bottom: 8px;               /* gap between tooltip and anchor */
+}</code></pre>
+  </div>
+
+  <h3>How anchor() works</h3>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* anchor() takes a side of the anchor element: */
+anchor(top)      /* the anchor's top edge position */
+anchor(bottom)   /* the anchor's bottom edge position */
+anchor(left)     /* the anchor's left edge position */
+anchor(right)    /* the anchor's right edge position */
+anchor(center)   /* the anchor's center */
+
+/* Used in inset properties: */
+top: anchor(bottom);       /* "my top = anchor's bottom" → below the anchor */
+bottom: anchor(top);       /* "my bottom = anchor's top" → above the anchor */
+left: anchor(right);       /* "my left = anchor's right" → to the right */
+right: anchor(left);       /* "my right = anchor's left" → to the left */</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <p><strong>Reading anchor() declarations:</strong> The property you're setting is YOUR edge. The value inside <code>anchor()</code> is THEIR edge. So <code>top: anchor(bottom)</code> means "place my top edge at their bottom edge" - i.e. position me below them.</p>
+  </div>
+
+  <h2>The position-area shorthand</h2>
+
+  <div class="demo">
+    <p class="demo-caption">All 9 positions in the 3x3 grid around the anchor</p>
+    <svg viewBox="0 0 480 360" style="width: 100%; max-width: 480px; margin: 0 auto; display: block;" aria-label="3x3 grid showing the 9 position-area values around an anchor element">
+      <!-- Background -->
+      <rect width="480" height="360" fill="var(--demo-bg, #f9f8f3)" rx="6"/>
+
+      <!-- Grid lines -->
+      <line x1="160" y1="30" x2="160" y2="330" stroke="var(--border, #ccc)" stroke-width="1.5"/>
+      <line x1="320" y1="30" x2="320" y2="330" stroke="var(--border, #ccc)" stroke-width="1.5"/>
+      <line x1="20" y1="120" x2="460" y2="120" stroke="var(--border, #ccc)" stroke-width="1.5"/>
+      <line x1="20" y1="240" x2="460" y2="240" stroke="var(--border, #ccc)" stroke-width="1.5"/>
+
+      <!-- Center cell - the anchor -->
+      <rect x="170" y="130" width="140" height="100" rx="8" fill="var(--accent, #3a86ff)"/>
+      <text x="240" y="178" font-size="13" font-weight="700" fill="white" text-anchor="middle" font-family="monospace">ANCHOR</text>
+      <text x="240" y="196" font-size="9" fill="rgba(255,255,255,0.8)" text-anchor="middle" font-family="monospace">(center center)</text>
+
+      <!-- Top left -->
+      <rect x="30" y="42" width="118" height="64" rx="5" fill="#e76f51"/>
+      <text x="89" y="79" font-size="10" font-weight="600" fill="white" text-anchor="middle" font-family="monospace">top left</text>
+
+      <!-- Top center -->
+      <rect x="171" y="42" width="138" height="64" rx="5" fill="#e76f51"/>
+      <text x="240" y="79" font-size="10" font-weight="600" fill="white" text-anchor="middle" font-family="monospace">top center</text>
+
+      <!-- Top right -->
+      <rect x="332" y="42" width="118" height="64" rx="5" fill="#e76f51"/>
+      <text x="391" y="79" font-size="10" font-weight="600" fill="white" text-anchor="middle" font-family="monospace">top right</text>
+
+      <!-- Center left -->
+      <rect x="30" y="148" width="118" height="64" rx="5" fill="#e76f51"/>
+      <text x="89" y="185" font-size="10" font-weight="600" fill="white" text-anchor="middle" font-family="monospace">center left</text>
+
+      <!-- Center right -->
+      <rect x="332" y="148" width="118" height="64" rx="5" fill="#e76f51"/>
+      <text x="391" y="185" font-size="10" font-weight="600" fill="white" text-anchor="middle" font-family="monospace">center right</text>
+
+      <!-- Bottom left -->
+      <rect x="30" y="254" width="118" height="64" rx="5" fill="#e76f51"/>
+      <text x="89" y="291" font-size="10" font-weight="600" fill="white" text-anchor="middle" font-family="monospace">bottom left</text>
+
+      <!-- Bottom center -->
+      <rect x="171" y="254" width="138" height="64" rx="5" fill="#e76f51"/>
+      <text x="240" y="291" font-size="10" font-weight="600" fill="white" text-anchor="middle" font-family="monospace">bottom center</text>
+
+      <!-- Bottom right -->
+      <rect x="332" y="254" width="118" height="64" rx="5" fill="#e76f51"/>
+      <text x="391" y="291" font-size="10" font-weight="600" fill="white" text-anchor="middle" font-family="monospace">bottom right</text>
+    </svg>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>.anchor { anchor-name: --target; }
+.label { position: absolute; position-anchor: --target; }
+
+/* The full 3x3 grid of positions: */
+.tl { position-area: top left; }
+.tc { position-area: top center; }
+.tr { position-area: top right; }
+.cl { position-area: center left; }
+.cr { position-area: center right; }
+.bl { position-area: bottom left; }
+.bc { position-area: bottom center; }
+.br { position-area: bottom right; }</code></pre>
+  </div>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <h2>The anchor follows the target - live demo</h2>
+
+  <div class="demo">
+    <p class="demo-caption">Drag the blue button - the tooltip follows it automatically (pure CSS positioning)</p>
+    <div class="drag-area" id="dragArea">
+      <div class="drag-target" id="dragTarget">Drag me</div>
+      <div class="drag-tooltip">I follow via CSS!</div>
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* CSS - the tooltip is anchored to the button */
+.button { anchor-name: --drag-btn; position: absolute; }
+.tooltip {
+  position: absolute;
+  position-anchor: --drag-btn;
+  bottom: anchor(top);
+  left: anchor(center);
+  translate: -50% 0;
+  margin-bottom: 8px;
+}
+
+// JS - only handles the drag. Tooltip follows automatically via CSS.</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <p><strong>The key insight here:</strong> The JavaScript only moves the button. The tooltip has zero JS - it follows the button purely through CSS anchor positioning. If the anchor moves (via drag, scroll, resize, animation), the positioned element tracks it automatically.</p>
+  </div>
+
+  <h2>position-try - fallback positions</h2>
+
+  <p>What if the tooltip would overflow the viewport? <code>position-try-fallbacks</code> lets you define fallback positions the browser can try automatically:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>.tooltip {
+  position: absolute;
+  position-anchor: --edge-btn;
+  bottom: anchor(top);          /* preferred: above the button */
+  left: anchor(center);
+  translate: -50% 0;
+
+  /* If above doesn't fit, try below */
+  position-try-fallbacks: flip-block;
+}
+
+/* position-try-fallbacks values: */
+/* flip-block        → flip vertically (above ↔ below) */
+/* flip-inline       → flip horizontally (left ↔ right) */
+/* flip-block flip-inline → try both flips */
+
+/* Or define a CUSTOM fallback position: */
+@position-try --below {
+  bottom: auto;
+  top: anchor(bottom);
+  margin-bottom: 0;
+  margin-top: 8px;
+}
+
+.tooltip {
+  position-try-fallbacks: --below;
+}</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <p><strong>Why this matters:</strong> Previously, tooltip/popover libraries used JS to detect overflow and flip position. Anchor positioning with <code>position-try-fallbacks</code> does this natively in CSS - the browser checks if the element overflows its containing block and automatically tries fallback positions.</p>
+  </div>
+
+  <h2>The Popover API + top layer</h2>
+
+  <p>Anchor-positioned elements are <code>position: absolute</code>, which means they participate in stacking contexts. The <strong>Popover API</strong> solves z-index issues by rendering in the browser's <strong>top layer</strong> - above ALL stacking contexts.</p>
+
+  <div class="demo">
+    <p class="demo-caption">Click the button - the popover opens in the top layer, positioned via anchor CSS</p>
+    <div style="position: relative;">
+      <button popovertarget="anchor-popover" style="anchor-name: --pop-trigger; padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: 4px; background: white; color: #1a1a2e; cursor: pointer; font-size: 0.85rem;">Open popover</button>
+      <div id="anchor-popover" popover style="position: absolute; position-anchor: --pop-trigger; top: anchor(bottom); left: anchor(left); margin-top: 4px; background: white; color: #1a1a2e; border: 1px solid var(--border); border-radius: 6px; padding: 0.75rem; font-size: 0.85rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+        <p style="margin: 0 0 0.5rem; font-weight: 600;">Popover content</p>
+        <p style="margin: 0; color: var(--muted);">I'm in the top layer. Click outside to dismiss.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;button popovertarget="my-popup"&gt;Open&lt;/button&gt;
+&lt;div id="my-popup" popover&gt;Content&lt;/div&gt;
+
+button { anchor-name: --pop-trigger; }
+
+[popover] {
+  position: absolute;
+  position-anchor: --pop-trigger;
+  top: anchor(bottom);
+  left: anchor(left);
+  margin-top: 4px;
+  position-try-fallbacks: flip-block;
+}</code></pre>
+  </div>
+
+  <p><strong>What you get for free with popover (no JS):</strong></p>
+  <ul>
+    <li><strong>Top layer</strong> - above all stacking contexts, no z-index needed</li>
+    <li><strong>Light dismiss</strong> - clicking outside or pressing Escape closes it</li>
+    <li><strong>One-at-a-time</strong> - opening a new auto popover closes the previous one</li>
+    <li><strong>Accessible</strong> - proper ARIA semantics built in</li>
+    <li><strong><code>:popover-open</code></strong> - CSS pseudo-class for styling the open state</li>
+  </ul>
+
+  <h2>anchor-name rules</h2>
+
+  <ul>
+    <li>Names must start with <code>--</code> (just like custom properties)</li>
+    <li>Names must be unique within the anchor scope</li>
+    <li>The anchor must be visible (not <code>display: none</code>) for positioning to work</li>
+    <li>The positioned element must be <code>position: absolute</code> or <code>position: fixed</code></li>
+  </ul>
+
+  <h2>Browser support</h2>
+
+  <p>Anchor positioning: Chrome 125+, Edge 125+. Not yet in Firefox or Safari (as of mid-2025). Progressive enhancement - without support, elements fall back to their normal position.</p>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <h2>Retrieval check</h2>
+
+  <div class="quiz" id="quiz1">
+    <h3>Question 1</h3>
+    <p>What property do you put on the reference element (the one you're positioning relative to)?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">position-anchor</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">anchor-name</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">anchor-target</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">position: anchor</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz2">
+    <h3>Question 2</h3>
+    <p>What does bottom: anchor(top) mean?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Place me at the bottom-top corner</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">Place my bottom edge at the anchor's top edge (= above the anchor)</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Place me at the top of the viewport bottom</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">The anchor's bottom becomes my top</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz3">
+    <h3>Question 3</h3>
+    <p>What does position-try-fallbacks: flip-block do?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Flips the element's content upside down</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Tries positioning as display: block first</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">If preferred position overflows, tries flipping vertically (above / below)</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Blocks the element from being positioned</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz4">
+    <h3>Question 4</h3>
+    <p>Does the positioned element need to be a DOM child of the anchor?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Yes - it must be inside the anchor element</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Yes - it must be a direct sibling</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">No - it can be anywhere in the document (references by name)</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Only if using position: fixed</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz5">
+    <h3>Question 5</h3>
+    <p>What position value must the anchored element have?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">position: relative</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">position: static</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">position: absolute or position: fixed</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">position: anchor</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="recommended">
+    <strong>Recommended resources:</strong>
+    <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_anchor_positioning">MDN - CSS Anchor Positioning</a> |
+    <a href="https://developer.chrome.com/blog/anchor-positioning-api">Chrome Developers - Anchor Positioning API</a>
+  </div>
+
+  <div class="footer-nav">
+    <a href="16-view-transitions.html">&larr; Prev: View Transitions</a>
+    <a href="index.html">Index</a>
+    <a href="18-advanced-colour.html">Next: Advanced Colour &rarr;</a>
+  </div>
+
+    </main>
+  </div>
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script>
+    // Simple drag for the anchor positioning demo
+    (function() {
+      const target = document.getElementById('dragTarget');
+      const area = document.getElementById('dragArea');
+      if (!target || !area) return;
+      let dragging = false, startX, startY, origLeft, origTop;
+      target.addEventListener('pointerdown', (e) => {
+        dragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        origLeft = target.offsetLeft;
+        origTop = target.offsetTop;
+        target.setPointerCapture(e.pointerId);
+      });
+      target.addEventListener('pointermove', (e) => {
+        if (!dragging) return;
+        target.style.left = (origLeft + e.clientX - startX) + 'px';
+        target.style.top = (origTop + e.clientY - startY) + 'px';
+      });
+      target.addEventListener('pointerup', () => { dragging = false; });
+    })();
+  </script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>Selectors Deep-Dive - Lesson 20 | Teach Me</title>
+  <meta name="description" content="Master every CSS pseudo-class and attribute selector including structural positioning, form states, user interaction, and the :nth-child gotcha.">
+  <link rel="canonical" href="https://teachmeskills.dev/css/20-selectors-deep-dive.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/css/20-selectors-deep-dive.html">
+  <meta property="og:title" content="Selectors Deep-Dive - Lesson 20 | Teach Me">
+  <meta property="og:description" content="Master every CSS pseudo-class and attribute selector including structural positioning, form states, user interaction, and the :nth-child gotcha.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Selectors Deep-Dive - Lesson 20 | Teach Me">
+  <meta name="twitter:description" content="Master every CSS pseudo-class and attribute selector including structural positioning, form states, user interaction, and the :nth-child gotcha.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .sel-list { list-style: none; padding: 0; border: 1px solid #e0e0e0; border-radius: 6px; overflow: hidden; }
+    .sel-list li { padding: 0.5rem 1rem; font-size: 0.85rem; border-bottom: 1px solid #e0e0e0; color: #1a1a2e; }
+    .sel-list li:last-child { border-bottom: none; }
+    .sel-list li:nth-child(odd) { background: #f8f8fa; }
+    .sel-list li:nth-child(even) { background: white; }
+    .sel-list li:first-child { font-weight: 600; color: #3a86ff; }
+    .sel-list li:last-child { font-weight: 600; color: #e76f51; }
+    .sel-list li:nth-child(3) { color: #2a9d8f; }
+    .gotcha-demo { display: flex; flex-direction: column; gap: 1rem; }
+    .gotcha-container { flex: 1; }
+    .gotcha-parent { border: 1px solid #e0e0e0; border-radius: 6px; padding: 1rem; background: white; color: #1a1a2e; }
+    .gotcha-parent h3 { font-size: 0.9rem; margin: 0; padding: 0.4rem 0.75rem; background: #f8f8fa; border-radius: 4px; color: #1a1a2e; }
+    .gotcha-parent p { font-size: 0.9rem; margin: 0; padding: 0.4rem 0.75rem; border-radius: 4px; margin-top: 0.35rem; color: #1a1a2e; }
+    #gotcha1 p:nth-child(2) { background: #d4f5e9; border-left: 3px solid #2a9d8f; }
+    #gotcha2 p:nth-of-type(2) { background: #d4f5e9; border-left: 3px solid #2a9d8f; }
+    .gotcha-explain { background: #f9f9f9; color: #1a1a2e; border-radius: 6px; padding: 0.75rem 1rem; border: 1px solid #e0e0e0; }
+    .form-demo input { display: block; margin-bottom: 0.5rem; padding: 0.5rem; border: 1px solid #e0e0e0; border-radius: 4px; font-size: 0.85rem; width: 250px; }
+    .form-demo input:focus { border-color: #3a86ff; outline: 2px solid rgba(58, 134, 255, 0.3); outline-offset: 1px; }
+    .form-demo input:valid { border-color: #2a9d8f; }
+    .form-demo input:invalid { border-color: #e76f51; }
+    .form-demo input:placeholder-shown { border-style: dashed; }
+    .form-demo input:disabled { opacity: 0.5; background: #f0f0f0; }
+    .target-demo :target { background: #fff3e0; border: 2px solid #e76f51; padding: 0.5rem; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header">
+        <a href="index.html">CSS Course</a>
+      </div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-custom-properties-fundamentals.html">1. Custom Properties</a></li>
+        <li><a href="02-registered-custom-properties.html">2. @property</a></li>
+        <li><a href="03-css-value-functions.html">3. Value Functions</a></li>
+        <li><a href="04-custom-css-functions.html">4. Custom Functions</a></li>
+        <li><a href="05-advanced-attr.html">5. Advanced attr()</a></li>
+        <li><a href="06-transitions.html">6. Transitions</a></li>
+        <li><a href="07-animations.html">7. Animations</a></li>
+        <li><a href="08-flexbox.html">8. Flexbox</a></li>
+        <li><a href="09-grid.html">9. Grid</a></li>
+        <li><a href="10-container-queries.html">10. Container Queries</a></li>
+        <li><a href="11-cascade-layers.html">11. Cascade Layers</a></li>
+        <li><a href="12-css-nesting.html">12. CSS Nesting</a></li>
+        <li><a href="13-modern-selectors.html">13. Modern Selectors</a></li>
+        <li><a href="14-the-cascade.html">14. The Cascade</a></li>
+        <li><a href="15-logical-properties.html">15. Logical Properties</a></li>
+        <li><a href="16-view-transitions.html">16. View Transitions</a></li>
+        <li><a href="17-anchor-positioning.html">17. Anchor Positioning</a></li>
+        <li><a href="18-advanced-colour.html">18. Advanced Colour</a></li>
+        <li><a href="19-scope.html">19. @scope</a></li>
+        <li class="current"><a href="20-selectors-deep-dive.html">20. Selectors Deep-Dive</a></li>
+        <li><a href="21-theming-deep-dive.html">21. Theming Deep-Dive</a></li>
+        <li><a href="22-responsive-design-patterns.html">22. Responsive Patterns</a></li>
+        <li><a href="23-scroll-driven-animations.html">23. Scroll-Driven Animations</a></li>
+        <li><a href="24-capstone-product-landing-page.html">24. Capstone Project</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="css-anatomy.html">CSS Anatomy</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+  <p class="lesson-num">Lesson 20</p>
+  <h1>Selectors Deep-Dive - Pseudo-Classes, Structural & Form Selectors</h1>
+
+  <p>Lesson 13 covered the functional pseudo-classes (<code>:has()</code>, <code>:is()</code>, <code>:where()</code>, <code>:not()</code>). This lesson covers everything else - the structural, form state, UI state, and link pseudo-classes you'll use daily. Think of this as the complete selector vocabulary.</p>
+
+  <h2>Structural pseudo-classes - selecting by position</h2>
+
+  <h3>The :nth-child gotcha - it doesn't mean what you think</h3>
+
+  <p>This is the single most common selector misunderstanding in CSS. Most people read <code>p:nth-child(2)</code> and think it means "the 2nd &lt;p&gt; inside its parent." <strong>It doesn't.</strong></p>
+
+  <p>It actually means: "an element that is <strong>both</strong> a &lt;p&gt; <strong>AND</strong> the 2nd child of its parent." Two independent conditions, both must be true. The type selector does not change what gets counted - it only filters whether the match applies.</p>
+
+  <div class="key-concept">
+    <p><strong>The mental model:</strong> Think of <code>p:nth-child(2)</code> as two separate filters applied simultaneously:</p>
+    <p>1. <strong>:nth-child(2)</strong> - "is this element at position 2 among ALL siblings?"</p>
+    <p>2. <strong>p</strong> - "is this element a &lt;p&gt;?"</p>
+    <p>Both must pass. The element type doesn't influence the counting - all siblings are counted regardless of type.</p>
+  </div>
+
+  <div class="demo">
+    <p class="demo-caption">The gotcha in action - p:nth-child(2) highlights the FIRST paragraph (because it's the 2nd child overall)</p>
+    <div class="gotcha-demo">
+      <div class="gotcha-container">
+        <h4 style="margin: 0 0 0.25rem; font-size: 0.8rem; color: var(--muted);">Parent container with p:nth-child(2) applied:</h4>
+        <div class="gotcha-parent" id="gotcha1">
+          <h3>Heading</h3>
+          <p>First paragraph</p>
+          <p>Second paragraph</p>
+        </div>
+      </div>
+      <div class="gotcha-explain">
+        <p style="margin: 0; font-size: 0.85rem;">Child #1 = <code>&lt;h3&gt;</code> · Child #2 = first <code>&lt;p&gt;</code> · Child #3 = second <code>&lt;p&gt;</code></p>
+        <p style="margin: 0.5rem 0 0; font-size: 0.85rem;"><strong><code>p:nth-child(2)</code></strong> &rarr; "Is child #2 a &lt;p&gt;?" <span style="color: #2a9d8f; font-weight: 600;">Yes!</span> &rarr; matches the <em>first</em> paragraph.</p>
+        <p style="margin: 0.5rem 0 0; font-size: 0.85rem;"><strong><code>p:nth-child(1)</code></strong> &rarr; "Is child #1 a &lt;p&gt;?" <span style="color: #e76f51; font-weight: 600;">No, it's an &lt;h3&gt;.</span> &rarr; matches <em>nothing</em>.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;!-- HTML --&gt;
+&lt;div&gt;
+  &lt;h3&gt;Heading&lt;/h3&gt;           &lt;!-- child #1 --&gt;
+  &lt;p&gt;First paragraph&lt;/p&gt;     &lt;!-- child #2 --&gt;
+  &lt;p&gt;Second paragraph&lt;/p&gt;    &lt;!-- child #3 --&gt;
+&lt;/div&gt;
+
+/* What most people THINK this does: "select the 2nd &lt;p&gt;" */
+/* What it ACTUALLY does: "select an element that is a &lt;p&gt; AND is the 2nd child" */
+p:nth-child(2) { background: #d4f5e9; border-left: 3px solid #2a9d8f; }
+
+/* This matches NOTHING — child #1 is an h3, not a p */
+p:nth-child(1) { background: red; }</code></pre>
+  </div>
+
+  <h3>What you probably want: :nth-of-type</h3>
+
+  <p>If your intent is "the 2nd &lt;p&gt; regardless of other siblings," use <code>:nth-of-type</code>. It counts only elements of the same type:</p>
+
+  <div class="demo">
+    <p class="demo-caption">p:nth-of-type(2) selects the 2nd &lt;p&gt;, ignoring the &lt;h3&gt; entirely</p>
+    <div class="gotcha-demo">
+      <div class="gotcha-container">
+        <h4 style="margin: 0 0 0.25rem; font-size: 0.8rem; color: var(--muted);">Same HTML, using p:nth-of-type(2) instead:</h4>
+        <div class="gotcha-parent" id="gotcha2">
+          <h3>Heading</h3>
+          <p>First paragraph</p>
+          <p>Second paragraph</p>
+        </div>
+      </div>
+      <div class="gotcha-explain">
+        <p style="margin: 0; font-size: 0.85rem;"><strong><code>p:nth-of-type(2)</code></strong> &rarr; counts only &lt;p&gt; siblings: 1st p, <span style="color: #2a9d8f; font-weight: 600;">2nd p &#10003;</span>. The &lt;h3&gt; is invisible to the count.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;!-- Same HTML --&gt;
+&lt;div&gt;
+  &lt;h3&gt;Heading&lt;/h3&gt;
+  &lt;p&gt;First paragraph&lt;/p&gt;
+  &lt;p&gt;Second paragraph&lt;/p&gt;  &lt;!-- ← this one matches --&gt;
+&lt;/div&gt;
+
+/* Counts only &lt;p&gt; elements among siblings — ignores the &lt;h3&gt; */
+p:nth-of-type(2) { background: #d4f5e9; border-left: 3px solid #2a9d8f; }</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <p><strong>The naming is the enemy.</strong> <code>:nth-child</code> sounds like it should scope its counting to "children of this type" - but it doesn't. It counts ALL siblings. The type selector is just an additional filter applied <em>after</em> counting. The name lies to you.</p>
+    <p><strong>Rule of thumb:</strong> If you want "the Nth &lt;foo&gt;", reach for <code>:nth-of-type</code>. Use <code>:nth-child</code> when you care about absolute position among all siblings (e.g., "every odd row in a list where all children are the same element type").</p>
+  </div>
+
+  <h3>Basic structural selectors in action</h3>
+
+  <div class="demo">
+    <p class="demo-caption">:first-child (blue), :last-child (coral), :nth-child(3) (teal), odds have grey background</p>
+    <ul class="sel-list">
+      <li>Item 1 (:first-child &rarr; blue + bold)</li>
+      <li>Item 2</li>
+      <li>Item 3 (:nth-child(3) &rarr; teal)</li>
+      <li>Item 4</li>
+      <li>Item 5 (:last-child &rarr; coral + bold)</li>
+    </ul>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;!-- HTML — all children are &lt;li&gt;, so :nth-child works intuitively here --&gt;
+&lt;ul class="list"&gt;
+  &lt;li&gt;Item 1&lt;/li&gt;
+  &lt;li&gt;Item 2&lt;/li&gt;
+  &lt;li&gt;Item 3&lt;/li&gt;
+  &lt;li&gt;Item 4&lt;/li&gt;
+  &lt;li&gt;Item 5&lt;/li&gt;
+&lt;/ul&gt;
+
+/* When all siblings are the same type, :nth-child is safe and intuitive */
+li:first-child { font-weight: 600; color: blue; }
+li:last-child  { font-weight: 600; color: coral; }
+li:nth-child(3) { color: teal; }
+li:nth-child(odd)  { background: #f8f8fa; }
+li:nth-child(even) { background: white; }</code></pre>
+  </div>
+
+  <h3>:nth-child() - the formula</h3>
+
+  <p><code>:nth-child()</code> accepts a formula: <code>An+B</code> where A is the step and B is the offset:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>:nth-child(odd)     /* = :nth-child(2n+1) — 1st, 3rd, 5th... */
+:nth-child(even)    /* = :nth-child(2n)   — 2nd, 4th, 6th... */
+:nth-child(3)       /* exactly the 3rd child */
+:nth-child(3n)      /* every 3rd: 3, 6, 9, 12... */
+:nth-child(3n+1)    /* every 3rd starting from 1st: 1, 4, 7, 10... */
+:nth-child(n+4)     /* everything from the 4th onward: 4, 5, 6, 7... */
+:nth-child(-n+3)    /* only the first 3: 1, 2, 3 */
+:nth-last-child(2)  /* 2nd from the end */</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <p><strong>Reading the formula:</strong> <code>An+B</code> = "start at position B, then repeat every A." So <code>3n+2</code> = positions 2, 5, 8, 11... Think of A as the interval and B as the starting point.</p>
+  </div>
+
+  <h3>:nth-child() with selector filtering (of S syntax)</h3>
+
+  <p>A newer feature: <code>:nth-child(An+B of S)</code> counts only elements matching selector S:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* Select every 2nd .highlighted item (ignoring non-highlighted ones) */
+:nth-child(2n of .highlighted) { }
+
+/* First visible item (counting only items without .hidden) */
+:nth-child(1 of :not(.hidden)) { }
+
+/* Every 3rd card in a grid, but only counting .card elements */
+:nth-child(3n of .card) { }</code></pre>
+  </div>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <h3>Full structural selector reference</h3>
+
+  <table style="width: 100%; border-collapse: collapse; font-size: 0.82rem; margin: 1.5rem 0;">
+    <thead>
+      <tr style="border-bottom: 2px solid #e0e0e0; text-align: left;">
+        <th style="padding: 0.5rem;">Selector</th>
+        <th style="padding: 0.5rem;">Matches</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom: 1px solid #e0e0e0;"><td style="padding: 0.4rem 0.5rem;"><code>:first-child</code></td><td style="padding: 0.4rem 0.5rem;">First child of its parent</td></tr>
+      <tr style="border-bottom: 1px solid #e0e0e0;"><td style="padding: 0.4rem 0.5rem;"><code>:last-child</code></td><td style="padding: 0.4rem 0.5rem;">Last child of its parent</td></tr>
+      <tr style="border-bottom: 1px solid #e0e0e0;"><td style="padding: 0.4rem 0.5rem;"><code>:nth-child(An+B)</code></td><td style="padding: 0.4rem 0.5rem;">Child at position An+B</td></tr>
+      <tr style="border-bottom: 1px solid #e0e0e0;"><td style="padding: 0.4rem 0.5rem;"><code>:nth-last-child(An+B)</code></td><td style="padding: 0.4rem 0.5rem;">Same, counting from the end</td></tr>
+      <tr style="border-bottom: 1px solid #e0e0e0;"><td style="padding: 0.4rem 0.5rem;"><code>:only-child</code></td><td style="padding: 0.4rem 0.5rem;">Element is the only child of its parent</td></tr>
+      <tr style="border-bottom: 1px solid #e0e0e0;"><td style="padding: 0.4rem 0.5rem;"><code>:first-of-type</code></td><td style="padding: 0.4rem 0.5rem;">First element of its type among siblings</td></tr>
+      <tr style="border-bottom: 1px solid #e0e0e0;"><td style="padding: 0.4rem 0.5rem;"><code>:last-of-type</code></td><td style="padding: 0.4rem 0.5rem;">Last element of its type among siblings</td></tr>
+      <tr style="border-bottom: 1px solid #e0e0e0;"><td style="padding: 0.4rem 0.5rem;"><code>:nth-of-type(An+B)</code></td><td style="padding: 0.4rem 0.5rem;">nth element of its type</td></tr>
+      <tr style="border-bottom: 1px solid #e0e0e0;"><td style="padding: 0.4rem 0.5rem;"><code>:only-of-type</code></td><td style="padding: 0.4rem 0.5rem;">Only element of its type among siblings</td></tr>
+      <tr><td style="padding: 0.4rem 0.5rem;"><code>:empty</code></td><td style="padding: 0.4rem 0.5rem;">Element has no children (not even text)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="key-concept">
+    <p><strong>:nth-of-type limitation:</strong> <code>:nth-of-type</code> can only filter by element type (tag name). It can't filter by class or attribute. If you need "the 3rd <code>.active</code> item," you need the <code>of S</code> syntax covered above - <code>:nth-child(3 of .active)</code>. That tells <code>:nth-child</code> to count only elements matching the selector <code>.active</code>, giving you class-based positional selection that <code>:nth-of-type</code> can't do.</p>
+  </div>
+
+  <h2>Form state pseudo-classes</h2>
+
+  <p>These select form elements based on their current state - incredibly useful for styling forms without JS:</p>
+
+  <div class="demo">
+    <p class="demo-caption">Type in the fields - :valid/:invalid/:focus/:placeholder-shown all react live</p>
+    <div class="form-demo">
+      <input type="email" placeholder="Email (try typing valid/invalid)" value="">
+      <input type="text" required placeholder="Required field (type something)">
+      <input type="text" placeholder="I have dashed border while empty (placeholder-shown)">
+      <input type="text" value="I'm disabled" disabled>
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;!-- HTML --&gt;
+&lt;input type="email" placeholder="Email (try typing valid/invalid)"&gt;
+&lt;input type="text" required placeholder="Required field (type something)"&gt;
+&lt;input type="text" placeholder="I have dashed border while empty (placeholder-shown)"&gt;
+&lt;input type="text" value="I'm disabled" disabled&gt;
+
+/* CSS — form state pseudo-classes */
+input:focus { border-color: blue; outline: 2px solid rgba(0,0,255,0.3); }
+input:valid { border-color: green; }
+input:invalid { border-color: red; }
+input:placeholder-shown { border-style: dashed; }  /* field is empty (placeholder visible) */
+input:disabled { opacity: 0.5; background: #f0f0f0; }</code></pre>
+  </div>
+
+  <h3>Full form state reference</h3>
+
+  <table style="width: 100%; border-collapse: collapse; font-size: 0.82rem; margin: 1.5rem 0;">
+    <thead>
+      <tr style="border-bottom: 2px solid #e0e0e0; text-align: left;">
+        <th style="padding: 0.5rem;">Selector</th>
+        <th style="padding: 0.5rem;">Matches</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom: 1px solid #e0e0e0;"><td style="padding: 0.4rem 0.5rem;"><code>:focus</code></td><td style="padding: 0.4rem 0.5rem;">Element has keyboard/mouse focus</td></tr>
+      <tr style="border-bottom: 1px solid #e0e0e0;"><td style="padding: 0.4rem 0.5rem;"><code>:focus-visible</code></td><td style="padding: 0.4rem 0.5rem;">Focus, but only when the browser deems it should be visible (keyboard, not mouse click)</td></tr>
+      <tr style="border-bottom: 1px solid #e0e0e0;"><td style="padding: 0.4rem 0.5rem;"><code>:focus-within</code></td><td style="padding: 0.4rem 0.5rem;">Element or any descendant has focus (useful for styling a form group)</td></tr>
+      <tr style="border-bottom: 1px solid #e0e0e0;"><td style="padding: 0.4rem 0.5rem;"><code>:valid</code></td><td style="padding: 0.4rem 0.5rem;">Input passes validation constraints</td></tr>
+      <tr style="border-bottom: 1px solid #e0e0e0;"><td style="padding: 0.4rem 0.5rem;"><code>:invalid</code></td><td style="padding: 0.4rem 0.5rem;">Input fails validation</td></tr>
+      <tr style="border-bottom: 1px solid #e0e0e0;"><td style="padding: 0.4rem 0.5rem;"><code>:required</code></td><td style="padding: 0.4rem 0.5rem;">Input has the required attribute</td></tr>
+      <tr style="border-bottom: 1px solid #e0e0e0;"><td style="padding: 0.4rem 0.5rem;"><code>:optional</code></td><td style="padding: 0.4rem 0.5rem;">Input does not have required</td></tr>
+      <tr style="border-bottom: 1px solid #e0e0e0;"><td style="padding: 0.4rem 0.5rem;"><code>:checked</code></td><td style="padding: 0.4rem 0.5rem;">Checkbox/radio is checked</td></tr>
+      <tr style="border-bottom: 1px solid #e0e0e0;"><td style="padding: 0.4rem 0.5rem;"><code>:indeterminate</code></td><td style="padding: 0.4rem 0.5rem;">Checkbox is in indeterminate state (set via JS)</td></tr>
+      <tr style="border-bottom: 1px solid #e0e0e0;"><td style="padding: 0.4rem 0.5rem;"><code>:disabled</code></td><td style="padding: 0.4rem 0.5rem;">Element is disabled</td></tr>
+      <tr style="border-bottom: 1px solid #e0e0e0;"><td style="padding: 0.4rem 0.5rem;"><code>:enabled</code></td><td style="padding: 0.4rem 0.5rem;">Element is not disabled</td></tr>
+      <tr style="border-bottom: 1px solid #e0e0e0;"><td style="padding: 0.4rem 0.5rem;"><code>:placeholder-shown</code></td><td style="padding: 0.4rem 0.5rem;">Input is showing its placeholder (i.e. empty)</td></tr>
+      <tr style="border-bottom: 1px solid #e0e0e0;"><td style="padding: 0.4rem 0.5rem;"><code>:read-only</code></td><td style="padding: 0.4rem 0.5rem;">Input has readonly attribute</td></tr>
+      <tr style="border-bottom: 1px solid #e0e0e0;"><td style="padding: 0.4rem 0.5rem;"><code>:in-range</code></td><td style="padding: 0.4rem 0.5rem;">Number/range input within min/max</td></tr>
+      <tr><td style="padding: 0.4rem 0.5rem;"><code>:out-of-range</code></td><td style="padding: 0.4rem 0.5rem;">Number/range input outside min/max</td></tr>
+    </tbody>
+  </table>
+
+  <div class="key-concept">
+    <p><strong>:focus vs :focus-visible:</strong> <code>:focus</code> fires on any focus (click or keyboard). <code>:focus-visible</code> only fires when the browser thinks a focus indicator should be shown (typically keyboard navigation). Use <code>:focus-visible</code> for outline styles so mouse users don't see outlines but keyboard users do.</p>
+  </div>
+
+  <h2>User interaction pseudo-classes</h2>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>:hover        /* mouse is over it */
+:active       /* being clicked/pressed right now */
+:visited      /* link the user has visited before */
+:link         /* unvisited link */
+:target       /* element whose ID matches the URL fragment (#section) */
+:fullscreen   /* element is in fullscreen mode */</code></pre>
+  </div>
+
+  <h3>:target - styling based on URL hash</h3>
+
+  <div class="demo">
+    <p class="demo-caption">Click a link - the targeted section gets highlighted via :target</p>
+    <div class="target-demo">
+      <p><a href="#sec-a" style="color: #3a86ff;">Jump to Section A</a> | <a href="#sec-b" style="color: #3a86ff;">Jump to Section B</a></p>
+      <div id="sec-a" style="margin-top: 0.5rem; padding: 0.5rem; border-radius: 4px;">
+        <strong>Section A</strong> - I highlight when the URL hash is #sec-a
+      </div>
+      <div id="sec-b" style="margin-top: 0.5rem; padding: 0.5rem; border-radius: 4px;">
+        <strong>Section B</strong> - I highlight when the URL hash is #sec-b
+      </div>
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;!-- HTML --&gt;
+&lt;a href="#section-a"&gt;Go to A&lt;/a&gt;
+&lt;a href="#section-b"&gt;Go to B&lt;/a&gt;
+
+&lt;div id="section-a"&gt;Section A content&lt;/div&gt;
+&lt;div id="section-b"&gt;Section B content&lt;/div&gt;
+
+/* CSS — style the element whose ID matches the URL #hash */
+:target {
+  background: #fff3e0;
+  border: 2px solid coral;
+}</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <p><strong>How :target works:</strong> It's driven by whatever is in the address bar right now - specifically the <code>#fragment</code> part. If the address bar shows <code>https://example.com/page.html#sec-a</code>, then <code>:target</code> matches the element with <code>id="sec-a"</code>. It's literally <code>location.hash</code> driving a CSS selector in real time.</p>
+    <p>There's only ever one fragment in the URL at a time, so there's only ever zero or one <code>:target</code> element on the page. When you click <code>&lt;a href="#sec-b"&gt;</code>, the browser updates the address bar &rarr; <code>:target</code> stops matching <code>#sec-a</code> and starts matching <code>#sec-b</code>. No fragment in the URL at all &rarr; nothing matches.</p>
+  </div>
+
+  <h2>Attribute selectors - beyond classes and IDs</h2>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* Has the attribute at all */
+[data-tooltip] { cursor: help; }
+
+/* Attribute equals exact value */
+[type="email"] { }
+[role="button"] { }
+
+/* Attribute starts with */
+[href^="https"] { }          /* links starting with https */
+[class^="icon-"] { }         /* classes starting with icon- */
+
+/* Attribute ends with */
+[src$=".svg"] { }            /* images ending in .svg */
+[href$=".pdf"] { }           /* links to PDFs */
+
+/* Attribute contains */
+[class*="card"] { }          /* class contains "card" anywhere */
+
+/* Attribute word list contains (space-separated) */
+[class~="featured"] { }     /* same as .featured */
+
+/* Case-insensitive matching */
+[type="email" i] { }        /* matches "Email", "EMAIL", etc. */</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <p><strong>When to use attribute selectors over classes:</strong> When styling based on HTML semantics (<code>[type="email"]</code>, <code>[aria-expanded="true"]</code>, <code>[data-state="open"]</code>) rather than presentational classes. Also useful for external content you can't add classes to (e.g. CMS-generated HTML, third-party widgets).</p>
+  </div>
+
+  <h2>Combining selectors - practical recipes</h2>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* Style external links differently (href starts with http, not your domain) */
+a[href^="http"]:not([href*="yourdomain.com"]) {
+  &amp;::after { content: " ↗"; }
+}
+
+/* Required fields that are empty (show a subtle indicator) */
+input:required:placeholder-shown {
+  border-left: 3px solid coral;
+}
+
+/* First item that ISN'T hidden */
+li:not(.hidden):first-child { }
+/* Or with the newer "of" syntax: */
+li:nth-child(1 of :not(.hidden)) { }
+
+/* Table rows on hover, but not the header */
+tr:not(:first-child):hover {
+  background: #f0f7ff;
+}
+
+/* Style a form group when any field inside has focus */
+.form-group:focus-within {
+  border-color: blue;
+  box-shadow: 0 0 0 3px rgba(0,0,255,0.1);
+}
+
+/* Cards that contain images AND are not the first card */
+.card:has(img):not(:first-child) {
+  margin-top: 2rem;
+}</code></pre>
+  </div>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <h2>Retrieval check</h2>
+
+  <div class="quiz" id="quiz1">
+    <h3>Question 1</h3>
+    <p>Given &lt;div&gt; containing: &lt;h2&gt;, &lt;p&gt;, &lt;p&gt; - what does p:nth-child(1) select?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">The first paragraph</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">Nothing - child #1 is an h2, not a p</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">The h2 element</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Both paragraphs</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz2">
+    <h3>Question 2</h3>
+    <p>You want "the 2nd &lt;p&gt; among siblings of mixed types." Which is the classic, widely-supported selector for this?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">p:nth-child(2) - counts only p elements</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">p:nth-of-type(2) - counts only p elements</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">div > p:nth-child(2) - scopes to div</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">p:nth-child(2n) - selects even p elements</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz3">
+    <h3>Question 3</h3>
+    <p>What's the difference between :focus and :focus-visible?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">:focus-visible is for visible elements, :focus is for hidden ones</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">:focus fires on any focus; :focus-visible only when browser thinks indicator should show (keyboard nav)</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">:focus-visible has higher specificity</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">They're identical - :focus-visible is just newer syntax</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz4">
+    <h3>Question 4</h3>
+    <p>What does :placeholder-shown match?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">An input that has a placeholder attribute defined</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">An input currently showing its placeholder (i.e. the field is empty)</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">The placeholder text itself</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Any input that has ever shown a placeholder</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz5">
+    <h3>Question 5</h3>
+    <p>What does [href$=".pdf"] select?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Links that contain ".pdf" anywhere</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Links that start with ".pdf"</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">Links whose href ends with ".pdf"</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Only the first PDF link on the page</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="recommended">
+    <strong>Recommended resources:</strong>
+    <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-classes">MDN - Pseudo-classes</a> |
+    <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors">MDN - Attribute selectors</a> |
+    <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:nth-child">MDN - :nth-child()</a>
+  </div>
+
+  <div class="footer-nav">
+    <a href="19-scope.html">&larr; Prev: @scope</a>
+    <a href="index.html">Index</a>
+    <a href="21-theming-deep-dive.html">Next: Theming Deep-Dive &rarr;</a>
+  </div>
+
+    </main>
+  </div>
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

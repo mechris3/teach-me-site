@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>CSS Custom Properties Fundamentals - Lesson 1 | Teach Me</title>
+  <meta name="description" content="CSS custom properties (variables) from the ground up. Declaration, scoping, fallbacks, var(), and how they differ from Sass variables.">
+  <link rel="canonical" href="https://teachmeskills.dev/css/01-custom-properties-fundamentals.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/css/01-custom-properties-fundamentals.html">
+  <meta property="og:title" content="CSS Custom Properties Fundamentals - Lesson 1 | Teach Me">
+  <meta property="og:description" content="CSS custom properties (variables) from the ground up. Declaration, scoping, fallbacks, var(), and how they differ from Sass variables.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="CSS Custom Properties Fundamentals - Lesson 1 | Teach Me">
+  <meta name="twitter:description" content="CSS custom properties (variables) from the ground up. Declaration, scoping, fallbacks, var(), and how they differ from Sass variables.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Demo: scoping */
+    .scope-demo {
+      --demo-color: #3a86ff;
+      padding: 1rem;
+      border: 2px solid var(--demo-color);
+      border-radius: 8px;
+      margin-bottom: 0.75rem;
+    }
+
+    .scope-demo .child {
+      padding: 0.75rem;
+      background: var(--demo-color);
+      color: white;
+      border-radius: 4px;
+      margin-top: 0.5rem;
+    }
+
+    .scope-demo.override {
+      --demo-color: #e76f51;
+    }
+
+    /* Demo: theming */
+    .theme-demo {
+      --card-bg: #fff;
+      --card-text: #1a1a2e;
+      --card-border: #e0e0e0;
+      padding: 1.25rem;
+      background: var(--card-bg);
+      color: var(--card-text);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      margin-bottom: 0.75rem;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .theme-demo.dark {
+      --card-bg: #1a1a2e;
+      --card-text: #f0f0f0;
+      --card-border: #333;
+    }
+
+    .theme-toggle-demo {
+      font-family: var(--sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: white;
+      cursor: pointer;
+      font-size: 0.85rem;
+      margin-bottom: 1rem;
+    }
+
+    /* Demo: fallbacks */
+    .fallback-demo {
+      padding: 1rem;
+      margin: var(--custom-margin, 0.5rem);
+      background: var(--custom-bg, #e8f8f5);
+      border-radius: 6px;
+      color: #1a1a2e;
+    }
+
+    /* Comparison grid */
+    .comparison {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    .comparison > div {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1rem;
+    }
+
+    .comparison .label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-bottom: 0.75rem;
+    }
+
+    @media (max-width: 600px) {
+      .comparison { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header">
+        <a href="index.html">CSS Course</a>
+      </div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li class="current"><a href="01-custom-properties-fundamentals.html">1. Custom Properties</a></li>
+        <li><a href="02-registered-custom-properties.html">2. @property</a></li>
+        <li><a href="03-css-value-functions.html">3. Value Functions</a></li>
+        <li><a href="04-custom-css-functions.html">4. Custom Functions</a></li>
+        <li><a href="05-advanced-attr.html">5. Advanced attr()</a></li>
+        <li><a href="06-transitions.html">6. Transitions</a></li>
+        <li><a href="07-animations.html">7. Animations</a></li>
+        <li><a href="08-flexbox.html">8. Flexbox</a></li>
+        <li><a href="09-grid.html">9. Grid</a></li>
+        <li><a href="10-container-queries.html">10. Container Queries</a></li>
+        <li><a href="11-cascade-layers.html">11. Cascade Layers</a></li>
+        <li><a href="12-css-nesting.html">12. CSS Nesting</a></li>
+        <li><a href="13-modern-selectors.html">13. Modern Selectors</a></li>
+        <li><a href="14-the-cascade.html">14. The Cascade</a></li>
+        <li><a href="15-logical-properties.html">15. Logical Properties</a></li>
+        <li><a href="16-view-transitions.html">16. View Transitions</a></li>
+        <li><a href="17-anchor-positioning.html">17. Anchor Positioning</a></li>
+        <li><a href="18-advanced-colour.html">18. Advanced Colour</a></li>
+        <li><a href="19-scope.html">19. @scope</a></li>
+        <li><a href="20-selectors-deep-dive.html">20. Selectors Deep-Dive</a></li>
+        <li><a href="21-theming-deep-dive.html">21. Theming Deep-Dive</a></li>
+        <li><a href="22-responsive-design-patterns.html">22. Responsive Patterns</a></li>
+        <li><a href="23-scroll-driven-animations.html">23. Scroll-Driven Animations</a></li>
+        <li><a href="24-capstone-product-landing-page.html">24. Capstone Project</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="css-anatomy.html">CSS Anatomy</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 1</p>
+  <h1>CSS Custom Properties from the Ground Up</h1>
+
+  <p>Custom properties (often called "CSS variables") let you store a value once and reuse it anywhere in your stylesheet. They're native to CSS  -  no preprocessor needed  -  and they behave differently from Sass/Less variables in important ways.</p>
+
+  <h2>Declaring and using</h2>
+
+  <p>A custom property is any property name that starts with <code>--</code>. You declare it inside a rule block, then consume it with <code>var()</code>:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* Declare */
+.card {
+  --card-padding: 1.5rem;
+  --card-radius: 8px;
+}
+
+/* Use */
+.card {
+  padding: var(--card-padding);
+  border-radius: var(--card-radius);
+}</code></pre>
+  </div>
+
+  <p>That's the whole syntax. Two hyphens to declare, <code>var()</code> to read.</p>
+
+  <h2>Scope: they follow the DOM, not the stylesheet</h2>
+
+  <p>This is the big mental shift if you're coming from Sass. A Sass variable is resolved at compile time based on where it appears in your <em>source file</em>. A custom property is resolved at runtime based on where the element sits in the <em>DOM tree</em>.</p>
+
+  <div class="key-concept">
+    <strong>Custom properties are scoped to the element they're declared on, and they inherit down through the DOM  -  just like <code>color</code> or <code>font-size</code>.</strong>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>:root {
+  --brand: blue;    /* available everywhere (html element) */
+}
+
+.sidebar {
+  --brand: green;   /* overrides for .sidebar and its children */
+}
+
+.button {
+  background: var(--brand);
+  /* A .button inside .sidebar gets green.
+     A .button elsewhere gets blue. */
+}</code></pre>
+  </div>
+
+  <h2>Live demo: scoping in action</h2>
+
+  <div class="demo">
+    <p class="demo-caption">Same class, different --demo-color values</p>
+    <div class="scope-demo">
+      <strong>Parent: --demo-color is #3a86ff (blue)</strong>
+      <div class="child">Child inherits --demo-color  -  blue background</div>
+    </div>
+    <div class="scope-demo override">
+      <strong>Parent: --demo-color is #e76f51 (orange)</strong>
+      <div class="child">Child inherits --demo-color  -  orange background</div>
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>.scope-demo {
+  --demo-color: #3a86ff;
+  border: 2px solid var(--demo-color);
+}
+
+.scope-demo .child {
+  background: var(--demo-color);
+  color: white;
+}
+
+.scope-demo.override {
+  --demo-color: #e76f51;
+}</code></pre>
+  </div>
+
+  <p>Both <code>.child</code> elements use the same CSS rule (<code>background: var(--demo-color)</code>), but they resolve to different colours because the custom property was set differently on their parents. This is impossible with Sass variables.</p>
+
+  <h2>Why <code>:root</code>?</h2>
+
+  <p>You'll see custom properties declared on <code>:root</code> constantly. That's just the <code>&lt;html&gt;</code> element  -  it's the highest point in the DOM tree, so anything declared there inherits everywhere. Think of it as "global scope":</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>:root {
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 2rem;
+  --color-primary: #3a86ff;
+  --color-text: #1a1a2e;
+}</code></pre>
+  </div>
+
+  <p>But you're not limited to <code>:root</code>. Declaring on a more specific selector narrows the scope  -  useful for component-level tokens.</p>
+
+  <h2>Fallbacks</h2>
+
+  <p><code>var()</code> takes an optional second argument: a fallback value used when the property isn't defined:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>.element {
+  /* If --custom-bg isn't set on this element or any ancestor,
+     use #e8f8f5 instead */
+  background: var(--custom-bg, #e8f8f5);
+
+  /* Fallbacks can be other var() calls */
+  color: var(--theme-text, var(--color-text, black));
+}</code></pre>
+  </div>
+
+  <div class="demo">
+    <p class="demo-caption">This box uses var(--custom-bg, #e8f8f5)  -  since --custom-bg isn't set, the fallback applies</p>
+    <div class="fallback-demo">This element is using the fallback background colour.</div>
+  </div>
+
+  <div class="key-concept">
+    <strong>Important subtlety:</strong> the fallback is only used when the property is <em>not defined at all</em> (no declaration reaches this element). If the property IS defined but has an invalid value for the context, the fallback does <em>not</em> kick in  -  instead you get the property's inherited or initial value. This catches people out.
+  </div>
+
+  <h2>Custom properties vs Sass variables</h2>
+
+  <div class="comparison">
+    <div>
+      <p class="label">Sass variable</p>
+      <pre><code>$color: blue;
+
+.a { color: $color; }
+
+$color: red;
+
+.b { color: $color; }</code></pre>
+      <p><code>.a</code> is blue, <code>.b</code> is red. Resolved at compile time, top to bottom in the file.</p>
+    </div>
+    <div>
+      <p class="label">Custom property</p>
+      <pre><code>:root { --color: blue; }
+
+.a { color: var(--color); }
+
+.dark { --color: red; }
+
+.b { color: var(--color); }</code></pre>
+      <p><code>.b</code> inside <code>.dark</code> is red. <code>.b</code> outside <code>.dark</code> is blue. Resolved at runtime, based on DOM position.</p>
+    </div>
+  </div>
+
+  <p>This runtime resolution is what makes custom properties powerful for theming, responsive design, and component APIs.</p>
+
+  <h2>Live demo: theming with custom properties</h2>
+
+  <div class="demo">
+    <p class="demo-caption">Click to toggle dark theme  -  same HTML, different property values</p>
+    <button class="theme-toggle-demo" onclick="document.getElementById('themeCard').classList.toggle('dark')">Toggle dark mode</button>
+    <div class="theme-demo" id="themeCard">
+      <p><strong>Card component</strong></p>
+      <p>This card uses <code>--card-bg</code>, <code>--card-text</code>, and <code>--card-border</code>. The <code>.dark</code> class just redefines those three properties  -  no other CSS changes.</p>
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>.theme-demo {
+  --card-bg: #fff;
+  --card-text: #1a1a2e;
+  --card-border: #e0e0e0;
+  background: var(--card-bg);
+  color: var(--card-text);
+  border: 1px solid var(--card-border);
+  transition: background 0.3s, color 0.3s;
+}
+
+.theme-demo.dark {
+  --card-bg: #1a1a2e;
+  --card-text: #f0f0f0;
+  --card-border: #333;
+}</code></pre>
+  </div>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <h2>They're live and reactive</h2>
+
+  <p>Because custom properties are resolved at runtime, you can change them with JavaScript and the page updates instantly  -  no reflow of the stylesheet needed:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>// Change a property on the root element
+document.documentElement.style.setProperty('--color-primary', '#e76f51');
+
+// Change it on a specific element
+myCard.style.setProperty('--card-padding', '2rem');</code></pre>
+  </div>
+
+  <p>This is the foundation of many CSS-in-JS alternatives: define your design tokens as custom properties, then manipulate them from JS when state changes.</p>
+
+  <h2>Naming conventions</h2>
+
+  <p>There's no enforced naming scheme, but common patterns:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* Global design tokens */
+--color-primary: #3a86ff;
+--spacing-md: 1rem;
+--font-body: system-ui, sans-serif;
+
+/* Component-scoped (prefixed with component name) */
+--card-padding: 1.5rem;
+--card-radius: 8px;
+--btn-bg: var(--color-primary);</code></pre>
+  </div>
+
+  <p>The double-hyphen prefix (<code>--</code>) is required by the spec. Everything after that is yours. Case-sensitive: <code>--Color</code> and <code>--color</code> are different properties.</p>
+
+  <h2>What you can and can't do</h2>
+
+  <ul>
+    <li>Store any valid CSS value: colours, lengths, entire shorthand values, even <code>calc()</code> expressions</li>
+    <li>Use <code>var()</code> inside <code>calc()</code>: <code>width: calc(var(--base) * 2)</code></li>
+    <li>Use <code>var()</code> inside other functions: <code>background: rgb(var(--r) var(--g) var(--b))</code></li>
+    <li>Can't use them in property <em>names</em>: <code>var(--prop): value</code> is invalid</li>
+    <li>Can't use them in selector names</li>
+    <li>Can't use them in media query conditions (but <em>can</em> use them inside property values within media queries)</li>
+    <li>Can't concatenate them with strings to form a value: <code>var(--size)px</code> doesn't work  -  use <code>calc(var(--size) * 1px)</code> instead</li>
+  </ul>
+
+  <h2>Quiz</h2>
+
+  <div class="quiz" id="quiz1">
+    <h3>Question 1</h3>
+    <p>A custom property --brand is set on :root as "blue" and on .sidebar as "green". A .button inside .sidebar uses var(--brand). What colour is it?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">blue  -  :root always wins</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">green  -  closer ancestor wins</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">invalid  -  conflicting declarations</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">transparent  -  no valid value</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz2">
+    <h3>Question 2</h3>
+    <p>What does var(--missing, 16px) resolve to when --missing is not declared anywhere in the DOM tree?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">nothing  -  the declaration is skipped</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">0px  -  numeric properties default to zero</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">16px  -  the fallback value is used</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">inherit  -  falls back to parent value</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz3">
+    <h3>Question 3</h3>
+    <p>You write: width: var(--size)px; where --size is 100. What happens?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Works fine  -  width becomes 100px</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">Invalid  -  can't concatenate like this</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Becomes "100 px" with a space in it</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Silently ignored, uses inherited width</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz4">
+    <h3>Question 4</h3>
+    <p>How do you correctly turn --size: 100 into a pixel value?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">width: var(--size) + "px";</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">width: #{var(--size)}px;</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">width: calc(var(--size) * 1px);</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">width: var(--size, px);</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <div class="recommended">
+    <strong>Recommended resources:</strong>
+    <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/--*/">MDN  -  Custom properties (--*): CSS variables</a> |
+    <a href="https://frontendmasters.com/tutorials/kevin-powell/master-css-custom-properties/">Kevin Powell: Master CSS Custom Properties</a> (video)  -  goes beyond :root into locally-scoped patterns.
+  </div>
+
+  <div class="footer-nav">
+    <span></span>
+    <a href="index.html">Index</a>
+    <a href="02-registered-custom-properties.html">Next: @property &rarr;</a>
+  </div>
+
+    </main>
+  </div>
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

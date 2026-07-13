@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>Capstone: Product Landing Page - Lesson 24 | Teach Me</title>
+  <meta name="description" content="Build a complete product landing page using 14+ CSS features from the course including @layer, custom properties, oklch, grid, container queries, and scroll-driven animations.">
+  <link rel="canonical" href="https://teachmeskills.dev/css/24-capstone-product-landing-page.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/css/24-capstone-product-landing-page.html">
+  <meta property="og:title" content="Capstone: Product Landing Page - Lesson 24 | Teach Me">
+  <meta property="og:description" content="Build a complete product landing page using 14+ CSS features from the course including @layer, custom properties, oklch, grid, container queries, and scroll-driven animations.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Capstone: Product Landing Page - Lesson 24 | Teach Me">
+  <meta name="twitter:description" content="Build a complete product landing page using 14+ CSS features from the course including @layer, custom properties, oklch, grid, container queries, and scroll-driven animations.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header">
+        <a href="index.html">CSS Course</a>
+      </div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-custom-properties-fundamentals.html">1. Custom Properties</a></li>
+        <li><a href="02-registered-custom-properties.html">2. @property</a></li>
+        <li><a href="03-css-value-functions.html">3. Value Functions</a></li>
+        <li><a href="04-custom-css-functions.html">4. Custom Functions</a></li>
+        <li><a href="05-advanced-attr.html">5. Advanced attr()</a></li>
+        <li><a href="06-transitions.html">6. Transitions</a></li>
+        <li><a href="07-animations.html">7. Animations</a></li>
+        <li><a href="08-flexbox.html">8. Flexbox</a></li>
+        <li><a href="09-grid.html">9. Grid</a></li>
+        <li><a href="10-container-queries.html">10. Container Queries</a></li>
+        <li><a href="11-cascade-layers.html">11. Cascade Layers</a></li>
+        <li><a href="12-css-nesting.html">12. CSS Nesting</a></li>
+        <li><a href="13-modern-selectors.html">13. Modern Selectors</a></li>
+        <li><a href="14-the-cascade.html">14. The Cascade</a></li>
+        <li><a href="15-logical-properties.html">15. Logical Properties</a></li>
+        <li><a href="16-view-transitions.html">16. View Transitions</a></li>
+        <li><a href="17-anchor-positioning.html">17. Anchor Positioning</a></li>
+        <li><a href="18-advanced-colour.html">18. Advanced Colour</a></li>
+        <li><a href="19-scope.html">19. @scope</a></li>
+        <li><a href="20-selectors-deep-dive.html">20. Selectors Deep-Dive</a></li>
+        <li><a href="21-theming-deep-dive.html">21. Theming Deep-Dive</a></li>
+        <li><a href="22-responsive-design-patterns.html">22. Responsive Patterns</a></li>
+        <li><a href="23-scroll-driven-animations.html">23. Scroll-Driven Animations</a></li>
+        <li class="current"><a href="24-capstone-product-landing-page.html">24. Capstone Project</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="css-anatomy.html">CSS Anatomy</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+  <p class="lesson-num">Lesson 24</p>
+  <h1>Capstone: Product Landing Page</h1>
+
+  <p>This capstone project exercises 14+ features from the course. The HTML is complete below - your job is to build the CSS section by section, applying what you've learned across all lessons.</p>
+
+  <h2>Features used in this project</h2>
+
+  <ol>
+    <li><code>@layer</code> (structure)</li>
+    <li>Custom properties - three-tier tokens</li>
+    <li>oklch + relative colour syntax (derived palette)</li>
+    <li>Dark/light theming via data-theme attribute</li>
+    <li>Nesting (native CSS)</li>
+    <li>Logical properties</li>
+    <li>Grid (named areas, responsive rearrangement)</li>
+    <li>Flexbox (nav, button groups)</li>
+    <li>Container queries (feature cards)</li>
+    <li>clamp() for fluid type and spacing</li>
+    <li>Scroll-driven animations (progress bar, section reveals)</li>
+    <li>Transitions (hover states, toggle)</li>
+    <li>@scope (testimonial region)</li>
+    <li>Anchor positioning (tooltip)</li>
+  </ol>
+
+  <h2>The project skeleton</h2>
+
+  <p>Below is the complete HTML and starter CSS. The CSS uses <code>@layer</code> to structure everything, with placeholder comments where you'll build each challenge.</p>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;!doctype html&gt;
+&lt;html lang="en" data-theme="light"&gt;
+  &lt;head&gt;
+    &lt;meta charset="UTF-8" /&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0" /&gt;
+    &lt;title&gt;Capstone: Horizon — Product Landing Page&lt;/title&gt;
+    &lt;style&gt;
+      /* ============================================================
+       CAPSTONE PROJECT: "Horizon" — a product landing page
+       
+       This page exercises 14+ features from the course:
+       1.  @layer (structure)
+       2.  Custom properties — three-tier tokens
+       3.  oklch + relative colour syntax (derived palette)
+       4.  Dark/light theming via data-theme attribute
+       5.  Nesting (native CSS)
+       6.  Logical properties
+       7.  Grid (named areas, responsive rearrangement)
+       8.  Flexbox (nav, button groups)
+       9.  Container queries (feature cards)
+       10. clamp() for fluid type and spacing
+       11. Scroll-driven animations (progress bar, section reveals)
+       12. Transitions (hover states, toggle)
+       13. @scope (testimonial region)
+       14. Anchor positioning (tooltip)
+       
+       STATUS: Skeleton — HTML complete, CSS minimal.
+       Challenges will build the CSS section by section.
+       ============================================================ */
+
+      /* === LAYER ORDER === */
+      @layer reset, tokens, layout, components, utilities;
+
+      /* === RESET (provided) === */
+      @layer reset {
+        *,
+        *::before,
+        *::after {
+          box-sizing: border-box;
+          margin: 0;
+        }
+        body {
+          min-height: 100dvh;
+        }
+        img,
+        picture,
+        svg {
+          display: block;
+          max-width: 100%;
+        }
+        input,
+        button,
+        textarea,
+        select {
+          font: inherit;
+        }
+        a {
+          color: inherit;
+          text-decoration: none;
+        }
+        ul,
+        ol {
+          list-style: none;
+          padding: 0;
+        }
+      }
+
+      /* === TOKENS (Challenge 1: you build this) === */
+      @layer tokens {
+        :root {
+          /* TODO: Primitives, semantics, component tokens */
+          /* Placeholder so the page isn't invisible */
+          --color-surface: #fefefe;
+          --color-text: #1a1a2e;
+          --color-primary: #3a86ff;
+          --font-body:
+            -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+          --font-heading: 'Georgia', serif;
+          --font-mono: 'SF Mono', 'Fira Code', monospace;
+
+          --gray-50: oklch(99.41% 0.001 0);
+          --gray-100: oklch(96.43% 0.007 256);
+          --gray-800: oklch(18.27% 0.036 263);
+          --gray-900: oklch(10.16% 0.029 264);
+
+          --brand-hue: 250;
+          --brand-chroma: 0.15;
+          --brand-base: oklch(0.55 var(--brand-chroma) var(--brand-hue));
+
+          --space-2: 0.5rem;
+          --space-4: 1rem;
+          --space-6: 1.5rem;
+          --radius-sm: 4px;
+          --radius-md: 8px;
+        }
+      }
+
+      /* === LAYOUT (Challenge 2+) === */
+      @layer layout {
+        body {
+          font-family: var(--font-body);
+          color: var(--color-text);
+          background: var(--color-surface);
+          line-height: 1.7;
+        }
+      }
+
+      /* === COMPONENTS (Challenge 3+) === */
+      @layer components {
+        /* Built up through challenges */
+      }
+
+      /* === UTILITIES === */
+      @layer utilities {
+        .visually-hidden {
+          position: absolute;
+          width: 1px;
+          height: 1px;
+          padding: 0;
+          margin: -1px;
+          overflow: hidden;
+          clip: rect(0, 0, 0, 0);
+          white-space: nowrap;
+          border: 0;
+        }
+      }
+    &lt;/style&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;!-- PROGRESS BAR (scroll-driven) --&gt;
+    &lt;div class="progress-bar" aria-hidden="true"&gt;&lt;/div&gt;
+
+    &lt;!-- HEADER / NAV --&gt;
+    &lt;header class="site-header"&gt;
+      &lt;nav class="nav"&gt;
+        &lt;a href="#" class="nav-logo"&gt;Horizon&lt;/a&gt;
+        &lt;ul class="nav-links"&gt;
+          &lt;li&gt;&lt;a href="#features"&gt;Features&lt;/a&gt;&lt;/li&gt;
+          &lt;li&gt;&lt;a href="#pricing"&gt;Pricing&lt;/a&gt;&lt;/li&gt;
+          &lt;li&gt;&lt;a href="#testimonials"&gt;Testimonials&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;button
+          class="theme-toggle"
+          aria-label="Toggle theme"
+          onclick="toggleTheme()"
+        &gt;
+          &lt;span class="toggle-icon"&gt;&lt;/span&gt;
+        &lt;/button&gt;
+      &lt;/nav&gt;
+    &lt;/header&gt;
+
+    &lt;!-- HERO --&gt;
+    &lt;section class="hero"&gt;
+      &lt;div class="hero-content"&gt;
+        &lt;h1&gt;Build faster.&lt;br /&gt;Ship with confidence.&lt;/h1&gt;
+        &lt;p class="hero-subtitle"&gt;
+          The modern platform for teams who refuse to compromise on quality.
+        &lt;/p&gt;
+        &lt;div class="hero-actions"&gt;
+          &lt;a href="#" class="btn btn-primary"&gt;Get Started&lt;/a&gt;
+          &lt;a href="#" class="btn btn-secondary"&gt;Learn More&lt;/a&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/section&gt;
+
+    &lt;!-- FEATURES (container query cards) --&gt;
+    &lt;section class="features" id="features"&gt;
+      &lt;h2 class="section-title"&gt;Features&lt;/h2&gt;
+      &lt;div class="features-grid"&gt;
+        &lt;div class="feature-card-wrapper"&gt;
+          &lt;article class="feature-card"&gt;
+            &lt;div class="feature-icon"&gt;⚡&lt;/div&gt;
+            &lt;h3&gt;Lightning Fast&lt;/h3&gt;
+            &lt;p&gt;Sub-second builds with intelligent caching.&lt;/p&gt;
+          &lt;/article&gt;
+        &lt;/div&gt;
+        &lt;div class="feature-card-wrapper"&gt;
+          &lt;article class="feature-card"&gt;
+            &lt;div class="feature-icon"&gt;🔒&lt;/div&gt;
+            &lt;h3&gt;Secure by Default&lt;/h3&gt;
+            &lt;p&gt;Automatic dependency scanning and zero-trust networking.&lt;/p&gt;
+          &lt;/article&gt;
+        &lt;/div&gt;
+        &lt;div class="feature-card-wrapper"&gt;
+          &lt;article class="feature-card"&gt;
+            &lt;div class="feature-icon"&gt;📊&lt;/div&gt;
+            &lt;h3&gt;Observable&lt;/h3&gt;
+            &lt;p&gt;Traces, metrics, and logs unified in one view.&lt;/p&gt;
+          &lt;/article&gt;
+        &lt;/div&gt;
+        &lt;div class="feature-card-wrapper"&gt;
+          &lt;article class="feature-card"&gt;
+            &lt;div class="feature-icon"&gt;🔄&lt;/div&gt;
+            &lt;h3&gt;GitOps Native&lt;/h3&gt;
+            &lt;p&gt;Every change is a pull request. Rollback to any commit.&lt;/p&gt;
+          &lt;/article&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/section&gt;
+
+    &lt;!-- PRICING (grid layout) --&gt;
+    &lt;section class="pricing" id="pricing"&gt;
+      &lt;h2 class="section-title"&gt;Pricing&lt;/h2&gt;
+      &lt;div class="pricing-grid"&gt;
+        &lt;div class="pricing-card"&gt;
+          &lt;h3&gt;Starter&lt;/h3&gt;
+          &lt;p class="price"&gt;&lt;span class="price-amount"&gt;$0&lt;/span&gt;/month&lt;/p&gt;
+          &lt;ul class="pricing-features"&gt;
+            &lt;li&gt;3 projects&lt;/li&gt;
+            &lt;li&gt;1 GB storage&lt;/li&gt;
+            &lt;li&gt;Community support&lt;/li&gt;
+          &lt;/ul&gt;
+          &lt;a href="#" class="btn btn-secondary"&gt;Start Free&lt;/a&gt;
+        &lt;/div&gt;
+        &lt;div class="pricing-card pricing-featured"&gt;
+          &lt;h3&gt;Pro&lt;/h3&gt;
+          &lt;p class="price"&gt;&lt;span class="price-amount"&gt;$29&lt;/span&gt;/month&lt;/p&gt;
+          &lt;ul class="pricing-features"&gt;
+            &lt;li&gt;Unlimited projects&lt;/li&gt;
+            &lt;li&gt;50 GB storage&lt;/li&gt;
+            &lt;li&gt;Priority support&lt;/li&gt;
+            &lt;li&gt;Custom domains&lt;/li&gt;
+          &lt;/ul&gt;
+          &lt;a href="#" class="btn btn-primary"&gt;Go Pro&lt;/a&gt;
+        &lt;/div&gt;
+        &lt;div class="pricing-card"&gt;
+          &lt;h3&gt;Enterprise&lt;/h3&gt;
+          &lt;p class="price"&gt;&lt;span class="price-amount"&gt;Custom&lt;/span&gt;&lt;/p&gt;
+          &lt;ul class="pricing-features"&gt;
+            &lt;li&gt;Everything in Pro&lt;/li&gt;
+            &lt;li&gt;SSO / SAML&lt;/li&gt;
+            &lt;li&gt;Dedicated support&lt;/li&gt;
+            &lt;li&gt;SLA guarantee&lt;/li&gt;
+          &lt;/ul&gt;
+          &lt;a href="#" class="btn btn-secondary"&gt;Contact Sales&lt;/a&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/section&gt;
+
+    &lt;!-- TESTIMONIALS (scoped styles) --&gt;
+    &lt;section class="testimonials" id="testimonials" data-theme="dark"&gt;
+      &lt;h2 class="section-title"&gt;What people say&lt;/h2&gt;
+      &lt;div class="testimonial-grid"&gt;
+        &lt;blockquote class="testimonial"&gt;
+          &lt;p&gt;"Horizon cut our deploy time from 12 minutes to 45 seconds."&lt;/p&gt;
+          &lt;footer&gt;— Sarah Chen, CTO at Fintrack&lt;/footer&gt;
+        &lt;/blockquote&gt;
+        &lt;blockquote class="testimonial"&gt;
+          &lt;p&gt;"The observability features alone justified the switch."&lt;/p&gt;
+          &lt;footer&gt;— Marcus Rivera, SRE Lead&lt;/footer&gt;
+        &lt;/blockquote&gt;
+        &lt;blockquote class="testimonial"&gt;
+          &lt;p&gt;"Our team of 40 engineers adopted it in a week."&lt;/p&gt;
+          &lt;footer&gt;— Priya Sharma, VP Engineering&lt;/footer&gt;
+        &lt;/blockquote&gt;
+      &lt;/div&gt;
+    &lt;/section&gt;
+
+    &lt;!-- FOOTER --&gt;
+    &lt;footer class="site-footer"&gt;
+      &lt;p&gt;Built with pure CSS. No frameworks. No JavaScript (except the theme toggle).&lt;/p&gt;
+    &lt;/footer&gt;
+
+    &lt;!-- TOOLTIP (anchor positioning) --&gt;
+    &lt;span class="tooltip" id="tooltip-pro" popover&gt;
+      Most popular plan — chosen by 73% of teams
+    &lt;/span&gt;
+
+    &lt;script&gt;
+      function toggleTheme() {
+        const root = document.documentElement;
+        const current = root.getAttribute('data-theme');
+        const next = current === 'dark' ? 'light' : 'dark';
+        root.setAttribute('data-theme', next);
+      }
+    &lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+  </div>
+
+  <h2>Challenges</h2>
+
+  <h3>Challenge 1: Token architecture</h3>
+  <p>Build the <code>@layer tokens</code> section:</p>
+  <ul>
+    <li>Define primitive tokens (palette using oklch, spacing scale, radii)</li>
+    <li>Define semantic tokens that map primitives to purposes (<code>--color-surface</code>, <code>--color-text</code>, <code>--color-primary</code>, etc.)</li>
+    <li>Add a <code>[data-theme="dark"]</code> block that swaps the semantic layer</li>
+    <li>Use relative colour syntax to derive hover/light/muted variants from <code>--brand-base</code></li>
+  </ul>
+
+  <h3>Challenge 2: Layout with grid</h3>
+  <ul>
+    <li>Make the page a pancake stack (header auto, main 1fr, footer auto)</li>
+    <li>Use <code>clamp()</code> for fluid section padding</li>
+    <li>Create the pricing grid using named grid areas or <code>repeat(auto-fill, minmax(...))</code></li>
+    <li>Use logical properties throughout (<code>padding-inline</code>, <code>margin-block</code>)</li>
+  </ul>
+
+  <h3>Challenge 3: Navigation with flexbox</h3>
+  <ul>
+    <li>Style the nav using flexbox with space-between</li>
+    <li>Add transitions on link hover states</li>
+    <li>Style the theme toggle button</li>
+  </ul>
+
+  <h3>Challenge 4: Hero section</h3>
+  <ul>
+    <li>Use <code>clamp()</code> for fluid heading size</li>
+    <li>Style the CTA buttons with component tokens (<code>--btn-bg</code>, <code>--btn-text</code>)</li>
+    <li>Add hover transitions on buttons</li>
+  </ul>
+
+  <h3>Challenge 5: Feature cards with container queries</h3>
+  <ul>
+    <li>Make <code>.feature-card-wrapper</code> a container (<code>container-type: inline-size</code>)</li>
+    <li>Default: cards stacked vertically</li>
+    <li>At <code>@container (min-width: 350px)</code>: switch to horizontal layout (icon left, text right)</li>
+    <li>Use the auto-fill grid pattern for the features grid</li>
+  </ul>
+
+  <h3>Challenge 6: Scroll-driven animations</h3>
+  <ul>
+    <li>Add a progress bar that grows with page scroll (<code>animation-timeline: scroll()</code>)</li>
+    <li>Add reveal animations on feature cards and testimonials using <code>animation-timeline: view()</code></li>
+    <li>Use <code>animation-range: entry</code> to trigger only during entry</li>
+  </ul>
+
+  <h3>Challenge 7: Testimonials with @scope</h3>
+  <ul>
+    <li>The testimonials section has <code>data-theme="dark"</code> - use scoped token overrides</li>
+    <li>Add <code>@scope (.testimonials) to (.site-footer)</code> for structural styles that shouldn't leak</li>
+    <li>Style blockquotes with borders and italic text</li>
+  </ul>
+
+  <h3>Challenge 8: Anchor positioning (tooltip)</h3>
+  <ul>
+    <li>Position the tooltip relative to the "Pro" pricing card using anchor positioning</li>
+    <li>Use the <code>popover</code> attribute for show/hide</li>
+    <li>Style with an arrow and appropriate z-index</li>
+  </ul>
+
+  <h3>Challenge 9: Responsive collapse</h3>
+  <ul>
+    <li>Use a media query to collapse the nav to a hamburger pattern on small viewports</li>
+    <li>Make the pricing grid stack to a single column on narrow containers</li>
+    <li>Ensure all clamp() values have sensible min/max for mobile</li>
+  </ul>
+
+  <div class="key-concept">
+    <p><strong>The goal:</strong> After completing all challenges, you should have a fully-styled, dark-mode-aware, responsive product landing page using only the CSS features from this course. No frameworks, no build tools, no JavaScript (except the theme toggle).</p>
+  </div>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <div class="footer-nav">
+    <a href="23-scroll-driven-animations.html">&larr; Prev: Scroll-Driven Animations</a>
+    <a href="index.html">Index</a>
+    <span></span>
+  </div>
+
+    </main>
+  </div>
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

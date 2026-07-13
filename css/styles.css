@@ -1,0 +1,48 @@
+/* ===========================
+   CSS Course — Course-Specific Styles
+   =========================== */
+
+/* CSS course demo variables */
+:root[data-theme="dark"] {
+  --css-demo-bg: #2c313a;
+}
+
+:root[data-theme="light"] {
+  --css-demo-bg: #f3f2ed;
+}
+
+/* --- Dark mode fixes for demos with hardcoded light backgrounds ---
+   Many CSS lesson demos use custom elements with light backgrounds
+   that don't adapt to dark mode (carried over from the source material).
+   Rather than fixing each individually, these rules ensure readability. */
+
+/* Inline code inside demos: ensure it's always readable */
+:root[data-theme="dark"] .demo code:not(pre code) {
+  background: rgba(0, 0, 0, 0.12);
+  color: var(--code-text);
+}
+
+/* The .step class (lesson 14) */
+:root[data-theme="dark"] .step {
+  background: var(--bg-surface);
+  border-color: var(--border);
+}
+
+/* Force dark text on demo elements that have hardcoded light backgrounds.
+   These classes appear across multiple lessons with backgrounds like
+   #e8f8f5, #f0f7ff, #fff3e0, #f9f0ff that don't respond to dark mode.
+   Using .main-content for extra specificity to beat inheritance. */
+:root[data-theme="dark"] .main-content .fallback-demo,
+:root[data-theme="dark"] .main-content .type-demo,
+:root[data-theme="dark"] .main-content .nested-demo,
+:root[data-theme="dark"] .main-content .calc-main,
+:root[data-theme="dark"] .main-content .clamp-text,
+:root[data-theme="dark"] .main-content .min-demo-box,
+:root[data-theme="dark"] .main-content .fluid-text,
+:root[data-theme="dark"] .main-content .grid-item,
+:root[data-theme="dark"] .main-content .cqu-text,
+:root[data-theme="dark"] .main-content .nest-responsive,
+:root[data-theme="dark"] .main-content .logical-box,
+:root[data-theme="dark"] .main-content .gotcha-explain {
+  color: #1a1a2e;
+}

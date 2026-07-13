@@ -30,7 +30,7 @@
         <nav>
             <a href="/">Courses</a>
             <a href="/about/">About</a>
-            <button class="theme-toggle" aria-label="Toggle light/dark mode"></button>
+            <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
         </nav>
     </header>
 
@@ -41,16 +41,13 @@
         <h2>Courses</h2>
         <ul class="course-list">
             <li>
+                <a href="/css/">CSS Mastery - Modern CSS From Custom Properties to Scroll-Driven Animations</a>
+                <p class="description">24 lessons covering custom properties, @property, value functions, flexbox, grid, container queries, cascade layers, nesting, view transitions, anchor positioning, scroll-driven animations, and a capstone project.</p>
+            </li>
+            <li>
                 <a href="/svg/">SVG - From Coordinates to Animation</a>
                 <p class="description">13 lessons covering the SVG coordinate system, shapes, paths, styling, gradients, filters, text, SMIL animation, CSS animation, and JavaScript interaction.</p>
             </li>
-            <!-- Future courses -->
-            <!--
-            <li>
-                <a href="/css/">Advanced CSS</a>
-                <p class="description">Coming soon.</p>
-            </li>
-            -->
         </ul>
     </main>
 
@@ -59,24 +56,7 @@
         <p><a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
     </footer>
 
-    <script>
-        (function() {
-            const toggle = document.querySelector('.theme-toggle');
-            const root = document.documentElement;
-            const stored = localStorage.getItem('lesson-theme');
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            const theme = stored || (prefersDark ? 'dark' : 'light');
-            root.setAttribute('data-theme', theme);
-            toggle.textContent = theme === 'dark' ? '\u2600\uFE0F' : '\uD83C\uDF19';
-            toggle.addEventListener('click', function() {
-                const current = root.getAttribute('data-theme');
-                const next = current === 'dark' ? 'light' : 'dark';
-                root.setAttribute('data-theme', next);
-                localStorage.setItem('lesson-theme', next);
-                toggle.textContent = next === 'dark' ? '\u2600\uFE0F' : '\uD83C\uDF19';
-            });
-        })();
-    </script>
+    <script src="/scripts.js"></script>
  <script defer src="/_vercel/insights/script.js"></script>
 </body>
 </html>

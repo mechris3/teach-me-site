@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>Cascade Layers - Lesson 11 | Teach Me</title>
+  <meta name="description" content="Learn CSS cascade layers (@layer) to manage specificity at scale, control priority between resets, components, and utilities without specificity wars.">
+  <link rel="canonical" href="https://teachmeskills.dev/css/11-cascade-layers.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/css/11-cascade-layers.html">
+  <meta property="og:title" content="Cascade Layers - Lesson 11 | Teach Me">
+  <meta property="og:description" content="Learn CSS cascade layers (@layer) to manage specificity at scale, control priority between resets, components, and utilities without specificity wars.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Cascade Layers - Lesson 11 | Teach Me">
+  <meta name="twitter:description" content="Learn CSS cascade layers (@layer) to manage specificity at scale, control priority between resets, components, and utilities without specificity wars.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    @layer reset, base, components, utilities;
+  </style>
+  <style>
+    @layer reset {
+      .layer-demo-box { all: unset; display: block; padding: 1rem; border-radius: 6px; font-size: 0.85rem; }
+    }
+  </style>
+  <style>
+    @layer base {
+      .layer-demo-box { background: #e8f8f5; color: #1a1a2e; }
+    }
+  </style>
+  <style>
+    @layer components {
+      .layer-demo-box.card { background: var(--accent); color: white; }
+    }
+  </style>
+  <style>
+    @layer utilities {
+      .bg-coral { background: #e76f51 !important; }
+    }
+  </style>
+  <style>
+    .layer-demo-box.override-demo { background: #6c5ce7; color: white; }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header">
+        <a href="index.html">CSS Course</a>
+      </div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-custom-properties-fundamentals.html">1. Custom Properties</a></li>
+        <li><a href="02-registered-custom-properties.html">2. @property</a></li>
+        <li><a href="03-css-value-functions.html">3. Value Functions</a></li>
+        <li><a href="04-custom-css-functions.html">4. Custom Functions</a></li>
+        <li><a href="05-advanced-attr.html">5. Advanced attr()</a></li>
+        <li><a href="06-transitions.html">6. Transitions</a></li>
+        <li><a href="07-animations.html">7. Animations</a></li>
+        <li><a href="08-flexbox.html">8. Flexbox</a></li>
+        <li><a href="09-grid.html">9. Grid</a></li>
+        <li><a href="10-container-queries.html">10. Container Queries</a></li>
+        <li class="current"><a href="11-cascade-layers.html">11. Cascade Layers</a></li>
+        <li><a href="12-css-nesting.html">12. CSS Nesting</a></li>
+        <li><a href="13-modern-selectors.html">13. Modern Selectors</a></li>
+        <li><a href="14-the-cascade.html">14. The Cascade</a></li>
+        <li><a href="15-logical-properties.html">15. Logical Properties</a></li>
+        <li><a href="16-view-transitions.html">16. View Transitions</a></li>
+        <li><a href="17-anchor-positioning.html">17. Anchor Positioning</a></li>
+        <li><a href="18-advanced-colour.html">18. Advanced Colour</a></li>
+        <li><a href="19-scope.html">19. @scope</a></li>
+        <li><a href="20-selectors-deep-dive.html">20. Selectors Deep-Dive</a></li>
+        <li><a href="21-theming-deep-dive.html">21. Theming Deep-Dive</a></li>
+        <li><a href="22-responsive-design-patterns.html">22. Responsive Patterns</a></li>
+        <li><a href="23-scroll-driven-animations.html">23. Scroll-Driven Animations</a></li>
+        <li><a href="24-capstone-product-landing-page.html">24. Capstone Project</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="css-anatomy.html">CSS Anatomy</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+  <p class="lesson-num">Lesson 11</p>
+  <h1>Cascade Layers</h1>
+
+  <p>CSS specificity was designed for small documents. A single stylesheet, a handful of selectors, and everything just worked. But modern projects have resets, base styles, component libraries, utility classes, and third-party CSS all competing for priority. The result? Specificity wars  -  developers stacking selectors, adding IDs, or reaching for <code>!important</code> just to make their styles win.</p>
+
+  <p>Cascade layers (<code>@layer</code>) solve this by letting you explicitly control which <em>group</em> of styles has priority  -  regardless of the specificity of individual selectors within those groups. Think of layers as a higher-level priority system that sits above specificity in the cascade.</p>
+
+  <h2>Quick primer: how specificity is calculated</h2>
+
+  <p>Before understanding layers, you need a solid grasp of specificity. Every selector has a specificity score expressed as three components: <strong>(A, B, C)</strong>.</p>
+
+  <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; margin: 1.5rem 0;">
+    <thead>
+      <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+        <th style="padding: 0.5rem;">Component</th>
+        <th style="padding: 0.5rem;">Counts</th>
+        <th style="padding: 0.5rem;">Example selectors</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 0.5rem;"><strong>A</strong>  -  IDs</td>
+        <td style="padding: 0.5rem;">Number of ID selectors</td>
+        <td style="padding: 0.5rem;"><code>#nav</code> = (1,0,0)</td>
+      </tr>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 0.5rem;"><strong>B</strong>  -  Classes</td>
+        <td style="padding: 0.5rem;">Classes, attributes, pseudo-classes</td>
+        <td style="padding: 0.5rem;"><code>.btn.primary</code> = (0,2,0)</td>
+      </tr>
+      <tr>
+        <td style="padding: 0.5rem;"><strong>C</strong>  -  Elements</td>
+        <td style="padding: 0.5rem;">Type selectors, pseudo-elements</td>
+        <td style="padding: 0.5rem;"><code>div p::before</code> = (0,0,3)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* Specificity: (0, 1, 0) */
+.button { background: blue; }
+
+/* Specificity: (0, 2, 0) - wins over .button */
+.sidebar .button { background: green; }
+
+/* Specificity: (1, 0, 0) - wins over both */
+#submit-btn { background: red; }
+
+/* Specificity: (1, 1, 1) */
+div#header .nav-link { ... }
+
+/* The problem: to override .sidebar .button, you need
+   equal or higher specificity - leading to escalation */
+.main-content .card .button { background: purple; } /* (0, 3, 0) */</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <p><strong>The specificity problem:</strong> In large codebases, developers keep increasing specificity to override previous styles. Each override requires yet higher specificity, creating an arms race that makes CSS fragile and hard to maintain. Cascade layers break this cycle entirely.</p>
+  </div>
+
+  <h2>The mental model: cascade resolution order</h2>
+
+  <p>The cascade resolves conflicting declarations by checking these criteria in order. If a higher criterion produces a winner, lower criteria are never consulted:</p>
+
+  <ol>
+    <li><strong>Transitions</strong>  -  active transition values always win</li>
+    <li><strong>!important</strong> (with layer inversion)  -  important declarations from earlier layers beat later ones</li>
+    <li><strong>Inline styles</strong>  -  the <code>style</code> attribute</li>
+    <li><strong>Unlayered styles</strong>  -  CSS not inside any <code>@layer</code></li>
+    <li><strong>Layers</strong>  -  later declared layers beat earlier ones</li>
+    <li><strong>Specificity</strong>  -  (A, B, C) comparison</li>
+    <li><strong>Source order</strong>  -  last rule in document wins</li>
+  </ol>
+
+  <p>Notice that layers sit <em>above</em> specificity in this hierarchy. A selector with (0,1,0) in a higher-priority layer beats a selector with (1,0,0) in a lower-priority layer. This is the key insight  -  layer priority trumps specificity entirely.</p>
+
+  <h2>Declaring and ordering layers</h2>
+
+  <p>You declare layers with <code>@layer</code>. The order you declare them determines their priority  -  <strong>last declared has highest priority</strong>:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* Declare layer order upfront (recommended) */
+@layer reset, base, components, utilities;
+
+/* Now add styles to each layer - order of these blocks doesn't matter */
+@layer components {
+  .btn { background: blue; padding: 0.5rem 1rem; }
+}
+
+@layer utilities {
+  .bg-red { background: red; }
+}
+
+@layer base {
+  body { font-family: system-ui; line-height: 1.6; }
+}
+
+@layer reset {
+  *, *::before, *::after { box-sizing: border-box; margin: 0; }
+}</code></pre>
+  </div>
+
+  <p>In the declaration <code>@layer reset, base, components, utilities</code>, priority goes left to right  -  <code>utilities</code> has the highest priority because it's declared last.</p>
+
+  <div class="demo">
+    <p class="demo-caption">Layer priority demo  -  the box gets its styles from the highest-priority layer</p>
+    <div class="layer-demo-box card">This box has class "layer-demo-box card". The <code>components</code> layer wins over <code>base</code> because it's declared later.</div>
+  </div>
+
+  <div class="key-concept">
+    <p><strong>Declare your layer order at the top of your stylesheet.</strong> A single <code>@layer reset, base, components, utilities;</code> statement establishes the priority hierarchy. Then you can add styles to any layer from anywhere in your CSS, and the declared order (not the definition order) determines priority.</p>
+  </div>
+
+  <h2>Declaration order vs definition order</h2>
+
+  <p>This is the most critical distinction in cascade layers. There are two separate concepts:</p>
+
+  <ul>
+    <li><strong>Declaration order:</strong> The order in which layer <em>names</em> are first introduced. This determines priority.</li>
+    <li><strong>Definition order:</strong> Where you actually write the styles for each layer. This does NOT affect priority.</li>
+  </ul>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* Declaration order: A first, B second (B has higher priority) */
+@layer A, B;
+
+/* Definition order doesn't matter - even though A's styles
+   appear AFTER B's styles in the file, B still wins */
+@layer B {
+  .box { background: blue; }
+}
+
+@layer A {
+  .box { background: red; }
+}
+
+/* Result: .box is blue (B wins because it was declared later) */</code></pre>
+  </div>
+
+  <p>This is what makes layers powerful  -  you set the priority once at the top, and then you can organise your actual CSS in whatever file/import order makes sense for your project without worrying about accidentally changing priority.</p>
+
+  <h2>Unlayered styles beat all layers</h2>
+
+  <p>Any CSS that is <em>not</em> inside an <code>@layer</code> block is considered "unlayered" and has higher priority than all layered styles, regardless of specificity:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>@layer utilities {
+  /* Even with !important specificity tricks... */
+  .special-box { background: gold; }
+}
+
+/* This unlayered style WINS over the layered one,
+   even though both target .special-box with (0,1,0) specificity */
+.special-box { background: purple; }</code></pre>
+  </div>
+
+  <div class="demo">
+    <p class="demo-caption">Unlayered styles override layers  -  the purple background comes from unlayered CSS</p>
+    <div class="layer-demo-box override-demo">This box has styles in the <code>base</code> layer AND unlayered CSS. The unlayered purple background wins.</div>
+  </div>
+
+  <div class="key-concept">
+    <p><strong>Unlayered CSS is at the top of the layer hierarchy.</strong> This is by design  -  it provides an escape hatch. If you need to override layered styles quickly, write the override outside any layer. But in a well-structured project, most CSS should be in a layer, with unlayered styles used sparingly for one-off overrides.</p>
+  </div>
+
+  <h2>A practical layer architecture</h2>
+
+  <p>Here's a recommended layer structure for a typical project, from lowest to highest priority:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>@layer reset, vendor, base, layout, components, utilities;
+
+/* 1. reset - Normalize browser defaults */
+@layer reset {
+  *, *::before, *::after { box-sizing: border-box; margin: 0; }
+  body { line-height: 1.5; -webkit-font-smoothing: antialiased; }
+}
+
+/* 2. vendor - Third-party libraries */
+@layer vendor {
+  /* Imported via @import url("...") layer(vendor); */
+}
+
+/* 3. base - Typography, colours, design tokens */
+@layer base {
+  :root { --accent: #2563eb; --text: #1a1a2e; }
+  body { font-family: system-ui, sans-serif; color: var(--text); }
+  a { color: var(--accent); }
+}
+
+/* 4. layout - Page-level structure */
+@layer layout {
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
+  .grid { display: grid; gap: 1rem; }
+}
+
+/* 5. components - UI components */
+@layer components {
+  .btn { padding: 0.5rem 1rem; border-radius: 4px; }
+  .card { border: 1px solid var(--border); border-radius: 8px; }
+}
+
+/* 6. utilities - Single-purpose overrides (highest priority) */
+@layer utilities {
+  .hidden { display: none; }
+  .text-center { text-align: center; }
+  .mt-4 { margin-top: 1rem; }
+}</code></pre>
+  </div>
+
+  <p>This architecture mirrors how specificity <em>should</em> work logically: utilities override components, components override base styles, and base styles override resets. With layers, this works regardless of selector specificity  -  a utility class <code>.hidden</code> with specificity (0,1,0) reliably overrides a component selector <code>.modal.active .panel</code> with specificity (0,3,0).</p>
+
+  <h2>!important and layers  -  the inversion</h2>
+
+  <p>Here's where layers get surprising. For normal (non-important) declarations, later layers win. But for <code>!important</code> declarations, the priority <strong>inverts</strong>  -  earlier layers win:</p>
+
+  <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; margin: 1.5rem 0;">
+    <thead>
+      <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+        <th style="padding: 0.5rem;">Priority (highest first)</th>
+        <th style="padding: 0.5rem;">Normal declarations</th>
+        <th style="padding: 0.5rem;">!important declarations</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 0.5rem;">1st</td>
+        <td style="padding: 0.5rem;">Unlayered</td>
+        <td style="padding: 0.5rem;">First-declared layer (e.g., reset)</td>
+      </tr>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 0.5rem;">2nd</td>
+        <td style="padding: 0.5rem;">Last-declared layer (e.g., utilities)</td>
+        <td style="padding: 0.5rem;">Second-declared layer (e.g., base)</td>
+      </tr>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 0.5rem;">3rd</td>
+        <td style="padding: 0.5rem;">...</td>
+        <td style="padding: 0.5rem;">...</td>
+      </tr>
+      <tr>
+        <td style="padding: 0.5rem;">Last</td>
+        <td style="padding: 0.5rem;">First-declared layer (e.g., reset)</td>
+        <td style="padding: 0.5rem;">Unlayered</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>@layer reset, base, components, utilities;
+
+@layer reset {
+  /* !important here has HIGHEST priority among layered !important */
+  img { display: block !important; }
+}
+
+@layer utilities {
+  /* Normal: utilities wins (last declared) */
+  .block { display: block; }
+
+  /* !important: utilities loses to reset's !important (first declared) */
+  .inline { display: inline !important; }
+}
+
+/* Why this makes sense: !important in a reset means "this must
+   NEVER be overridden" - and the inversion guarantees exactly that. */</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <p><strong>Why the inversion exists:</strong> <code>!important</code> was always meant to be a "this must not change" signal. The inversion makes that intent reliable. A reset layer saying <code>img { display: block !important; }</code> truly cannot be overridden by later layers  -  because the first-declared layer has highest !important priority. This finally gives <code>!important</code> a sensible, predictable role.</p>
+  </div>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <h2>Adding third-party CSS to a layer</h2>
+
+  <p>You can import external stylesheets directly into a named layer using <code>@import</code> with the <code>layer()</code> function:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* Import third-party CSS into a dedicated layer */
+@import url("https://cdn.example.com/library.css") layer(vendor);
+
+/* Or import into a new anonymous layer */
+@import url("normalize.css") layer;
+
+/* Layer order still determined by your declaration */
+@layer reset, vendor, base, components, utilities;
+
+/* Now the third-party CSS has lower priority than your components
+   and utilities - no more fighting their selectors! */</code></pre>
+  </div>
+
+  <p>This is transformative for managing third-party CSS. Instead of fighting specificity battles with Bootstrap, Tailwind preflight, or any other library, you simply put it in a layer below your own code. Your styles always win without needing to increase specificity.</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* Real-world example: taming a UI library */
+@layer reset, vendor, theme, components, utilities;
+
+@import url("open-props/style.css") layer(vendor);
+@import url("some-component-lib/styles.css") layer(vendor);
+
+@layer theme {
+  /* Your design tokens override the library's defaults
+     without needing higher specificity */
+  :root {
+    --brand: #2563eb;
+    --radius: 8px;
+  }
+}
+
+@layer components {
+  /* Your component styles always beat the vendor layer,
+     even if the library uses .namespace .component .element */
+  .btn {
+    background: var(--brand);
+    border-radius: var(--radius);
+  }
+}</code></pre>
+  </div>
+
+  <h2>Nested layers</h2>
+
+  <p>Layers can be nested inside other layers using dot notation or block nesting. Nested layers are scoped to their parent:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* Dot notation for declaring nested layers */
+@layer components.buttons, components.cards, components.forms;
+
+/* Block nesting syntax */
+@layer components {
+  @layer buttons {
+    .btn { padding: 0.5rem 1rem; }
+  }
+  @layer cards {
+    .card { border-radius: 8px; }
+  }
+}
+
+/* Equivalent dot notation for adding styles */
+@layer components.buttons {
+  .btn-primary { background: blue; }
+}
+
+/* Priority: within the components layer,
+   forms > cards > buttons (last declared wins) */</code></pre>
+  </div>
+
+  <p>Nested layers are useful for organising large layers. A <code>components</code> layer might contain sub-layers for different component categories. The parent layer's position in the top-level hierarchy is unchanged  -  nesting only affects priority <em>within</em> that parent.</p>
+
+  <h2>Anonymous layers</h2>
+
+  <p>You can create layers without naming them. Anonymous layers are useful when you want to isolate styles at a lower priority without tracking a name:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* Anonymous layer - cannot be referenced later */
+@layer {
+  .legacy-widget { color: grey; font-size: 14px; }
+}
+
+/* Another anonymous layer - each is separate */
+@layer {
+  .old-component { margin: 10px; }
+}
+
+/* Anonymous layers are ordered by their position in the source.
+   You can't add more styles to them later because they have no name.
+   Useful for one-shot isolation of legacy CSS. */</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <p><strong>When to use anonymous layers:</strong> They're ideal for wrapping legacy CSS you don't control and don't need to extend. Since they can't be referenced by name, they act as sealed containers. Named layers are better for anything you'll actively maintain or add to over time.</p>
+  </div>
+
+  <h2>How this changes your workflow</h2>
+
+  <p>Here's a before/after comparison of how you handle specificity conflicts:</p>
+
+  <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; margin: 1.5rem 0;">
+    <thead>
+      <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+        <th style="padding: 0.5rem;">Scenario</th>
+        <th style="padding: 0.5rem;">Before (no layers)</th>
+        <th style="padding: 0.5rem;">After (with layers)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 0.5rem;">Utility class not applying</td>
+        <td style="padding: 0.5rem;">Add <code>!important</code> or increase specificity</td>
+        <td style="padding: 0.5rem;">Utilities layer already wins  -  just works</td>
+      </tr>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 0.5rem;">Third-party styles overriding yours</td>
+        <td style="padding: 0.5rem;">Match or exceed their specificity</td>
+        <td style="padding: 0.5rem;">Put vendor CSS in a lower layer</td>
+      </tr>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 0.5rem;">Reset styles leaking into components</td>
+        <td style="padding: 0.5rem;">More specific selectors on components</td>
+        <td style="padding: 0.5rem;">Reset in lowest layer, components always win</td>
+      </tr>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 0.5rem;">File/import order changing priority</td>
+        <td style="padding: 0.5rem;">Careful ordering of stylesheets</td>
+        <td style="padding: 0.5rem;">Declaration order is explicit and separate from file order</td>
+      </tr>
+      <tr>
+        <td style="padding: 0.5rem;">Collaborator writes high-specificity CSS</td>
+        <td style="padding: 0.5rem;">Cascade breakage, debugging pain</td>
+        <td style="padding: 0.5rem;">Their layer determines priority, not their selectors</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>The fundamental shift: instead of managing specificity at the <em>selector</em> level (which is fragile and doesn't scale), you manage priority at the <em>architectural</em> level. Each category of CSS has a defined priority, and individual selectors within that category compete only with each other.</p>
+
+  <h2>Browser support</h2>
+
+  <p>Cascade layers (<code>@layer</code>) are supported in all modern browsers: Chrome 99+, Firefox 97+, Safari 15.4+, Edge 99+. That covers over 95% of global users as of 2024. For older browsers, unlayered CSS is simply treated normally  -  it doesn't break, it just doesn't get the layer prioritisation benefits.</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* Feature detection if needed */
+@supports at-rule(@layer) {
+  /* Layer-aware styles */
+}
+
+/* In practice, you rarely need this.
+   Browsers that don't support @layer simply ignore the layer
+   declarations and treat all styles as unlayered (normal behaviour). */</code></pre>
+  </div>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <h2>Retrieval check</h2>
+
+  <div class="quiz" id="quiz1">
+    <h3>Question 1</h3>
+    <p>Where do layers sit relative to specificity in the cascade resolution order?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Below  -  specificity is checked before layers</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">Above  -  layer priority is checked first</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Same level  -  they're combined into one score</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">It depends on whether !important is used</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz2">
+    <h3>Question 2</h3>
+    <p>Given <code>@layer reset, base, components, utilities</code>  -  which layer has the highest normal priority?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">reset  -  first declared gets priority</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">components  -  it has the most specific selectors</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">utilities  -  last declared wins</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">They all have equal priority</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz3">
+    <h3>Question 3</h3>
+    <p>What beats all layered styles in the cascade?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Styles with higher specificity selectors</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Styles using !important</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">Unlayered styles (CSS not inside any @layer)</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Inline styles only</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz4">
+    <h3>Question 4</h3>
+    <p>For <code>!important</code> rules, how is layer priority resolved?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Same as normal  -  last declared wins</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">Inverted  -  first declared layer wins</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">!important ignores layers entirely</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">All !important rules have equal priority</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz5">
+    <h3>Question 5</h3>
+    <p>How do you put third-party CSS into a named layer?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">@layer vendor { @include "library.css"; }</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">link rel="stylesheet" layer="vendor" href="library.css"</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">@import url("library.css") layer(vendor)</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">@layer(vendor) url("library.css")</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="recommended">
+    <strong>Recommended resources:</strong>
+    <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@layer">MDN  -  @layer</a> |
+    <a href="https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Styling_basics/Cascade_layers">MDN  -  Cascade layers guide</a> |
+    <a href="https://css-tricks.com/css-cascade-layers/">CSS-Tricks  -  A Complete Guide to CSS Cascade Layers</a>
+  </div>
+
+  <div class="footer-nav">
+    <a href="10-container-queries.html">&larr; Prev: Container Queries</a>
+    <a href="index.html">Index</a>
+    <a href="12-css-nesting.html">Next: CSS Nesting &rarr;</a>
+  </div>
+
+    </main>
+  </div>
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

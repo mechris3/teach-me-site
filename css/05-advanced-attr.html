@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>Advanced attr() - Lesson 5 | Teach Me</title>
+  <meta name="description" content="Learn how to use the upgraded attr() function to read HTML attributes as typed CSS values - lengths, colours, numbers - in any property, not just content.">
+  <link rel="canonical" href="https://teachmeskills.dev/css/05-advanced-attr.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/css/05-advanced-attr.html">
+  <meta property="og:title" content="Advanced attr() - Lesson 5 | Teach Me">
+  <meta property="og:description" content="Learn how to use the upgraded attr() function to read HTML attributes as typed CSS values - lengths, colours, numbers - in any property, not just content.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Advanced attr() - Lesson 5 | Teach Me">
+  <meta name="twitter:description" content="Learn how to use the upgraded attr() function to read HTML attributes as typed CSS values - lengths, colours, numbers - in any property, not just content.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Demo: basic attr for content (old way) */
+    .tooltip-old::after {
+      content: attr(data-tip);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #333;
+      color: white;
+      padding: 0.3rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.2s;
+      pointer-events: none;
+    }
+
+    .tooltip-old:hover::after { opacity: 1; }
+    .tooltip-old { position: relative; display: inline-block; cursor: help; border-bottom: 1px dashed #888; }
+
+    /* Demo: typed attr - width from data attribute */
+    .bar {
+      height: 2rem;
+      width: attr(data-width type(<percentage>), 10%);
+      background: var(--accent, #3a86ff);
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      padding-left: 0.5rem;
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 600;
+      transition: width 0.4s ease-out;
+    }
+
+    /* Demo: colour from attr */
+    .color-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      border-radius: 6px;
+      background: attr(data-color type(<color>), #ccc);
+      color: white;
+      font-size: 0.85rem;
+      font-weight: 500;
+      margin: 0.25rem;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    }
+
+    /* Demo: attr in calc */
+    .grid-item {
+      padding: calc(attr(data-pad type(<length>), 8px) * 2);
+      background: #e8f8f5; color: #1a1a2e;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      margin-bottom: 0.5rem;
+    }
+
+    /* Demo: attr with custom property fallback */
+    .themed-box {
+      --default-radius: 8px;
+      border-radius: attr(data-radius type(<length>), var(--default-radius));
+      background: attr(data-bg type(<color>), #f0f7ff);
+      padding: 1rem;
+      border: 1px solid var(--border, #e0e0e0);
+      margin-bottom: 0.5rem;
+      font-size: 0.85rem;
+      color: #1a1a2e;
+    }
+
+    /* Demo: progress bar */
+    progress-bar {
+      --pct: calc(attr(data-value type(<number>), 0) / attr(data-max type(<number>), 100) * 100%);
+      display: block;
+      height: 8px;
+      background: lightgray;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+      position: relative;
+    }
+
+    progress-bar::after {
+      content: "";
+      display: block;
+      height: 100%;
+      width: var(--pct);
+      background: var(--accent, #3a86ff);
+      border-radius: 4px;
+    }
+
+    /* Demo: grid from attr */
+    .attr-grid {
+      display: grid;
+      grid-template-columns: repeat(attr(data-cols type(<integer>), 3), 1fr);
+      gap: 0.5rem;
+    }
+
+    .attr-grid-cell {
+      background: var(--accent, #3a86ff);
+      color: white;
+      padding: 0.75rem;
+      border-radius: 4px;
+      text-align: center;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    /* Demo: icon sizing */
+    svg-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: attr(data-size type(<length>), 16px);
+      height: attr(data-size type(<length>), 16px);
+      color: attr(data-color type(<color>), currentColor);
+      font-size: attr(data-size type(<length>), 16px);
+      margin-right: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header">
+        <a href="index.html">CSS Course</a>
+      </div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-custom-properties-fundamentals.html">1. Custom Properties</a></li>
+        <li><a href="02-registered-custom-properties.html">2. @property</a></li>
+        <li><a href="03-css-value-functions.html">3. Value Functions</a></li>
+        <li><a href="04-custom-css-functions.html">4. Custom Functions</a></li>
+        <li class="current"><a href="05-advanced-attr.html">5. Advanced attr()</a></li>
+        <li><a href="06-transitions.html">6. Transitions</a></li>
+        <li><a href="07-animations.html">7. Animations</a></li>
+        <li><a href="08-flexbox.html">8. Flexbox</a></li>
+        <li><a href="09-grid.html">9. Grid</a></li>
+        <li><a href="10-container-queries.html">10. Container Queries</a></li>
+        <li><a href="11-cascade-layers.html">11. Cascade Layers</a></li>
+        <li><a href="12-css-nesting.html">12. CSS Nesting</a></li>
+        <li><a href="13-modern-selectors.html">13. Modern Selectors</a></li>
+        <li><a href="14-the-cascade.html">14. The Cascade</a></li>
+        <li><a href="15-logical-properties.html">15. Logical Properties</a></li>
+        <li><a href="16-view-transitions.html">16. View Transitions</a></li>
+        <li><a href="17-anchor-positioning.html">17. Anchor Positioning</a></li>
+        <li><a href="18-advanced-colour.html">18. Advanced Colour</a></li>
+        <li><a href="19-scope.html">19. @scope</a></li>
+        <li><a href="20-selectors-deep-dive.html">20. Selectors Deep-Dive</a></li>
+        <li><a href="21-theming-deep-dive.html">21. Theming Deep-Dive</a></li>
+        <li><a href="22-responsive-design-patterns.html">22. Responsive Patterns</a></li>
+        <li><a href="23-scroll-driven-animations.html">23. Scroll-Driven Animations</a></li>
+        <li><a href="24-capstone-product-landing-page.html">24. Capstone Project</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="css-anatomy.html">CSS Anatomy</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 5</p>
+  <h1>Advanced <code>attr()</code>  -  HTML Attributes as Typed CSS Values</h1>
+
+  <p>You've learned how <code>var()</code> pulls values from custom property declarations. <code>attr()</code> does something similar  -  but the source is an HTML attribute on the element itself, rather than a CSS declaration.</p>
+
+  <p>For years, <code>attr()</code> was limited to one use: reading an attribute as a string for the <code>content</code> property of pseudo-elements. The advanced version (Chrome 133+) removes both restrictions. You can now use <code>attr()</code> with <strong>any property</strong> and parse values into <strong>any CSS type</strong>.</p>
+
+  <h2>The old attr()  -  strings only, content only</h2>
+
+  <p>This is what you may have seen before:</p>
+
+  <div class="demo">
+    <p class="demo-caption">Old attr()  -  tooltip via content property</p>
+    <p><span class="tooltip-old" data-tip="I'm a tooltip!">Hover this text</span> to see the attribute value used as content.</p>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;span class="tooltip-old" data-tip="I'm a tooltip!"&gt;Hover this text&lt;/span&gt;
+
+.tooltip-old::after {
+  content: attr(data-tip);  /* always a string, only works in content */
+}</code></pre>
+  </div>
+
+  <p>That's useful but limited. The value is always a string, and it can only appear in <code>content:</code>.</p>
+
+  <h2>The new attr()  -  typed values, any property</h2>
+
+  <p>The advanced syntax adds a type and a fallback:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>attr( &lt;attribute-name&gt; type(&lt;css-type&gt;), &lt;fallback&gt; )</code></pre>
+  </div>
+
+  <p>Compare this to what you already know:</p>
+
+  <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; margin: 1.5rem 0;">
+    <thead>
+      <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+        <th style="padding: 0.5rem;">Function</th>
+        <th style="padding: 0.5rem;">Source</th>
+        <th style="padding: 0.5rem;">Syntax</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 0.5rem;"><code>var()</code></td>
+        <td style="padding: 0.5rem;">Custom property declaration</td>
+        <td style="padding: 0.5rem;"><code>var(--name, fallback)</code></td>
+      </tr>
+      <tr>
+        <td style="padding: 0.5rem;"><code>attr()</code></td>
+        <td style="padding: 0.5rem;">HTML attribute on element</td>
+        <td style="padding: 0.5rem;"><code>attr(name type(&lt;T&gt;), fallback)</code></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="key-concept">
+    <p><strong>The parallel:</strong> <code>var()</code> reads from the cascade. <code>attr()</code> reads from the DOM. Both support fallbacks. Both can now be typed. Both work anywhere a value is expected.</p>
+  </div>
+
+  <h2>Syntax breakdown</h2>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* Read data-width as a percentage, fallback to 50% */
+width: attr(data-width type(&lt;percentage&gt;), 50%);
+
+/* Read data-color as a colour */
+background: attr(data-color type(&lt;color&gt;), gray);
+
+/* Read data-size as a length */
+font-size: attr(data-size type(&lt;length&gt;), 1rem);
+
+/* Read data-cols as an integer */
+grid-template-columns: repeat(attr(data-cols type(&lt;integer&gt;), 3), 1fr);</code></pre>
+  </div>
+
+  <p>The <code>type()</code> wrapper uses the same type names you learned in <code>@property</code>:</p>
+  <ul>
+    <li><code>type(&lt;length&gt;)</code>, <code>type(&lt;percentage&gt;)</code>, <code>type(&lt;number&gt;)</code>, <code>type(&lt;integer&gt;)</code></li>
+    <li><code>type(&lt;color&gt;)</code>, <code>type(&lt;angle&gt;)</code>, <code>type(&lt;time&gt;)</code></li>
+    <li><code>type(&lt;length-percentage&gt;)</code>, <code>type(&lt;custom-ident&gt;)</code></li>
+  </ul>
+
+  <p>If you omit <code>type()</code>, it still behaves as the old string-only version (backward compatible).</p>
+
+  <h2>Live demo: bar chart from data attributes</h2>
+
+  <div class="demo">
+    <p class="demo-caption">Each bar reads its width from data-width  -  no custom properties or JS needed</p>
+    <div class="bar" data-width="85%">85%</div>
+    <div class="bar" data-width="62%">62%</div>
+    <div class="bar" data-width="94%">94%</div>
+    <div class="bar" data-width="41%">41%</div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;div class="bar" data-width="85%"&gt;85%&lt;/div&gt;
+&lt;div class="bar" data-width="62%"&gt;62%&lt;/div&gt;
+&lt;div class="bar" data-width="94%"&gt;94%&lt;/div&gt;
+&lt;div class="bar" data-width="41%"&gt;41%&lt;/div&gt;
+
+.bar {
+  width: attr(data-width type(&lt;percentage&gt;), 10%);
+  height: 2rem;
+  background: var(--accent);
+}</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <p><strong>Why this matters:</strong> The data lives in the HTML. No JavaScript needed to set widths. A server can render the attributes, a CMS can populate them, or you can generate them from a framework binding (<code>[attr.data-width]</code> in Angular). The CSS just reads them.</p>
+  </div>
+
+  <h2>Live demo: colours from attributes</h2>
+
+  <div class="demo">
+    <p class="demo-caption">Background colour read directly from data-color attribute</p>
+    <span class="color-chip" data-color="#3a86ff">Blue</span>
+    <span class="color-chip" data-color="#e76f51">Coral</span>
+    <span class="color-chip" data-color="#2a9d8f">Teal</span>
+    <span class="color-chip" data-color="#6c5ce7">Purple</span>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;span class="color-chip" data-color="#3a86ff"&gt;Blue&lt;/span&gt;
+&lt;span class="color-chip" data-color="#e76f51"&gt;Coral&lt;/span&gt;
+&lt;span class="color-chip" data-color="#2a9d8f"&gt;Teal&lt;/span&gt;
+&lt;span class="color-chip" data-color="#6c5ce7"&gt;Purple&lt;/span&gt;
+
+.color-chip {
+  background: attr(data-color type(&lt;color&gt;), #ccc);
+}</code></pre>
+  </div>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <h2>Using attr() inside calc()</h2>
+
+  <p>Since typed <code>attr()</code> returns a real CSS value (not a string), it composes with everything you've learned:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;div class="grid-item" data-pad="8px"&gt;...&lt;/div&gt;
+&lt;div class="grid-item" data-pad="16px"&gt;...&lt;/div&gt;
+&lt;div class="grid-item" data-pad="4px"&gt;...&lt;/div&gt;
+
+.grid-item {
+  /* Double the padding from the attribute */
+  padding: calc(attr(data-pad type(&lt;length&gt;), 8px) * 2);
+}</code></pre>
+  </div>
+
+  <div class="demo">
+    <p class="demo-caption">Padding doubled via calc() on attr()</p>
+    <div class="grid-item" data-pad="8px">data-pad="8px" → padding: 16px</div>
+    <div class="grid-item" data-pad="16px">data-pad="16px" → padding: 32px</div>
+    <div class="grid-item" data-pad="4px">data-pad="4px" → padding: 8px</div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;div class="grid-item" data-pad="8px"&gt;...&lt;/div&gt;
+&lt;div class="grid-item" data-pad="16px"&gt;...&lt;/div&gt;
+&lt;div class="grid-item" data-pad="4px"&gt;...&lt;/div&gt;
+
+.grid-item {
+  /* Double the padding from the attribute */
+  padding: calc(attr(data-pad type(&lt;length&gt;), 8px) * 2);
+}</code></pre>
+  </div>
+
+  <h2>Fallbacks: var() inside attr()</h2>
+
+  <p>The fallback value can itself be a <code>var()</code> call, giving you a chain: attribute → custom property → hardcoded default:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;div class="themed-box" data-radius="20px" data-bg="#fff3e0"&gt;...&lt;/div&gt;
+&lt;div class="themed-box"&gt;...&lt;/div&gt;  &lt;!-- no attributes --&gt;
+
+.themed-box {
+  --default-radius: 8px;
+  border-radius: attr(data-radius type(&lt;length&gt;), var(--default-radius));
+  background: attr(data-bg type(&lt;color&gt;), #f0f7ff);
+  /* First box: 20px radius, orange background (from attributes)
+     Second box: 8px radius, light blue background (from fallbacks) */
+}</code></pre>
+  </div>
+
+  <div class="demo">
+    <p class="demo-caption">First box has data-radius="20px", second has no attribute (uses --default-radius)</p>
+    <div class="themed-box" data-radius="20px" data-bg="#fff3e0">data-radius="20px", data-bg="#fff3e0"</div>
+    <div class="themed-box">No attributes  -  uses custom property defaults</div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;div class="themed-box" data-radius="20px" data-bg="#fff3e0"&gt;...&lt;/div&gt;
+&lt;div class="themed-box"&gt;No attributes  -  uses custom property defaults&lt;/div&gt;
+
+.themed-box {
+  --default-radius: 8px;
+  border-radius: attr(data-radius type(&lt;length&gt;), var(--default-radius));
+  background: attr(data-bg type(&lt;color&gt;), #f0f7ff);
+}</code></pre>
+  </div>
+
+  <h2>When to use attr() vs custom properties</h2>
+
+  <p>They solve different problems:</p>
+
+  <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; margin: 1.5rem 0;">
+    <thead>
+      <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+        <th style="padding: 0.5rem;">Use attr() when...</th>
+        <th style="padding: 0.5rem;">Use custom properties when...</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 0.5rem;">The value comes from the HTML/server/CMS</td>
+        <td style="padding: 0.5rem;">The value is a design decision (token)</td>
+      </tr>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 0.5rem;">Each element has a unique value</td>
+        <td style="padding: 0.5rem;">Many elements share the same value</td>
+      </tr>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 0.5rem;">The value is data-driven (charts, progress bars)</td>
+        <td style="padding: 0.5rem;">The value is theme-driven (colours, spacing)</td>
+      </tr>
+      <tr>
+        <td style="padding: 0.5rem;">You want to avoid inline styles</td>
+        <td style="padding: 0.5rem;">You want cascade inheritance</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="key-concept">
+    <p><strong>Angular connection:</strong> In Angular, you'd bind like <code>[attr.data-width]="item.progress + '%'"</code>. The CSS reads it with <code>attr(data-width type(&lt;percentage&gt;))</code>. No <code>[ngStyle]</code> or inline styles needed  -  cleaner separation of concerns.</p>
+  </div>
+
+  <h2>What attr() can't do</h2>
+
+  <ul>
+    <li><strong>No inheritance.</strong> <code>attr()</code> reads from the element itself, not its ancestors. Unlike custom properties, there's no cascade.</li>
+    <li><strong>No animated transitions.</strong> If you change an attribute in the DOM (e.g. via <code>element.setAttribute('data-width', '80%')</code>), CSS <em>will</em> pick up the new value  -  it's reactive, not frozen. But the change is an instant swap. You can't smoothly transition between the old and new values, because the browser's transition system tracks CSS properties, not DOM attributes. It doesn't know "this attribute just went from X to Y, let me interpolate."</li>
+    <li><strong>Attribute must exist in the HTML.</strong> If the attribute is missing AND no fallback is provided, the declaration becomes invalid at computed-value time.</li>
+    <li><strong>Only reads the element's own attributes.</strong> You can't read a parent's attribute from a child's CSS rule.</li>
+  </ul>
+
+  <h3>Workaround: attr() + @property for animated transitions</h3>
+
+  <p>If you need both data-attribute-sourced values AND smooth transitions, bridge the gap with a registered custom property and a tiny bit of JS:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* Register a typed custom property so transitions work */
+@property --width {
+  syntax: "&lt;percentage&gt;";
+  inherits: false;
+  initial-value: 0%;
+}
+
+.bar {
+  width: var(--width);
+  transition: --width 0.3s ease;
+}</code></pre>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>// JS reads the attribute and writes it into the custom property
+const bar = document.querySelector('.bar');
+bar.style.setProperty('--width', bar.dataset.width);
+
+// Later, when the data changes:
+bar.dataset.width = '80%';
+bar.style.setProperty('--width', '80%');  // triggers smooth transition</code></pre>
+  </div>
+
+  <p>The attribute is still the source of truth (your server/framework sets it), but JS bridges it into a registered custom property that the browser knows how to interpolate. This is a common pattern in data-driven UIs where you want both server-driven values and polished animation.</p>
+
+  <h2>Practical patterns</h2>
+
+  <h3>Progress bar without JS</h3>
+
+  <div class="demo">
+    <p class="demo-caption">Width derived from data-value / data-max  -  pure CSS</p>
+    <progress-bar data-value="73" data-max="100"></progress-bar>
+    <progress-bar data-value="45" data-max="100"></progress-bar>
+    <progress-bar data-value="91" data-max="100"></progress-bar>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;progress-bar data-value="73" data-max="100"&gt;&lt;/progress-bar&gt;
+&lt;progress-bar data-value="45" data-max="100"&gt;&lt;/progress-bar&gt;
+&lt;progress-bar data-value="91" data-max="100"&gt;&lt;/progress-bar&gt;
+
+progress-bar {
+  --pct: calc(attr(data-value type(&lt;number&gt;), 0) / attr(data-max type(&lt;number&gt;), 100) * 100%);
+  display: block;
+  height: 8px;
+  background: lightgray;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+}
+
+progress-bar::after {
+  content: "";
+  display: block;
+  height: 100%;
+  width: var(--pct);
+  background: var(--accent);
+  border-radius: 4px;
+}</code></pre>
+  </div>
+
+  <h3>Responsive grid columns from markup</h3>
+
+  <div class="demo">
+    <p class="demo-caption">Column count read from data-cols attribute</p>
+    <div class="attr-grid" data-cols="4">
+      <div class="attr-grid-cell">1</div>
+      <div class="attr-grid-cell">2</div>
+      <div class="attr-grid-cell">3</div>
+      <div class="attr-grid-cell">4</div>
+    </div>
+    <div class="attr-grid" data-cols="2" style="margin-top: 0.75rem;">
+      <div class="attr-grid-cell">1</div>
+      <div class="attr-grid-cell">2</div>
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;div class="attr-grid" data-cols="4"&gt;
+  &lt;div class="attr-grid-cell"&gt;1&lt;/div&gt;
+  &lt;div class="attr-grid-cell"&gt;2&lt;/div&gt;
+  &lt;div class="attr-grid-cell"&gt;3&lt;/div&gt;
+  &lt;div class="attr-grid-cell"&gt;4&lt;/div&gt;
+&lt;/div&gt;
+
+.attr-grid {
+  display: grid;
+  grid-template-columns: repeat(attr(data-cols type(&lt;integer&gt;), 3), 1fr);
+  gap: 0.5rem;
+}</code></pre>
+  </div>
+
+  <h3>Icon sizing from attributes</h3>
+
+  <div class="demo">
+    <p class="demo-caption">Size and colour from data attributes  -  no inline styles</p>
+    <svg-icon data-size="16px" data-color="#3a86ff">&#9654;</svg-icon>
+    <svg-icon data-size="24px" data-color="#e76f51">&#9654;</svg-icon>
+    <svg-icon data-size="32px" data-color="#2a9d8f">&#9654;</svg-icon>
+    <svg-icon data-size="48px" data-color="#6c5ce7">&#9654;</svg-icon>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;svg-icon data-size="16px" data-color="#3a86ff"&gt;▶&lt;/svg-icon&gt;
+&lt;svg-icon data-size="24px" data-color="#e76f51"&gt;▶&lt;/svg-icon&gt;
+&lt;svg-icon data-size="32px" data-color="#2a9d8f"&gt;▶&lt;/svg-icon&gt;
+&lt;svg-icon data-size="48px" data-color="#6c5ce7"&gt;▶&lt;/svg-icon&gt;
+
+svg-icon {
+  width: attr(data-size type(&lt;length&gt;), 16px);
+  height: attr(data-size type(&lt;length&gt;), 16px);
+  color: attr(data-color type(&lt;color&gt;), currentColor);
+}</code></pre>
+  </div>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <h2>Retrieval check</h2>
+
+  <div class="quiz" id="quiz1">
+    <h3>Question 1</h3>
+    <p>What was the old limitation of attr() before the upgrade?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">It only worked on data- attributes</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">It only returned strings and only worked in content:</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">It only worked in Chrome browsers</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">It required JavaScript to function</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz2">
+    <h3>Question 2</h3>
+    <p>How do you tell the browser that data-size should be parsed as a length?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">attr(data-size, &lt;length&gt;)</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">attr(data-size as length)</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">attr(data-size type(&lt;length&gt;), fallback)</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">attr(data-size, type: length)</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz3">
+    <h3>Question 3</h3>
+    <p>Can you transition a value read from attr()?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Yes  -  once typed, it interpolates like any value</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">No  -  attributes aren't tracked for interpolation</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Only if you also register it with @property</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Only for colour and length types</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz4">
+    <h3>Question 4</h3>
+    <p>An element has no data-size attribute. You use: font-size: attr(data-size type(&lt;length&gt;), 1rem). What happens?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">The declaration is skipped entirely</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">1rem is used  -  the fallback applies</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">0px  -  missing attributes default to zero</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">inherit  -  falls back to parent value</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz5">
+    <h3>Question 5</h3>
+    <p>A child element wants to read data-theme from its parent. Can it use attr(data-theme)?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Yes  -  attr() inherits like custom properties</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">No  -  attr() only reads the element's own attributes</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Only if the parent has display: contents</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Only with the inherit keyword as fallback</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="recommended">
+    <strong>Recommended resources:</strong>
+    <a href="https://developer.chrome.com/blog/advanced-attr">Chrome Developers  -  CSS attr() gets an upgrade</a> |
+    <a href="https://una.im/advanced-attr/">Una Kravets  -  New capabilities for attr()</a> |
+    <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/attr/">MDN  -  attr()</a>
+  </div>
+
+  <div class="footer-nav">
+    <a href="04-custom-css-functions.html">&larr; Prev: Custom Functions</a>
+    <a href="index.html">Index</a>
+    <a href="06-transitions.html">Next: Transitions &rarr;</a>
+  </div>
+
+    </main>
+  </div>
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

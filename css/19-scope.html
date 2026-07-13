@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>@scope - Lesson 19 | Teach Me</title>
+  <meta name="description" content="Learn CSS @scope for proximity-based styling with upper and lower boundaries, creating true component isolation without frameworks or Shadow DOM.">
+  <link rel="canonical" href="https://teachmeskills.dev/css/19-scope.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/css/19-scope.html">
+  <meta property="og:title" content="@scope - Lesson 19 | Teach Me">
+  <meta property="og:description" content="Learn CSS @scope for proximity-based styling with upper and lower boundaries, creating true component isolation without frameworks or Shadow DOM.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="@scope - Lesson 19 | Teach Me">
+  <meta name="twitter:description" content="Learn CSS @scope for proximity-based styling with upper and lower boundaries, creating true component isolation without frameworks or Shadow DOM.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    @scope (.scope-card) {
+      p { color: #3a86ff; font-weight: 500; }
+      .title { font-size: 1.1rem; color: #e76f51; }
+    }
+    @scope (.scope-outer) to (.scope-inner) {
+      p { background: #6ea8ff; color: #1a1a2e; padding: 0.5rem; border-radius: 4px; font-size: 0.85rem; }
+    }
+    @scope (.theme-blue) {
+      .badge { background: #3a86ff; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; display: inline-block; }
+    }
+    @scope (.theme-coral) {
+      .badge { background: #e76f51; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; display: inline-block; }
+    }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header">
+        <a href="index.html">CSS Course</a>
+      </div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-custom-properties-fundamentals.html">1. Custom Properties</a></li>
+        <li><a href="02-registered-custom-properties.html">2. @property</a></li>
+        <li><a href="03-css-value-functions.html">3. Value Functions</a></li>
+        <li><a href="04-custom-css-functions.html">4. Custom Functions</a></li>
+        <li><a href="05-advanced-attr.html">5. Advanced attr()</a></li>
+        <li><a href="06-transitions.html">6. Transitions</a></li>
+        <li><a href="07-animations.html">7. Animations</a></li>
+        <li><a href="08-flexbox.html">8. Flexbox</a></li>
+        <li><a href="09-grid.html">9. Grid</a></li>
+        <li><a href="10-container-queries.html">10. Container Queries</a></li>
+        <li><a href="11-cascade-layers.html">11. Cascade Layers</a></li>
+        <li><a href="12-css-nesting.html">12. CSS Nesting</a></li>
+        <li><a href="13-modern-selectors.html">13. Modern Selectors</a></li>
+        <li><a href="14-the-cascade.html">14. The Cascade</a></li>
+        <li><a href="15-logical-properties.html">15. Logical Properties</a></li>
+        <li><a href="16-view-transitions.html">16. View Transitions</a></li>
+        <li><a href="17-anchor-positioning.html">17. Anchor Positioning</a></li>
+        <li><a href="18-advanced-colour.html">18. Advanced Colour</a></li>
+        <li class="current"><a href="19-scope.html">19. @scope</a></li>
+        <li><a href="20-selectors-deep-dive.html">20. Selectors Deep-Dive</a></li>
+        <li><a href="21-theming-deep-dive.html">21. Theming Deep-Dive</a></li>
+        <li><a href="22-responsive-design-patterns.html">22. Responsive Patterns</a></li>
+        <li><a href="23-scroll-driven-animations.html">23. Scroll-Driven Animations</a></li>
+        <li><a href="24-capstone-product-landing-page.html">24. Capstone Project</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="css-anatomy.html">CSS Anatomy</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+  <p class="lesson-num">Lesson 19</p>
+  <h1><code>@scope</code> - Proximity-Based Styling</h1>
+
+  <p>You've learned how to control which styles win via layers (Lesson 11) and specificity (Lesson 14). <code>@scope</code> adds a new dimension: <strong>proximity</strong>. Styles from a closer scope root beat styles from a farther one - regardless of source order. It also lets you define where styles <em>stop</em> applying, creating true component boundaries in CSS.</p>
+
+  <h2>The mental model</h2>
+
+  <p><code>@scope</code> does two things:</p>
+  <ol>
+    <li><strong>Limits where styles apply</strong> - styles inside <code>@scope (.card)</code> only match elements inside <code>.card</code>. Like a built-in descendant selector, but with a defined boundary.</li>
+    <li><strong>Proximity wins</strong> - when two scopes both match an element, the closer ancestor scope root wins. No specificity battle needed.</li>
+  </ol>
+
+  <div class="key-concept">
+    <p><strong>How it fits in the cascade:</strong> Scope proximity is checked AFTER layers and specificity, but BEFORE source order. So if two declarations have the same origin, layer, and specificity - the one from the closer scope root wins.</p>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>Cascade resolution: origin → inline → layers → specificity → SCOPE PROXIMITY → source order</code></pre>
+  </div>
+
+  <h2>Basic @scope - scoping styles to a subtree</h2>
+
+  <div class="demo">
+    <p class="demo-caption">The blue text and orange title only apply inside .scope-card - the paragraph outside is unaffected</p>
+    <p style="font-size: 0.85rem;">I'm outside the scope - normal styling.</p>
+    <div class="scope-card" style="border: 1px solid #e0e0e0; border-radius: 6px; padding: 1rem; margin-top: 0.5rem;">
+      <div class="title">Card Title (scoped orange)</div>
+      <p>I'm inside .scope-card - scoped blue styling applies to me.</p>
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;!-- HTML --&gt;
+&lt;p&gt;I'm outside the scope — normal styling.&lt;/p&gt;
+&lt;div class="card"&gt;
+  &lt;h3 class="title"&gt;Card Title&lt;/h3&gt;
+  &lt;p&gt;I'm inside — scoped styling applies.&lt;/p&gt;
+&lt;/div&gt;
+
+/* CSS */
+@scope (.card) {
+  p { color: blue; font-weight: 500; }
+  .title { color: coral; }
+}
+
+/* These rules ONLY apply to p and .title elements
+   that are descendants of .card. Elements outside .card
+   are completely unaffected — no specificity needed to exclude them. */</code></pre>
+  </div>
+
+  <h2>Scope limits - where styles STOP applying</h2>
+
+  <p>The killer feature: you can define a lower boundary. Styles apply from the scope root DOWN TO (but not including) the limit:</p>
+
+  <div class="demo">
+    <p class="demo-caption">Blue background applies between .outer and .inner - the paragraph inside .inner is unaffected</p>
+    <div class="scope-outer" style="border: 1px solid #e0e0e0; border-radius: 6px; padding: 1rem;">
+      <p>I'm between outer and inner - scoped style applies (blue background).</p>
+      <div class="scope-inner" style="border: 1px dashed #e76f51; border-radius: 4px; padding: 0.75rem; margin-top: 0.5rem; background: white;">
+        <p style="color: #1a1a2e; margin: 0;">I'm inside .inner - the scope STOPS here. No blue background.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;!-- HTML --&gt;
+&lt;div class="outer"&gt;
+  &lt;p&gt;I get styled (between root and limit).&lt;/p&gt;
+  &lt;div class="inner"&gt;
+    &lt;p&gt;I do NOT get styled (past the limit).&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+/* CSS — scope FROM .outer, STOP AT .inner */
+@scope (.outer) to (.inner) {
+  p { background: lightblue; padding: 0.5rem; border-radius: 4px; }
+}
+
+/* "to" defines the lower boundary.
+   Elements AT or INSIDE .inner are excluded from the scope.
+   This creates a "donut" — styles apply in between. */</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <p><strong>Why scope limits matter:</strong> They solve the "nested component" problem. If you have a <code>.card</code> inside a <code>.card</code>, styles for the outer card's children shouldn't bleed into the inner card. With <code>@scope (.card) to (.card)</code>, they stop at the boundary of any nested card.</p>
+  </div>
+
+  <h2>Proximity - closer scope root wins</h2>
+
+  <p>When an element is inside multiple overlapping scopes, the one with the closer ancestor scope root wins:</p>
+
+  <div class="demo">
+    <p class="demo-caption">The badge is inside both .theme-blue and .theme-coral - the closer one (.theme-coral) wins</p>
+    <div class="theme-blue" style="border: 2px solid #3a86ff; border-radius: 6px; padding: 1rem;">
+      <p style="font-size: 0.8rem; margin-bottom: 0.5rem;">theme-blue scope</p>
+      <span class="badge">Blue badge (closest scope is blue)</span>
+      <div class="theme-coral" style="border: 2px solid #e76f51; border-radius: 6px; padding: 0.75rem; margin-top: 0.75rem;">
+        <p style="font-size: 0.8rem; margin-bottom: 0.5rem;">theme-coral scope (nested inside blue)</p>
+        <span class="badge">Coral badge (closest scope is coral - wins!)</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;!-- HTML --&gt;
+&lt;div class="theme-blue"&gt;
+  &lt;span class="badge"&gt;Blue (closest scope is blue)&lt;/span&gt;
+  &lt;div class="theme-coral"&gt;
+    &lt;span class="badge"&gt;Coral (closest scope is coral — wins!)&lt;/span&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+/* CSS — two scopes with the same specificity */
+@scope (.theme-blue) {
+  .badge { background: blue; color: white; }
+}
+
+@scope (.theme-coral) {
+  .badge { background: coral; color: white; }
+}
+
+/* Both rules match the inner badge (it's inside both scopes).
+   Same specificity. Same layer.
+   Proximity wins: .theme-coral is the CLOSER ancestor → coral wins.
+   Without @scope, source order would decide (coral last → coral wins by coincidence).
+   With @scope, proximity ALWAYS wins — order doesn't matter. */</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <p><strong>The mental model for proximity:</strong> "Which scope root is the shortest DOM walk from this element?" That one wins. It's like CSS specificity, but measured in DOM distance rather than selector weight.</p>
+  </div>
+
+  <h2>@scope vs other scoping approaches</h2>
+
+  <table style="width: 100%; border-collapse: collapse; font-size: 0.82rem; margin: 1.5rem 0;">
+    <thead>
+      <tr style="border-bottom: 2px solid #e0e0e0; text-align: left;">
+        <th style="padding: 0.5rem;">Approach</th>
+        <th style="padding: 0.5rem;">How it works</th>
+        <th style="padding: 0.5rem;">Limitations</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom: 1px solid #e0e0e0;">
+        <td style="padding: 0.4rem 0.5rem;">BEM naming</td>
+        <td style="padding: 0.4rem 0.5rem;">Convention-based - unique class names prevent clashes</td>
+        <td style="padding: 0.4rem 0.5rem;">Manual, verbose, no lower boundary</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #e0e0e0;">
+        <td style="padding: 0.4rem 0.5rem;">Angular ViewEncapsulation</td>
+        <td style="padding: 0.4rem 0.5rem;">Compiler adds unique attributes to scope component styles</td>
+        <td style="padding: 0.4rem 0.5rem;">Framework-specific, can't define lower boundaries, no proximity</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #e0e0e0;">
+        <td style="padding: 0.4rem 0.5rem;">Shadow DOM</td>
+        <td style="padding: 0.4rem 0.5rem;">Hard encapsulation boundary - styles can't leak in or out</td>
+        <td style="padding: 0.4rem 0.5rem;">Too strict for many use cases, hard to theme from outside</td>
+      </tr>
+      <tr>
+        <td style="padding: 0.4rem 0.5rem;"><code>@scope</code></td>
+        <td style="padding: 0.4rem 0.5rem;">Native CSS scoping with upper AND lower boundaries + proximity</td>
+        <td style="padding: 0.4rem 0.5rem;">Still relatively new (Chrome 118+, no Firefox yet)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>The :scope selector</h2>
+
+  <p>Inside <code>@scope</code>, the <code>:scope</code> pseudo-class refers to the scope root element itself:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>@scope (.card) {
+  :scope {
+    /* Styles the .card element itself (the root) */
+    border: 1px solid gray;
+    border-radius: 8px;
+  }
+
+  :scope > .title {
+    /* Direct children of the scope root */
+    font-weight: 600;
+  }
+
+  p {
+    /* Any p descendant within the scope */
+    color: #555;
+  }
+}</code></pre>
+  </div>
+
+  <h2>Practical patterns</h2>
+
+  <h3>Component isolation - nested cards don't leak</h3>
+
+  <div class="demo">
+    <p class="demo-caption">Outer card has scoped styles that stop at nested cards</p>
+    <div style="border: 2px solid #3a86ff; border-radius: 8px; padding: 1rem;">
+      <p style="font-size: 0.85rem; color: #3a86ff; font-weight: 500;">Outer card content (styled by outer scope)</p>
+      <div style="border: 2px solid #2a9d8f; border-radius: 6px; padding: 0.75rem; margin-top: 0.5rem;">
+        <p style="font-size: 0.85rem; color: #2a9d8f; font-weight: 500;">Inner card content (NOT styled by outer scope - boundary stops it)</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;!-- HTML --&gt;
+&lt;div class="card"&gt;
+  &lt;p&gt;Outer card content&lt;/p&gt;
+  &lt;div class="card"&gt;
+    &lt;p&gt;Inner card — outer styles DON'T reach here&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+/* CSS — scope stops at nested .card boundaries */
+@scope (.card) to (.card) {
+  p { color: blue; font-weight: 500; }
+}
+
+/* The inner .card gets its own scope instance.
+   Outer card's p styles don't leak into inner card. */</code></pre>
+  </div>
+
+  <h3>Theme regions without custom properties</h3>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;!-- HTML --&gt;
+&lt;section class="light-region"&gt;
+  &lt;p&gt;Light themed content&lt;/p&gt;
+&lt;/section&gt;
+&lt;section class="dark-region"&gt;
+  &lt;p&gt;Dark themed content&lt;/p&gt;
+&lt;/section&gt;
+
+/* CSS */
+@scope (.light-region) {
+  :scope { background: white; }
+  p { color: #1a1a2e; }
+}
+
+@scope (.dark-region) {
+  :scope { background: #1a1a2e; }
+  p { color: #f0f0f0; }
+}</code></pre>
+  </div>
+
+  <h2>Browser support</h2>
+
+  <p><code>@scope</code>: Chrome 118+, Edge 118+, Safari 17.4+. Firefox: not yet supported (as of mid-2025). Progressive enhancement - without support, styles simply apply globally (the scope limits are ignored).</p>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <h2>Retrieval check</h2>
+
+  <div class="quiz" id="quiz1">
+    <h3>Question 1</h3>
+    <p>What does the "to" clause in @scope (.card) to (.slot) define?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">The element the scope transitions to</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">The lower boundary - styles stop applying at (and inside) .slot</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">An animation endpoint for the scope</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">A selector that inherits from the scope</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz2">
+    <h3>Question 2</h3>
+    <p>An element is inside both @scope(.blue) and @scope(.red) - same specificity, same layer. Which wins?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Last in source order</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">The one whose scope root is the closer ancestor (proximity)</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">The one with more characters in the selector</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Neither - they cancel each other out</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz3">
+    <h3>Question 3</h3>
+    <p>Where does scope proximity sit in the cascade resolution order?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Before layers - it's the first thing checked</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Same level as specificity</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">After specificity, before source order</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">After source order - it's the final tiebreaker</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz4">
+    <h3>Question 4</h3>
+    <p>What does :scope refer to inside @scope (.card)?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">The :root element</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">The .card element itself (the scope root)</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">The nearest positioned ancestor</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">The element being styled</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz5">
+    <h3>Question 5</h3>
+    <p>How does @scope (.card) to (.card) prevent style leakage into nested cards?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">It removes the nested .card from the DOM</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">Styles stop at the nested .card boundary - it starts its own scope</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">It increases specificity so nested cards can't override</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">It applies Shadow DOM isolation automatically</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="recommended">
+    <strong>Recommended resources:</strong>
+    <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@scope">MDN - @scope</a> |
+    <a href="https://developer.chrome.com/docs/css-ui/at-scope">Chrome Developers - @scope</a>
+  </div>
+
+  <div class="footer-nav">
+    <a href="18-advanced-colour.html">&larr; Prev: Advanced Colour</a>
+    <a href="index.html">Index</a>
+    <a href="20-selectors-deep-dive.html">Next: Selectors Deep-Dive &rarr;</a>
+  </div>
+
+    </main>
+  </div>
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

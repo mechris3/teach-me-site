@@ -10,6 +10,7 @@
 
 ## Courses
 
+- [CSS Mastery](https://teachmeskills.dev/css/): A 24-lesson advanced course covering modern CSS from custom properties to scroll-driven animations.
 - [SVG - From Coordinates to Animation](https://teachmeskills.dev/svg/): A 13-lesson course covering SVG from first principles through to complex animation.
 
 ## SVG Lessons
@@ -32,3 +33,34 @@
 
 - [SVG Elements and Attributes](https://teachmeskills.dev/svg/svg-elements-and-attributes.html): comprehensive reference of all SVG elements and their attributes
 - [SVG DOM Methods](https://teachmeskills.dev/svg/svg-dom-methods.html): JavaScript API reference for SVG manipulation
+
+## CSS Mastery Lessons
+
+- [Custom Properties from the Ground Up](https://teachmeskills.dev/css/01-custom-properties-fundamentals.html): declaration, scoping, fallbacks, var(), runtime vs compile-time
+- [@property - Registered Custom Properties](https://teachmeskills.dev/css/02-registered-custom-properties.html): type syntax, inherits, initial-value, animating custom properties
+- [CSS Value Functions](https://teachmeskills.dev/css/03-css-value-functions.html): calc(), min(), max(), clamp(), color-mix(), composing responsive values
+- [@function - Custom CSS Functions](https://teachmeskills.dev/css/04-custom-css-functions.html): parametrised reusable logic, typed parameters, defaults, if()
+- [Advanced attr()](https://teachmeskills.dev/css/05-advanced-attr.html): typed attr(), HTML attributes as CSS values, data-driven styling
+- [CSS Transitions](https://teachmeskills.dev/css/06-transitions.html): four parts, timing functions, cubic-bezier, performance tiers, allow-discrete
+- [CSS Animations](https://teachmeskills.dev/css/07-animations.html): @keyframes, fill modes, direction, scroll-driven animations intro
+- [Flexbox - How the Algorithm Works](https://teachmeskills.dev/css/08-flexbox.html): flex-basis/grow/shrink, axis model, alignment, practical patterns
+- [CSS Grid - Two-Dimensional Layout](https://teachmeskills.dev/css/09-grid.html): fr, repeat, areas, subgrid, auto-flow, named lines
+- [Container Queries](https://teachmeskills.dev/css/10-container-queries.html): container-type, @container, container query units, style queries
+- [Cascade Layers (@layer)](https://teachmeskills.dev/css/11-cascade-layers.html): layer order, specificity bypass, !important inversion, third-party isolation
+- [CSS Nesting](https://teachmeskills.dev/css/12-css-nesting.html): native nesting, & selector, nested at-rules, specificity, Sass differences
+- [Modern Selectors](https://teachmeskills.dev/css/13-modern-selectors.html): :has(), :is(), :where(), :not(), specificity rules, combining
+- [The Cascade - Complete Resolution Algorithm](https://teachmeskills.dev/css/14-the-cascade.html): origin, importance, layers, specificity, scope, inheritance
+- [Logical Properties](https://teachmeskills.dev/css/15-logical-properties.html): block/inline axes, writing-mode awareness, inset, inline-size
+- [View Transitions](https://teachmeskills.dev/css/16-view-transitions.html): startViewTransition, pseudo-element tree, shared elements, cross-document
+- [Anchor Positioning](https://teachmeskills.dev/css/17-anchor-positioning.html): anchor-name, position-anchor, anchor(), position-try, popover API
+- [Advanced Colour](https://teachmeskills.dev/css/18-advanced-colour.html): OKLCH, wide gamut, relative colour syntax, light-dark(), palette derivation
+- [@scope - Proximity-Based Styling](https://teachmeskills.dev/css/19-scope.html): scope boundaries, limits, proximity in the cascade
+- [Selectors Deep-Dive](https://teachmeskills.dev/css/20-selectors-deep-dive.html): structural pseudo-classes, form states, :nth-child gotcha, attribute selectors
+- [Theming Deep-Dive](https://teachmeskills.dev/css/21-theming-deep-dive.html): three-tier tokens, multi-brand, light/dark, scoped regions, Angular patterns
+- [Responsive Design Patterns](https://teachmeskills.dev/css/22-responsive-design-patterns.html): intrinsic layout, auto-fill grids, container queries, clamp(), flex-wrap
+- [Scroll-Driven Animations](https://teachmeskills.dev/css/23-scroll-driven-animations.html): scroll(), view(), animation-range, named timelines, replacing JS libraries
+- [Capstone: Product Landing Page](https://teachmeskills.dev/css/24-capstone-product-landing-page.html): full project using 14+ course features
+
+## CSS Reference
+
+- [CSS Anatomy - Symbols, Structure & Terminology](https://teachmeskills.dev/css/css-anatomy.html): rules, selectors, @-rules, --, ::, combinators, pseudo-classes

@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>CSS Nesting - Lesson 12 | Teach Me</title>
+  <meta name="description" content="Learn native CSS nesting syntax to write hierarchical styles without preprocessors, including the & selector, nested media queries, and specificity behaviour.">
+  <link rel="canonical" href="https://teachmeskills.dev/css/12-css-nesting.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/css/12-css-nesting.html">
+  <meta property="og:title" content="CSS Nesting - Lesson 12 | Teach Me">
+  <meta property="og:description" content="Learn native CSS nesting syntax to write hierarchical styles without preprocessors, including the & selector, nested media queries, and specificity behaviour.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="CSS Nesting - Lesson 12 | Teach Me">
+  <meta name="twitter:description" content="Learn native CSS nesting syntax to write hierarchical styles without preprocessors, including the & selector, nested media queries, and specificity behaviour.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .nest-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+
+      & .title {
+        font-weight: 600;
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+        color: var(--accent);
+      }
+
+      & .body {
+        font-size: 0.85rem;
+        color: #555;
+      }
+
+      &:hover {
+        border-color: var(--accent);
+        box-shadow: 0 2px 8px rgba(58, 134, 255, 0.1);
+      }
+
+      &.featured {
+        border-color: #e76f51;
+        border-width: 2px;
+
+        & .title {
+          color: #e76f51;
+        }
+      }
+    }
+
+    .nest-responsive {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+      padding: 1rem;
+      background: #f0f7ff; color: #1a1a2e;
+      border-radius: 6px;
+
+      @media (min-width: 500px) {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .nest-responsive-item {
+      background: var(--accent);
+      color: white;
+      padding: 0.75rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header">
+        <a href="index.html">CSS Course</a>
+      </div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-custom-properties-fundamentals.html">1. Custom Properties</a></li>
+        <li><a href="02-registered-custom-properties.html">2. @property</a></li>
+        <li><a href="03-css-value-functions.html">3. Value Functions</a></li>
+        <li><a href="04-custom-css-functions.html">4. Custom Functions</a></li>
+        <li><a href="05-advanced-attr.html">5. Advanced attr()</a></li>
+        <li><a href="06-transitions.html">6. Transitions</a></li>
+        <li><a href="07-animations.html">7. Animations</a></li>
+        <li><a href="08-flexbox.html">8. Flexbox</a></li>
+        <li><a href="09-grid.html">9. Grid</a></li>
+        <li><a href="10-container-queries.html">10. Container Queries</a></li>
+        <li><a href="11-cascade-layers.html">11. Cascade Layers</a></li>
+        <li class="current"><a href="12-css-nesting.html">12. CSS Nesting</a></li>
+        <li><a href="13-modern-selectors.html">13. Modern Selectors</a></li>
+        <li><a href="14-the-cascade.html">14. The Cascade</a></li>
+        <li><a href="15-logical-properties.html">15. Logical Properties</a></li>
+        <li><a href="16-view-transitions.html">16. View Transitions</a></li>
+        <li><a href="17-anchor-positioning.html">17. Anchor Positioning</a></li>
+        <li><a href="18-advanced-colour.html">18. Advanced Colour</a></li>
+        <li><a href="19-scope.html">19. @scope</a></li>
+        <li><a href="20-selectors-deep-dive.html">20. Selectors Deep-Dive</a></li>
+        <li><a href="21-theming-deep-dive.html">21. Theming Deep-Dive</a></li>
+        <li><a href="22-responsive-design-patterns.html">22. Responsive Patterns</a></li>
+        <li><a href="23-scroll-driven-animations.html">23. Scroll-Driven Animations</a></li>
+        <li><a href="24-capstone-product-landing-page.html">24. Capstone Project</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="css-anatomy.html">CSS Anatomy</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+  <p class="lesson-num">Lesson 12</p>
+  <h1>CSS Nesting</h1>
+
+  <p>If you've used Sass or Less, you already know how nesting works conceptually  -  writing child selectors inside their parent to keep related styles together. As of 2023, native CSS supports nesting directly in the browser. No build step, no preprocessor, just the language itself.</p>
+
+  <p>This lesson covers the syntax, the <code>&amp;</code> selector, nested at-rules, specificity behaviour, and how native nesting differs from Sass. By the end you'll be able to use nesting confidently in production CSS.</p>
+
+  <h2>The mental model</h2>
+
+  <p>Nesting is purely a convenience for <em>authoring</em>. It lets you co-locate related rules so you can see the relationship between parent and child styles at a glance. But it doesn't change how the cascade resolves conflicts  -  the browser de-sugars nested rules into flat equivalents before applying them.</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* Nested */
+.card {
+  padding: 1rem;
+
+  & .title {
+    font-weight: 600;
+  }
+}
+
+/* De-sugars to exactly this: */
+.card { padding: 1rem; }
+.card .title { font-weight: 600; }</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <p><strong>Nesting is syntactic sugar.</strong> The browser converts nested rules to flat selectors before resolving styles. Specificity, cascade order, and inheritance all work identically to the flat equivalents. Nesting just makes the code easier to read and maintain.</p>
+  </div>
+
+  <h2>Basic nesting with &amp;</h2>
+
+  <p>The <code>&amp;</code> character represents the parent selector  -  whatever selector wraps the current nesting level. You use it to compose the final selector that the browser will apply:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>.card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+
+  /* & .title  →  .card .title (descendant) */
+  & .title {
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  /* & .body  →  .card .body */
+  & .body {
+    font-size: 0.85rem;
+    color: #555;
+  }
+
+  /* &:hover  →  .card:hover (pseudo-class) */
+  &:hover {
+    border-color: var(--accent);
+    box-shadow: 0 2px 8px rgba(58, 134, 255, 0.1);
+  }
+}</code></pre>
+  </div>
+
+  <div class="demo">
+    <p class="demo-caption">Hover to see the nested <code>&amp;:hover</code> rule in action</p>
+    <div class="nest-card">
+      <div class="title">Card Title</div>
+      <div class="body">This card uses native CSS nesting. Hover over it to see the border and shadow change  -  that's the <code>&amp;:hover</code> rule firing.</div>
+    </div>
+  </div>
+
+  <h2>When &amp; is required vs optional</h2>
+
+  <p>The <code>&amp;</code> is sometimes optional and sometimes required. Here's when you need it:</p>
+
+  <ul>
+    <li><strong>Required</strong>  -  pseudo-classes and pseudo-elements: <code>&amp;:hover</code>, <code>&amp;::before</code></li>
+    <li><strong>Required</strong>  -  compound selectors (no space): <code>&amp;.active</code>, <code>&amp;[data-state]</code></li>
+    <li><strong>Optional</strong>  -  descendant selectors: <code>&amp; .child</code> can be written as just <code>.child { }</code> inside the parent</li>
+    <li><strong>Required</strong>  -  when placing the parent selector after another selector: <code>.wrapper &amp;</code> (produces <code>.wrapper .card</code>)</li>
+  </ul>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>.btn {
+  /* These two are equivalent for descendant selectors: */
+  & .icon { margin-right: 0.5rem; }
+  .icon { margin-right: 0.5rem; }
+
+  /* & is REQUIRED for pseudo-classes (starts with :) */
+  &:hover { background: darkblue; }
+  /* Without &, the browser can't parse it correctly */
+
+  /* & is REQUIRED for compound selectors (no space) */
+  &.primary { background: blue; }
+  /* This means .btn.primary, NOT .btn .primary */
+
+  /* & AFTER another selector - reverses the relationship */
+  .dark-mode & { background: #333; }
+  /* Produces: .dark-mode .btn { background: #333; } */
+}</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <p><strong>Rule of thumb:</strong> If the nested selector should attach directly to the parent (no space between them), you need <code>&amp;</code>. If it's a descendant (space between parent and child), <code>&amp;</code> is optional but improves clarity.</p>
+  </div>
+
+  <h2>Compound selectors: &amp; with no space</h2>
+
+  <p>One of the most common uses of <code>&amp;</code> is creating compound selectors  -  selectors that target the <em>same element</em> with multiple conditions.</p>
+
+  <h3>Quick refresher: space vs no space in selectors</h3>
+
+  <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; margin: 1.5rem 0;">
+    <thead>
+      <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+        <th style="padding: 0.5rem;">Selector</th>
+        <th style="padding: 0.5rem;">Meaning</th>
+        <th style="padding: 0.5rem;">Nesting syntax</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 0.5rem;"><code>.card .featured</code></td>
+        <td style="padding: 0.5rem;">Element with class <code>featured</code> <em>inside</em> an element with class <code>card</code></td>
+        <td style="padding: 0.5rem;"><code>& .featured { }</code></td>
+      </tr>
+      <tr>
+        <td style="padding: 0.5rem;"><code>.card.featured</code></td>
+        <td style="padding: 0.5rem;">Element with <em>both</em> classes <code>card</code> and <code>featured</code> on the same element</td>
+        <td style="padding: 0.5rem;"><code>&amp;.featured { }</code></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>.card {
+  border: 1px solid var(--border);
+
+  /* Compound: same element has both .card AND .featured */
+  &.featured {
+    border-color: #e76f51;
+    border-width: 2px;
+
+    & .title {
+      color: #e76f51;
+    }
+  }
+
+  /* Descendant: .featured is a CHILD element inside .card */
+  & .featured {
+    font-style: italic;
+  }
+}</code></pre>
+  </div>
+
+  <div class="demo">
+    <p class="demo-caption">Compound selector demo  -  the card below has both <code>.nest-card</code> and <code>.featured</code> classes</p>
+    <div class="nest-card featured">
+      <div class="title">Featured Card</div>
+      <div class="body">This card has the <code>.featured</code> class on the same element as <code>.nest-card</code>. The compound selector <code>&amp;.featured</code> applies the orange border and title colour.</div>
+    </div>
+  </div>
+
+  <h2>Nesting media queries</h2>
+
+  <p>One of the most practical benefits of nesting is co-locating responsive styles with the component they affect. Instead of scrolling to a separate <code>@media</code> block at the bottom of your file, you nest the query right inside the selector:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+
+  @media (min-width: 500px) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @media (min-width: 900px) {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+/* De-sugars to: */
+.grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+@media (min-width: 500px) { .grid { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 900px) { .grid { grid-template-columns: 1fr 1fr 1fr; } }</code></pre>
+  </div>
+
+  <p>The nested <code>@media</code> is unwrapped by the browser into a normal media query block wrapping that selector. It's purely co-location for readability  -  the effect is identical to writing the media query separately.</p>
+
+  <div class="demo">
+    <p class="demo-caption">Resize the browser below 500px to see the grid switch from two columns to one</p>
+    <div class="nest-responsive">
+      <div class="nest-responsive-item">Item 1</div>
+      <div class="nest-responsive-item">Item 2</div>
+      <div class="nest-responsive-item">Item 3</div>
+      <div class="nest-responsive-item">Item 4</div>
+    </div>
+  </div>
+
+  <div class="key-concept">
+    <p><strong>Co-location is the benefit.</strong> Nested media queries don't change behaviour  -  they de-sugar to the same flat <code>@media</code> blocks. The advantage is purely organisational: all of a component's responsive logic lives together instead of scattered across separate breakpoint sections.</p>
+  </div>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <h2>Nesting other at-rules</h2>
+
+  <p>Media queries aren't the only at-rules you can nest. Container queries (<code>@container</code>) and feature queries (<code>@supports</code>) work the same way:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>.sidebar {
+  width: 100%;
+
+  /* Nested container query */
+  @container (min-width: 300px) {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.fancy-text {
+  font-size: 1rem;
+
+  /* Nested feature query */
+  @supports (font-size: clamp(1rem, 2vw, 2rem)) {
+    font-size: clamp(1rem, 2vw, 2rem);
+  }
+}
+
+/* Both de-sugar to normal at-rule blocks wrapping the selector,
+   just like nested @media queries. */</code></pre>
+  </div>
+
+  <p>Any conditional at-rule can be nested inside a selector. The browser unwraps it into the equivalent flat structure.</p>
+
+  <h2>Specificity of nested selectors</h2>
+
+  <p>Nested selectors have <strong>exactly the same specificity</strong> as their flat equivalents. Nesting does not increase or decrease specificity in any way:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* Nested */
+.card {
+  & .title { color: blue; }
+}
+
+/* Flat equivalent - IDENTICAL specificity (0, 2, 0) */
+.card .title { color: blue; }
+
+/* Both have specificity (0, 2, 0) - two class selectors */</code></pre>
+  </div>
+
+  <p>However, deep nesting can accidentally create high-specificity selectors without you realising it:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* Looks innocent... */
+.page {
+  & .section {
+    & .card {
+      & .title {
+        & span {
+          color: red;
+        }
+      }
+    }
+  }
+}
+
+/* But de-sugars to: */
+.page .section .card .title span { color: red; }
+/* Specificity: (0, 4, 1) - very hard to override! */</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <p><strong>Keep nesting shallow  -  2 to 3 levels maximum.</strong> Each nesting level adds to the final selector's specificity. Deep nesting creates the same specificity problems that made old-school CSS hard to maintain. Just because you <em>can</em> nest deeply doesn't mean you should.</p>
+  </div>
+
+  <h2>CSS nesting vs Sass nesting  -  differences</h2>
+
+  <p>If you're coming from Sass, native CSS nesting is very similar but has some important differences:</p>
+
+  <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; margin: 1.5rem 0;">
+    <thead>
+      <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+        <th style="padding: 0.5rem;">Feature</th>
+        <th style="padding: 0.5rem;">Sass</th>
+        <th style="padding: 0.5rem;">Native CSS</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 0.5rem;">&amp; for parent reference</td>
+        <td style="padding: 0.5rem;">Yes</td>
+        <td style="padding: 0.5rem;">Yes</td>
+      </tr>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 0.5rem;">String concatenation with &amp;</td>
+        <td style="padding: 0.5rem;"><code>&amp;__element</code> produces <code>.block__element</code></td>
+        <td style="padding: 0.5rem;">Not supported  -  &amp; is a selector, not a string</td>
+      </tr>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 0.5rem;">Nesting at-rules</td>
+        <td style="padding: 0.5rem;">Yes</td>
+        <td style="padding: 0.5rem;">Yes</td>
+      </tr>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 0.5rem;">Descendant without &amp;</td>
+        <td style="padding: 0.5rem;"><code>.child { }</code> implies descendant</td>
+        <td style="padding: 0.5rem;"><code>.child { }</code> also implies descendant (relaxed syntax)</td>
+      </tr>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 0.5rem;">Variables</td>
+        <td style="padding: 0.5rem;">$variables, @mixin, @include</td>
+        <td style="padding: 0.5rem;">Custom properties only  -  no mixins</td>
+      </tr>
+      <tr>
+        <td style="padding: 0.5rem;">Build step required</td>
+        <td style="padding: 0.5rem;">Yes  -  compiles to CSS</td>
+        <td style="padding: 0.5rem;">No  -  runs directly in the browser</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>The biggest difference is that native CSS <code>&amp;</code> cannot do string concatenation. In Sass, <code>&amp;__title</code> inside <code>.card</code> produces <code>.card__title</code>. In native CSS, this doesn't work  -  <code>&amp;</code> represents the full selector object, not a string you can append to. BEM-style concatenation still requires Sass or manual flat selectors.</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* Sass - works */
+.card {
+  &__title { font-weight: bold; } /* → .card__title */
+  &--large { font-size: 2rem; }   /* → .card--large */
+}
+
+/* Native CSS - does NOT work */
+.card {
+  &__title { ... } /* Invalid! & is not a string */
+}
+
+/* Native CSS - you'd write these flat instead: */
+.card__title { font-weight: bold; }
+.card--large { font-size: 2rem; }</code></pre>
+  </div>
+
+  <h2>Browser support</h2>
+
+  <p>Native CSS nesting is supported in Chrome 120+, Firefox 117+, Safari 17.2+, and Edge 120+. As of mid-2024, this covers approximately 85% of global users. For older browsers, nested rules are simply ignored (they won't break anything, but the styles won't apply). Consider your audience before relying on nesting in production without a build fallback.</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* Progressive enhancement approach */
+/* Flat fallback for older browsers */
+.card .title { font-weight: 600; color: var(--accent); }
+
+/* Nested version for modern browsers - won't conflict
+   since specificity is identical */
+.card {
+  & .title { font-weight: 600; color: var(--accent); }
+}
+
+/* Or use @supports if you need conditional logic */
+@supports selector(&) {
+  /* Browser supports nesting */
+}</code></pre>
+  </div>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <h2>Retrieval check</h2>
+
+  <div class="quiz" id="quiz1">
+    <h3>Question 1</h3>
+    <p>What does <code>&amp;</code> represent in CSS nesting?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">The parent selector (the outer rule's selector)</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">The nearest HTML parent element</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">A placeholder for any class name</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">The document root selector</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz2">
+    <h3>Question 2</h3>
+    <p>What is the difference between <code>&amp;.featured</code> and <code>&amp; .featured</code>?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">They are identical  -  the space doesn't matter</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">&amp;.featured = same element (compound). &amp; .featured = descendant (with space)</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">&amp;.featured targets children, &amp; .featured targets siblings</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">&amp;.featured is invalid syntax</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz3">
+    <h3>Question 3</h3>
+    <p>Does nesting change specificity compared to the flat equivalent?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Yes  -  nesting increases specificity by one level per depth</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Yes  -  nested selectors get a specificity bonus</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">No  -  specificity is identical to the equivalent flat selector</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Only if you use &amp; explicitly</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz4">
+    <h3>Question 4</h3>
+    <p>What does nesting a <code>@media</code> rule inside a selector do?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Creates a scoped media query that only applies to that selector's children</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">De-sugars to a normal @media block wrapping that selector  -  just co-locates the code</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Increases the media query's priority in the cascade</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Makes the media query inherit the parent's specificity</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz5">
+    <h3>Question 5</h3>
+    <p>What is a good maximum nesting depth to maintain readable CSS?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">1 level  -  never nest deeper than one level</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">2-3 levels  -  keeps specificity manageable</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">5-6 levels  -  matches typical DOM depth</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">No limit  -  nesting depth doesn't affect specificity</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="recommended">
+    <strong>Recommended resources:</strong>
+    <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_nesting">MDN  -  CSS nesting</a> |
+    <a href="https://developer.chrome.com/docs/css-ui/css-nesting">Chrome Developers  -  CSS nesting</a>
+  </div>
+
+  <div class="footer-nav">
+    <a href="11-cascade-layers.html">&larr; Prev: Cascade Layers</a>
+    <a href="index.html">Index</a>
+    <a href="13-modern-selectors.html">Next: Modern Selectors &rarr;</a>
+  </div>
+
+    </main>
+  </div>
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

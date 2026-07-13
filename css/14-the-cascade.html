@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>The Cascade - Lesson 14 | Teach Me</title>
+  <meta name="description" content="Understand the complete CSS cascade resolution algorithm including origin, importance, layers, specificity, scope proximity, and source order.">
+  <link rel="canonical" href="https://teachmeskills.dev/css/14-the-cascade.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/css/14-the-cascade.html">
+  <meta property="og:title" content="The Cascade - Lesson 14 | Teach Me">
+  <meta property="og:description" content="Understand the complete CSS cascade resolution algorithm including origin, importance, layers, specificity, scope proximity, and source order.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="The Cascade - Lesson 14 | Teach Me">
+  <meta name="twitter:description" content="Understand the complete CSS cascade resolution algorithm including origin, importance, layers, specificity, scope proximity, and source order.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .step { background: var(--bg-surface, #f0f7ff); border: 1px solid var(--border); border-radius: 6px; padding: 1rem; margin-bottom: 0.75rem; }
+    .step-number { font-weight: 700; color: var(--accent); margin-right: 0.5rem; }
+    .step-title { font-weight: 600; }
+    .winner { color: #2a9d8f; font-weight: 600; }
+    .loser { color: var(--muted); }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header">
+        <a href="index.html">CSS Course</a>
+      </div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-custom-properties-fundamentals.html">1. Custom Properties</a></li>
+        <li><a href="02-registered-custom-properties.html">2. @property</a></li>
+        <li><a href="03-css-value-functions.html">3. Value Functions</a></li>
+        <li><a href="04-custom-css-functions.html">4. Custom Functions</a></li>
+        <li><a href="05-advanced-attr.html">5. Advanced attr()</a></li>
+        <li><a href="06-transitions.html">6. Transitions</a></li>
+        <li><a href="07-animations.html">7. Animations</a></li>
+        <li><a href="08-flexbox.html">8. Flexbox</a></li>
+        <li><a href="09-grid.html">9. Grid</a></li>
+        <li><a href="10-container-queries.html">10. Container Queries</a></li>
+        <li><a href="11-cascade-layers.html">11. Cascade Layers</a></li>
+        <li><a href="12-css-nesting.html">12. CSS Nesting</a></li>
+        <li><a href="13-modern-selectors.html">13. Modern Selectors</a></li>
+        <li class="current"><a href="14-the-cascade.html">14. The Cascade</a></li>
+        <li><a href="15-logical-properties.html">15. Logical Properties</a></li>
+        <li><a href="16-view-transitions.html">16. View Transitions</a></li>
+        <li><a href="17-anchor-positioning.html">17. Anchor Positioning</a></li>
+        <li><a href="18-advanced-colour.html">18. Advanced Colour</a></li>
+        <li><a href="19-scope.html">19. @scope</a></li>
+        <li><a href="20-selectors-deep-dive.html">20. Selectors Deep-Dive</a></li>
+        <li><a href="21-theming-deep-dive.html">21. Theming Deep-Dive</a></li>
+        <li><a href="22-responsive-design-patterns.html">22. Responsive Patterns</a></li>
+        <li><a href="23-scroll-driven-animations.html">23. Scroll-Driven Animations</a></li>
+        <li><a href="24-capstone-product-landing-page.html">24. Capstone Project</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="css-anatomy.html">CSS Anatomy</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+  <p class="lesson-num">Lesson 14</p>
+  <h1>The Cascade - The Complete Resolution Algorithm</h1>
+
+  <p>Everything you've learned - layers, specificity, selectors, custom properties, inheritance - is part of one unified system: the <strong>cascade</strong>. This lesson puts it all together into a single mental model you can use to predict exactly which style wins in any situation.</p>
+
+  <h2>The cascade answers one question</h2>
+
+  <p>When multiple CSS declarations target the same property on the same element, which one applies? The cascade resolves this by checking a series of criteria in order. The first criterion to produce a winner ends the comparison.</p>
+
+  <div class="key-concept">
+    <p><strong>Mental model:</strong> Think of it as a tournament bracket. Competing declarations are eliminated round by round. Each round is a different criterion. Most conflicts are resolved in the early rounds - you rarely need to go all the way to the end.</p>
+  </div>
+
+  <h2>The resolution order - all 8 steps</h2>
+
+  <p>When two or more declarations compete for the same property on an element, the browser resolves them in this order (first decisive step wins):</p>
+
+  <div class="step">
+    <p><span class="step-number">1.</span> <span class="step-title">Origin & Importance</span></p>
+    <p>Where did the style come from, and is it <code>!important</code>?</p>
+    <p style="font-size: 0.82rem; color: var(--muted); margin-bottom: 0;">Priority (highest &rarr; lowest): transition declarations > user-agent !important > user !important > author !important > author normal > user normal > user-agent normal</p>
+  </div>
+
+  <div class="step">
+    <p><span class="step-number">2.</span> <span class="step-title">Inline styles</span></p>
+    <p><code>style="..."</code> on the element beats any selector-based rule (within the same origin/importance tier).</p>
+  </div>
+
+  <div class="step">
+    <p><span class="step-number">3.</span> <span class="step-title">Layers</span></p>
+    <p>Unlayered > last declared layer > ... > first declared layer. For <code>!important</code>: inverted (first layer wins).</p>
+  </div>
+
+  <div class="step">
+    <p><span class="step-number">4.</span> <span class="step-title">Specificity</span></p>
+    <p>Compare selector specificity: (ID count, class/attribute/pseudo-class count, element/pseudo-element count). Higher wins.</p>
+  </div>
+
+  <div class="step">
+    <p><span class="step-number">5. </span> <span class="step-title">Scope proximity</span> (new, with @scope)</p>
+    <p>Closer scope root wins. Only relevant when using <code>@scope</code>.</p>
+  </div>
+
+  <div class="step">
+    <p><span class="step-number">6.</span> <span class="step-title">Source order</span></p>
+    <p>Last declaration in source order wins. This is the final tiebreaker.</p>
+  </div>
+
+  <div class="key-concept">
+    <p><strong>In practice:</strong> Most conflicts you encounter are resolved at step 3 (layers) or step 4 (specificity). If you use layers properly, you'll rarely even need to think about specificity. If you don't use layers, specificity is your main battleground.</p>
+  </div>
+
+  <h2>Step 1: Origin & Importance - who wrote it?</h2>
+
+  <p>CSS comes from three "origins":</p>
+
+  <ul>
+    <li><strong>User-agent</strong> - the browser's default stylesheet (why buttons look different in Chrome vs Firefox)</li>
+    <li><strong>User</strong> - styles set by the user (accessibility overrides, custom stylesheets - rare in practice)</li>
+    <li><strong>Author</strong> - your stylesheets. This is almost always what's competing with itself.</li>
+  </ul>
+
+  <p>Within author styles, <code>!important</code> flips the priority:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* Normal author styles  -  resolved by later steps (layers, specificity, order) */
+.card { color: blue; }
+
+/* !important author styles  -  beat ALL normal author styles regardless of specificity */
+.text { color: red !important; }
+
+/* Even this loses to !important above, despite higher specificity: */
+#main .content .card .title { color: green; }  /* loses to red !important */</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <p><strong>Why !important is a last resort:</strong> It jumps an entire tier in the cascade. Once you use it, the only way to override it is with another <code>!important</code> in a higher-priority layer or a later source order position. This creates escalation wars. Use layers instead.</p>
+  </div>
+
+  <h2>Step 2: Inline styles</h2>
+
+  <p>The <code>style=""</code> attribute on an element beats any selector-based rule in the same origin/importance tier:</p>
+
+  <div class="demo">
+    <p class="demo-caption">The inline style (red) beats the stylesheet rule (blue), despite .card being a valid selector</p>
+    <div style="color: red; padding: 0.75rem; background: #fef0ed; border-radius: 6px; font-size: 0.85rem;">
+      I'm red because of style="color: red" - the stylesheet says blue but inline wins.
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;!-- HTML --&gt;
+&lt;div class="card" style="color: red;"&gt;I'm red&lt;/div&gt;
+
+/* This loses to the inline style: */
+.card { color: blue; }
+
+/* Only !important can beat inline: */
+.card { color: blue !important; }  /* this WOULD win */</code></pre>
+  </div>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <h2>Step 3: Layers (you learned this in Lesson 11)</h2>
+
+  <p>Quick recap of how layers interact with the rest of the cascade:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* Resolution order for normal styles: */
+Unlayered styles (no @layer)     ← WINS over all layers
+@layer utilities { }             ← wins over components
+@layer components { }            ← wins over base
+@layer base { }                  ← wins over reset
+@layer reset { }                 ← lowest priority
+
+/* For !important: INVERTED */
+@layer reset { !important }      ← WINS (highest priority)
+@layer base { !important }
+@layer components { !important }
+@layer utilities { !important }
+Unlayered !important             ← lowest for !important</code></pre>
+  </div>
+
+  <h2>Step 4: Specificity - the scoring system</h2>
+
+  <p>Specificity is a three-part score written as <code>(A, B, C)</code>. Each position counts a different category of selector part:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>Specificity = ( A,          B,                        C                    )
+                ↑            ↑                         ↑
+           count of     count of                  count of
+           #id          .class                    element
+                        [attribute]               ::pseudo-element
+                        :pseudo-class
+                        (:hover, :not, :has, :is)
+</code></pre>
+  </div>
+
+  <p>Calculate it by counting each part of your selector and placing the count in the right column:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>h1                        → 0 IDs, 0 classes, 1 element     = (0, 0, 1)
+.card                     → 0 IDs, 1 class,   0 elements    = (0, 1, 0)
+.card .title              → 0 IDs, 2 classes, 0 elements    = (0, 2, 0)
+#main .card               → 1 ID,  1 class,   0 elements    = (1, 1, 0)
+#main .card .title:hover  → 1 ID,  3 (card+title+hover), 0  = (1, 3, 0)
+div.card[data-v]          → 0 IDs, 2 (class+attr), 1 elem   = (0, 2, 1)
+
+/* Functional pseudo-classes  -  specificity from their argument: */
+:is(.card, #main)         → (1, 0, 0)  /* takes highest argument (#main) */
+:where(.card, #main)      → (0, 0, 0)  /* :where is ALWAYS zero */
+:not(.disabled)           → (0, 1, 0)  /* specificity of its argument */</code></pre>
+  </div>
+
+  <p><strong>Comparison rule:</strong> Read left to right. The first column where one score is higher wins. Columns don't add up across positions - <code>(1, 0, 0)</code> beats <code>(0, 99, 99)</code> because one ID outranks any number of classes. Think of it like version numbers: 2.0.0 > 1.99.99.</p>
+
+  <div class="key-concept">
+    <p><strong>The scoring rules:</strong></p>
+    <ul>
+      <li>Compare left to right: IDs beat any number of classes. Classes beat any number of elements.</li>
+      <li><code>(1, 0, 0)</code> beats <code>(0, 99, 99)</code> - one ID outweighs 99 classes.</li>
+      <li>If tied at every position, fall through to step 6 (source order).</li>
+    </ul>
+  </div>
+
+  <h2>Step 6: Source order - the final tiebreaker</h2>
+
+  <p>If origin, importance, layers, and specificity are all equal, the last declaration in source order wins:</p>
+
+  <div class="demo">
+    <p class="demo-caption">Same specificity, same layer - last one in the file wins (coral)</p>
+    <div style="padding: 0.75rem; border-radius: 6px; font-size: 0.85rem; background: #e76f51; color: white;">
+      I'm coral - the second .box rule wins by source order.
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;!-- HTML --&gt;
+&lt;div class="box"&gt;What colour am I?&lt;/div&gt;
+
+/* Same specificity (0,1,0)  -  source order decides */
+.box { background: blue; }    /* first  -  loses */
+.box { background: coral; }   /* last  -  wins */</code></pre>
+  </div>
+
+  <p>This is why CSS files loaded later in the <code>&lt;head&gt;</code> override earlier ones - and why putting your custom stylesheet after a framework's stylesheet lets you override it (assuming equal specificity).</p>
+
+  <h2>Inheritance - the other way properties get values</h2>
+
+  <p>The cascade resolves conflicting declarations. But what about properties with NO declaration at all? That's where inheritance comes in.</p>
+
+  <p>Some properties <strong>inherit</strong> by default - if not explicitly set, they take the parent's computed value:</p>
+
+  <ul>
+    <li>Inherited: <code>color</code>, <code>font-family</code>, <code>font-size</code>, <code>line-height</code>, <code>letter-spacing</code>, <code>text-align</code>, <code>visibility</code>, <code>cursor</code>, custom properties (unless <code>@property</code> says <code>inherits: false</code>)</li>
+    <li>NOT inherited: <code>background</code>, <code>border</code>, <code>padding</code>, <code>margin</code>, <code>width</code>, <code>height</code>, <code>display</code>, <code>position</code>, <code>overflow</code></li>
+  </ul>
+
+  <div class="key-concept">
+    <p><strong>The mental model:</strong> "Text-related" properties generally inherit (because you want text styling to flow down). "Box-related" properties don't (because you don't want every child to have the parent's padding).</p>
+  </div>
+
+  <h3>Controlling inheritance explicitly</h3>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>.child {
+  color: inherit;    /* force inheritance (even for non-inheriting properties) */
+  border: initial;   /* reset to the property's default value */
+  padding: unset;    /* = inherit for inheriting properties, initial for non-inheriting */
+  all: revert;       /* reset ALL properties to browser default (user-agent stylesheet) */
+  all: revert-layer; /* reset to the previous layer's value */
+}</code></pre>
+  </div>
+
+  <h2>Putting it all together - a worked example</h2>
+
+  <div class="demo">
+    <p class="demo-caption">Which colour wins? Walk through the cascade steps.</p>
+    <div style="padding: 0.75rem; border-radius: 6px; font-size: 0.85rem; background: #2a9d8f; color: white;">
+      I'm teal. See the walkthrough below.
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;!-- HTML --&gt;
+&lt;p id="intro" class="text highlight" style="color: pink;"&gt;What colour?&lt;/p&gt;
+
+/* Competing declarations for color on this element: */
+@layer base {
+  p { color: gray; }                              /* (0,0,1) in base layer */
+}
+
+@layer components {
+  .text { color: blue; }                          /* (0,1,0) in components layer */
+  #intro { color: red; }                          /* (1,0,0) in components layer */
+}
+
+.highlight { color: teal !important; }            /* (0,1,0) unlayered !important */
+
+/* Resolution:
+   Step 1: !important beats all normal rules → "teal !important" vs "pink" (inline)
+           !important author beats inline (unless inline is also !important)
+           → teal wins.
+
+   Without the !important, inline "pink" would win (step 2).
+   Without inline, the layer step would matter (unlayered > components > base).
+   Within the same layer, #intro (1,0,0) beats .text (0,1,0).
+*/</code></pre>
+  </div>
+
+  <h2>The complete picture - one diagram</h2>
+
+  <svg viewBox="0 0 600 594" style="width: 100%; margin: 1.5rem auto; display: block;" aria-label="CSS cascade resolution flowchart showing the order: origin, inline, layers, specificity, scope, source order, inheritance">
+    <!-- Background -->
+    <rect width="600" height="594" fill="var(--demo-bg, #f9f8f3)" rx="6"/>
+
+    <!-- Title -->
+    <text x="300" y="28" font-size="11" font-weight="700" fill="var(--text, #111)" text-anchor="middle" font-family="monospace">CASCADE RESOLUTION ORDER</text>
+    <text x="300" y="44" font-size="9" fill="var(--muted, #555)" text-anchor="middle" font-family="monospace">First decisive step wins - later steps are never consulted</text>
+
+    <!-- Step 1 -->
+    <rect x="40" y="60" width="520" height="44" rx="4" fill="#bdd4ff" stroke="#4a90d9"/>
+    <text x="56" y="78" font-size="10" font-weight="700" fill="#1a1a2e" font-family="monospace">1. Origin &amp; Importance</text>
+    <text x="56" y="93" font-size="9" fill="#444" font-family="monospace">transitions > UA !important > user !important > author !important > author > UA</text>
+
+    <!-- Arrow -->
+    <line x1="300" y1="104" x2="300" y2="116" stroke="var(--muted, #999)" stroke-width="1.5" marker-end="url(#arrow-cascade)"/>
+
+    <!-- Step 2 -->
+    <rect x="40" y="116" width="520" height="44" rx="4" fill="#bdd4ff" stroke="#4a90d9"/>
+    <text x="56" y="134" font-size="10" font-weight="700" fill="#1a1a2e" font-family="monospace">2. Inline styles</text>
+    <text x="56" y="149" font-size="9" fill="#444" font-family="monospace">style="" beats any selector-based rule in same tier</text>
+
+    <!-- Arrow -->
+    <line x1="300" y1="160" x2="300" y2="172" stroke="var(--muted, #999)" stroke-width="1.5" marker-end="url(#arrow-cascade)"/>
+
+    <!-- Step 3 -->
+    <rect x="40" y="172" width="520" height="82" rx="4" fill="#bdd4ff" stroke="#4a90d9"/>
+    <text x="56" y="190" font-size="10" font-weight="700" fill="#1a1a2e" font-family="monospace">3. Layers</text>
+    <text x="56" y="208" font-size="9" font-weight="600" fill="#1a1a2e" font-family="monospace">Normal declarations:</text>
+    <text x="56" y="221" font-size="9" fill="#444" font-family="monospace">unlayered > last layer > ... > first layer</text>
+    <text x="56" y="237" font-size="9" font-weight="600" fill="#1a1a2e" font-family="monospace">Declarations with !important (priority reverses):</text>
+    <text x="56" y="250" font-size="9" fill="#444" font-family="monospace">first layer > ... > last layer > unlayered</text>
+
+    <!-- Arrow -->
+    <line x1="300" y1="254" x2="300" y2="266" stroke="var(--muted, #999)" stroke-width="1.5" marker-end="url(#arrow-cascade)"/>
+
+    <!-- Step 4 -->
+    <rect x="40" y="266" width="520" height="44" rx="4" fill="#bdd4ff" stroke="#4a90d9"/>
+    <text x="56" y="284" font-size="10" font-weight="700" fill="#1a1a2e" font-family="monospace">4. Specificity</text>
+    <text x="56" y="299" font-size="9" fill="#444" font-family="monospace">(IDs, Classes, Elements) - compare left to right, higher wins</text>
+
+    <!-- Arrow -->
+    <line x1="300" y1="310" x2="300" y2="322" stroke="var(--muted, #999)" stroke-width="1.5" marker-end="url(#arrow-cascade)"/>
+
+    <!-- Step 5 -->
+    <rect x="40" y="322" width="520" height="44" rx="4" fill="#d0d0d0" stroke="#888"/>
+    <text x="56" y="340" font-size="10" font-weight="700" fill="#1a1a2e" font-family="monospace">5. Scope proximity</text>
+    <text x="56" y="355" font-size="9" fill="#444" font-family="monospace">closer @scope root wins (only with @scope)</text>
+
+    <!-- Arrow -->
+    <line x1="300" y1="366" x2="300" y2="378" stroke="var(--muted, #999)" stroke-width="1.5" marker-end="url(#arrow-cascade)"/>
+
+    <!-- Step 6 -->
+    <rect x="40" y="378" width="520" height="44" rx="4" fill="#bdd4ff" stroke="#4a90d9"/>
+    <text x="56" y="396" font-size="10" font-weight="700" fill="#1a1a2e" font-family="monospace">6. Source order</text>
+    <text x="56" y="411" font-size="9" fill="#444" font-family="monospace">last declaration in the file wins (final tiebreaker)</text>
+
+    <!-- Arrow -->
+    <line x1="300" y1="422" x2="300" y2="434" stroke="var(--muted, #999)" stroke-width="1.5" marker-end="url(#arrow-cascade)"/>
+
+    <!-- Step 7 - inheritance (different colour - it's a fallback, not a competition) -->
+    <rect x="40" y="434" width="520" height="56" rx="4" fill="#7ecba1" stroke="#3a9d5e"/>
+    <text x="56" y="456" font-size="10" font-weight="700" fill="#1a1a2e" font-family="monospace">7. No declaration at all?</text>
+    <text x="56" y="471" font-size="9" fill="#1a1a2e" font-family="monospace">Inheriting property (color, font-size...) → parent's computed value</text>
+    <text x="56" y="484" font-size="9" fill="#1a1a2e" font-family="monospace">Non-inheriting property (padding, border...) → initial value</text>
+
+    <!-- Legend -->
+    <rect x="40" y="508" width="520" height="70" rx="4" fill="var(--bg-raised, #f3f2ed)" stroke="var(--border, #ddd)"/>
+    <rect x="55" y="521" width="10" height="10" rx="2" fill="#bdd4ff" stroke="#4a90d9"/>
+    <text x="72" y="530" font-size="9" fill="var(--text, #111)" font-family="monospace">Cascade steps (competing declarations)</text>
+    <rect x="55" y="539" width="10" height="10" rx="2" fill="#7ecba1" stroke="#3a9d5e"/>
+    <text x="72" y="548" font-size="9" fill="var(--text, #111)" font-family="monospace">Inheritance fallback (no declaration exists)</text>
+    <rect x="55" y="557" width="10" height="10" rx="2" fill="#d0d0d0" stroke="#888"/>
+    <text x="72" y="566" font-size="9" fill="var(--text, #111)" font-family="monospace">Newer / less common (may not apply)</text>
+
+    <!-- Arrow marker -->
+    <defs>
+      <marker id="arrow-cascade" markerWidth="6" markerHeight="5" refX="6" refY="2.5" orient="auto"><path d="M0,0 L6,2.5 L0,5" fill="var(--muted, #999)"/></marker>
+    </defs>
+  </svg>
+
+  <div class="key-concept">
+    <p><strong>The practical takeaway:</strong> If you use <code>@layer</code> properly, you almost never need to think about specificity. If you keep specificity flat (BEM or similar), you almost never need to think about source order. The cascade gives you multiple tools - you only need to master the level of control your project requires.</p>
+  </div>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <h2>Retrieval check</h2>
+
+  <div class="quiz" id="quiz1">
+    <h3>Question 1</h3>
+    <p>In the cascade resolution order, what is checked BEFORE specificity?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Source order</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Inheritance</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">Origin/importance, inline styles, and layers</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Selector complexity</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz2">
+    <h3>Question 2</h3>
+    <p>An element has style="color: blue" and a stylesheet rule .card { color: red !important }. Which wins?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Inline (blue) - inline always beats stylesheets</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">!important (red) - importance beats inline</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Neither - they cancel each other out</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Depends on specificity of .card</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz3">
+    <h3>Question 3</h3>
+    <p>Selector A has specificity (0, 3, 0). Selector B has specificity (1, 0, 0). Same layer, same origin. Which wins?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">A - higher total count (3 vs 1)</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">B - one ID beats any number of classes</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Tie - need to check source order</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Depends on which came later in the file</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz4">
+    <h3>Question 4</h3>
+    <p>A property has no declaration on an element. It's an inheriting property (like color). What value does it get?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">transparent - the default for all CSS</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">The initial value defined in the spec</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">The parent element's computed value</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">It remains undefined until JavaScript sets it</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz5">
+    <h3>Question 5</h3>
+    <p>Two rules in the same layer have the same specificity. How is the winner determined?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">The one with more properties wins</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">They merge - both apply</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">It's random - depends on browser</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">Last in source order wins</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="recommended">
+    <strong>Recommended resources:</strong>
+    <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Cascade">MDN - Introducing the CSS cascade</a> |
+    <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Specificity">MDN - Specificity</a> |
+    <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Inheritance">MDN - Inheritance</a> |
+    <a href="https://2ality.com/2022/01/css-specificity-and-cascade.html">2ality - CSS specificity and the cascade</a>
+  </div>
+
+  <div class="footer-nav">
+    <a href="13-modern-selectors.html">&larr; Prev: Modern Selectors</a>
+    <a href="index.html">Index</a>
+    <a href="15-logical-properties.html">Next: Logical Properties &rarr;</a>
+  </div>
+
+    </main>
+  </div>
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

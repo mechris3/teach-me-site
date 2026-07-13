@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>CSS Transitions - Lesson 6 | Teach Me</title>
+  <meta name="description" content="Master CSS transitions - the four parts, timing functions, cubic-bezier curves, performance tiers, transition-behavior allow-discrete, and transitioning registered custom properties.">
+  <link rel="canonical" href="https://teachmeskills.dev/css/06-transitions.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/css/06-transitions.html">
+  <meta property="og:title" content="CSS Transitions - Lesson 6 | Teach Me">
+  <meta property="og:description" content="Master CSS transitions - the four parts, timing functions, cubic-bezier curves, performance tiers, transition-behavior allow-discrete, and transitioning registered custom properties.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="CSS Transitions - Lesson 6 | Teach Me">
+  <meta name="twitter:description" content="Master CSS transitions - the four parts, timing functions, cubic-bezier curves, performance tiers, transition-behavior allow-discrete, and transitioning registered custom properties.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Demo: basic transition */
+    .basic-box {
+      width: 100px;
+      height: 60px;
+      background: var(--accent, #3a86ff);
+      border-radius: 6px;
+      transition: width 0.4s ease, background 0.4s ease;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .basic-box:hover {
+      width: 300px;
+      background: #e76f51;
+    }
+
+    /* Demo: timing functions */
+    .timing-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .timing-bar {
+      height: 2.5rem;
+      width: 60px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      padding-left: 0.5rem;
+      color: white;
+      font-size: 0.7rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .timing-bar:nth-child(1) { background: var(--accent, #3a86ff); transition: width 1s ease; }
+    .timing-bar:nth-child(2) { background: #e76f51; transition: width 1s linear; }
+    .timing-bar:nth-child(3) { background: #2a9d8f; transition: width 1s ease-in; }
+    .timing-bar:nth-child(4) { background: #6c5ce7; transition: width 1s ease-out; }
+    .timing-bar:nth-child(5) { background: #f4a261; transition: width 1s ease-in-out; }
+    .timing-bar:nth-child(6) { background: #264653; transition: width 1s cubic-bezier(0.68, -0.55, 0.27, 1.55); }
+
+    .timing-row:hover .timing-bar {
+      width: 100%;
+    }
+
+    /* Demo: delay */
+    .delay-row {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .delay-box {
+      width: 50px;
+      height: 50px;
+      border-radius: 6px;
+      background: var(--accent, #3a86ff);
+      transition: transform 0.3s ease, background 0.3s ease;
+      cursor: pointer;
+    }
+    .delay-box:nth-child(1) { transition-delay: 0s; }
+    .delay-box:nth-child(2) { transition-delay: 0.1s; }
+    .delay-box:nth-child(3) { transition-delay: 0.2s; }
+    .delay-box:nth-child(4) { transition-delay: 0.3s; }
+    .delay-box:nth-child(5) { transition-delay: 0.4s; }
+    .delay-row:hover .delay-box {
+      transform: translateY(-10px);
+      background: #2a9d8f;
+    }
+
+    /* Demo: what can't transition */
+    .discrete-box {
+      display: block;
+      width: 100px;
+      height: 60px;
+      background: var(--accent, #3a86ff);
+      border-radius: 6px;
+      transition: display 0.4s ease, opacity 0.4s ease;
+      opacity: 1;
+      cursor: pointer;
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-align: center;
+      line-height: 60px;
+    }
+    .discrete-box:hover {
+      opacity: 0.3;
+    }
+
+    /* Demo: transition-behavior: allow-discrete */
+    .discrete-new-box {
+      width: 100px;
+      height: 60px;
+      background: #6c5ce7;
+      border-radius: 6px;
+      opacity: 1;
+      transition: opacity 0.4s ease, display 0.4s ease allow-discrete;
+      cursor: pointer;
+      color: white;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-align: center;
+      line-height: 60px;
+    }
+
+    /* Demo: multiple properties */
+    .multi-box {
+      width: 100px;
+      height: 60px;
+      background: var(--accent, #3a86ff);
+      border-radius: 6px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      transform: scale(1);
+      transition:
+        background 0.3s ease,
+        transform 0.2s ease,
+        box-shadow 0.3s ease,
+        border-radius 0.4s ease;
+      cursor: pointer;
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .multi-box:hover {
+      background: #e76f51;
+      transform: scale(1.1);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      border-radius: 50%;
+    }
+
+    /* Demo: @property transition */
+    @property --gradient-angle {
+      syntax: "<angle>";
+      inherits: false;
+      initial-value: 0deg;
+    }
+
+    .gradient-angle-box {
+      width: 150px;
+      height: 100px;
+      border-radius: 8px;
+      background: linear-gradient(var(--gradient-angle), var(--accent, #3a86ff), #e76f51);
+      transition: --gradient-angle 0.8s ease-in-out;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .gradient-angle-box:hover {
+      --gradient-angle: 180deg;
+    }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header">
+        <a href="index.html">CSS Course</a>
+      </div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-custom-properties-fundamentals.html">1. Custom Properties</a></li>
+        <li><a href="02-registered-custom-properties.html">2. @property</a></li>
+        <li><a href="03-css-value-functions.html">3. Value Functions</a></li>
+        <li><a href="04-custom-css-functions.html">4. Custom Functions</a></li>
+        <li><a href="05-advanced-attr.html">5. Advanced attr()</a></li>
+        <li class="current"><a href="06-transitions.html">6. Transitions</a></li>
+        <li><a href="07-animations.html">7. Animations</a></li>
+        <li><a href="08-flexbox.html">8. Flexbox</a></li>
+        <li><a href="09-grid.html">9. Grid</a></li>
+        <li><a href="10-container-queries.html">10. Container Queries</a></li>
+        <li><a href="11-cascade-layers.html">11. Cascade Layers</a></li>
+        <li><a href="12-css-nesting.html">12. CSS Nesting</a></li>
+        <li><a href="13-modern-selectors.html">13. Modern Selectors</a></li>
+        <li><a href="14-the-cascade.html">14. The Cascade</a></li>
+        <li><a href="15-logical-properties.html">15. Logical Properties</a></li>
+        <li><a href="16-view-transitions.html">16. View Transitions</a></li>
+        <li><a href="17-anchor-positioning.html">17. Anchor Positioning</a></li>
+        <li><a href="18-advanced-colour.html">18. Advanced Colour</a></li>
+        <li><a href="19-scope.html">19. @scope</a></li>
+        <li><a href="20-selectors-deep-dive.html">20. Selectors Deep-Dive</a></li>
+        <li><a href="21-theming-deep-dive.html">21. Theming Deep-Dive</a></li>
+        <li><a href="22-responsive-design-patterns.html">22. Responsive Patterns</a></li>
+        <li><a href="23-scroll-driven-animations.html">23. Scroll-Driven Animations</a></li>
+        <li><a href="24-capstone-product-landing-page.html">24. Capstone Project</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="css-anatomy.html">CSS Anatomy</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 6</p>
+  <h1>CSS Transitions</h1>
+
+  <p>A transition is the simplest form of CSS animation: you define a start state and an end state, and the browser interpolates between them over time. No keyframes, no timeline  -  just "when this property changes, do it smoothly."</p>
+
+  <h2>The four parts of a transition</h2>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>transition: &lt;property&gt; &lt;duration&gt; &lt;timing-function&gt; &lt;delay&gt;;
+
+/* Example */
+transition: background 0.3s ease 0s;
+
+/* Shorthand with multiple properties */
+transition:
+  background 0.3s ease,
+  transform 0.2s ease-out,
+  box-shadow 0.4s ease;</code></pre>
+  </div>
+
+  <ol>
+    <li><code>transition-property</code>  -  which property to animate (<code>all</code>, a specific name, or a comma-separated list)</li>
+    <li><code>transition-duration</code>  -  how long the interpolation takes (e.g. <code>0.3s</code>, <code>300ms</code>)</li>
+    <li><code>transition-timing-function</code>  -  the acceleration curve</li>
+    <li><code>transition-delay</code>  -  how long to wait before starting (default <code>0s</code>)</li>
+  </ol>
+
+  <div class="key-concept">
+    <p><strong>Where to put it:</strong> The <code>transition</code> declaration goes on the <strong>base state</strong>, not the hover/active state. This way it applies in both directions  -  entering AND leaving the state change.</p>
+    <p><strong>Why?</strong> The transition declaration is only in effect while its selector matches. If you put it on <code>:hover</code>, then when the mouse leaves, the <code>:hover</code> block deactivates  -  taking the transition instruction with it. The property snaps back instantly because there's no transition in effect for the "return trip."</p>
+  </div>
+
+  <h3>Asymmetric transitions  -  different timing for enter vs leave</h3>
+
+  <p>You can exploit this behaviour intentionally. By putting different <code>transition</code> values on the base and hover states, you get different speeds for each direction:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>.button {
+  background: blue;
+  transition: background 0.6s ease;  /* governs the LEAVE (slow fade back) */
+}
+
+.button:hover {
+  background: coral;
+  transition: background 0.1s ease;  /* governs the ENTER (fast snap on) */
+}</code></pre>
+  </div>
+
+  <p>When you hover, the <code>:hover</code> transition kicks in (fast 0.1s). When you leave, the <code>:hover</code> rules disappear, and the base state's transition takes over (slow 0.6s). This gives you a fast snap-in, slow fade-out effect  -  useful for things like button highlights that should feel responsive on hover but gentle on leave.</p>
+
+  <h2>Live demo: basic transition</h2>
+
+  <div class="demo">
+    <p class="demo-caption">Hover to transition width and background simultaneously</p>
+    <div class="basic-box">Hover me</div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;!-- HTML --&gt;
+&lt;div class="basic-box"&gt;Hover me&lt;/div&gt;
+
+/* CSS */
+.basic-box {
+  width: 100px;
+  height: 60px;
+  background: var(--accent);
+  border-radius: 6px;
+  transition: width 0.4s ease, background 0.4s ease;
+}
+
+.basic-box:hover {
+  width: 300px;
+  background: #e76f51;
+}</code></pre>
+  </div>
+
+  <h2>Timing functions  -  the acceleration curve</h2>
+
+  <p>The timing function controls how the value changes over time. It doesn't change the start/end  -  just how you get there.</p>
+
+  <div class="demo">
+    <p class="demo-caption">Hover anywhere in this box  -  all bars transition to full width with different timing</p>
+    <div class="timing-row">
+      <div class="timing-bar">ease</div>
+      <div class="timing-bar">linear</div>
+      <div class="timing-bar">ease-in</div>
+      <div class="timing-bar">ease-out</div>
+      <div class="timing-bar">ease-in-out</div>
+      <div class="timing-bar">cubic-bezier</div>
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;!-- HTML --&gt;
+&lt;div class="timing-row"&gt;
+  &lt;div class="timing-bar"&gt;ease&lt;/div&gt;
+  &lt;div class="timing-bar"&gt;linear&lt;/div&gt;
+  &lt;div class="timing-bar"&gt;ease-in&lt;/div&gt;
+  &lt;div class="timing-bar"&gt;ease-out&lt;/div&gt;
+  &lt;div class="timing-bar"&gt;ease-in-out&lt;/div&gt;
+  &lt;div class="timing-bar"&gt;cubic-bezier&lt;/div&gt;
+&lt;/div&gt;
+
+/* CSS */
+.timing-bar:nth-child(1) { transition: width 1s ease; }
+.timing-bar:nth-child(2) { transition: width 1s linear; }
+.timing-bar:nth-child(3) { transition: width 1s ease-in; }
+.timing-bar:nth-child(4) { transition: width 1s ease-out; }
+.timing-bar:nth-child(5) { transition: width 1s ease-in-out; }
+.timing-bar:nth-child(6) { transition: width 1s cubic-bezier(0.68, -0.55, 0.27, 1.55); }
+
+.timing-row:hover .timing-bar { width: 100%; }</code></pre>
+  </div>
+
+  <p>The built-in keywords:</p>
+  <ul>
+    <li><code>ease</code>  -  starts fast, slows down at the end (default). Good for most UI transitions.</li>
+    <li><code>linear</code>  -  constant speed. Feels mechanical. Use for progress bars or continuous motion.</li>
+    <li><code>ease-in</code>  -  starts slow, accelerates. Feels like something being thrown. Good for exit animations.</li>
+    <li><code>ease-out</code>  -  starts fast, decelerates. Feels like something arriving. Good for entrance animations.</li>
+    <li><code>ease-in-out</code>  -  slow start and end, fast middle. Symmetric. Good for things that move and stop.</li>
+  </ul>
+
+  <h3>cubic-bezier()  -  custom curves</h3>
+
+  <p>All timing keywords are shortcuts for <code>cubic-bezier()</code> curves. You can write your own:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* Bouncy overshoot */
+transition-timing-function: cubic-bezier(0.68, -0.55, 0.27, 1.55);
+
+/* The keywords as cubic-bezier: */
+ease:        cubic-bezier(0.25, 0.1, 0.25, 1.0)
+linear:      cubic-bezier(0.0, 0.0, 1.0, 1.0)
+ease-in:     cubic-bezier(0.42, 0, 1.0, 1.0)
+ease-out:    cubic-bezier(0, 0, 0.58, 1.0)
+ease-in-out: cubic-bezier(0.42, 0, 0.58, 1.0)</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <p><strong>Practical tip:</strong> Use <a href="https://cubic-bezier.com">cubic-bezier.com</a> to visually design curves. Values outside 0 - 1 on the Y axis create overshoot/bounce effects (the bar in the demo above overshoots then snaps back).</p>
+  </div>
+
+  <h2>Transition delay  -  staggered effects</h2>
+
+  <p>A delay makes the transition wait before starting. Combined with different delays per element, you get stagger effects:</p>
+
+  <div class="demo">
+    <p class="demo-caption">Hover the row  -  each box starts its transition slightly later</p>
+    <div class="delay-row">
+      <div class="delay-box"></div>
+      <div class="delay-box"></div>
+      <div class="delay-box"></div>
+      <div class="delay-box"></div>
+      <div class="delay-box"></div>
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;!-- HTML --&gt;
+&lt;div class="delay-row"&gt;
+  &lt;div class="delay-box"&gt;&lt;/div&gt;
+  &lt;div class="delay-box"&gt;&lt;/div&gt;
+  &lt;div class="delay-box"&gt;&lt;/div&gt;
+  &lt;div class="delay-box"&gt;&lt;/div&gt;
+  &lt;div class="delay-box"&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+/* CSS */
+.delay-box {
+  transition: transform 0.3s ease, background 0.3s ease;
+}
+
+.delay-box:nth-child(1) { transition-delay: 0s; }
+.delay-box:nth-child(2) { transition-delay: 0.1s; }
+.delay-box:nth-child(3) { transition-delay: 0.2s; }
+.delay-box:nth-child(4) { transition-delay: 0.3s; }
+.delay-box:nth-child(5) { transition-delay: 0.4s; }
+
+.delay-row:hover .delay-box {
+  transform: translateY(-10px);
+  background: teal;
+}</code></pre>
+  </div>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <h2>Multiple properties  -  independent timing</h2>
+
+  <p>You can give each property its own duration, timing, and delay:</p>
+
+  <div class="demo">
+    <p class="demo-caption">Hover  -  each property transitions at its own speed</p>
+    <div class="multi-box">Hover</div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>&lt;!-- HTML --&gt;
+&lt;div class="multi-box"&gt;Hover&lt;/div&gt;
+
+/* CSS */
+.multi-box {
+  width: 100px;
+  height: 60px;
+  background: var(--accent);
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition:
+    background 0.3s ease,
+    transform 0.2s ease,
+    box-shadow 0.3s ease,
+    border-radius 0.4s ease;
+}
+
+.multi-box:hover {
+  background: #e76f51;
+  transform: scale(1.1);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  border-radius: 50%;
+}</code></pre>
+  </div>
+
+  <h2><code>transition: all</code>  -  convenient but risky</h2>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* Transitions every animatable property */
+transition: all 0.3s ease;</code></pre>
+  </div>
+
+  <p>This is tempting but has downsides:</p>
+  <ul>
+    <li>Transitions properties you didn't intend (e.g. <code>height</code> changing when content updates)</li>
+    <li>Can cause performance issues if expensive properties animate unexpectedly</li>
+    <li>Makes it harder to give different properties different timings</li>
+  </ul>
+
+  <div class="key-concept">
+    <p><strong>Best practice:</strong> Be explicit. List the properties you want to transition. Use <code>all</code> only in prototyping or when you genuinely want everything to animate.</p>
+  </div>
+
+  <h2>What can and can't be transitioned</h2>
+
+  <p>A property can be transitioned if the browser knows how to interpolate between its values. Most numeric/colour properties work:</p>
+
+  <ul>
+    <li>&#10003; <code>opacity</code>, <code>transform</code>, <code>color</code>, <code>background-color</code>, <code>width</code>, <code>height</code>, <code>padding</code>, <code>margin</code>, <code>border-radius</code>, <code>box-shadow</code>, <code>font-size</code></li>
+    <li>&#10003; Registered custom properties (via <code>@property</code>  -  you learned this in Lesson 2)</li>
+    <li>&#10007; <code>display</code>  -  historically a discrete swap (can't interpolate between <code>block</code> and <code>none</code>)</li>
+    <li>&#10007; <code>font-family</code>  -  no interpolation between typefaces</li>
+    <li>&#10007; <code>background-image</code>  -  can't interpolate between different images (but CAN crossfade gradients in some cases)</li>
+  </ul>
+
+  <h3>New: <code>transition-behavior: allow-discrete</code></h3>
+
+  <p>A recent addition (Chrome 117+) lets you transition properties that would normally swap discretely. The most useful case: transitioning <code>display</code> so elements can fade out before being removed:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>.box {
+  transition: opacity 0.4s ease, display 0.4s ease allow-discrete;
+}
+
+.box.hidden {
+  opacity: 0;
+  display: none;  /* transitions at the END of the opacity fade */
+}</code></pre>
+  </div>
+
+  <p>Without <code>allow-discrete</code>, adding <code>display: none</code> would instantly hide the element before the opacity had a chance to fade. With it, the display change waits until the transition finishes.</p>
+
+  <h2>Transitioning custom properties (callback to Lesson 2)</h2>
+
+  <p>Remember: unregistered custom properties can't be transitioned. But with <code>@property</code>, you can transition anything that has a numeric component inside it. Here's a gradient angle rotating on hover:</p>
+
+  <div class="demo">
+    <p class="demo-caption">Hover  -  the gradient angle transitions from 0deg to 180deg</p>
+    <div class="gradient-angle-box">Hover me</div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>@property --gradient-angle {
+  syntax: "&lt;angle&gt;";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+&lt;!-- HTML --&gt;
+&lt;div class="gradient-angle-box"&gt;Hover me&lt;/div&gt;
+
+/* CSS */
+.gradient-angle-box {
+  background: linear-gradient(var(--gradient-angle), blue, coral);
+  transition: --gradient-angle 0.8s ease-in-out;
+}
+
+.gradient-angle-box:hover {
+  --gradient-angle: 180deg;
+}</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <p><strong>The pattern:</strong> Extract → Register → Transition. Pull a numeric part out of a compound value into a custom property, register it with @property, then transition the property. Works for gradient stops, hues, angles, individual transform values  -  anything.</p>
+  </div>
+
+  <h2>Performance: what's cheap to transition</h2>
+
+  <p>Not all transitions are created equal. The browser renders in layers, and some property changes are much cheaper than others:</p>
+
+  <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; margin: 1.5rem 0;">
+    <thead>
+      <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+        <th style="padding: 0.5rem;">Cost</th>
+        <th style="padding: 0.5rem;">Properties</th>
+        <th style="padding: 0.5rem;">Why</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 0.5rem;">Cheap (composite)</td>
+        <td style="padding: 0.5rem;"><code>transform</code>, <code>opacity</code></td>
+        <td style="padding: 0.5rem;">GPU-accelerated. No layout or paint needed.</td>
+      </tr>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 0.5rem;">Medium (paint)</td>
+        <td style="padding: 0.5rem;"><code>color</code>, <code>background</code>, <code>box-shadow</code>, <code>border</code></td>
+        <td style="padding: 0.5rem;">Triggers repaint but no layout recalculation.</td>
+      </tr>
+      <tr>
+        <td style="padding: 0.5rem;">Expensive (layout)</td>
+        <td style="padding: 0.5rem;"><code>width</code>, <code>height</code>, <code>padding</code>, <code>margin</code>, <code>top</code>/<code>left</code></td>
+        <td style="padding: 0.5rem;">Triggers layout recalculation for the element AND its neighbours.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="key-concept">
+    <p><strong>Rule of thumb:</strong> If you can achieve the same visual effect with <code>transform</code> (e.g. <code>scale()</code> instead of changing <code>width</code>, <code>translateY()</code> instead of changing <code>top</code>), prefer transform. It's composited on the GPU and won't trigger layout thrash.</p>
+  </div>
+
+  <h2>Common gotchas</h2>
+
+  <h3>1. Transitioning height to/from <code>auto</code></h3>
+
+  <p>You can't transition <code>height: 0</code> → <code>height: auto</code> because the browser can't interpolate to an unknown value. Workarounds:</p>
+  <ul>
+    <li>Use <code>max-height</code> with an estimated value (hacky, can feel off)</li>
+    <li>Use <code>transform: scaleY(0)</code> → <code>scaleY(1)</code> (visual only, doesn't affect layout)</li>
+    <li>Use the new <code>calc-size()</code> function: <code>height: calc-size(auto)</code> (Chrome 129+, allows transitioning to auto)</li>
+    <li>Use <code>grid-template-rows: 0fr</code> → <code>1fr</code> (works today, transitions the grid track)</li>
+  </ul>
+
+  <h3>2. Transition on page load</h3>
+
+  <p>Transitions don't fire on initial page load  -  they only trigger when a property <em>changes</em>. If you want an entrance animation, use <code>@keyframes</code> (Lesson 7).</p>
+
+  <h3>3. Transitioning to <code>display: none</code></h3>
+
+  <p>Covered above  -  use <code>transition-behavior: allow-discrete</code> or the classic workaround: transition <code>opacity</code> to 0 first, then toggle display in a <code>transitionend</code> event handler.</p>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <h2>Retrieval check</h2>
+
+  <div class="quiz" id="quiz1">
+    <h3>Question 1</h3>
+    <p>Where should the transition declaration go  -  on the base state or the hover/active state?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">Base state  -  so it applies in both directions</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Hover state  -  that's where the change happens</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Either  -  it doesn't matter where you put it</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">A separate @transition rule at the top of the file</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz2">
+    <h3>Question 2</h3>
+    <p>Which two properties are cheapest to transition (GPU composited)?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">width and height</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">background and color</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">transform and opacity</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">padding and margin</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz3">
+    <h3>Question 3</h3>
+    <p>You want an element to start moving slowly and accelerate. Which timing function?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">ease-out  -  decelerates at the end</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">ease-in  -  starts slow, gets faster</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">ease  -  slow at start and end equally</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">linear  -  constant speed throughout</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz4">
+    <h3>Question 4</h3>
+    <p>Can you transition height from 0 to auto?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Yes  -  auto is a valid target for any transition</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">No  -  browser can't interpolate to unknown value (use workarounds)</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Only if you set transition-behavior: allow-discrete</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Only with a registered @property for height</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz5">
+    <h3>Question 5</h3>
+    <p>What does transition-behavior: allow-discrete enable?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Allows transitions on unregistered custom properties</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Makes all transitions run on the GPU</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">Lets discrete properties like display participate in transitions</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Enables transitions to fire on page load</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="recommended">
+    <strong>Recommended resources:</strong>
+    <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/transition">MDN  -  transition</a> |
+    <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/transition-timing-function">MDN  -  transition-timing-function</a> |
+    <a href="https://cubic-bezier.com">cubic-bezier.com</a>  -  visual curve editor |
+    <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/transition-behavior">MDN  -  transition-behavior</a>
+  </div>
+
+  <div class="footer-nav">
+    <a href="05-advanced-attr.html">&larr; Prev: Advanced attr()</a>
+    <a href="index.html">Index</a>
+    <a href="07-animations.html">Next: Animations &rarr;</a>
+  </div>
+
+    </main>
+  </div>
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>Custom CSS Functions - Lesson 4 | Teach Me</title>
+  <meta name="description" content="Learn how to create reusable custom CSS functions with @function - native parametrised value computation with typed parameters, defaults, and conditional logic.">
+  <link rel="canonical" href="https://teachmeskills.dev/css/04-custom-css-functions.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/css/04-custom-css-functions.html">
+  <meta property="og:title" content="Custom CSS Functions - Lesson 4 | Teach Me">
+  <meta property="og:description" content="Learn how to create reusable custom CSS functions with @function - native parametrised value computation with typed parameters, defaults, and conditional logic.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Custom CSS Functions - Lesson 4 | Teach Me">
+  <meta name="twitter:description" content="Learn how to create reusable custom CSS functions with @function - native parametrised value computation with typed parameters, defaults, and conditional logic.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Demo: --double function */
+    @function --double(--value) {
+      result: calc(var(--value) * 2);
+    }
+
+    .double-demo {
+      --base: 12px;
+      display: flex;
+      gap: 1rem;
+      align-items: flex-end;
+    }
+
+    .double-demo .box {
+      background: var(--accent, #3a86ff);
+      border-radius: 4px;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+    }
+
+    .double-demo .box-base {
+      width: 60px;
+      height: 60px;
+      padding: var(--base);
+    }
+
+    .double-demo .box-doubled {
+      width: 60px;
+      height: 60px;
+      padding: --double(var(--base));
+    }
+
+    /* Demo: --tint function */
+    @function --tint(--color <color>, --amount <percentage>: 50%) returns <color> {
+      result: color-mix(in oklch, var(--color), white var(--amount));
+    }
+
+    @function --shade(--color <color>, --amount <percentage>: 50%) returns <color> {
+      result: color-mix(in oklch, var(--color), black var(--amount));
+    }
+
+    .tint-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.5rem;
+    }
+
+    .tint-swatch {
+      height: 50px;
+      border-radius: 6px;
+    }
+
+    /* Demo: responsive function */
+    @function --fluid(--min <length>, --max <length>, --vw <length>: 2vw) returns <length> {
+      result: clamp(var(--min), calc(var(--vw) + var(--min)), var(--max));
+    }
+
+    .fluid-text {
+      font-size: --fluid(1rem, 2rem);
+      padding: --fluid(0.75rem, 2rem, 3vw);
+      background: #f0f7ff; color: #1a1a2e;
+      border-radius: 6px;
+    }
+
+    @media (max-width: 500px) {
+      .tint-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header">
+        <a href="index.html">CSS Course</a>
+      </div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-custom-properties-fundamentals.html">1. Custom Properties</a></li>
+        <li><a href="02-registered-custom-properties.html">2. @property</a></li>
+        <li><a href="03-css-value-functions.html">3. Value Functions</a></li>
+        <li class="current"><a href="04-custom-css-functions.html">4. Custom Functions</a></li>
+        <li><a href="05-advanced-attr.html">5. Advanced attr()</a></li>
+        <li><a href="06-transitions.html">6. Transitions</a></li>
+        <li><a href="07-animations.html">7. Animations</a></li>
+        <li><a href="08-flexbox.html">8. Flexbox</a></li>
+        <li><a href="09-grid.html">9. Grid</a></li>
+        <li><a href="10-container-queries.html">10. Container Queries</a></li>
+        <li><a href="11-cascade-layers.html">11. Cascade Layers</a></li>
+        <li><a href="12-css-nesting.html">12. CSS Nesting</a></li>
+        <li><a href="13-modern-selectors.html">13. Modern Selectors</a></li>
+        <li><a href="14-the-cascade.html">14. The Cascade</a></li>
+        <li><a href="15-logical-properties.html">15. Logical Properties</a></li>
+        <li><a href="16-view-transitions.html">16. View Transitions</a></li>
+        <li><a href="17-anchor-positioning.html">17. Anchor Positioning</a></li>
+        <li><a href="18-advanced-colour.html">18. Advanced Colour</a></li>
+        <li><a href="19-scope.html">19. @scope</a></li>
+        <li><a href="20-selectors-deep-dive.html">20. Selectors Deep-Dive</a></li>
+        <li><a href="21-theming-deep-dive.html">21. Theming Deep-Dive</a></li>
+        <li><a href="22-responsive-design-patterns.html">22. Responsive Patterns</a></li>
+        <li><a href="23-scroll-driven-animations.html">23. Scroll-Driven Animations</a></li>
+        <li><a href="24-capstone-product-landing-page.html">24. Capstone Project</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="css-anatomy.html">CSS Anatomy</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 4</p>
+  <h1><code>@function</code>  -  Custom CSS Functions</h1>
+
+  <p>In Lessons 1 - 3 you learned to store values (custom properties), type them (@property), and compute with them (calc, min, max, clamp, color-mix). Now: what if you could wrap all of that into a reusable function with parameters  -  like a Sass function, but native to CSS?</p>
+
+  <p>That's <code>@function</code>. It's brand new  -  defined in the <a href="https://www.w3.org/TR/css-mixins-1/">CSS Functions and Mixins Module</a> (First Public Working Draft, May 2025).</p>
+
+  <div class="warning">
+    <p><strong>Browser support:</strong> Chrome/Edge 139+ (June 2025). Not yet in Firefox or Safari. This is experimental but actively shipping. The demos in this lesson will only work in Chrome/Edge.</p>
+  </div>
+
+  <h2>The basic shape</h2>
+
+  <p>A custom function has a name (starting with <code>--</code>), parameters, and a <code>result</code> descriptor that defines what it returns:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>@function --double(--value) {
+  result: calc(var(--value) * 2);
+}</code></pre>
+  </div>
+
+  <p>Call it anywhere you'd put a value:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>.box {
+  padding: --double(8px);   /* → 16px */
+  margin: --double(1rem);   /* → 2rem */
+}</code></pre>
+  </div>
+
+  <p>That's it. The function name starts with <code>--</code>, parameters are custom property names, and you use <code>var()</code> to read them inside the body.</p>
+
+  <div class="key-concept">
+    <p><strong>Key mental model:</strong> A custom function is a parametrised custom property. Instead of returning one fixed value, it computes a value from its inputs. The <code>result</code> descriptor is what gets returned to the caller.</p>
+  </div>
+
+  <h2>Adding types</h2>
+
+  <p>Just like <code>@property</code>, you can type your parameters and return value. This gives you validation and makes the function self-documenting:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>@function --tint(--color &lt;color&gt;, --amount &lt;percentage&gt;: 50%) returns &lt;color&gt; {
+  result: color-mix(in oklch, var(--color), white var(--amount));
+}</code></pre>
+  </div>
+
+  <p>Breaking that down:</p>
+  <ul>
+    <li><code>--color &lt;color&gt;</code>  -  first parameter, must be a colour</li>
+    <li><code>--amount &lt;percentage&gt;: 50%</code>  -  second parameter, must be a percentage, <strong>defaults to 50%</strong> if omitted</li>
+    <li><code>returns &lt;color&gt;</code>  -  the return type (optional, but good practice)</li>
+    <li><code>result:</code>  -  the computed value that's returned</li>
+  </ul>
+
+  <p>Call it:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>.card {
+  background: --tint(#3a86ff, 30%);       /* light blue */
+  border-color: --tint(#3a86ff);          /* uses default 50% */
+}</code></pre>
+  </div>
+
+  <h2>Default values</h2>
+
+  <p>Parameters can have defaults, specified after a colon. If the caller omits that argument, the default kicks in:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>@function --fluid(--min &lt;length&gt;, --max &lt;length&gt;, --vw &lt;length&gt;: 2vw) returns &lt;length&gt; {
+  result: clamp(var(--min), calc(var(--vw) + var(--min)), var(--max));
+}
+
+/* Use with default --vw */
+font-size: --fluid(1rem, 2rem);
+
+/* Override --vw */
+padding: --fluid(0.75rem, 2rem, 3vw);</code></pre>
+  </div>
+
+  <h2>Live demos</h2>
+
+  <p><em>These demos require Chrome/Edge 139+. In other browsers you'll see fallback styling.</em></p>
+
+  <div class="demo">
+    <p class="demo-caption">--double(12px) applied to padding</p>
+    <div class="double-demo">
+      <div class="box box-base">12px pad</div>
+      <div class="box box-doubled">24px pad</div>
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>@function --double(--value) {
+  result: calc(var(--value) * 2);
+}
+
+&lt;!-- HTML --&gt;
+&lt;div class="double-demo"&gt;
+  &lt;div class="box box-base"&gt;12px pad&lt;/div&gt;
+  &lt;div class="box box-doubled"&gt;24px pad&lt;/div&gt;
+&lt;/div&gt;
+
+/* CSS */
+.double-demo { --base: 12px; display: flex; gap: 1rem; }
+.box-base    { padding: var(--base); }
+.box-doubled { padding: --double(var(--base)); }</code></pre>
+  </div>
+
+  <div class="demo">
+    <p class="demo-caption">--fluid(1rem, 2rem) on font-size  -  resize the window</p>
+    <div class="fluid-text">
+      This text uses a custom --fluid() function that wraps clamp().
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>@function --fluid(--min &lt;length&gt;, --max &lt;length&gt;, --vw &lt;length&gt;: 2vw) returns &lt;length&gt; {
+  result: clamp(var(--min), calc(var(--vw) + var(--min)), var(--max));
+}
+
+&lt;!-- HTML --&gt;
+&lt;div class="fluid-text"&gt;This text uses a custom --fluid() function.&lt;/div&gt;
+
+/* CSS */
+.fluid-text {
+  font-size: --fluid(1rem, 2rem);
+  padding: --fluid(0.75rem, 2rem, 3vw);
+}</code></pre>
+  </div>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <h2>Local variables inside functions</h2>
+
+  <p>You can declare custom properties inside the function body as local constants:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>@function --elevation(--level &lt;integer&gt;) {
+  --base-shadow: 0px;
+  --blur: calc(var(--level) * 4px);
+  --spread: calc(var(--level) * 1px);
+  --opacity: calc(0.1 + var(--level) * 0.03);
+  result: var(--base-shadow) var(--blur) var(--spread) rgba(0, 0, 0, var(--opacity));
+}
+
+.card-1 { box-shadow: --elevation(1); }
+.card-3 { box-shadow: --elevation(3); }
+.card-5 { box-shadow: --elevation(5); }</code></pre>
+  </div>
+
+  <p>Local variables are scoped to the function  -  they don't leak out.</p>
+
+  <h2>Calling functions from functions</h2>
+
+  <p>Functions can call other functions. Inner functions can even access the outer function's parameters and locals:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>@function --shade(--color &lt;color&gt;, --amount &lt;percentage&gt;: 30%) returns &lt;color&gt; {
+  result: color-mix(in oklch, var(--color), black var(--amount));
+}
+
+@function --tint(--color &lt;color&gt;, --amount &lt;percentage&gt;: 30%) returns &lt;color&gt; {
+  result: color-mix(in oklch, var(--color), white var(--amount));
+}
+
+@function --contrast-pair(--base &lt;color&gt;) {
+  /* Returns a lighter version  -  could call --shade for dark variant */
+  result: --tint(var(--base), 80%);
+}
+
+.hero {
+  background: --contrast-pair(navy);  /* very light navy */
+}</code></pre>
+  </div>
+
+  <h2>Conditional logic with <code>@media</code> and <code>if()</code></h2>
+
+  <p>You can include <code>@media</code> rules inside a function to return different values based on context:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>@function --responsive-padding(--sm &lt;length&gt;, --lg &lt;length&gt;) {
+  result: var(--lg);
+
+  @media (width &lt; 768px) {
+    result: var(--sm);
+  }
+}
+
+.container {
+  padding: --responsive-padding(1rem, 3rem);
+}</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <p><strong>No early returns.</strong> Unlike JavaScript, CSS functions don't "return" at the first <code>result</code> they hit. They follow normal cascade rules: last matching <code>result</code> wins. So the <code>@media</code> version above works because when the media query matches, its <code>result</code> overrides the earlier one.</p>
+  </div>
+
+  <p>There's also a new <code>if()</code> function for inline conditionals:</p>
+
+  <h3>The if() function  -  inline conditional logic</h3>
+
+  <p><code>if()</code> lets you choose between values based on a condition, directly inside a property value  -  no @media block needed. It's CSS's first true inline conditional:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* Syntax */
+if( &lt;condition&gt; : &lt;value-if-true&gt; ; else: &lt;value-if-false&gt; )
+
+/* The condition can be: */
+if( media(width &lt; 768px) : ... ; else: ... )     /* media query */
+if( supports(display: grid) : ... ; else: ... )  /* feature query */
+if( style(--theme: dark) : ... ; else: ... )     /* style query (custom property) */</code></pre>
+  </div>
+
+  <p>Used inside a @function:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>@function --responsive-padding(--sm &lt;length&gt;, --lg &lt;length&gt;) returns &lt;length&gt; {
+  result: if(media(width &lt; 768px): var(--sm); else: var(--lg));
+}
+
+.container {
+  padding: --responsive-padding(1rem, 3rem);
+}</code></pre>
+  </div>
+
+  <p>Used directly in a property value (outside @function):</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>/* Inline conditional without @function */
+.card {
+  padding: if(media(width &lt; 768px): 1rem; else: 2rem);
+  background: if(style(--theme: dark): #1a1a2e; else: white);
+  display: if(supports(display: grid): grid; else: flex);
+}
+
+/* Chaining multiple conditions */
+.text {
+  font-size: if(
+    media(width &lt; 400px): 0.875rem;
+    else: if(
+      media(width &lt; 768px): 1rem;
+      else: 1.125rem
+    )
+  );
+}</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <p><strong>if() vs @media blocks:</strong> They produce the same result, but <code>if()</code> keeps the logic inline with the value  -  no separate block needed. This is especially powerful inside <code>@function</code> where you want one-liner conditional returns, or when you want to set a single property conditionally without the overhead of a media query block.</p>
+    <p><strong>Browser support:</strong> <code>if()</code> is very new  -  Chrome 137+ (behind a flag), not yet stable in any browser as of mid-2025. The @media-inside-function approach works today.</p>
+  </div>
+
+  <h2>Passing comma-separated values</h2>
+
+  <p>If an argument itself contains commas (like a list of colours), wrap it in curly braces to avoid it being parsed as multiple arguments:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>@function --longest(--list &lt;length&gt;#, --extra &lt;length&gt;) {
+  result: calc(max(var(--list)) + var(--extra));
+}
+
+.box {
+  width: --longest({10px, 40px, 25px}, 5px);  /* 45px */
+}</code></pre>
+  </div>
+
+  <h2>How this compares to what you know</h2>
+
+  <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; margin: 1.5rem 0;">
+    <thead>
+      <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+        <th style="padding: 0.5rem;">Feature</th>
+        <th style="padding: 0.5rem;">Sass @function</th>
+        <th style="padding: 0.5rem;">CSS @function</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 0.5rem;">When it runs</td>
+        <td style="padding: 0.5rem;">Compile time</td>
+        <td style="padding: 0.5rem;">Runtime (browser)</td>
+      </tr>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 0.5rem;">Can use viewport/container units</td>
+        <td style="padding: 0.5rem;">No</td>
+        <td style="padding: 0.5rem;">Yes</td>
+      </tr>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 0.5rem;">Can respond to media queries</td>
+        <td style="padding: 0.5rem;">No</td>
+        <td style="padding: 0.5rem;">Yes</td>
+      </tr>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 0.5rem;">Loops / iteration</td>
+        <td style="padding: 0.5rem;">Yes (@for, @each)</td>
+        <td style="padding: 0.5rem;">No</td>
+      </tr>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 0.5rem;">String manipulation</td>
+        <td style="padding: 0.5rem;">Yes</td>
+        <td style="padding: 0.5rem;">No</td>
+      </tr>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 0.5rem;">Type checking</td>
+        <td style="padding: 0.5rem;">Manual</td>
+        <td style="padding: 0.5rem;">Built-in (syntax types)</td>
+      </tr>
+      <tr>
+        <td style="padding: 0.5rem;">Reactive to DOM state</td>
+        <td style="padding: 0.5rem;">No</td>
+        <td style="padding: 0.5rem;">Yes (inherits custom properties)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="key-concept">
+    <p><strong>The big difference:</strong> CSS @function runs in the browser with full access to runtime context  -  viewport size, inherited properties, media queries, container queries. Sass functions are powerful but frozen at build time. CSS functions are alive.</p>
+  </div>
+
+  <h2>Practical patterns</h2>
+
+  <h3>Design token utilities</h3>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>@function --space(--multiplier &lt;number&gt;: 1) returns &lt;length&gt; {
+  --base: 0.5rem;
+  result: calc(var(--base) * var(--multiplier));
+}
+
+.card {
+  padding: --space(3);    /* 1.5rem */
+  gap: --space(2);        /* 1rem */
+  margin-bottom: --space(4);  /* 2rem */
+}</code></pre>
+  </div>
+
+  <h3>Colour palette generation</h3>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>@function --tint(--color &lt;color&gt;, --amount &lt;percentage&gt;: 50%) returns &lt;color&gt; {
+  result: color-mix(in oklch, var(--color), white var(--amount));
+}
+
+@function --shade(--color &lt;color&gt;, --amount &lt;percentage&gt;: 50%) returns &lt;color&gt; {
+  result: color-mix(in oklch, var(--color), black var(--amount));
+}
+
+:root {
+  --brand: #3a86ff;
+}
+
+.button {
+  background: var(--brand);
+  border-color: --shade(var(--brand), 20%);
+}
+
+.button:hover {
+  background: --tint(var(--brand), 15%);
+}</code></pre>
+  </div>
+
+  <h3>Responsive typography</h3>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>@function --fluid-type(--min &lt;length&gt;, --max &lt;length&gt;) returns &lt;length&gt; {
+  /* Grows from min at 320px viewport to max at 1200px viewport */
+  --slope: calc((var(--max) - var(--min)) / (1200 - 320));
+  result: clamp(var(--min), calc(var(--min) + (100vw - 320px) * var(--slope)), var(--max));
+}
+
+h1 { font-size: --fluid-type(1.5rem, 3rem); }
+h2 { font-size: --fluid-type(1.25rem, 2rem); }
+p  { font-size: --fluid-type(1rem, 1.25rem); }</code></pre>
+  </div>
+
+  <h2>What @function can't do (yet)</h2>
+
+  <ul>
+    <li>No loops or iteration  -  you can't generate a list of values</li>
+    <li>No string manipulation  -  can't build selector names or property names</li>
+    <li>No side effects  -  functions can only return a value, not set properties on elements</li>
+    <li>No recursion  -  a function can't call itself</li>
+    <li>Can't be used in selectors or property names  -  only in values</li>
+  </ul>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <h2>Retrieval check</h2>
+
+  <div class="quiz" id="quiz1">
+    <h3>Question 1</h3>
+    <p>What must a custom function name start with?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">@  -  like other at-rules</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">--  -  like custom properties</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">fn-  -  a dedicated prefix</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Any valid identifier works</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz2">
+    <h3>Question 2</h3>
+    <p>What descriptor do you use to specify what a @function returns?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">return: value;</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">output: value;</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">result: value;</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">value: value;</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz3">
+    <h3>Question 3</h3>
+    <p>A function has two result descriptors  -  one inside @media and one outside. Which value is returned when the media query matches?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">The first result  -  early return wins</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">The @media result  -  last matching result wins</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Both are combined into a list</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">It's invalid  -  only one result allowed</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz4">
+    <h3>Question 4</h3>
+    <p>You define: @function --space(--n &lt;number&gt;: 1). How do you call it to get the default?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">--space(default)</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">--space()</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">--space</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">var(--space)</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz" id="quiz5">
+    <h3>Question 5</h3>
+    <p>How do you pass a comma-separated value as a single argument?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Quote it: --fn("1px, 2px, 3px")</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">Wrap in braces: --fn({1px, 2px, 3px})</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Escape commas: --fn(1px\, 2px\, 3px)</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Use semicolons: --fn(1px; 2px; 3px)</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="recommended">
+    <strong>Recommended resources:</strong>
+    <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@function">MDN  -  @function</a> |
+    <a href="https://www.w3.org/TR/css-mixins-1/">W3C  -  CSS Functions and Mixins Module Level 1</a> |
+    <a href="https://www.oddbird.net/2025/04/11/custom-functions/">OddBird  -  Custom CSS Functions in the Browser</a>
+  </div>
+
+  <div class="footer-nav">
+    <a href="03-css-value-functions.html">&larr; Prev: Value Functions</a>
+    <a href="index.html">Index</a>
+    <a href="05-advanced-attr.html">Next: Advanced attr() &rarr;</a>
+  </div>
+
+    </main>
+  </div>
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>
