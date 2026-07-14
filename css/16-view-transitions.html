@@ -456,51 +456,51 @@ function switchTab(id) {
   <div class="quiz" id="quiz1">
     <h3>Question 1</h3>
     <p>What does view-transition-name do?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Triggers a view transition automatically on hover</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Identifies an element so the browser can match it between old and new states</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Names a @keyframes animation for the transition</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Creates a snapshot of the element for caching</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Triggers a view transition automatically on hover</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Identifies an element so the browser can match it between old and new states</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Names a @keyframes animation for the transition</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Creates a snapshot of the element for caching</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz2">
     <h3>Question 2</h3>
     <p>What does the browser actually show during a view transition animation?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The live DOM being modified in real time</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Static image snapshots (pseudo-elements) of the old and new states</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">A canvas element with the transition painted on it</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The new DOM with opacity transitioning from 0 to 1</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The live DOM being modified in real time</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Static image snapshots (pseudo-elements) of the old and new states</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">A canvas element with the transition painted on it</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The new DOM with opacity transitioning from 0 to 1</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz3">
     <h3>Question 3</h3>
     <p>How do you trigger a same-document view transition?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Add transition: view 0.3s to the element</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Use the CSS @view-transition at-rule</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Call document.startViewTransition(() =&gt; { /* DOM changes */ })</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Set view-transition: auto on the container</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Add transition: view 0.3s to the element</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Use the CSS @view-transition at-rule</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Call document.startViewTransition(() =&gt; { /* DOM changes */ })</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Set view-transition: auto on the container</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz4">
     <h3>Question 4</h3>
     <p>Two elements on the same page have the same view-transition-name. What happens?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">They both animate together as one group</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The second one overrides the first</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">The view transition fails - names must be unique per page</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">They crossfade between each other</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">They both animate together as one group</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The second one overrides the first</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">The view transition fails - names must be unique per page</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">They crossfade between each other</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz5">
     <h3>Question 5</h3>
     <p>How do you enable view transitions for multi-page navigations (no JS)?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Add view-transition: auto to the body element</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Add @view-transition { navigation: auto; } to both pages' CSS</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Include a &lt;meta name="view-transition"&gt; tag</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">It works automatically in all modern browsers</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Add view-transition: auto to the body element</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Add @view-transition { navigation: auto; } to both pages' CSS</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Include a &lt;meta name="view-transition"&gt; tag</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">It works automatically in all modern browsers</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="recommended">

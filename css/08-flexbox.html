@@ -612,51 +612,51 @@ flex: auto;       /* same as flex: 1 1 auto - grow and shrink from content size 
   <div class="quiz" id="quiz1">
     <h3>Question 1</h3>
     <p>What does flex-grow distribute?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The total container width equally</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">The free space left after all items reach their flex-basis</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The difference between min-width and max-width</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The gap between items proportionally</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The total container width equally</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">The free space left after all items reach their flex-basis</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The difference between min-width and max-width</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The gap between items proportionally</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz2">
     <h3>Question 2</h3>
     <p>What's the difference between flex: 1 and flex: 1 1 auto?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">No difference - they're equivalent</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">flex: 1 sets basis to 0% (equal widths); flex: 1 1 auto uses content size as basis</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">flex: 1 prevents shrinking; flex: 1 1 auto allows it</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">flex: 1 only works in row direction</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">No difference - they're equivalent</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">flex: 1 sets basis to 0% (equal widths); flex: 1 1 auto uses content size as basis</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">flex: 1 prevents shrinking; flex: 1 1 auto allows it</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">flex: 1 only works in row direction</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz3">
     <h3>Question 3</h3>
     <p>A flex item with long text overflows its container despite flex-shrink: 1. What's the most likely fix?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Set flex-shrink: 99 to force it smaller</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Add overflow: scroll to the container</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Add min-width: 0 to the item</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Set width: 0 on the item</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Set flex-shrink: 99 to force it smaller</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Add overflow: scroll to the container</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Add min-width: 0 to the item</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Set width: 0 on the item</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz4">
     <h3>Question 4</h3>
     <p>You want a fixed 250px sidebar that never grows or shrinks. What flex value?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">flex: 1 0 250px</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">flex: 0 0 250px</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">flex: 250px</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">flex: none 250px</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">flex: 1 0 250px</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">flex: 0 0 250px</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">flex: 250px</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">flex: none 250px</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz5">
     <h3>Question 5</h3>
     <p>What does justify-content: space-between do with 3 items?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Equal gaps everywhere including edges</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">First item at start, last at end, equal gaps between them</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">All three items centered with gaps around them</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Items spread with half-gaps at the edges</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Equal gaps everywhere including edges</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">First item at start, last at end, equal gaps between them</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">All three items centered with gaps around them</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Items spread with half-gaps at the edges</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="recommended">

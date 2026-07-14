@@ -355,51 +355,51 @@ button { anchor-name: --pop-trigger; }
   <div class="quiz" id="quiz1">
     <h3>Question 1</h3>
     <p>What property do you put on the reference element (the one you're positioning relative to)?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">position-anchor</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">anchor-name</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">anchor-target</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">position: anchor</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">position-anchor</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">anchor-name</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">anchor-target</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">position: anchor</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz2">
     <h3>Question 2</h3>
     <p>What does bottom: anchor(top) mean?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Place me at the bottom-top corner</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Place my bottom edge at the anchor's top edge (= above the anchor)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Place me at the top of the viewport bottom</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The anchor's bottom becomes my top</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Place me at the bottom-top corner</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Place my bottom edge at the anchor's top edge (= above the anchor)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Place me at the top of the viewport bottom</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The anchor's bottom becomes my top</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz3">
     <h3>Question 3</h3>
     <p>What does position-try-fallbacks: flip-block do?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Flips the element's content upside down</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Tries positioning as display: block first</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">If preferred position overflows, tries flipping vertically (above / below)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Blocks the element from being positioned</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Flips the element's content upside down</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Tries positioning as display: block first</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">If preferred position overflows, tries flipping vertically (above / below)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Blocks the element from being positioned</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz4">
     <h3>Question 4</h3>
     <p>Does the positioned element need to be a DOM child of the anchor?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Yes - it must be inside the anchor element</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Yes - it must be a direct sibling</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">No - it can be anywhere in the document (references by name)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Only if using position: fixed</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Yes - it must be inside the anchor element</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Yes - it must be a direct sibling</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">No - it can be anywhere in the document (references by name)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Only if using position: fixed</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz5">
     <h3>Question 5</h3>
     <p>What position value must the anchored element have?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">position: relative</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">position: static</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">position: absolute or position: fixed</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">position: anchor</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">position: relative</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">position: static</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">position: absolute or position: fixed</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">position: anchor</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="recommended">

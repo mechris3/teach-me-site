@@ -517,31 +517,31 @@
   <div class="quiz" id="quiz1">
     <h3>Question 1</h3>
     <p>What does <code>gradientUnits="objectBoundingBox"</code> mean?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Gradient coordinates are 0&ndash;1, relative to the target element's bounding box</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Gradient coordinates are in absolute pixel values</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The gradient is fixed in the SVG's root coordinate system</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The gradient inherits the element's transform</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Gradient coordinates are 0&ndash;1, relative to the target element's bounding box</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Gradient coordinates are in absolute pixel values</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The gradient is fixed in the SVG's root coordinate system</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The gradient inherits the element's transform</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz2">
     <h3>Question 2</h3>
     <p>How do you make a linear gradient go from top to bottom?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Set <code>x1="0" y1="0" x2="1" y2="0"</code>  -  horizontal axis covers vertical</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Set <code>x1="0" y1="0" x2="0" y2="1"</code>  -  the vector points straight down</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Use <code>gradientTransform="vertical"</code></div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Set <code>direction="vertical"</code> on the linearGradient element</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Set <code>x1="0" y1="0" x2="1" y2="0"</code>  -  horizontal axis covers vertical</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Set <code>x1="0" y1="0" x2="0" y2="1"</code>  -  the vector points straight down</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Use <code>gradientTransform="vertical"</code></div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Set <code>direction="vertical"</code> on the linearGradient element</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz3">
     <h3>Question 3</h3>
     <p>What's the difference between <code>patternUnits</code> and <code>patternContentUnits</code>?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">They're the same thing  -  just aliases for backwards compatibility</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">patternUnits controls rotation; patternContentUnits controls scale</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">patternUnits controls how the tile's position/size (x, y, width, height) is interpreted; patternContentUnits controls the coordinate system for content inside the tile</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">patternUnits applies to the fill; patternContentUnits applies to the stroke</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">They're the same thing  -  just aliases for backwards compatibility</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">patternUnits controls rotation; patternContentUnits controls scale</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">patternUnits controls how the tile's position/size (x, y, width, height) is interpreted; patternContentUnits controls the coordinate system for content inside the tile</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">patternUnits applies to the fill; patternContentUnits applies to the stroke</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="ad-footer" aria-label="Advertisement">Ad</div>

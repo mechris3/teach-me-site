@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>Skills - Lesson 4 | Teach Me</title>
+  <meta name="description" content="Kiro skills: front-matter configuration, auto-activation, writing reusable skills for your team.">
+  <link rel="canonical" href="https://teachmeskills.dev/kiro/04-skills.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/kiro/04-skills.html">
+  <meta property="og:title" content="Skills - Lesson 4 | Teach Me">
+  <meta property="og:description" content="Kiro skills: front-matter configuration, auto-activation, writing reusable skills for your team.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Skills - Lesson 4 | Teach Me">
+  <meta name="twitter:description" content="Kiro skills: front-matter configuration, auto-activation, writing reusable skills for your team.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header"><a href="index.html">Kiro Course</a></div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-steering-the-foundation.html">1. Steering</a></li>
+        <li><a href="02-context-management.html">2. Context Management</a></li>
+        <li><a href="03-hooks.html">3. Hooks</a></li>
+        <li class="current"><a href="04-skills.html">4. Skills</a></li>
+        <li><a href="05-mcp-using.html">5. MCP: Using</a></li>
+        <li><a href="06-mcp-building.html">6. MCP: Building</a></li>
+        <li><a href="07-powers.html">7. Powers</a></li>
+        <li><a href="08-subagents.html">8. Sub-agents</a></li>
+        <li><a href="09-custom-agents.html">9. Custom Agents</a></li>
+        <li><a href="10-acp.html">10. ACP</a></li>
+        <li><a href="11-property-based-testing.html">11. Property Testing</a></li>
+        <li><a href="12-specs-as-living-artifacts.html">12. Specs</a></li>
+        <li><a href="13-model-selection.html">13. Model Selection</a></li>
+        <li><a href="14-multi-root-workspaces.html">14. Multi-root</a></li>
+        <li><a href="15-kiro-cli.html">15. Kiro CLI</a></li>
+        <li><a href="16-capstone-team-setup.html">16. Capstone</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="steering-reference.html">Steering Reference</a></li>
+        <li><a href="mcp-setup-guides.html">MCP Setup Guides</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 4</p>
+  <h1>Skills</h1>
+
+  <h2>What Skills Are</h2>
+
+  <p>A skill is a <strong>modular instruction package</strong> that teaches Kiro how to do something specific. Unlike steering (which provides persistent background knowledge), a skill is a complete set of instructions for a particular task or workflow - activated on demand.</p>
+
+  <p>You're using one right now: the <code>teach</code> skill that drives this entire learning experience.</p>
+
+  <h2>Skills vs Steering vs Hooks</h2>
+
+  <table>
+    <tr><th>Feature</th><th>Purpose</th><th>When loaded</th></tr>
+    <tr><td>Steering</td><td>Background knowledge and rules</td><td>Always, on file match, or manually</td></tr>
+    <tr><td>Skills</td><td>Complete workflow instructions</td><td>When activated by keyword or slash command</td></tr>
+    <tr><td>Hooks</td><td>Automated event-driven actions</td><td>When a specific event fires</td></tr>
+  </table>
+
+  <p>The key distinction: steering tells Kiro <em>what to remember</em>, skills tell Kiro <em>how to do a task end-to-end</em>, and hooks tell Kiro <em>what to do automatically when something happens</em>.</p>
+
+  <h2>Where Skills Come From</h2>
+
+  <p>When you type <code>/</code> in the chat input, you'll see skills from three sources mixed together:</p>
+
+  <table>
+    <tr><th>Source</th><th>Location</th><th>Example</th></tr>
+    <tr><td>Built-in</td><td>Bundled with Kiro (not editable)</td><td><code>/quick-spec</code>, <code>/architecture-selection</code></td></tr>
+    <tr><td>Global</td><td><code>~/.kiro/skills/*.md</code></td><td>Your personal cross-project skills</td></tr>
+    <tr><td>Workspace</td><td><code>.kiro/skills/*.md</code></td><td>Project-specific team skills</td></tr>
+  </table>
+
+  <p>There's no visual separator in the menu indicating which source a skill comes from - they're all listed together. Built-in skills work exactly like user-created ones (same activation, same invocation) but you can't edit them.</p>
+
+  <h2>Where Skills Live (Your Skills)</h2>
+
+  <p>Same two-scope pattern as steering:</p>
+
+  <table>
+    <tr><th>Scope</th><th>Location</th><th>Use for</th></tr>
+    <tr><td>Workspace</td><td><code>.kiro/skills/*.md</code></td><td>Project-specific workflows (team deployment, code review process)</td></tr>
+    <tr><td>Global (User)</td><td><code>~/.kiro/skills/*.md</code></td><td>Personal workflows you use across all projects (your PR style, documentation process)</td></tr>
+  </table>
+
+  <p>Like steering, only <code>.md</code> files directly in the folder are documented as being picked up - subdirectory support is not mentioned in official docs.</p>
+
+  <h2>The Skill File Format</h2>
+
+  <p>A skill is a single <code>.md</code> file with YAML front-matter followed by markdown instructions:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>---
+name: deploy
+description: Deploy the application to staging or production environments
+argument-hint: "Which environment? (staging/production)"
+---
+
+## Deployment Process
+
+When asked to deploy, follow these steps:
+
+1. Run the test suite: `npm test`
+2. Build the application: `npm run build`
+3. Check which environment the user wants...
+...</code></pre>
+  </div>
+
+  <h2>Front-matter Schema (Complete)</h2>
+
+  <table>
+    <tr><th>Key</th><th>Required</th><th>What it does</th></tr>
+    <tr><td><code>name</code></td><td>Yes</td><td>The skill's identifier. Becomes the slash command name (e.g. <code>/deploy</code>)</td></tr>
+    <tr><td><code>description</code></td><td>Yes</td><td>Used for auto-activation - Kiro matches your prompt against this text to decide if the skill is relevant</td></tr>
+    <tr><td><code>argument-hint</code></td><td>No</td><td>Purely cosmetic - a UI hint suggesting what input to provide when invoking the skill. Does not affect activation, behaviour, or what gets passed to the model. The only functional keys are <code>name</code> and <code>description</code>.</td></tr>
+  </table>
+
+  <p>That's the complete schema. Three keys - one optional.</p>
+
+  <h2>How Skills Are Activated</h2>
+
+  <p>There are two activation paths:</p>
+
+  <h3>1. Automatic activation (keyword matching)</h3>
+
+  <p>Kiro reads the <code>description</code> field of all available skills. When your prompt matches a skill's description semantically, Kiro loads the full skill content automatically.</p>
+
+  <p>For example, if a skill has <code>description: "Deploy the application to staging or production"</code> and you type "deploy the app to staging", Kiro will activate that skill.</p>
+
+  <div class="key-concept">
+    <strong>Important:</strong> Only the <code>name</code> and <code>description</code> are loaded at startup. The full skill content (the markdown body) is loaded <em>on demand</em> when activated. This means skills don't cost context tokens until they're needed - unlike always-on steering. The metadata does use tokens (maybe 10 - 30 per skill), but that's negligible - 20 skills might cost ~500 tokens of metadata overhead total, compared to potentially thousands for the full body of a single skill. The expensive part stays out until needed.
+  </div>
+
+  <h3>2. Explicit invocation</h3>
+
+  <p>Type <code>/</code> in the chat input and you'll see your skills listed as slash commands. Select one to load its full instructions. You can also find skills via <code>#</code> in the context menu alongside files and steering.</p>
+
+  <div class="key-concept">
+    <strong>Invocation methods:</strong> The <code>/</code> slash menu shows both built-in and user-created skills as slash commands - this is the primary way to explicitly invoke a skill. Skills also appear in the <code>#</code> context menu. Both work the same way: the skill's full instructions are loaded into context for that message.
+  </div>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <h2>What Makes a Good Skill</h2>
+
+  <p>A skill should be:</p>
+
+  <ul>
+    <li><strong>Self-contained</strong> - all the instructions needed to complete the task, from start to finish</li>
+    <li><strong>Task-oriented</strong> - focused on a specific workflow, not general knowledge</li>
+    <li><strong>Detailed</strong> - unlike steering (which should be concise), skills can be long because they only load when needed</li>
+  </ul>
+
+  <p>The teach skill you're using is ~150 lines of detailed instructions covering philosophy, methodology, file formats, and workflow. That's fine for a skill - it only loads when teaching is requested. You'd never put that much in a steering file.</p>
+
+  <h2>File References in Skills</h2>
+
+  <p>Skills support the same <code>#[[file:...]]</code> syntax as steering:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>---
+name: api-review
+description: Review API endpoint code for correctness and standards compliance
+---
+
+## API Review Process
+
+Check the code against our API standards defined in #[[file:docs/api-standards.md]]
+and ensure all endpoints match the schema in #[[file:docs/openapi.yaml]]
+...</code></pre>
+  </div>
+
+  <p>Referenced files are loaded alongside the skill when it activates. The same rules apply as with steering: the referenced files are just content embeds with no independent inclusion logic.</p>
+
+  <h2>Skills Can Be Large</h2>
+
+  <p>Since skills only load on demand, they can afford to be comprehensive. Good use cases for skills:</p>
+
+  <ul>
+    <li><strong>Complex workflows</strong> - multi-step deployment, database migration, release process</li>
+    <li><strong>Teaching/coaching</strong> - the teach skill in this workspace</li>
+    <li><strong>Code generation templates</strong> - "create a new API endpoint following our patterns"</li>
+    <li><strong>Review checklists</strong> - PR review, security audit, accessibility review</li>
+    <li><strong>Onboarding guides</strong> - "explain this codebase to a new developer"</li>
+  </ul>
+
+  <h2>A Real Example: Commit Message Skill</h2>
+
+  <p>Something you might currently do by typing instructions in chat every time - generate a commit message from the current diff in a specific format. As a skill, the instructions are codified and reusable:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>---
+name: commit-message
+description: Generate a git commit message from the current staged or unstaged changes
+argument-hint: "Any additional context about the change?"
+---
+
+## Commit Message Generation
+
+When asked to generate a commit message:
+
+1. Get the current branch name: `git rev-parse --abbrev-ref HEAD`
+2. Get the diff since last commit: `git diff` (or `git diff --cached` if changes are staged)
+3. Analyse the changes — which files changed, what was the intent
+
+## Format
+
+Generate the commit message in this format:
+
+```
+[branch-name] Short title (max 72 chars)
+
+- What changed (files/areas affected)
+- Why it changed (intent, not just "updated X")
+- Any notable decisions or trade-offs
+```
+
+## Rules
+
+- Title should be imperative mood ("Add feature" not "Added feature")
+- Keep the title under 72 characters
+- The body should explain *why*, not just *what* — the diff shows what
+- Group related file changes together in the description</code></pre>
+  </div>
+
+  <p>This auto-activates when you say "generate a commit message" or "commit message", or you invoke it explicitly with <code>/commit-message</code>. No more re-typing your format preferences every time.</p>
+
+  <h2>A Real Example: PR Review Skill</h2>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>---
+name: pr-review
+description: Review a pull request for code quality, security, and standards compliance
+argument-hint: "Which PR or branch to review?"
+---
+
+## Pull Request Review
+
+When reviewing a PR, follow this process:
+
+### 1. Understand the change
+- Read the PR description or commit messages
+- Identify which files changed and why
+
+### 2. Check for correctness
+- Does the code do what it claims?
+- Are edge cases handled?
+- Are there off-by-one errors, null checks, race conditions?
+
+### 3. Check standards
+- Follows our naming conventions (see #[[file:docs/naming.md]])
+- Uses approved libraries (no new dependencies without discussion)
+- Has appropriate test coverage
+
+### 4. Check security
+- No secrets or credentials in code
+- Input validation on all external data
+- SQL queries use parameterised statements
+
+### 5. Provide feedback
+- Be specific: reference file and line
+- Suggest fixes, don't just point out problems
+- Separate blocking issues from nits</code></pre>
+  </div>
+
+  <h2>Skills vs Steering: Full Comparison</h2>
+
+  <p>Skills and steering share a lot of surface-level traits. Here's what's identical and what diverges:</p>
+
+  <h3>What's identical</h3>
+  <ul>
+    <li>Both are markdown files with YAML front-matter</li>
+    <li>Both live in <code>.kiro/</code> subfolders (<code>steering/</code> and <code>skills/</code>)</li>
+    <li>Both have workspace and global scopes (<code>.kiro/</code> and <code>~/.kiro/</code>)</li>
+    <li>Both support <code>#[[file:...]]</code> references</li>
+    <li>Both can be invoked via <code>/</code> slash commands and <code>#</code> context keys</li>
+    <li>Both inject text into the model's context when loaded</li>
+  </ul>
+
+  <h3>What's different</h3>
+
+  <table>
+    <tr><th></th><th>Steering</th><th>Skills</th></tr>
+    <tr><td><strong>Purpose</strong></td><td>Background knowledge - rules, conventions, context</td><td>Task instructions - how to do a specific thing end-to-end</td></tr>
+    <tr><td><strong>Front-matter</strong></td><td><code>inclusion</code>, <code>fileMatchPattern</code> (2 keys)</td><td><code>name</code>, <code>description</code>, <code>argument-hint</code> (3 keys)</td></tr>
+    <tr><td><strong>Can auto-load</strong></td><td>Yes (<code>inclusion: auto</code>, <code>fileMatch</code>)</td><td>Yes (keyword match against <code>description</code>)</td></tr>
+    <tr><td><strong>Auto-load trigger</strong></td><td>Always, or when a matching file enters context</td><td>When your prompt semantically matches the description</td></tr>
+    <tr><td><strong>Ideal length</strong></td><td>Short (every token costs on every message if always-on)</td><td>Can be long (only loads on demand, zero cost until activated)</td></tr>
+    <tr><td><strong>Startup cost</strong></td><td>Always-on files fully loaded at startup</td><td>Only <code>name</code> + <code>description</code> loaded (body loads later)</td></tr>
+    <tr><td><strong>Posture</strong></td><td>Passive - "here's what to know"</td><td>Active - "here's what to do"</td></tr>
+    <tr><td><strong>Conditional on file type</strong></td><td>Yes (<code>fileMatch</code>)</td><td>No - keyword-based only</td></tr>
+  </table>
+
+  <h3>The grey area: manual steering vs skills</h3>
+
+  <p>This is where the overlap is most confusing. A manual steering file and a skill are both loaded only when invoked, both available via <code>/</code> and <code>#</code>, and both are markdown with front-matter. Mechanically, Kiro treats them the same way - the difference is in how you write the content and your intent:</p>
+
+  <ul>
+    <li><strong>Manual steering</strong> = reference material you want Kiro to be aware of ("here are our API conventions")</li>
+    <li><strong>Skill</strong> = a procedure you want Kiro to follow ("here's how to do a code review step by step")</li>
+  </ul>
+
+  <p>If you're unsure which to use: if the content is mostly declarative (rules, standards, schemas) → steering. If it's mostly imperative (steps, decisions, workflows) → skill.</p>
+
+  <h2>Your Tangible Win</h2>
+
+  <p>You can now create skills for any workflow your team repeats. You know the full front-matter schema (three keys), both activation paths (auto and slash), how file references work, and when to choose skills over steering. You also understand why skills are ideal for large instruction sets - they're free until activated.</p>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <h2>Quiz</h2>
+
+  <div class="quiz" role="group">
+    <h3>A skill's description field is used for:</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Display in the UI when the skill is running</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Auto-activation - Kiro matches prompts against it to decide if the skill is relevant</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Documentation only - has no functional purpose</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="quiz" role="group">
+    <h3>When does a skill's full markdown body get loaded into context?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">At session start, alongside always-on steering</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">On demand - when auto-activated by keyword match or explicitly invoked via slash command</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">When a file matching its name is opened</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="quiz" role="group">
+    <h3>You want to give Kiro a 100-line procedure for setting up a new microservice. Skill or manual steering?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Skill - it's a complete workflow with step-by-step instructions</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Manual steering - it's long reference material</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Always-on steering - it applies to all sessions</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="recommended">
+    <strong>Recommended resources:</strong>
+    <a href="https://kiro.dev/docs/skills/">Kiro Docs: Agent Skills</a> and <a href="https://kiro.dev/docs/cli/skills/">Kiro CLI Docs: Skills</a>.
+  </div>
+
+  <div class="footer-nav">
+    <a href="03-hooks.html">&larr; Prev: Hooks</a>
+    <a href="index.html">Index</a>
+    <a href="05-mcp-using.html">Next: MCP Servers: Using &rarr;</a>
+  </div>
+
+    </main>
+  </div>
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

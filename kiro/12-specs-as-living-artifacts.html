@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>Specs as Living Artifacts - Lesson 12 | Teach Me</title>
+  <meta name="description" content="Kiro specs as living artifacts: feature vs bugfix specs, strategic spec management, and PBT integration.">
+  <link rel="canonical" href="https://teachmeskills.dev/kiro/12-specs-as-living-artifacts.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/kiro/12-specs-as-living-artifacts.html">
+  <meta property="og:title" content="Specs as Living Artifacts - Lesson 12 | Teach Me">
+  <meta property="og:description" content="Kiro specs as living artifacts: feature vs bugfix specs, strategic spec management, and PBT integration.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Specs as Living Artifacts - Lesson 12 | Teach Me">
+  <meta name="twitter:description" content="Kiro specs as living artifacts: feature vs bugfix specs, strategic spec management, and PBT integration.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header"><a href="index.html">Kiro Course</a></div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-steering-the-foundation.html">1. Steering</a></li>
+        <li><a href="02-context-management.html">2. Context Management</a></li>
+        <li><a href="03-hooks.html">3. Hooks</a></li>
+        <li><a href="04-skills.html">4. Skills</a></li>
+        <li><a href="05-mcp-using.html">5. MCP: Using</a></li>
+        <li><a href="06-mcp-building.html">6. MCP: Building</a></li>
+        <li><a href="07-powers.html">7. Powers</a></li>
+        <li><a href="08-subagents.html">8. Sub-agents</a></li>
+        <li><a href="09-custom-agents.html">9. Custom Agents</a></li>
+        <li><a href="10-acp.html">10. ACP</a></li>
+        <li><a href="11-property-based-testing.html">11. Property Testing</a></li>
+        <li class="current"><a href="12-specs-as-living-artifacts.html">12. Specs</a></li>
+        <li><a href="13-model-selection.html">13. Model Selection</a></li>
+        <li><a href="14-multi-root-workspaces.html">14. Multi-root</a></li>
+        <li><a href="15-kiro-cli.html">15. Kiro CLI</a></li>
+        <li><a href="16-capstone-team-setup.html">16. Capstone</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="steering-reference.html">Steering Reference</a></li>
+        <li><a href="mcp-setup-guides.html">MCP Setup Guides</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 12</p>
+  <h1>Specs as Living Artifacts</h1>
+
+  <h2>Shifting How You Think About Specs</h2>
+
+  <p>You already use spec mode - but if you've been treating specs as planning scaffolding that you discard once the feature ships, this lesson reframes them as <strong>living verification artifacts</strong> that serve multiple purposes over the life of the code.</p>
+
+  <p>The key shift: specs aren't just "how we planned the work." They're the source of truth from which code and tests are independently derived. They're the "why" that outlives any particular implementation.</p>
+
+  <h2>The Two Spec Types</h2>
+
+  <p>Kiro has two distinct spec types, each modelling a different development workflow:</p>
+
+  <h3>Feature Specs</h3>
+
+  <p>For building new capabilities. Two workflow variants:</p>
+
+  <table>
+    <tr><th>Variant</th><th>Starting point</th><th>Flow</th><th>Best when</th></tr>
+    <tr><td><strong>Requirements-First</strong></td><td>What the system should do</td><td>Requirements &rarr; Design &rarr; Tasks</td><td>You know the behaviour you want but not the implementation</td></tr>
+    <tr><td><strong>Design-First</strong></td><td>How to build it technically</td><td>Design &rarr; Requirements &rarr; Tasks</td><td>You have a technical approach in mind and want to formalise it</td></tr>
+  </table>
+
+  <p>Both produce the same three artifacts:</p>
+  <ol>
+    <li><strong>Requirements</strong> - what the system shall do (EARS notation)</li>
+    <li><strong>Design</strong> - how it will be built (architecture, data model, interfaces)</li>
+    <li><strong>Tasks</strong> - discrete implementation steps Kiro executes</li>
+  </ol>
+
+  <p>You can't switch variants mid-spec. If you need to change approach, create a new spec.</p>
+
+  <h3>Bugfix Specs</h3>
+
+  <p>For fixing defects. Models how experienced developers approach bugs:</p>
+
+  <ol>
+    <li><strong>Root cause analysis</strong> - identify why the bug exists, not just what it does</li>
+    <li><strong>Fix design</strong> - what should change AND what should NOT change</li>
+    <li><strong>Regression prevention</strong> - ensure the fix doesn't break existing behaviour</li>
+  </ol>
+
+  <p>The "explicitly preserve what shouldn't change" part is key - it prevents the fix from being broader than necessary.</p>
+
+  <div class="key-concept">
+    <strong>When to use which:</strong> Building something new &rarr; Feature Spec. Something is broken &rarr; Bugfix Spec. The workflows are fundamentally different - a bugfix spec focuses on surgical change and preservation, not on designing from scratch.
+  </div>
+
+  <h3>How to initiate each type</h3>
+
+  <p>When you start a Spec session, you should see the choice between Feature Spec and Bugfix Spec. The exact UI may vary by Kiro version - look for a type selector when creating a new spec, or describe your intent clearly ("I need to fix a bug where...") and Kiro may route you to the bugfix workflow based on your description. If you don't see a choice, try explicitly stating "create a bugfix spec" in your prompt.</p>
+
+  <h2>The Bug-as-Spec-Gap Pattern</h2>
+
+  <p>When a bug appears in code that was built from a spec, ask: <strong>did the spec miss this case, or did the implementation deviate from the spec?</strong></p>
+
+  <p>This is a diagnostic mental model - but it's also a prompt you can give Kiro directly. Point Kiro at the spec and the bug, and ask: "Does the spec cover this scenario? Are the property tests passing?" Kiro can read both artifacts and tell you where the chain broke.</p>
+
+  <table>
+    <tr><th>Diagnosis</th><th>Action</th></tr>
+    <tr><td>Spec was incomplete - didn't cover this scenario</td><td>Update the original feature spec with the missing requirement, then re-derive property tests for the new requirement. Fix only the affected area.</td></tr>
+    <tr><td>Code diverged from spec - spec is correct but code doesn't match</td><td>Use a bugfix spec to fix the code. The property tests from the original spec should already be failing - confirming the divergence.</td></tr>
+    <tr><td>Both - spec was ambiguous, code interpreted it wrong</td><td>Clarify the spec first, then fix the code. Re-run full PBT to verify.</td></tr>
+  </table>
+
+  <p>This is powerful because it turns debugging into a structured process: check the spec, check the tests, identify where the chain broke.</p>
+
+  <h2>Feature Spec Anatomy (What Lives in .kiro/specs/)</h2>
+
+  <p>Each spec creates a directory:</p>
+
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>.kiro/specs/
+└── order-discount-rules/
+    ├── requirements.md      # EARS-format requirements
+    ├── design.md            # Technical design decisions
+    └── tasks.md             # Implementation tasks (with status)</code></pre></div>
+
+  <p>These are markdown files - human-readable, committable to git, reviewable in PRs.</p>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <h2>EARS: Writing Requirements That Generate Good Tests</h2>
+
+  <p>EARS (Easy Approach to Requirements Syntax) is the notation Kiro uses for requirements. It matters because property-based tests are derived directly from these statements - clearer requirements &rarr; better properties.</p>
+
+  <table>
+    <tr><th>Pattern</th><th>Template</th><th>Example</th></tr>
+    <tr><td>Ubiquitous</td><td>THE [system] SHALL [behaviour]</td><td>THE System SHALL display prices in GBP</td></tr>
+    <tr><td>Event-driven</td><td>WHEN [trigger], THE [system] SHALL [behaviour]</td><td>WHEN a user adds an item to cart, THE System SHALL update the cart total</td></tr>
+    <tr><td>State-driven</td><td>WHILE [state], THE [system] SHALL [behaviour]</td><td>WHILE the user is unauthenticated, THE System SHALL redirect to login</td></tr>
+    <tr><td>Optional</td><td>WHERE [feature], THE [system] SHALL [behaviour]</td><td>WHERE premium subscription is active, THE System SHALL show ad-free content</td></tr>
+    <tr><td>Unwanted</td><td>IF [condition], THEN THE [system] SHALL [behaviour]</td><td>IF the payment gateway times out, THEN THE System SHALL retry once then show an error</td></tr>
+  </table>
+
+  <p>Each requirement maps naturally to a property test:</p>
+  <ul>
+    <li>"THE System SHALL display prices in GBP" &rarr; for any product, <code>getPrice(product).currency === 'GBP'</code></li>
+    <li>"WHEN a user adds an item to cart, THE System SHALL update the cart total" &rarr; for any user and any item, <code>cart.total === previousTotal + item.price</code></li>
+  </ul>
+
+  <p>The more structured your requirements, the better Kiro can derive properties.</p>
+
+  <h2>Parallel Task Execution</h2>
+
+  <p>When you click "Run all Tasks" on a spec, Kiro doesn't just run them sequentially. It:</p>
+
+  <ol>
+    <li>Builds a <strong>dependency graph</strong> from the task list</li>
+    <li>Identifies which tasks touch the same files (never run in parallel)</li>
+    <li>Identifies which are truly independent (run concurrently)</li>
+    <li>Runs setup/infrastructure tasks first</li>
+    <li>Runs independent implementation tasks in parallel via sub-agents</li>
+  </ol>
+
+  <p>This connects directly to <a href="08-subagents.html">Lesson 8 (Sub-agents)</a> - each parallel task runs in its own isolated context.</p>
+
+  <h2>Spec Lifecycle: From Creation to Maintenance</h2>
+
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>Create spec → Define requirements → Generate design → Generate tasks
+     │
+     ▼
+Execute tasks (parallel where possible) → PBT verifies each task
+     │
+     ▼
+Feature ships → Spec stays committed in git
+     │
+     ▼  (months later)
+Bug reported → Check: is spec incomplete or did code diverge?
+     │
+     ├── Spec gap → Update spec → Re-derive property tests → Fix code
+     │
+     └── Code divergence → Bugfix spec → Surgical fix → PBT re-run
+     │
+     ▼
+Requirements change → Update spec → Kiro re-derives tests → Implement delta</code></pre></div>
+
+  <h2>Specs in Pull Requests</h2>
+
+  <p>Since specs are committed to git, they appear in pull requests alongside the code. This transforms code review:</p>
+
+  <ul>
+    <li>Reviewers can read the <strong>intent</strong> (spec) alongside the <strong>implementation</strong> (code)</li>
+    <li>Instead of guessing what the developer intended, they ask: "does the code match the spec?"</li>
+    <li>Requirements are visible - reviewers can challenge whether the spec itself is complete</li>
+    <li>Design decisions are documented - no "why was it done this way?" questions later</li>
+  </ul>
+
+  <p>This is especially powerful for team code review - junior developers get clarity on intent, senior developers can review the design without reading every line of code.</p>
+
+  <h2>Iterating on Specs</h2>
+
+  <p>Specs aren't frozen after creation. If during implementation you realise a requirement is wrong, missing, or ambiguous:</p>
+
+  <ol>
+    <li>Update the requirement in <code>requirements.md</code></li>
+    <li>Regenerate affected tasks (or add new ones)</li>
+    <li>Continue implementation from where you left off</li>
+  </ol>
+
+  <p>The spec stays as the authoritative record of what changed and why. This is normal - specs evolve as you learn more about the problem. The key is that the spec always reflects current intent, not original intent.</p>
+
+  <h2>Strategic Spec Management</h2>
+
+  <h3>Organising specs at scale</h3>
+
+  <p>With hundreds of specs over time, organisation matters. Kiro stores specs flat in <code>.kiro/specs/</code>, but you can add structure:</p>
+
+  <p><strong>Naming conventions:</strong></p>
+  <ul>
+    <li>Prefix with domain: <code>commerce--order-discounts</code>, <code>auth--session-management</code></li>
+    <li>Prefix bugfix specs: <code>fix--discount-rounding-bug</code></li>
+    <li>Optionally include date: <code>2026-06--order-discounts</code> for temporal context</li>
+  </ul>
+
+  <p><strong>Archiving completed specs:</strong></p>
+  <ul>
+    <li>Move fully-implemented, stable specs to <code>.kiro/specs/_archive/</code> - still in git, still searchable, not cluttering the active view</li>
+    <li>Keep specs active while the feature is still evolving or has known gaps</li>
+  </ul>
+
+  <p><strong>Linking related specs:</strong></p>
+  <p>In <code>requirements.md</code>, reference related specs: "See also: <code>../payment-processing/</code> for the upstream pricing model this depends on." This creates a navigable web of intent.</p>
+
+  <p><strong>General principles:</strong></p>
+  <ul>
+    <li><strong>One spec per feature/fix</strong> - never a monolithic application spec</li>
+    <li><strong>Commit specs to git</strong> - they're reviewed alongside code in PRs</li>
+    <li><strong>Keep specs updated</strong> - when requirements change, update the spec first, then the code</li>
+  </ul>
+
+  <h3>Cross-cutting context lives in steering, not specs</h3>
+
+  <p>Application-wide knowledge (architecture, conventions, shared patterns) belongs in steering. Each spec is self-contained for its feature but reads steering for the broader context. This avoids duplication across specs.</p>
+
+  <h3>Meta-overview for humans</h3>
+
+  <p>Consider maintaining a manual steering file or reference doc that indexes your specs by domain - not for Kiro (it reads specs directly) but for humans navigating the project:</p>
+
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>---
+inclusion: manual
+---
+
+# Spec Index
+## Commerce Domain
+- order-discount-rules/ — discount calculation logic
+- payment-processing/ — Stripe integration, retry logic
+- cart-management/ — add/remove items, persistence
+
+## User Domain
+- user-authentication/ — login, session, JWT
+- notification-preferences/ — email/push settings</code></pre></div>
+
+  <h2>When to Create a Spec vs. Just Code</h2>
+
+  <table>
+    <tr><th>Use a spec when</th><th>Just vibe-code when</th></tr>
+    <tr><td>Complex feature with multiple requirements</td><td>Simple change you could describe in one sentence</td></tr>
+    <tr><td>You want PBT verification</td><td>Pure UI/styling work</td></tr>
+    <tr><td>Multiple people need to understand the intent</td><td>Exploratory/prototype work</td></tr>
+    <tr><td>You need traceability (requirement &rarr; test &rarr; code)</td><td>Quick fix where you already know the solution</td></tr>
+    <tr><td>The feature will be maintained long-term</td><td>Throwaway or temporary code</td></tr>
+  </table>
+
+  <h2>Your Tangible Win</h2>
+
+  <p>You now think about specs strategically: as living verification artifacts, not disposable plans. You know both spec types (feature + bugfix), both feature variants (requirements-first + design-first), how EARS requirements map to property tests, the bug-as-spec-gap pattern, parallel task execution, and how specs/steering/PBT form an integrated system.</p>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <h2>Quiz</h2>
+
+  <div class="quiz" role="group">
+    <h3>A bug appears in code that was built from a spec. The spec's property tests are passing. What does that tell you?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">The spec likely has a gap - it doesn't cover the failing scenario. Update the spec first.</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The code is correct and the bug report is wrong</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Property-based tests are unreliable</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="quiz" role="group">
+    <h3>You have clear requirements but no technical design yet. Which spec variant?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Requirements-First - start with behaviour, then derive design</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Design-First - always start with architecture</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Bugfix Spec - it handles any scenario</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="quiz" role="group">
+    <h3>Application-wide conventions should live in:</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Every spec's requirements.md</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Steering files - specs read them for context but don't duplicate them</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">A single master spec</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="recommended">
+    <strong>Recommended resources:</strong>
+    <a href="https://kiro.dev/docs/specs/">Specs Overview</a>, <a href="https://kiro.dev/docs/specs/feature-specs/">Feature Specs</a>, <a href="https://kiro.dev/docs/specs/bugfix-specs/">Bugfix Specs</a>, <a href="https://kiro.dev/docs/specs/best-practices/">Best Practices</a>, and <a href="https://kiro.dev/docs/specs/correctness/">Correctness (PBT)</a>.
+  </div>
+
+  <div class="footer-nav">
+    <a href="11-property-based-testing.html">&larr; Prev: Property-Based Testing</a>
+    <a href="index.html">Index</a>
+    <a href="13-model-selection.html">Next: Model Selection &rarr;</a>
+  </div>
+
+    </main>
+  </div>
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

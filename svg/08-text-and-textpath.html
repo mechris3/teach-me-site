@@ -816,54 +816,54 @@
 
   <h2>Quiz</h2>
 
-  <div class="quiz">
+  <div class="quiz" role="group">
     <h3>Question 1</h3>
     <p>What does the <code>y</code> attribute on a <code>&lt;text&gt;</code> element position?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The top edge of the tallest glyph</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">The alphabetic baseline of the text</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The vertical centre of the em-box</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The bottom edge of descender glyphs</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The top edge of the tallest glyph</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">The alphabetic baseline of the text</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The vertical centre of the em-box</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The bottom edge of descender glyphs</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
-  <div class="quiz">
+  <div class="quiz" role="group">
     <h3>Question 2</h3>
     <p>To perfectly centre text at a coordinate point, which combination of attributes do you need?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">text-anchor="start" and dominant-baseline="hanging"</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">text-anchor="middle" and dominant-baseline="auto"</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">text-anchor="middle" and dominant-baseline="middle"</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">text-anchor="end" and dominant-baseline="central"</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">text-anchor="start" and dominant-baseline="hanging"</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">text-anchor="middle" and dominant-baseline="auto"</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">text-anchor="middle" and dominant-baseline="middle"</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">text-anchor="end" and dominant-baseline="central"</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
-  <div class="quiz">
+  <div class="quiz" role="group">
     <h3>Question 3</h3>
     <p>What does <code>startOffset="50%"</code> on a <code>&lt;textPath&gt;</code> do?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Scales the text to half its normal size</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Skips the first half of the text string</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Starts rendering text at the midpoint of the referenced path</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Offsets the text 50% perpendicular to the path</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Scales the text to half its normal size</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Skips the first half of the text string</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Starts rendering text at the midpoint of the referenced path</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Offsets the text 50% perpendicular to the path</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
-  <div class="quiz">
+  <div class="quiz" role="group">
     <h3>Question 4</h3>
     <p>How do you create multi-line text in SVG 1.1 (cross-browser)?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Use the white-space: pre-wrap CSS property on the text element</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Use multiple tspan elements with x (to reset) and dy (to advance)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Insert newline characters directly into the text content</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Set the inline-size attribute on the text element for wrapping</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Use the white-space: pre-wrap CSS property on the text element</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Use multiple tspan elements with x (to reset) and dy (to advance)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Insert newline characters directly into the text content</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Set the inline-size attribute on the text element for wrapping</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
-  <div class="quiz">
+  <div class="quiz" role="group">
     <h3>Question 5</h3>
     <p>What is the difference between <code>lengthAdjust="spacing"</code> and <code>lengthAdjust="spacingAndGlyphs"</code>?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">spacing adjusts word gaps; spacingAndGlyphs adjusts letter gaps</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">spacing only changes inter-glyph gaps; spacingAndGlyphs also stretches the glyphs themselves</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">spacing works on single lines; spacingAndGlyphs works on multiline text</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">spacing preserves text-anchor; spacingAndGlyphs ignores text-anchor</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">spacing adjusts word gaps; spacingAndGlyphs adjusts letter gaps</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">spacing only changes inter-glyph gaps; spacingAndGlyphs also stretches the glyphs themselves</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">spacing works on single lines; spacingAndGlyphs works on multiline text</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">spacing preserves text-anchor; spacingAndGlyphs ignores text-anchor</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="ad-footer" aria-label="Advertisement">Ad</div>

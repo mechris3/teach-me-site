@@ -467,51 +467,51 @@ animation-range: entry 0% entry 100%; /* explicit start/end within a range */
   <div class="quiz" id="quiz1">
     <h3>Question 1</h3>
     <p>What does animation-timeline: scroll() do?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Triggers the animation when the user starts scrolling</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Replaces the time-based timeline with scroll progress (0% at top, 100% at bottom)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Makes the animation play faster when scrolling faster</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Pauses the animation until the element is scrolled into view</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Triggers the animation when the user starts scrolling</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Replaces the time-based timeline with scroll progress (0% at top, 100% at bottom)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Makes the animation play faster when scrolling faster</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Pauses the animation until the element is scrolled into view</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz2">
     <h3>Question 2</h3>
     <p>What's the difference between scroll() and view()?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">scroll() is for vertical, view() is for horizontal</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">scroll() tracks a container's overall scroll progress; view() tracks an element's visibility within the scrollport</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">scroll() uses JavaScript, view() is pure CSS</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">They're identical but view() has better browser support</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">scroll() is for vertical, view() is for horizontal</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">scroll() tracks a container's overall scroll progress; view() tracks an element's visibility within the scrollport</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">scroll() uses JavaScript, view() is pure CSS</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">They're identical but view() has better browser support</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz3">
     <h3>Question 3</h3>
     <p>What does animation-range: entry 0% entry 100% mean?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The animation plays during the first 100% of scroll</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">The animation plays from when the element starts entering to when it's fully entered</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The animation has a 100% entry delay before playing</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Only the first 100px of the element triggers the animation</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The animation plays during the first 100% of scroll</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">The animation plays from when the element starts entering to when it's fully entered</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The animation has a 100% entry delay before playing</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Only the first 100px of the element triggers the animation</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz4">
     <h3>Question 4</h3>
     <p>Why are CSS scroll-driven animations more performant than JavaScript scroll handlers?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">CSS is always faster than JavaScript by definition</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">They use WebGL for rendering</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">They run on the compositor thread (like transforms/opacity), not the main thread</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">They skip the rendering pipeline entirely</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">CSS is always faster than JavaScript by definition</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">They use WebGL for rendering</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">They run on the compositor thread (like transforms/opacity), not the main thread</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">They skip the rendering pipeline entirely</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz5">
     <h3>Question 5</h3>
     <p>scroll(self) means:</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The element scrolls itself into view</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">This element IS the scroll container (track its own scroll progress)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Only this element's animations are affected</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The scroll timeline is scoped to this component only</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The element scrolls itself into view</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">This element IS the scroll container (track its own scroll progress)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Only this element's animations are affected</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The scroll timeline is scoped to this component only</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="recommended">

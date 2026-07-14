@@ -424,51 +424,51 @@ p {
   <div class="quiz" id="quiz1">
     <h3>Question 1</h3>
     <p>What does repeat(auto-fill, minmax(200px, 1fr)) do?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Creates exactly 3 columns of 200px each</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Creates as many 200px+ columns as fit, each stretching to fill space equally</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Creates one column that's between 200px and the full width</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Creates columns only when a media query matches</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Creates exactly 3 columns of 200px each</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Creates as many 200px+ columns as fit, each stretching to fill space equally</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Creates one column that's between 200px and the full width</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Creates columns only when a media query matches</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz2">
     <h3>Question 2</h3>
     <p>When should you use container queries instead of media queries?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Always - media queries are deprecated</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">For reusable components that might live in different-width contexts</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Only when flexbox isn't available</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Only for mobile-first designs</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Always - media queries are deprecated</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">For reusable components that might live in different-width contexts</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Only when flexbox isn't available</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Only for mobile-first designs</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz3">
     <h3>Question 3</h3>
     <p>In clamp(1rem, 0.5rem + 2vw, 2rem), what does the middle value do?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Sets the default before any viewport calculation</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Defines the preferred size that scales with viewport, clamped between the min and max</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Overrides the min when the viewport is exactly 768px</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Provides a fallback for browsers that don't support clamp</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Sets the default before any viewport calculation</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Defines the preferred size that scales with viewport, clamped between the min and max</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Overrides the min when the viewport is exactly 768px</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Provides a fallback for browsers that don't support clamp</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz4">
     <h3>Question 4</h3>
     <p>What's the difference between auto-fill and auto-fit?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">auto-fit is for flexbox, auto-fill is for grid</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">auto-fill creates flexible tracks, auto-fit creates fixed ones</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">auto-fill keeps empty tracks; auto-fit collapses them so items stretch to fill</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">They're identical - auto-fit is just newer syntax</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">auto-fit is for flexbox, auto-fill is for grid</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">auto-fill creates flexible tracks, auto-fit creates fixed ones</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">auto-fill keeps empty tracks; auto-fit collapses them so items stretch to fill</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">They're identical - auto-fit is just newer syntax</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz5">
     <h3>Question 5</h3>
     <p>The flex-wrap sidebar pattern uses flex-basis to control the collapse point. Why does it work without a breakpoint?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Flexbox ignores breakpoints by default</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">When items can't satisfy their flex-basis in one row, they wrap - the basis IS the implicit breakpoint</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">It uses container queries internally</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The browser calculates the breakpoint from the gap value</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Flexbox ignores breakpoints by default</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">When items can't satisfy their flex-basis in one row, they wrap - the basis IS the implicit breakpoint</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">It uses container queries internally</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The browser calculates the breakpoint from the gap value</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="recommended">

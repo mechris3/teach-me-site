@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>Steering - The Foundation - Lesson 1 | Teach Me</title>
+  <meta name="description" content="Steering files are persistent instructions injected into Kiro's context. Learn the three inclusion modes, two scopes, file references, and how steering connects to every other Kiro feature.">
+  <link rel="canonical" href="https://teachmeskills.dev/kiro/01-steering-the-foundation.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/kiro/01-steering-the-foundation.html">
+  <meta property="og:title" content="Steering - The Foundation - Lesson 1 | Teach Me">
+  <meta property="og:description" content="Steering files are persistent instructions injected into Kiro's context. Learn the three inclusion modes, two scopes, file references, and how steering connects to every other Kiro feature.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Steering - The Foundation - Lesson 1 | Teach Me">
+  <meta name="twitter:description" content="Steering files are persistent instructions injected into Kiro's context. Learn the three inclusion modes, two scopes, file references, and how steering connects to every other Kiro feature.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header"><a href="index.html">Kiro Course</a></div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li class="current"><a href="01-steering-the-foundation.html">1. Steering</a></li>
+        <li><a href="02-context-management.html">2. Context Management</a></li>
+        <li><a href="03-hooks.html">3. Hooks</a></li>
+        <li><a href="04-skills.html">4. Skills</a></li>
+        <li><a href="05-mcp-using.html">5. MCP: Using</a></li>
+        <li><a href="06-mcp-building.html">6. MCP: Building</a></li>
+        <li><a href="07-powers.html">7. Powers</a></li>
+        <li><a href="08-subagents.html">8. Sub-agents</a></li>
+        <li><a href="09-custom-agents.html">9. Custom Agents</a></li>
+        <li><a href="10-acp.html">10. ACP</a></li>
+        <li><a href="11-property-based-testing.html">11. Property Testing</a></li>
+        <li><a href="12-specs-as-living-artifacts.html">12. Specs</a></li>
+        <li><a href="13-model-selection.html">13. Model Selection</a></li>
+        <li><a href="14-multi-root-workspaces.html">14. Multi-root</a></li>
+        <li><a href="15-kiro-cli.html">15. Kiro CLI</a></li>
+        <li><a href="16-capstone-team-setup.html">16. Capstone</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="steering-reference.html">Steering Reference</a></li>
+        <li><a href="mcp-setup-guides.html">MCP Setup Guides</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 1</p>
+  <h1>Steering - The Foundation</h1>
+
+  <h2>The Core Idea</h2>
+
+  <div class="key-concept">
+    <strong>Mental model:</strong> Steering files are persistent instructions that get injected into the model's context before you even type a message. They're the difference between telling Kiro your preferences every session vs. Kiro just <em>knowing</em> them.
+  </div>
+
+  <p>Every time you start a chat, Kiro assembles a context window. Into that window go: the system prompt, your message, any files you reference, and - crucially - your <strong>steering files</strong>. These are markdown files that live in <code>.kiro/steering/</code> and shape how Kiro behaves across all sessions in that workspace.</p>
+
+  <p>You've already seen one in action - the <code>session-context.md</code> in this very workspace is a steering file.</p>
+
+  <h2>Where Steering Lives</h2>
+
+  <p>There are two scopes:</p>
+
+  <table>
+    <tr><th>Scope</th><th>Location</th><th>Applies to</th></tr>
+    <tr><td>Workspace</td><td><code>.kiro/steering/*.md</code></td><td>This workspace only</td></tr>
+    <tr><td>Global (User)</td><td><code>~/.kiro/steering/*.md</code></td><td>Every workspace you open</td></tr>
+  </table>
+
+  <p>Only <code>.md</code> files directly in the <code>steering/</code> folder are documented as being recognised - subdirectory support is not mentioned in official docs. To be safe, keep all steering files at the top level. Store supporting content (specs, schemas, reference docs) elsewhere in the workspace and reference them with <code>#[[file:...]]</code>.</p>
+
+  <p>Global steering is for personal cross-project standards: "always use British English", "prefer functional patterns", "I use pnpm not npm". Workspace steering is for project-specific knowledge: "this is an Angular 18 app", "we use Tailwind", "API routes live in <code>src/api/</code>".</p>
+
+  <div class="key-concept">
+    <strong>Precedence:</strong> If global and workspace steering conflict, workspace wins. Think of it like CSS specificity - more specific scope overrides the general.
+  </div>
+
+  <h2>The Three Inclusion Modes</h2>
+
+  <p>This is the key thing most people don't realise: not all steering files are loaded all the time. There are three modes, controlled by YAML front-matter at the top of the file. The front-matter schema is tiny - just two keys, and that's the complete set:</p>
+
+  <table>
+    <tr><th>Key</th><th>Values</th><th>Required</th></tr>
+    <tr><td><code>inclusion</code></td><td><code>auto</code> | <code>fileMatch</code> | <code>manual</code></td><td>No (defaults to <code>auto</code> if omitted)</td></tr>
+    <tr><td><code>fileMatchPattern</code></td><td>A glob string</td><td>Only when <code>inclusion: fileMatch</code></td></tr>
+  </table>
+
+  <p>That's it. No other front-matter keys exist for steering files. Here's what each mode does:</p>
+
+  <h3>1. Always-on (default)</h3>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>---
+inclusion: auto
+---
+
+# My Coding Standards
+Always use TypeScript strict mode...</code></pre>
+  </div>
+
+  <p>No front-matter, or <code>inclusion: auto</code> - loaded into every single session, every message. Use this sparingly. Every token here costs you context space in every interaction.</p>
+
+  <p><em>Note: in practice, a rule that's purely about TypeScript would be better as <code>fileMatch</code> against <code>**/*.ts</code> so it doesn't load when you're working on CSS, HTML, or JSON. Reserve always-on for truly cross-cutting rules (naming conventions, tooling preferences, project-wide architecture).</em></p>
+
+  <h3>2. Conditional (fileMatch)</h3>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>---
+inclusion: fileMatch
+fileMatchPattern: "src/app/services/**/*.ts"
+---
+
+# API Layer Conventions
+All HTTP services must use HttpClient with typed responses and handle errors with catchError...</code></pre>
+  </div>
+
+  <p>Only loaded when Kiro reads a file matching the glob pattern. This is powerful - you can have detailed API conventions that only activate when you're working on API files. Zero cost when you're in the UI layer.</p>
+
+  <div class="key-concept">
+    <strong>What "reads a file" means concretely:</strong> The trigger fires when a matching file <em>enters the model's context window</em>. This happens when: (1) Kiro's agent reads the file using its tools during a task, (2) you explicitly reference a matching file with <code>#File</code> in your message, or (3) the matching file is your active editor file. It does <strong>not</strong> trigger just because a matching file is open in a background tab - only when the file's content actually reaches Kiro.
+  </div>
+
+  <h3>3. Manual</h3>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>---
+inclusion: manual
+---
+
+# Database Migration Guide
+When creating a new migration...</code></pre>
+  </div>
+
+  <p>Never auto-loaded. You pull it in when you need it. Perfect for reference material that's too large to be always-on. There are two ways to invoke a manual steering file - both do the same thing (inject its content into context):</p>
+
+  <ul>
+    <li><code>/</code> - type slash in the chat input. Manual steering files appear in the slash-command menu alongside skills. This groups them with <em>invokable things</em>.</li>
+    <li><code>#</code> - type hash in the chat input. Manual steering files appear alongside files and folders. This groups them with <em>contextual things</em>.</li>
+  </ul>
+
+  <p>Different entry point, identical result: the file's content is added to your conversation context for that message. The only practical distinction is what <em>else</em> shows up in each menu - <code>/</code> lists skills alongside manual steering (things you invoke), while <code>#</code> lists files, folders, and other context keys like <code>#Problems</code>, <code>#Terminal</code>, <code>#Git Diff</code> alongside manual steering (things that add context). Pick whichever menu matches your mental framing at the time.</p>
+
+  <p>The file appears in these menus using its <strong>filename</strong> (minus the <code>.md</code> extension). There's no <code>name</code> property in the front-matter to override this - so if your file is <code>.kiro/steering/db-migrations.md</code>, it shows up as "db-migrations". Name your files descriptively.</p>
+
+  <p>In short: <strong>always</strong>, <strong>when a matching file is read</strong>, or <strong>when you ask for it</strong>.</p>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <h2>File References: Pulling in External Content</h2>
+
+  <p>Steering files can reference other files in your workspace using a special syntax:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>Follow the API patterns defined in #[[file:docs/api-spec.yaml]]</code></pre>
+  </div>
+
+  <p>This is <strong>Kiro-specific syntax</strong>, not standard markdown. Kiro intercepts this directive and expands it - replacing it with the referenced file's actual content before anything reaches the model. Standard markdown has no concept of <code>#[[file:...]]</code>. So steering files are markdown <em>plus</em> this one special directive.</p>
+
+  <p>When Kiro loads that steering file, it <em>also</em> loads the referenced file's content. This is how you can point Kiro at an OpenAPI spec, a GraphQL schema, a style guide, or any other document without pasting its contents into the steering file itself.</p>
+
+  <p>The path is relative to the workspace root.</p>
+
+  <div class="key-concept">
+    <strong>Key distinction:</strong> Referenced files are just content embeds - they aren't steering files themselves and don't have their own inclusion modes. The inclusion mode of the <em>parent</em> steering file controls when everything loads. If the parent is always-on, all its referenced files are always-on. If the parent is fileMatch, the references only load when the match triggers. Referenced files have no independent say - they come along for the ride.
+  </div>
+
+  <h2>What Makes Good Steering</h2>
+
+  <p>Steering files are injected raw into the context. Every word costs tokens. The best steering files are:</p>
+
+  <ul>
+    <li><strong>Concise</strong> - state the rule, not the rationale (unless the rationale prevents misapplication)</li>
+    <li><strong>Actionable</strong> - "use <code>pnpm</code>" not "we prefer pnpm because it's faster"</li>
+    <li><strong>Scoped correctly</strong> - use fileMatch for domain-specific rules, not always-on</li>
+    <li><strong>Non-obvious</strong> - don't tell Kiro things it would infer from the code anyway (like "this is a TypeScript project" when <code>tsconfig.json</code> exists)</li>
+  </ul>
+
+  <div class="key-concept">
+    <strong>Anti-pattern:</strong> A single massive always-on steering file with everything. You're paying the full token cost on every message, even when working on something unrelated. Split into focused files and use appropriate inclusion modes.
+  </div>
+
+  <h2>A Practical Example</h2>
+
+  <p>Here's how a real project might structure its steering:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>.kiro/steering/
+├── conventions.md          # Always-on: code style, naming, tooling
+├── architecture.md         # Always-on: high-level structure, key patterns
+├── api-standards.md        # fileMatch: "src/app/services/**/*.ts" — HTTP/API conventions
+├── component-patterns.md   # fileMatch: "src/app/**/*.component.ts" — Angular component patterns
+├── db-migrations.md        # Manual — only when doing migrations
+└── deployment.md           # Manual — only when deploying</code></pre>
+  </div>
+
+  <h2>How Steering Relates to Everything Else</h2>
+
+  <p>This is why we started here:</p>
+
+  <ul>
+    <li><strong>Skills</strong> reference steering-format files and can include file references the same way</li>
+    <li><strong>Powers</strong> inject their steering files into the model's context when activated - the power's own <code>steering/</code> directory contents are loaded on-demand, not physically added to your <code>.kiro/steering/</code></li>
+    <li><strong>Hooks</strong> with <code>"type": "agent"</code> actions inject prompt text, which is conceptually the same as steering but triggered by an event</li>
+    <li><strong>Specs</strong> read steering to understand your project context before generating requirements</li>
+    <li><strong>Context management</strong> is the system that decides which steering files make it into the window - understanding inclusion modes is understanding context management</li>
+  </ul>
+
+  <h2>Quiz</h2>
+
+  <div class="quiz" role="group">
+    <h3>You have a 200-line style guide that's only relevant when editing SCSS files. Which inclusion mode?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Always-on (auto)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Conditional (fileMatch with "**/*.scss")</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Manual</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="quiz" role="group">
+    <h3>You want a rule that applies in this workspace AND every other workspace you open. Where does the file go?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">.kiro/steering/</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">~/.kiro/steering/</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Either - they're equivalent</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="quiz" role="group">
+    <h3>Your steering file references #[[file:docs/openapi.yaml]]. When is that YAML loaded?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Only when you explicitly open the YAML file</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Whenever the steering file itself is loaded (based on its inclusion mode)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Once at workspace open, then cached</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <h2>Your Tangible Win</h2>
+
+  <p>You now understand the full mechanics of steering: three inclusion modes, two scopes, file references, and how it connects to every other Kiro feature. You can look at any <code>.kiro/steering/</code> directory and immediately understand what's always-on, what's contextual, and what's on-demand.</p>
+
+  <div class="recommended">
+    <strong>Primary source:</strong>
+    <a href="https://kiro.dev/docs/steering/">Kiro Docs: Steering</a> |
+    <a href="https://kiro.dev/docs/cli/steering/">Kiro CLI Docs: Steering</a> - covers global/team distribution in more detail.
+  </div>
+
+  <div class="footer-nav">
+    <a href="index.html">Index</a>
+    <a href="02-context-management.html">Next: Context Management &rarr;</a>
+  </div>
+
+    </main>
+  </div>
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

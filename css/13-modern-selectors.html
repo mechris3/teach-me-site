@@ -462,51 +462,51 @@ article:has(&gt; img):not(.featured) {
   <div class="quiz" id="quiz1">
     <h3>Question 1</h3>
     <p>What does :has() let you do that was previously impossible in CSS?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Select elements by their class name</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Style an element based on what's inside it (its children/descendants)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Apply styles only on hover</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Select elements by their position in the DOM</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Select elements by their class name</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Style an element based on what's inside it (its children/descendants)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Apply styles only on hover</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Select elements by their position in the DOM</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz2">
     <h3>Question 2</h3>
     <p>What's the specificity of :where(.card, #main, .title)?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">(1, 0, 0) - takes #main's specificity</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">(0, 2, 0) - sum of class selectors</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">(0, 0, 0) - :where() is always zero</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">(0, 1, 0) - average of arguments</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">(1, 0, 0) - takes #main's specificity</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">(0, 2, 0) - sum of class selectors</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">(0, 0, 0) - :where() is always zero</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">(0, 1, 0) - average of arguments</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz3">
     <h3>Question 3</h3>
     <p>What's the specificity of :is(.card, #main)?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">(1, 0, 0) - takes the most specific argument (#main)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">(0, 0, 0) - :is() has zero specificity</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">(0, 1, 0) - uses .card's specificity</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">(1, 1, 0) - sum of both</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">(1, 0, 0) - takes the most specific argument (#main)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">(0, 0, 0) - :is() has zero specificity</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">(0, 1, 0) - uses .card's specificity</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">(1, 1, 0) - sum of both</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz4">
     <h3>Question 4</h3>
     <p>You want to style a form differently when any of its inputs are invalid. Which selector?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">form:not(:valid)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">form:has(:invalid)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">form:is(:invalid)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">form > :invalid</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">form:not(:valid)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">form:has(:invalid)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">form:is(:invalid)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">form > :invalid</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz5">
     <h3>Question 5</h3>
     <p>When should you use :where() instead of :is()?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">When you need higher specificity</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">When targeting multiple elements at once</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">When you want zero specificity so styles are easily overridden (resets, defaults)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">When the selector list contains IDs</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">When you need higher specificity</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">When targeting multiple elements at once</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">When you want zero specificity so styles are easily overridden (resets, defaults)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">When the selector list contains IDs</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="recommended">

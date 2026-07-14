@@ -400,41 +400,41 @@ myCard.style.setProperty('--card-padding', '2rem');</code></pre>
   <div class="quiz" id="quiz1">
     <h3>Question 1</h3>
     <p>A custom property --brand is set on :root as "blue" and on .sidebar as "green". A .button inside .sidebar uses var(--brand). What colour is it?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">blue  -  :root always wins</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">green  -  closer ancestor wins</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">invalid  -  conflicting declarations</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">transparent  -  no valid value</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">blue  -  :root always wins</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">green  -  closer ancestor wins</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">invalid  -  conflicting declarations</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">transparent  -  no valid value</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz2">
     <h3>Question 2</h3>
     <p>What does var(--missing, 16px) resolve to when --missing is not declared anywhere in the DOM tree?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">nothing  -  the declaration is skipped</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">0px  -  numeric properties default to zero</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">16px  -  the fallback value is used</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">inherit  -  falls back to parent value</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">nothing  -  the declaration is skipped</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">0px  -  numeric properties default to zero</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">16px  -  the fallback value is used</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">inherit  -  falls back to parent value</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz3">
     <h3>Question 3</h3>
     <p>You write: width: var(--size)px; where --size is 100. What happens?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Works fine  -  width becomes 100px</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Invalid  -  can't concatenate like this</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Becomes "100 px" with a space in it</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Silently ignored, uses inherited width</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Works fine  -  width becomes 100px</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Invalid  -  can't concatenate like this</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Becomes "100 px" with a space in it</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Silently ignored, uses inherited width</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz4">
     <h3>Question 4</h3>
     <p>How do you correctly turn --size: 100 into a pixel value?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">width: var(--size) + "px";</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">width: #{var(--size)}px;</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">width: calc(var(--size) * 1px);</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">width: var(--size, px);</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">width: var(--size) + "px";</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">width: #{var(--size)}px;</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">width: calc(var(--size) * 1px);</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">width: var(--size, px);</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="ad-footer" aria-label="Advertisement">Ad</div>

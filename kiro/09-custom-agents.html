@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>Custom Agents - Lesson 9 | Teach Me</title>
+  <meta name="description" content="Kiro custom agents: config files, tool scoping, prompt injection, and creating specialised agents for your team.">
+  <link rel="canonical" href="https://teachmeskills.dev/kiro/09-custom-agents.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/kiro/09-custom-agents.html">
+  <meta property="og:title" content="Custom Agents - Lesson 9 | Teach Me">
+  <meta property="og:description" content="Kiro custom agents: config files, tool scoping, prompt injection, and creating specialised agents for your team.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Custom Agents - Lesson 9 | Teach Me">
+  <meta name="twitter:description" content="Kiro custom agents: config files, tool scoping, prompt injection, and creating specialised agents for your team.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header"><a href="index.html">Kiro Course</a></div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-steering-the-foundation.html">1. Steering</a></li>
+        <li><a href="02-context-management.html">2. Context Management</a></li>
+        <li><a href="03-hooks.html">3. Hooks</a></li>
+        <li><a href="04-skills.html">4. Skills</a></li>
+        <li><a href="05-mcp-using.html">5. MCP: Using</a></li>
+        <li><a href="06-mcp-building.html">6. MCP: Building</a></li>
+        <li><a href="07-powers.html">7. Powers</a></li>
+        <li><a href="08-subagents.html">8. Sub-agents</a></li>
+        <li class="current"><a href="09-custom-agents.html">9. Custom Agents</a></li>
+        <li><a href="10-acp.html">10. ACP</a></li>
+        <li><a href="11-property-based-testing.html">11. Property Testing</a></li>
+        <li><a href="12-specs-as-living-artifacts.html">12. Specs</a></li>
+        <li><a href="13-model-selection.html">13. Model Selection</a></li>
+        <li><a href="14-multi-root-workspaces.html">14. Multi-root</a></li>
+        <li><a href="15-kiro-cli.html">15. Kiro CLI</a></li>
+        <li><a href="16-capstone-team-setup.html">16. Capstone</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="steering-reference.html">Steering Reference</a></li>
+        <li><a href="mcp-setup-guides.html">MCP Setup Guides</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 9</p>
+  <h1>Custom Agents</h1>
+
+  <h2>What Custom Agents Are</h2>
+
+  <p>A custom agent is a specialised version of Kiro with its own system prompt, tool access, and optionally its own MCP servers. You define it in a config file, and Kiro can spawn it as a sub-agent when the task matches its description - or you can invoke it explicitly.</p>
+
+  <p>Think of it as: a sub-agent with a personality and toolbox you've defined in advance.</p>
+
+  <h2>Where Custom Agents Live</h2>
+
+  <table>
+    <tr><th>Scope</th><th>Location</th><th>Use for</th></tr>
+    <tr><td>Workspace</td><td><code>.kiro/agents/*.md</code></td><td>Project-specific agents (frontend agent, API agent)</td></tr>
+    <tr><td>Global</td><td><code>~/.kiro/agents/*.md</code></td><td>Personal agents you use across projects (review agent, docs agent)</td></tr>
+  </table>
+
+  <p>Same two-scope pattern as steering and skills.</p>
+
+  <h2>The Agent File Format (IDE)</h2>
+
+  <p>In the IDE, a custom agent is a <strong>markdown file</strong> with YAML front-matter. The body is the agent's system prompt - the instructions it follows when spawned.</p>
+
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>---
+name: frontend-agent
+description: Specialist in Angular components, templates, and browser tooling
+model: auto
+tools:
+  - read_file
+  - fs_write
+  - str_replace
+  - execute_bash
+  - grep_search
+mcpServers:
+  - component-docs
+---
+
+You are a frontend specialist working on an Angular 18 application.
+
+## Your expertise
+- Angular standalone components with signals
+- RxJS for async data streams
+- Template syntax and change detection
+- SCSS styling with our design token system
+
+## Rules
+- Always create standalone components
+- Use inject() over constructor injection
+- Prefer signals over BehaviorSubject for new code
+- Run ng lint after changes</code></pre></div>
+
+  <h2>Front-matter Schema (IDE)</h2>
+
+  <table>
+    <tr><th>Field</th><th>Required</th><th>What it does</th></tr>
+    <tr><td><code>name</code></td><td>No</td><td>Agent identifier (derived from filename if not specified)</td></tr>
+    <tr><td><code>description</code></td><td>Yes</td><td>Used for auto-selection - Kiro matches tasks against this</td></tr>
+    <tr><td><code>model</code></td><td>No</td><td>Which model to use (<code>auto</code>, <code>claude-opus-4</code>, <code>claude-sonnet-4</code>, etc.)</td></tr>
+    <tr><td><code>tools</code></td><td>No</td><td>List of tools this agent can access (restricts to only these)</td></tr>
+    <tr><td><code>mcpServers</code></td><td>No</td><td>MCP servers available to this agent (by name from your mcp.json)</td></tr>
+  </table>
+
+  <p>If you omit <code>tools</code>, the agent gets all tools. If you specify it, the agent is restricted to only those tools - useful for creating read-only agents or agents that can't run shell commands.</p>
+
+  <div class="key-concept">
+    <strong>Tools format note:</strong> Recent versions of Kiro also support category-based tool access using tags like <code>read</code>, <code>write</code>, <code>shell</code> instead of individual tool names. Both approaches work - individual tool names give finer control, categories are more future-proof (new tools in a category are included automatically). Check <a href="https://kiro.dev/docs/custom-agents/">the official docs</a> for the current recommended format.
+  </div>
+
+  <h2>How Custom Agents Get Used</h2>
+
+  <h3>Automatic selection</h3>
+  <p>Kiro reads the <code>description</code> of all available custom agents. When a task matches, it spawns the appropriate agent as a sub-agent. For example, if you ask "update the header component's styling" and you have a frontend-agent with a matching description, Kiro may choose to delegate to it.</p>
+
+  <h3>Explicit invocation</h3>
+  <p>You can name the agent directly: "Use the frontend-agent to refactor this component" or "Run the docs-agent on this file."</p>
+
+  <h3>How is this different from asking a skill to run in parallel?</h3>
+
+  <p>Both can run in parallel - the difference is about constraints and identity, not concurrency:</p>
+
+  <table>
+    <tr><th></th><th>Skill (run in parallel)</th><th>Custom agent (invoked explicitly)</th></tr>
+    <tr><td><strong>Where instructions live</strong></td><td>Loaded into whatever agent runs them (main or generic sub-agent)</td><td>Permanently bound to the agent - its own system prompt</td></tr>
+    <tr><td><strong>Tool access</strong></td><td>Full - the executing agent has all tools</td><td>Restricted to only what's listed in the config</td></tr>
+    <tr><td><strong>MCP access</strong></td><td>All configured MCP servers</td><td>Only the MCP servers specified in the agent's config</td></tr>
+    <tr><td><strong>Model</strong></td><td>Uses whatever model is currently selected</td><td>Can specify its own model</td></tr>
+    <tr><td><strong>Identity</strong></td><td>Temporary instructions - different each time you invoke</td><td>Fixed identity that persists across uses</td></tr>
+  </table>
+
+  <p>A skill is <em>instructions anyone can follow</em>. A custom agent is <em>a specific person with defined capabilities and limits</em>.</p>
+
+  <h2>Practical Examples</h2>
+
+  <h3>Read-only research agent</h3>
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>---
+description: Research and analyse code without making changes
+tools:
+  - read_file
+  - grep_search
+  - file_search
+  - list_directory
+---
+
+You are a research assistant. Your job is to explore the codebase and
+provide analysis. You cannot modify any files or run commands.
+
+When asked to investigate something:
+1. Search for relevant files
+2. Read and understand the code
+3. Provide a clear summary of findings
+4. Suggest next steps (but don't implement them)</code></pre></div>
+
+  <h3>Test writer agent</h3>
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>---
+description: Write and run unit tests for Angular components and services
+tools:
+  - read_file
+  - fs_write
+  - str_replace
+  - execute_bash
+  - grep_search
+---
+
+You are a testing specialist for an Angular application using Jest.
+
+## Rules
+- Every test file lives next to its source: `foo.component.spec.ts`
+- Use Testing Library for component tests
+- Mock HTTP calls with HttpClientTestingModule
+- Run tests after writing: `npx jest --testPathPattern=&lt;file&gt;`
+- Aim for meaningful assertions, not just coverage</code></pre></div>
+
+  <h3>Backend API agent</h3>
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>---
+description: Work with the Node.js/Express API layer and database
+tools:
+  - read_file
+  - fs_write
+  - str_replace
+  - execute_bash
+  - grep_search
+mcpServers:
+  - postgres
+---
+
+You are a backend specialist working on the Express API.
+
+## Your domain
+- Routes in src/api/
+- Services in src/services/
+- Database access via the postgres MCP server
+
+## Rules
+- All endpoints validate input with zod
+- Use parameterised queries (never string interpolation)
+- Return consistent error responses: { error: string, code: number }</code></pre></div>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <h2>When and Why: Custom Agents vs. Just Asking Kiro</h2>
+
+  <p>You might think: "Why not just ask Kiro to do this in the main conversation, or use a skill?" Here's when a custom agent genuinely adds value over alternatives:</p>
+
+  <h3>Use a custom agent when you need:</h3>
+
+  <table>
+    <tr><th>Need</th><th>Why a custom agent solves it</th><th>Why a skill/main agent doesn't</th></tr>
+    <tr><td><strong>Tool restriction</strong></td><td>Agent only has access to specific tools - can't accidentally write files or run commands</td><td>Skills and main agent always have all tools available</td></tr>
+    <tr><td><strong>Scoped MCP access</strong></td><td>Agent only connects to specific MCP servers (e.g. just the database, not GitHub)</td><td>Main agent sees all configured MCP servers</td></tr>
+    <tr><td><strong>Context isolation</strong></td><td>Agent's exploration doesn't bloat the main conversation</td><td>Skills run in main context - every file read costs main tokens</td></tr>
+    <tr><td><strong>A different model</strong></td><td>Can use a cheaper/faster model for simple tasks, or a more capable one for hard tasks</td><td>Main agent uses whatever model is currently selected</td></tr>
+    <tr><td><strong>Repeatable identity</strong></td><td>The agent's persona, rules, and constraints are defined once and reused across sessions</td><td>Skills provide instructions but no constraints on what tools can be used</td></tr>
+  </table>
+
+  <h3>Just use a skill (or ask Kiro directly) when:</h3>
+  <ul>
+    <li>You need the task done <em>in</em> the current context (not isolated)</li>
+    <li>You don't need to restrict tools - the main agent's full toolbox is fine</li>
+    <li>The task is straightforward and doesn't need a different model</li>
+    <li>You want to see everything happen step-by-step in the main conversation</li>
+  </ul>
+
+  <h3>Concrete comparison</h3>
+
+  <p><strong>Scenario: "Lint all components and fix issues"</strong></p>
+  <ul>
+    <li><strong>Skill approach:</strong> A skill provides instructions on how to lint. Kiro follows them in the main context. Every file read and fix happens in your main conversation's token budget. Fine for a few files.</li>
+    <li><strong>Sub-agent approach:</strong> "Use subagents to lint these files in parallel." Kiro spawns general-purpose sub-agents. Faster, isolated context, but they have full tool access - could theoretically do anything.</li>
+    <li><strong>Custom agent approach:</strong> You have a <code>lint-agent.md</code> that only has <code>read_file</code>, <code>str_replace</code>, and <code>execute_bash</code> (scoped to <code>ng lint</code>). It can't accidentally delete files, can't run arbitrary commands, can't access your database MCP server. Safest option for delegating to run autonomously.</li>
+  </ul>
+
+  <p><strong>Scenario: "Research how auth works in this codebase"</strong></p>
+  <ul>
+    <li><strong>Main agent:</strong> Reads 15 files directly in your conversation - uses all your context budget.</li>
+    <li><strong>Built-in context gatherer:</strong> Does the same exploration in an isolated context, returns a summary. Good, but it uses all tools and has no domain-specific instructions.</li>
+    <li><strong>Custom research agent:</strong> Read-only tools only (can't modify anything), has your project-specific instructions baked in ("auth uses JWT tokens stored in HttpOnly cookies, check src/auth/"). Safer, more focused, returns better results because it has domain context from its prompt.</li>
+  </ul>
+
+  <div class="key-concept">
+    <strong>Rule of thumb:</strong> If you'd be comfortable giving the task to any sub-agent with full access, just ask Kiro directly (or use a skill). If you want <em>constraints</em> on what it can do, or a <em>persistent identity</em> with domain knowledge, that's when a custom agent earns its keep.
+  </div>
+
+  <p>Tool restriction is a safety and focus mechanism:</p>
+
+  <ul>
+    <li><strong>Read-only agents</strong> - can explore but not break anything (remove write/bash tools)</li>
+    <li><strong>Focused agents</strong> - a docs agent doesn't need bash access; a test agent doesn't need web tools</li>
+    <li><strong>Security</strong> - limit what a sub-agent can do to reduce blast radius</li>
+  </ul>
+
+  <div class="key-concept">
+    <strong>Connection to hooks:</strong> You can combine this with PreToolUse hooks for defence in depth. The agent config restricts what tools are <em>available</em>; hooks can gate <em>how</em> those tools are used (e.g. blocking writes to certain directories).
+  </div>
+
+  <h2>Custom Agents vs Skills</h2>
+
+  <table>
+    <tr><th></th><th>Custom Agents</th><th>Skills</th></tr>
+    <tr><td><strong>What they define</strong></td><td>A whole agent identity (prompt + tools + model + MCP)</td><td>Instructions for the main agent to follow</td></tr>
+    <tr><td><strong>Execution</strong></td><td>Run in their own isolated context as sub-agents</td><td>Run in the main agent's context</td></tr>
+    <tr><td><strong>Context isolation</strong></td><td>Yes - own context window</td><td>No - shares the main context</td></tr>
+    <tr><td><strong>Tool restriction</strong></td><td>Can limit which tools are available</td><td>No - main agent keeps all tools</td></tr>
+    <tr><td><strong>MCP scoping</strong></td><td>Can specify which MCP servers to use</td><td>No - uses whatever's configured globally</td></tr>
+    <tr><td><strong>Best for</strong></td><td>Domain-specific delegation with safety constraints</td><td>Reusable workflows the main agent follows</td></tr>
+  </table>
+
+  <h2>The CLI Difference</h2>
+
+  <p>In the Kiro CLI, custom agents use a more elaborate YAML/JSON config format (not markdown) and support additional features like:</p>
+  <ul>
+    <li><code>allowedTools</code> - tools that can run without asking for permission</li>
+    <li><code>toolAliases</code> - renaming tools to avoid collisions</li>
+    <li><code>includeMcpJson</code> - whether to inherit mcp.json servers</li>
+    <li><code>resources</code> - files pre-loaded into context</li>
+    <li><code>hooks</code> - agent-specific hooks</li>
+  </ul>
+
+  <p>The IDE format (markdown with front-matter) is simpler but covers the common cases. If you move to the CLI for more advanced workflows, the config options expand significantly. See <a href="https://kiro.dev/docs/cli/custom-agents/configuration-reference/">CLI Agent Config Reference</a> for the full schema.</p>
+
+  <h2>Your Tangible Win</h2>
+
+  <p>You can now create custom agents with scoped tools, specific MCP access, and focused system prompts. You know how they differ from skills (isolated context, tool restriction, MCP scoping), how Kiro auto-selects them, and how to invoke them explicitly. You can build a team of specialised agents for your project.</p>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <h2>Quiz</h2>
+
+  <div class="quiz" role="group">
+    <h3>You want an agent that can read code but never modify it. How?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Add "read-only: true" to the front-matter</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">List only read tools in the "tools" front-matter field (read_file, grep_search, etc.)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">You can't - all agents have all tools</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="quiz" role="group">
+    <h3>What's the key difference between a custom agent and a skill?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Skills are more powerful</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Custom agents run in their own isolated context as sub-agents; skills run in the main agent's context</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Custom agents are CLI-only; skills are IDE-only</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="quiz" role="group">
+    <h3>Where do IDE custom agents live?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">.kiro/skills/*.md</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">.kiro/settings/agents.json</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">.kiro/agents/*.md (workspace) or ~/.kiro/agents/*.md (global)</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="recommended">
+    <strong>Recommended resources:</strong>
+    <a href="https://kiro.dev/docs/chat/subagents/">Kiro Docs: Sub-agents (includes custom agents)</a>, <a href="https://kiro.dev/docs/cli/custom-agents/">CLI Custom Agents</a>, and <a href="https://kiro.dev/docs/cli/custom-agents/configuration-reference/">CLI Config Reference</a>.
+  </div>
+
+  <div class="footer-nav">
+    <a href="08-subagents.html">&larr; Prev: Sub-agents</a>
+    <a href="index.html">Index</a>
+    <a href="10-acp.html">Next: Agent Client Protocol &rarr;</a>
+  </div>
+
+    </main>
+  </div>
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

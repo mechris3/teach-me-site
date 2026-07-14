@@ -32,6 +32,14 @@ function copyCode(btn) {
 }
 
 // --- Quiz ---
+// Keyboard support for quiz options (role="button" needs Enter/Space handling)
+document.addEventListener('keydown', function(e) {
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('quiz-option')) {
+    e.preventDefault();
+    e.target.click();
+  }
+});
+
 function checkAnswer(el, correct) {
   const quiz = el.closest('.quiz');
   // If already answered correctly, lock the quiz

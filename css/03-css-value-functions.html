@@ -537,51 +537,51 @@ h1 {
   <div class="quiz" id="quiz1">
     <h3>Question 1</h3>
     <p>What does min(100%, 600px) resolve to when the parent is 400px wide?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">400px - 100% of 400px is smaller than 600px</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">600px - min() picks the static value</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">100% - percentages always win over px</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">500px - it averages the two values</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">400px - 100% of 400px is smaller than 600px</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">600px - min() picks the static value</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">100% - percentages always win over px</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">500px - it averages the two values</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz2">
     <h3>Question 2</h3>
     <p>In clamp(1rem, 5vw, 3rem), what happens when 5vw computes to 4rem?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">4rem - the preferred value is used as-is</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">3rem - it's capped at the maximum</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">1rem - preferred exceeds max so floor is used</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">5vw - viewport units are never clamped</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">4rem - the preferred value is used as-is</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">3rem - it's capped at the maximum</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">1rem - preferred exceeds max so floor is used</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">5vw - viewport units are never clamped</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz3">
     <h3>Question 3</h3>
     <p>Why must + and - have spaces in calc()?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">It's just a style convention, both work</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">The parser can't distinguish minus sign from negative number without spaces</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Spaces activate hardware acceleration</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Only - needs spaces, + works without them</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">It's just a style convention, both work</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">The parser can't distinguish minus sign from negative number without spaces</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Spaces activate hardware acceleration</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Only - needs spaces, + works without them</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz4">
     <h3>Question 4</h3>
     <p>You want to lighten a colour by 40% using color-mix. Which is correct?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">color-mix(in oklch, var(--c), lighten 40%)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">color-mix(in oklch, var(--c), white 40%)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">color-mix(oklch, var(--c), white 40%)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">color-mix(var(--c), white, in oklch 40%)</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">color-mix(in oklch, var(--c), lighten 40%)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">color-mix(in oklch, var(--c), white 40%)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">color-mix(oklch, var(--c), white 40%)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">color-mix(var(--c), white, in oklch 40%)</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz5">
     <h3>Question 5</h3>
     <p>What colour space should you prefer for perceptually natural mixes?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">srgb - it's the web standard</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">hsl - designed for human perception</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">oklch - perceptually uniform</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">rgb - most widely supported</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">srgb - it's the web standard</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">hsl - designed for human perception</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">oklch - perceptually uniform</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">rgb - most widely supported</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="recommended">

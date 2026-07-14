@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>Steering Reference | Teach Me</title>
+  <meta name="description" content="Quick reference for Kiro steering files: locations, front-matter schema, inclusion modes, glob patterns, and best practices.">
+  <link rel="canonical" href="https://teachmeskills.dev/kiro/steering-reference.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/kiro/steering-reference.html">
+  <meta property="og:title" content="Steering Reference | Teach Me">
+  <meta property="og:description" content="Quick reference for Kiro steering files: locations, front-matter schema, inclusion modes, glob patterns, and best practices.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Steering Reference | Teach Me">
+  <meta name="twitter:description" content="Quick reference for Kiro steering files: locations, front-matter schema, inclusion modes, glob patterns, and best practices.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header"><a href="index.html">Kiro Course</a></div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-steering-the-foundation.html">1. Steering</a></li>
+        <li><a href="02-context-management.html">2. Context Management</a></li>
+        <li><a href="03-hooks.html">3. Hooks</a></li>
+        <li><a href="04-skills.html">4. Skills</a></li>
+        <li><a href="05-mcp-using.html">5. MCP: Using</a></li>
+        <li><a href="06-mcp-building.html">6. MCP: Building</a></li>
+        <li><a href="07-powers.html">7. Powers</a></li>
+        <li><a href="08-subagents.html">8. Sub-agents</a></li>
+        <li><a href="09-custom-agents.html">9. Custom Agents</a></li>
+        <li><a href="10-acp.html">10. ACP</a></li>
+        <li><a href="11-property-based-testing.html">11. Property Testing</a></li>
+        <li><a href="12-specs-as-living-artifacts.html">12. Specs</a></li>
+        <li><a href="13-model-selection.html">13. Model Selection</a></li>
+        <li><a href="14-multi-root-workspaces.html">14. Multi-root</a></li>
+        <li><a href="15-kiro-cli.html">15. Kiro CLI</a></li>
+        <li><a href="16-capstone-team-setup.html">16. Capstone</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li class="current"><a href="steering-reference.html">Steering Reference</a></li>
+        <li><a href="mcp-setup-guides.html">MCP Setup Guides</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <h1>Steering - Quick Reference</h1>
+
+  <h2>File Locations</h2>
+  <table>
+    <tr><th>Scope</th><th>Path</th><th>Precedence</th></tr>
+    <tr><td>Global (user-level)</td><td><code>~/.kiro/steering/*.md</code></td><td>Lower (overridden by workspace)</td></tr>
+    <tr><td>Workspace</td><td><code>.kiro/steering/*.md</code></td><td>Higher</td></tr>
+  </table>
+
+  <h2>Front-matter Options (Complete Schema)</h2>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>---
+inclusion: auto | fileMatch | manual
+fileMatchPattern: "glob/pattern/**/*.ts"   # required when inclusion: fileMatch
+---</code></pre>
+  </div>
+  <p><strong>This is the full schema.</strong> Steering files only support these two keys - there are no other options.</p>
+
+  <h2>Inclusion Modes</h2>
+  <table>
+    <tr><th>Mode</th><th>Front-matter</th><th>When loaded</th><th>Use for</th></tr>
+    <tr><td>Always-on</td><td><code>inclusion: auto</code> (or omitted)</td><td>Every message</td><td>Core conventions, architecture overview</td></tr>
+    <tr><td>Conditional</td><td><code>inclusion: fileMatch</code></td><td>When a matching file is read</td><td>Domain-specific rules (API, DB, UI)</td></tr>
+    <tr><td>Manual</td><td><code>inclusion: manual</code></td><td>Only when invoked via <code>/</code> or <code>#</code></td><td>Large reference docs, infrequent tasks</td></tr>
+  </table>
+
+  <h2>File References</h2>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>Refer to #[[file:relative/path/from/workspace-root.yaml]]</code></pre>
+  </div>
+  <p>Loads the referenced file's content into context alongside the steering file. Chain multiple references in one file.</p>
+
+  <h2>Glob Pattern Examples (fileMatch)</h2>
+  <table>
+    <tr><th>Pattern</th><th>Matches</th></tr>
+    <tr><td><code>src/api/**/*.ts</code></td><td>Any .ts file under src/api/ at any depth</td></tr>
+    <tr><td><code>**/*.test.ts</code></td><td>Any test file anywhere</td></tr>
+    <tr><td><code>*.md</code></td><td>Markdown files in root only</td></tr>
+    <tr><td><code>src/components/**</code></td><td>All files under src/components/</td></tr>
+  </table>
+
+  <h2>Best Practices</h2>
+  <ul>
+    <li>Keep always-on files short - every token is spent on every message</li>
+    <li>Use fileMatch to scope domain rules to relevant files</li>
+    <li>Use manual for large docs or infrequent workflows (migrations, deployments)</li>
+    <li>Don't state things Kiro can infer from code (tsconfig.json, package.json)</li>
+    <li>Use file references to point at specs/schemas instead of duplicating content</li>
+    <li>One concern per file - makes it easy to toggle and scope</li>
+  </ul>
+
+  <h2>How to Invoke Manual Steering</h2>
+  <ul>
+    <li>Type <code>/</code> in chat input - manual steering files appear as slash commands</li>
+    <li>Type <code>#</code> followed by the filename to pull it into context</li>
+  </ul>
+
+  <h2>Relationship to Other Features</h2>
+  <table>
+    <tr><th>Feature</th><th>Relationship to Steering</th></tr>
+    <tr><td>Skills</td><td>Skills use the same file-reference syntax; they're invoked steering</td></tr>
+    <tr><td>Powers</td><td>Powers inject their own steering files on activation</td></tr>
+    <tr><td>Hooks (agent type)</td><td>Agent hooks inject prompt text, like event-triggered steering</td></tr>
+    <tr><td>Specs</td><td>Specs read steering for project context during generation</td></tr>
+    <tr><td>Multi-root</td><td>Each workspace folder gets its own <code>.kiro/steering/</code></td></tr>
+  </table>
+
+  <h2>Official Docs</h2>
+  <ul>
+    <li><a href="https://kiro.dev/docs/steering/">Steering (IDE)</a></li>
+    <li><a href="https://kiro.dev/docs/cli/steering/">Steering (CLI / Global)</a></li>
+  </ul>
+
+  <div class="footer-nav">
+    <a href="index.html">Index</a>
+  </div>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

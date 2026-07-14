@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>MCP Servers: Building - Lesson 6 | Teach Me</title>
+  <meta name="description" content="Build your own MCP server from scratch using the MCP SDK. Tools, resources, prompts, and connecting to Kiro.">
+  <link rel="canonical" href="https://teachmeskills.dev/kiro/06-mcp-building.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/kiro/06-mcp-building.html">
+  <meta property="og:title" content="MCP Servers: Building - Lesson 6 | Teach Me">
+  <meta property="og:description" content="Build your own MCP server from scratch using the MCP SDK. Tools, resources, prompts, and connecting to Kiro.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="MCP Servers: Building - Lesson 6 | Teach Me">
+  <meta name="twitter:description" content="Build your own MCP server from scratch using the MCP SDK. Tools, resources, prompts, and connecting to Kiro.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header"><a href="index.html">Kiro Course</a></div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-steering-the-foundation.html">1. Steering</a></li>
+        <li><a href="02-context-management.html">2. Context Management</a></li>
+        <li><a href="03-hooks.html">3. Hooks</a></li>
+        <li><a href="04-skills.html">4. Skills</a></li>
+        <li><a href="05-mcp-using.html">5. MCP: Using</a></li>
+        <li class="current"><a href="06-mcp-building.html">6. MCP: Building</a></li>
+        <li><a href="07-powers.html">7. Powers</a></li>
+        <li><a href="08-subagents.html">8. Sub-agents</a></li>
+        <li><a href="09-custom-agents.html">9. Custom Agents</a></li>
+        <li><a href="10-acp.html">10. ACP</a></li>
+        <li><a href="11-property-based-testing.html">11. Property Testing</a></li>
+        <li><a href="12-specs-as-living-artifacts.html">12. Specs</a></li>
+        <li><a href="13-model-selection.html">13. Model Selection</a></li>
+        <li><a href="14-multi-root-workspaces.html">14. Multi-root</a></li>
+        <li><a href="15-kiro-cli.html">15. Kiro CLI</a></li>
+        <li><a href="16-capstone-team-setup.html">16. Capstone</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="steering-reference.html">Steering Reference</a></li>
+        <li><a href="mcp-setup-guides.html">MCP Setup Guides</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 6</p>
+  <h1>MCP Servers: Building</h1>
+
+  <h2>Why Build Your Own</h2>
+
+  <p>You'd build an MCP server when you want to give Kiro access to something it can't reach with built-in tools - an internal API, a bespoke service, a database with custom query patterns, or any workflow that's specific to your team.</p>
+
+  <p>Real examples:</p>
+  <ul>
+    <li>A server that queries your team's internal documentation wiki</li>
+    <li>A server that interacts with your deployment pipeline</li>
+    <li>A server that reads/writes from a shared team config service</li>
+    <li>A server that wraps your Angular component library's API docs</li>
+  </ul>
+
+  <h2>The Architecture</h2>
+
+  <p>An MCP server is any process that speaks the MCP protocol (JSON-RPC over stdio or HTTP). It can be written in any language - TypeScript/Node and Python are most common because they have official SDKs, but community SDKs exist for Go, Rust, Java, C#, and others. We'll use the TypeScript SDK here since it's the most common for web development teams.</p>
+
+  <p>Regardless of language, every MCP server does three things:</p>
+  <ol>
+    <li>Starts up and listens over a <strong>transport</strong> (stdio or HTTP)</li>
+    <li>Responds to a <strong>discovery</strong> request - telling the client what tools/resources/prompts it offers</li>
+    <li>Handles <strong>tool calls</strong> - receives parameters, does work, returns results</li>
+  </ol>
+
+  <p>Communication uses JSON-RPC. But you don't need to implement that yourself - the SDK handles it.</p>
+
+  <h2>The Protocol Under the Hood</h2>
+
+  <p>The SDK abstracts this away, but understanding what's on the wire helps you debug issues and reason about performance. MCP is built on <a href="https://www.jsonrpc.org/specification">JSON-RPC 2.0</a> - every message is a JSON object with a method name, parameters, and an ID for request/response matching.</p>
+
+  <h3>The Connection Lifecycle</h3>
+
+  <p>When Kiro connects to your MCP server, this sequence happens:</p>
+
+  <div class="demo">
+    <svg width="100%" height="480" viewBox="0 0 720 480" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Sequence diagram showing the MCP connection lifecycle between Kiro (client) and your MCP server, from initialization through tool calls to shutdown">
+      <!-- Background -->
+      <rect width="720" height="480" rx="12" fill="#f8f8f6"/>
+
+      <!-- Arrow markers -->
+      <defs>
+        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+          <polygon points="0,0 10,3.5 0,7" fill="#3730a3"/>
+        </marker>
+        <marker id="arrowhead-green" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+          <polygon points="0,0 10,3.5 0,7" fill="#065f46"/>
+        </marker>
+      </defs>
+
+      <!-- Column headers -->
+      <rect x="70" y="18" width="130" height="34" rx="6" fill="#e0e7ff" stroke="#3730a3" stroke-width="1.5"/>
+      <text x="135" y="40" font-size="12.5" font-weight="700" fill="#1e1b4b" text-anchor="middle" font-family="system-ui, sans-serif">Client (Kiro)</text>
+
+      <rect x="400" y="18" width="140" height="34" rx="6" fill="#d1fae5" stroke="#065f46" stroke-width="1.5"/>
+      <text x="470" y="40" font-size="12.5" font-weight="700" fill="#052e16" text-anchor="middle" font-family="system-ui, sans-serif">Server (your code)</text>
+
+      <!-- Lifelines removed - phase boxes and arrows are sufficient -->
+
+      <!-- ═══ Phase 1: Initialization ═══ -->
+      <rect x="30" y="64" width="680" height="130" rx="6" fill="#ede9fe" stroke="#7c3aed" stroke-width="1"/>
+      <text x="46" y="80" font-size="10" fill="#5b21b6" font-weight="800" letter-spacing="0.8" font-family="system-ui, sans-serif">INITIALIZATION</text>
+
+      <!-- 1a: initialize (Client → Server) -->
+      <line x1="80" y1="100" x2="480" y2="100" stroke="#3730a3" stroke-width="2" marker-end="url(#arrowhead)"/>
+      <text x="280" y="94" font-size="11" font-weight="700" fill="#1e1b4b" text-anchor="middle" font-family="'SF Mono', 'Fira Code', monospace">initialize</text>
+      <text x="500" y="104" font-size="11" fill="#374151" font-family="system-ui, sans-serif">"What version? What can you do?"</text>
+
+      <!-- 1b: initialize response (Server → Client) -->
+      <line x1="480" y1="130" x2="80" y2="130" stroke="#065f46" stroke-width="2" marker-end="url(#arrowhead-green)"/>
+      <text x="280" y="124" font-size="11" font-weight="700" fill="#065f46" text-anchor="middle" font-family="'SF Mono', 'Fira Code', monospace">initialize response</text>
+      <text x="500" y="134" font-size="11" fill="#374151" font-family="system-ui, sans-serif">"I support tools + resources"</text>
+
+      <!-- 1c: notifications/initialized (Client → Server) -->
+      <line x1="80" y1="160" x2="480" y2="160" stroke="#3730a3" stroke-width="2" marker-end="url(#arrowhead)"/>
+      <text x="280" y="154" font-size="10.5" font-weight="700" fill="#1e1b4b" text-anchor="middle" font-family="'SF Mono', 'Fira Code', monospace">notifications/initialized</text>
+      <text x="500" y="164" font-size="11" fill="#374151" font-family="system-ui, sans-serif">"OK, we're live"</text>
+
+      <!-- ═══ Phase 2: Discovery ═══ -->
+      <rect x="30" y="202" width="680" height="90" rx="6" fill="#e0f2fe" stroke="#0369a1" stroke-width="1"/>
+      <text x="46" y="218" font-size="10" fill="#0c4a6e" font-weight="800" letter-spacing="0.8" font-family="system-ui, sans-serif">DISCOVERY</text>
+
+      <!-- 2a: tools/list (Client → Server) -->
+      <line x1="80" y1="240" x2="480" y2="240" stroke="#3730a3" stroke-width="2" marker-end="url(#arrowhead)"/>
+      <text x="280" y="234" font-size="11" font-weight="700" fill="#1e1b4b" text-anchor="middle" font-family="'SF Mono', 'Fira Code', monospace">tools/list</text>
+      <text x="500" y="244" font-size="11" fill="#374151" font-family="system-ui, sans-serif">"What tools do you have?"</text>
+
+      <!-- 2b: tools/list response (Server → Client) -->
+      <line x1="480" y1="270" x2="80" y2="270" stroke="#065f46" stroke-width="2" marker-end="url(#arrowhead-green)"/>
+      <text x="280" y="264" font-size="11" font-weight="700" fill="#065f46" text-anchor="middle" font-family="'SF Mono', 'Fira Code', monospace">tools/list response</text>
+      <text x="500" y="274" font-size="11" fill="#374151" font-family="system-ui, sans-serif">"Here are my tools + schemas"</text>
+
+      <!-- ═══ Phase 3: Session Active ═══ -->
+      <rect x="30" y="300" width="680" height="100" rx="6" fill="#fef3c7" stroke="#b45309" stroke-width="1"/>
+      <text x="46" y="316" font-size="10" fill="#92400e" font-weight="800" letter-spacing="0.8" font-family="system-ui, sans-serif">SESSION ACTIVE</text>
+
+      <!-- 3a: tools/call (Client → Server) -->
+      <line x1="80" y1="340" x2="480" y2="340" stroke="#3730a3" stroke-width="2" marker-end="url(#arrowhead)"/>
+      <text x="280" y="334" font-size="11" font-weight="700" fill="#1e1b4b" text-anchor="middle" font-family="'SF Mono', 'Fira Code', monospace">tools/call</text>
+      <text x="500" y="344" font-size="11" fill="#374151" font-family="system-ui, sans-serif">"Run 'get-sprint-summary'"</text>
+
+      <!-- 3b: tools/call response (Server → Client) -->
+      <line x1="480" y1="372" x2="80" y2="372" stroke="#065f46" stroke-width="2" marker-end="url(#arrowhead-green)"/>
+      <text x="280" y="366" font-size="11" font-weight="700" fill="#065f46" text-anchor="middle" font-family="'SF Mono', 'Fira Code', monospace">tools/call response</text>
+      <text x="500" y="376" font-size="11" fill="#374151" font-family="system-ui, sans-serif">"Here's the result"</text>
+
+      <!-- ═══ Phase 4: Shutdown ═══ -->
+      <rect x="30" y="410" width="680" height="52" rx="6" fill="#fee2e2" stroke="#b91c1c" stroke-width="1"/>
+      <text x="46" y="426" font-size="10" fill="#7f1d1d" font-weight="800" letter-spacing="0.8" font-family="system-ui, sans-serif">SHUTDOWN</text>
+
+      <!-- 4a: shutdown (Client → Server) -->
+      <line x1="80" y1="446" x2="480" y2="446" stroke="#3730a3" stroke-width="2" marker-end="url(#arrowhead)"/>
+      <text x="280" y="440" font-size="11" font-weight="700" fill="#1e1b4b" text-anchor="middle" font-family="'SF Mono', 'Fira Code', monospace">shutdown</text>
+      <text x="500" y="450" font-size="11" fill="#374151" font-family="system-ui, sans-serif">"We're done"</text>
+    </svg>
+    <p class="demo-caption">The MCP connection lifecycle: initialize, discover tools, call tools during the session, then shut down. All messages are JSON-RPC over stdio.</p>
+  </div>
+
+  <h3>What the messages look like</h3>
+
+  <p><strong>1. Initialize request</strong> (Kiro → Server):</p>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "initialize",
+  "params": {
+    "protocolVersion": "2025-06-18",
+    "capabilities": { "roots": { "listChanged": true } },
+    "clientInfo": { "name": "Kiro", "version": "0.11.0" }
+  }
+}</code></pre>
+  </div>
+
+  <p><strong>2. Initialize response</strong> (Server → Kiro):</p>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "protocolVersion": "2025-06-18",
+    "capabilities": { "tools": {}, "resources": {} },
+    "serverInfo": { "name": "my-team-tools", "version": "1.0.0" }
+  }
+}</code></pre>
+  </div>
+
+  <p>The <code>capabilities</code> field is the negotiation - the server declares what it supports (tools, resources, prompts). Kiro only asks for things the server said it can do.</p>
+
+  <p><strong>3. Tool discovery</strong> (Kiro → Server):</p>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>{
+  "jsonrpc": "2.0",
+  "id": 2,
+  "method": "tools/list"
+}</code></pre>
+  </div>
+
+  <p><strong>4. Tool list response</strong> (Server → Kiro):</p>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>{
+  "jsonrpc": "2.0",
+  "id": 2,
+  "result": {
+    "tools": [{
+      "name": "get-sprint-summary",
+      "description": "Get a summary of the current sprint for a Jira project",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectKey": { "type": "string", "description": "The Jira project key" }
+        },
+        "required": ["projectKey"]
+      }
+    }]
+  }
+}</code></pre>
+  </div>
+
+  <p>This is what gets loaded into Kiro's context window - every tool's name, description, and full schema. This is why more tools = more context cost.</p>
+
+  <p><strong>5. Tool call</strong> (Kiro → Server):</p>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>{
+  "jsonrpc": "2.0",
+  "id": 3,
+  "method": "tools/call",
+  "params": {
+    "name": "get-sprint-summary",
+    "arguments": { "projectKey": "LMT" }
+  }
+}</code></pre>
+  </div>
+
+  <p><strong>6. Tool result</strong> (Server → Kiro):</p>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>{
+  "jsonrpc": "2.0",
+  "id": 3,
+  "result": {
+    "content": [{ "type": "text", "text": "Sprint summary for LMT:\n- 5 stories in progress..." }]
+  }
+}</code></pre>
+  </div>
+
+  <h3>Key takeaways from the protocol</h3>
+
+  <ul>
+    <li><strong>Capability negotiation</strong> - client and server agree on what's supported before anything else happens. This is why your server can expose only tools, only resources, or any combination.</li>
+    <li><strong>Stateless tool calls</strong> - each <code>tools/call</code> is independent. The server doesn't need to remember previous calls (though it can if you want).</li>
+    <li><strong>The context cost is in the discovery</strong> - the <code>tools/list</code> response (with all schemas) is what Kiro injects into context. The actual tool calls happen at runtime and only their results use tokens.</li>
+    <li><strong>JSON-RPC means request/response</strong> - every request has an ID, and the response matches that ID. This is how stdio (which is a raw stream) maintains order.</li>
+  </ul>
+
+  <div class="key-concept">
+    <strong>When this matters:</strong> If your MCP server is slow to respond or crashes, Kiro will see a timeout or error on the JSON-RPC response. If your server returns malformed JSON, the connection breaks. The SDK prevents most of these issues, but if you're debugging connectivity problems, knowing the protocol helps you inspect the raw messages.
+  </div>
+
+  <h2>Setup: Project Scaffolding</h2>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>mkdir my-mcp-server
+cd my-mcp-server
+npm init -y
+npm install @modelcontextprotocol/sdk zod
+npm install -D typescript @types/node</code></pre>
+  </div>
+
+  <p>Create a <code>tsconfig.json</code>:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "Node16",
+    "moduleResolution": "Node16",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true
+  },
+  "include": ["src/**/*"]
+}</code></pre>
+  </div>
+
+  <p>Add to <code>package.json</code>:</p>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>{
+  "type": "module",
+  "bin": { "my-mcp-server": "./dist/index.js" },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js"
+  }
+}</code></pre>
+  </div>
+
+  <h2>A Complete Working Server</h2>
+
+  <p>Here's a minimal server that exposes one tool - a Jira issue summariser that takes a project key and returns a formatted summary. This shows all the moving parts:</p>
+
+  <p>Create <code>src/index.ts</code>:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>#!/usr/bin/env node
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { z } from "zod";
+
+// 1. Create the server
+const server = new McpServer({
+  name: "my-team-tools",
+  version: "1.0.0",
+});
+
+// 2. Register a tool
+server.tool(
+  // Tool name (what appears in Kiro's tool list)
+  "get-sprint-summary",
+  // Description (helps the model decide when to use it)
+  "Get a summary of the current sprint for a Jira project",
+  // Input schema using Zod
+  {
+    projectKey: z.string().describe("The Jira project key, e.g. 'LMT'"),
+  },
+  // Handler function
+  async ({ projectKey }) => {
+    // Your logic here - call an API, query a DB, whatever
+    // This is a placeholder; replace with real Jira API call
+    const summary = `Sprint summary for ${projectKey}:\n` +
+      `- 5 stories in progress\n` +
+      `- 3 stories completed\n` +
+      `- 2 blocked items`;
+
+    return {
+      content: [{ type: "text", text: summary }],
+    };
+  }
+);
+
+// 3. Connect transport and start
+const transport = new StdioServerTransport();
+await server.connect(transport);</code></pre>
+  </div>
+
+  <h2>The Three Key Concepts</h2>
+
+  <h3>1. McpServer - the container</h3>
+  <p>Creates a server instance with a name and version. This is what clients see when they connect.</p>
+
+  <h3>2. server.tool() - registering capabilities</h3>
+  <p>Each call to <code>server.tool()</code> registers one tool. It takes:</p>
+  <ul>
+    <li><strong>name</strong> - identifier (what hooks match against with <code>@mcp</code>)</li>
+    <li><strong>description</strong> - helps the model decide when to call it</li>
+    <li><strong>input schema</strong> - Zod schema defining the parameters</li>
+    <li><strong>handler</strong> - async function that does the work and returns results</li>
+  </ul>
+
+  <h3>3. StdioServerTransport - how it communicates</h3>
+  <p>For local servers, stdio is the standard. The server reads JSON-RPC from stdin and writes responses to stdout. Kiro launches the process and handles the plumbing.</p>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <h2>Adding More Tools</h2>
+
+  <p>Just call <code>server.tool()</code> multiple times:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>server.tool(
+  "search-components",
+  "Search the Angular component library documentation",
+  {
+    query: z.string().describe("Search term, e.g. 'datepicker'"),
+    category: z.enum(["form", "layout", "navigation", "data"]).optional()
+      .describe("Optional category filter"),
+  },
+  async ({ query, category }) => {
+    // Search your component docs API
+    const results = await searchComponentDocs(query, category);
+    return {
+      content: [{ type: "text", text: JSON.stringify(results, null, 2) }],
+    };
+  }
+);
+
+server.tool(
+  "create-component-scaffold",
+  "Generate boilerplate for a new Angular component following team patterns",
+  {
+    name: z.string().describe("Component name in kebab-case, e.g. 'user-profile'"),
+    standalone: z.boolean().default(true).describe("Whether to create a standalone component"),
+  },
+  async ({ name, standalone }) => {
+    const scaffold = generateComponentBoilerplate(name, standalone);
+    return {
+      content: [{ type: "text", text: scaffold }],
+    };
+  }
+);</code></pre>
+  </div>
+
+  <h2>Building and Testing</h2>
+
+  <h3>Build</h3>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>npm run build</code></pre>
+  </div>
+
+  <h3>Test locally</h3>
+  <p>You can test with the MCP Inspector (a debugging tool):</p>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>npx @modelcontextprotocol/inspector node dist/index.js</code></pre>
+  </div>
+  <p>This opens a web UI where you can invoke tools and see responses.</p>
+
+  <h3>Connect to Kiro</h3>
+  <p>Add to your <code>.kiro/settings/mcp.json</code>:</p>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>{
+  "mcpServers": {
+    "my-team-tools": {
+      "command": "node",
+      "args": ["/absolute/path/to/my-mcp-server/dist/index.js"]
+    }
+  }
+}</code></pre>
+  </div>
+
+  <p>Or if you've published it to npm:</p>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>{
+  "mcpServers": {
+    "my-team-tools": {
+      "command": "npx",
+      "args": ["my-team-tools"]
+    }
+  }
+}</code></pre>
+  </div>
+
+  <h2>Adding Resources</h2>
+
+  <p>Resources make static data available without the model needing to "decide" to fetch it:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>server.resource(
+  "component-guidelines",
+  "file:///docs/component-guidelines",
+  async (uri) => ({
+    contents: [{
+      uri: uri.href,
+      mimeType: "text/markdown",
+      text: "# Component Guidelines\n\nAll components must be standalone..."
+    }]
+  })
+);</code></pre>
+  </div>
+
+  <h2>Adding Prompts</h2>
+
+  <p>Prompts are reusable templates users can invoke explicitly:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>server.prompt(
+  "code-review",
+  { file: z.string().describe("Path to the file to review") },
+  ({ file }) => ({
+    messages: [{
+      role: "user",
+      content: {
+        type: "text",
+        text: `Review ${file} for: security issues, performance problems, and Angular best practices. Be specific about line numbers.`
+      }
+    }]
+  })
+);</code></pre>
+  </div>
+
+  <h2>Environment Variables</h2>
+
+  <p>Pass secrets via the <code>env</code> field in <code>mcp.json</code>, then read them in your server:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>// In your server code
+const apiKey = process.env.MY_API_KEY;
+if (!apiKey) throw new Error("MY_API_KEY not set");</code></pre>
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>// In mcp.json
+{
+  "mcpServers": {
+    "my-team-tools": {
+      "command": "node",
+      "args": ["/path/to/dist/index.js"],
+      "env": {
+        "MY_API_KEY": "secret-value"
+      }
+    }
+  }
+}</code></pre>
+  </div>
+
+  <h2>The Full Development Loop</h2>
+
+  <ol>
+    <li><strong>Scaffold</strong> - <code>npm init</code>, install SDK + zod</li>
+    <li><strong>Define tools</strong> - <code>server.tool()</code> with Zod schemas and handlers</li>
+    <li><strong>Build</strong> - <code>tsc</code></li>
+    <li><strong>Test</strong> - MCP Inspector (<code>npx @modelcontextprotocol/inspector</code>)</li>
+    <li><strong>Connect</strong> - add to <code>mcp.json</code></li>
+    <li><strong>Use</strong> - Kiro sees the tools and calls them when relevant</li>
+    <li><strong>Iterate</strong> - add tools, rebuild, Kiro reconnects automatically</li>
+  </ol>
+
+  <div class="key-concept">
+    <strong>Hot reload:</strong> After changing and rebuilding your server, Kiro reconnects to MCP servers automatically when the config changes. Or you can manually reconnect from the MCP Servers panel in the Kiro sidebar.
+  </div>
+
+  <h2>When to Build vs. Use an Existing Server</h2>
+
+  <table>
+    <tr><th>Build your own when...</th><th>Use an existing server when...</th></tr>
+    <tr><td>The API/service is internal to your org</td><td>It's a public service (GitHub, Jira, Slack)</td></tr>
+    <tr><td>You need custom logic or formatting</td><td>The standard tools cover your needs</td></tr>
+    <tr><td>You want to wrap multiple APIs into one cohesive interface</td><td>A single existing server covers it</td></tr>
+    <tr><td>You need team-specific tooling</td><td>The community has already built it</td></tr>
+  </table>
+
+  <h2>Your Tangible Win</h2>
+
+  <p>You can now build a custom MCP server from scratch in TypeScript: scaffold the project, register tools with Zod schemas, test with MCP Inspector, and connect to Kiro. You know the full development loop and when building your own makes sense vs. using an existing server.</p>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <h2>Quiz</h2>
+
+  <div class="quiz" role="group">
+    <h3>What does Zod do in an MCP server?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Handles the JSON-RPC transport layer</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Defines and validates the input schema for each tool's parameters</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Manages authentication with the MCP client</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="quiz" role="group">
+    <h3>What transport should you use for a local MCP server that Kiro launches?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">StdioServerTransport - communicates over stdin/stdout</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">HttpServerTransport - listens on a port</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">WebSocketTransport - persistent bidirectional connection</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="quiz" role="group">
+    <h3>How do you test an MCP server before connecting it to Kiro?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Run it and check the console output</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Use the MCP Inspector (npx @modelcontextprotocol/inspector)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Write unit tests for the JSON-RPC handlers</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="recommended">
+    <strong>Recommended resources:</strong>
+    <a href="https://github.com/modelcontextprotocol/typescript-sdk">MCP TypeScript SDK on GitHub</a> and <a href="https://www.npmjs.com/package/@modelcontextprotocol/sdk">@modelcontextprotocol/sdk on npm</a>.
+  </div>
+
+  <div class="footer-nav">
+    <a href="05-mcp-using.html">&larr; Prev: MCP Servers: Using</a>
+    <a href="index.html">Index</a>
+    <a href="07-powers.html">Next: Powers &rarr;</a>
+  </div>
+
+    </main>
+  </div>
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

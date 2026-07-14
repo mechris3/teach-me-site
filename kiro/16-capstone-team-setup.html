@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>Capstone: Team Setup - Lesson 16 | Teach Me</title>
+  <meta name="description" content="Capstone project: combining steering, hooks, skills, MCP servers, powers, and custom agents into a complete team setup.">
+  <link rel="canonical" href="https://teachmeskills.dev/kiro/16-capstone-team-setup.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/kiro/16-capstone-team-setup.html">
+  <meta property="og:title" content="Capstone: Team Setup - Lesson 16 | Teach Me">
+  <meta property="og:description" content="Capstone project: combining steering, hooks, skills, MCP servers, powers, and custom agents into a complete team setup.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Capstone: Team Setup - Lesson 16 | Teach Me">
+  <meta name="twitter:description" content="Capstone project: combining steering, hooks, skills, MCP servers, powers, and custom agents into a complete team setup.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header"><a href="index.html">Kiro Course</a></div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-steering-the-foundation.html">1. Steering</a></li>
+        <li><a href="02-context-management.html">2. Context Management</a></li>
+        <li><a href="03-hooks.html">3. Hooks</a></li>
+        <li><a href="04-skills.html">4. Skills</a></li>
+        <li><a href="05-mcp-using.html">5. MCP: Using</a></li>
+        <li><a href="06-mcp-building.html">6. MCP: Building</a></li>
+        <li><a href="07-powers.html">7. Powers</a></li>
+        <li><a href="08-subagents.html">8. Sub-agents</a></li>
+        <li><a href="09-custom-agents.html">9. Custom Agents</a></li>
+        <li><a href="10-acp.html">10. ACP</a></li>
+        <li><a href="11-property-based-testing.html">11. Property Testing</a></li>
+        <li><a href="12-specs-as-living-artifacts.html">12. Specs</a></li>
+        <li><a href="13-model-selection.html">13. Model Selection</a></li>
+        <li><a href="14-multi-root-workspaces.html">14. Multi-root</a></li>
+        <li><a href="15-kiro-cli.html">15. Kiro CLI</a></li>
+        <li class="current"><a href="16-capstone-team-setup.html">16. Capstone</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="steering-reference.html">Steering Reference</a></li>
+        <li><a href="mcp-setup-guides.html">MCP Setup Guides</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 16</p>
+  <h1>Capstone - Designing a Team Kiro Setup</h1>
+
+  <h2>The Scenario</h2>
+
+  <p>You're setting up Kiro for an Angular 18 project. The team has 5 developers, uses Jira for tickets, GitHub for PRs, and deploys to AWS. You want to design the full <code>.kiro/</code> configuration that ships with the repo - so any team member who clones the project gets a properly configured Kiro experience out of the box.</p>
+
+  <p><em>Note: This example uses Angular, but the patterns apply to any framework. Replace Angular-specific conventions (standalone components, signals, ng lint) with your stack's equivalents - the structure and decision-making are universal.</em></p>
+
+  <p>This is the design exercise. Everything you've learned comes together here.</p>
+
+  <h2>The Complete .kiro/ Directory</h2>
+
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>.kiro/
+├── steering/
+│   ├── conventions.md              # Always-on: team-wide code standards
+│   ├── architecture.md             # Always-on: project structure, key decisions
+│   ├── component-patterns.md       # fileMatch: "src/app/**/*.component.ts"
+│   ├── service-patterns.md         # fileMatch: "src/app/**/*.service.ts"
+│   ├── testing-standards.md        # fileMatch: "**/*.spec.ts"
+│   ├── api-layer.md                # fileMatch: "src/app/services/api/**"
+│   └── deployment-guide.md         # Manual: only when deploying
+│
+├── hooks/
+│   ├── lint-on-save.json           # PostFileSave: run ng lint on .ts/.html
+│   ├── test-after-task.json        # PostTaskExec: run affected tests
+│   └── protect-prod-config.json    # PreToolUse: gate writes to environment.prod.ts
+│
+├── skills/
+│   ├── commit-message.md           # Generate commit messages from diff
+│   ├── pr-review.md                # Review PR against team standards
+│   └── new-feature.md              # Scaffold a new feature module
+│
+├── agents/
+│   └── researcher.md               # Read-only exploration agent
+│
+├── settings/
+│   └── mcp.json                    # MCP servers (project-specific only)
+│
+└── specs/
+    ├── auth--user-login/
+    ├── commerce--order-management/
+    └── ...</code></pre></div>
+
+  <h2>Layer by Layer: Design Decisions</h2>
+
+  <h3>Steering: What Kiro Always Knows</h3>
+
+  <p><strong>conventions.md</strong> (always-on) - kept short, cross-cutting:</p>
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>---
+inclusion: auto
+---
+
+# Team Conventions
+- Angular 18 with standalone components
+- State management: Angular signals (not NgRx for new code)
+- HTTP: HttpClient with typed responses, catchError in services
+- Styling: SCSS with design tokens from @company/tokens
+- Testing: Jest with Testing Library, property-based tests for business logic
+- Package manager: pnpm
+- Commit format: [branch-name] Short title\n\n- Details</code></pre></div>
+
+  <p><strong>component-patterns.md</strong> (fileMatch) - only loads when working on components:</p>
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>---
+inclusion: fileMatch
+fileMatchPattern: "src/app/**/*.component.ts"
+---
+
+# Component Patterns
+- Always standalone (no NgModules)
+- Use inject() not constructor injection
+- Use signals for local state
+- OnPush change detection for all components
+- Template: inline for &lt;20 lines, separate file otherwise
+- Prefer computed() over manual derivation</code></pre></div>
+
+  <p><strong>deployment-guide.md</strong> (manual) - large, only needed occasionally:</p>
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>---
+inclusion: manual
+---
+
+# Deployment Guide
+Refer to deployment procedures in #[[file:docs/deployment/runbook.md]]
+...</code></pre></div>
+
+  <h3>Hooks: What Happens Automatically</h3>
+
+  <p><strong>lint-on-save.json</strong> - catch issues immediately:</p>
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>{
+  "version": "v1",
+  "hooks": [{
+    "name": "Lint on Save",
+    "trigger": "PostFileSave",
+    "matcher": "\\.(ts|html)$",
+    "action": { "type": "command", "command": "bash -c 'FILE=$(cat | jq -r .filePath); npx ng lint --files \"$FILE\"'" }
+  }]
+}</code></pre></div>
+
+  <p><strong>test-after-task.json</strong> - verify spec tasks:</p>
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>{
+  "version": "v1",
+  "hooks": [{
+    "name": "Run Tests After Task",
+    "trigger": "PostTaskExec",
+    "action": { "type": "command", "command": "npx jest --passWithNoTests" }
+  }]
+}</code></pre></div>
+
+  <p><strong>protect-prod-config.json</strong> - safety gate:</p>
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>{
+  "version": "v1",
+  "hooks": [{
+    "name": "Protect Production Config",
+    "trigger": "PreToolUse",
+    "matcher": "fs_write|str_replace",
+    "action": {
+      "type": "command",
+      "command": "bash -c 'INPUT=$(cat); if echo \"$INPUT\" | grep -q \"environment.prod\"; then echo \"Modifying production config requires confirmation\" &gt;&amp;2; exit 2; fi; exit 0'"
+    }
+  }]
+}</code></pre></div>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <h3>Skills: Reusable Team Workflows</h3>
+
+  <p><strong>commit-message.md</strong>:</p>
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>---
+name: commit-message
+description: Generate a commit message from the current changes
+argument-hint: "Any extra context about this change?"
+---
+
+## Generate Commit Message
+
+1. Get the current branch: `git rev-parse --abbrev-ref HEAD`
+2. Get the diff: `git diff --cached` (or `git diff` if nothing staged)
+3. Format as:
+
+```
+[branch-name] Short imperative title (max 72 chars)
+
+- What changed (files/areas)
+- Why it changed (intent)
+- Any trade-offs or decisions made
+```</code></pre></div>
+
+  <p><strong>new-feature.md</strong>:</p>
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>---
+name: new-feature
+description: Scaffold a new feature module with component, service, routes, and tests
+argument-hint: "Feature name, e.g. 'user-settings'"
+---
+
+## Scaffold New Feature
+
+When asked to create a new feature:
+
+1. Create directory: src/app/features/{name}/
+2. Generate:
+   - {name}.component.ts (standalone, OnPush)
+   - {name}.service.ts (inject HttpClient)
+   - {name}.routes.ts (lazy-loaded route)
+   - {name}.component.spec.ts (Testing Library)
+3. Register the route in app.routes.ts
+4. Run lint and tests</code></pre></div>
+
+  <h3>MCP: External Tool Access</h3>
+
+  <p><strong>.kiro/settings/mcp.json</strong> - project-specific servers only (shared ones live in <code>~/.kiro/settings/mcp.json</code>):</p>
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>{
+  "mcpServers": {
+    "project-docs": {
+      "command": "node",
+      "args": ["./tools/docs-mcp-server/dist/index.js"],
+      "disabled": false
+    }
+  }
+}</code></pre></div>
+
+  <p>Shared servers (GitHub, Jira) go in each developer's global config - not committed to git (contains tokens).</p>
+
+  <h3>Custom Agents: Specialised Delegation</h3>
+
+  <p><strong>researcher.md</strong> - read-only exploration:</p>
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>---
+description: Explore and analyse code without making changes
+tools:
+  - read_file
+  - grep_search
+  - file_search
+  - list_directory
+---
+
+You are a read-only research agent for this Angular project.
+Explore the codebase and provide analysis. You cannot modify files or run commands.
+When investigating, always check: component hierarchy, service dependencies, route structure.</code></pre></div>
+
+  <h2>What Goes in Git vs What Doesn't</h2>
+
+  <table>
+    <tr><th>Committed to git (team-shared)</th><th>NOT committed (.gitignore)</th></tr>
+    <tr><td><code>.kiro/steering/</code></td><td><code>~/.kiro/settings/mcp.json</code> (has tokens)</td></tr>
+    <tr><td><code>.kiro/hooks/</code></td><td>Any file with API keys or secrets</td></tr>
+    <tr><td><code>.kiro/skills/</code></td><td></td></tr>
+    <tr><td><code>.kiro/agents/</code></td><td></td></tr>
+    <tr><td><code>.kiro/specs/</code></td><td></td></tr>
+    <tr><td><code>.kiro/settings/mcp.json</code> (if no secrets)</td><td></td></tr>
+  </table>
+
+  <div class="key-concept">
+    <strong>The rule:</strong> If it contains team knowledge (conventions, workflows, hooks) - commit it. If it contains personal secrets (API tokens) - global config or .gitignore.
+  </div>
+
+  <h2>Onboarding a New Team Member</h2>
+
+  <p>With this setup, a new developer's experience is:</p>
+
+  <ol>
+    <li><strong>Clone the repo</strong> - all steering, hooks, skills, agents, and specs come along</li>
+    <li><strong>Set up personal MCP</strong> - add GitHub/Jira tokens to <code>~/.kiro/settings/mcp.json</code> (one-time)</li>
+    <li><strong>Start coding</strong> - Kiro already knows the conventions, runs lint on save, uses the right patterns</li>
+  </ol>
+
+  <p>No "read the wiki." No "ask Dave how we do X." The configuration IS the onboarding.</p>
+
+  <h2>Evolution Over Time</h2>
+
+  <p>This isn't a one-time setup. The <code>.kiro/</code> directory evolves with the project:</p>
+
+  <ul>
+    <li><strong>New pattern emerges?</strong> - Add a steering file</li>
+    <li><strong>Team keeps making the same mistake?</strong> - Add a hook or agent-type PreToolUse prompt</li>
+    <li><strong>Repeating a workflow manually?</strong> - Create a skill</li>
+    <li><strong>New external tool needed?</strong> - Add MCP server (or power if occasional use)</li>
+    <li><strong>Standards change?</strong> - Update steering, Kiro adapts immediately</li>
+  </ul>
+
+  <p>Treat <code>.kiro/</code> like any other code - review changes in PRs, discuss in standups, iterate.</p>
+
+  <h2>The Decision Framework</h2>
+
+  <p>When you encounter a need, this is how to choose the right mechanism:</p>
+
+  <table>
+    <tr><th>Need</th><th>Mechanism</th><th>Why</th></tr>
+    <tr><td>"Kiro should always know X"</td><td>Steering (auto)</td><td>Persistent background knowledge</td></tr>
+    <tr><td>"Kiro should know X when working on Y files"</td><td>Steering (fileMatch)</td><td>Conditional, saves tokens</td></tr>
+    <tr><td>"Kiro should do X automatically when Y happens"</td><td>Hook</td><td>Event-driven automation</td></tr>
+    <tr><td>"Kiro should follow this procedure when I ask"</td><td>Skill</td><td>On-demand workflow instructions</td></tr>
+    <tr><td>"Kiro needs access to external service Z"</td><td>MCP server</td><td>Extends capabilities</td></tr>
+    <tr><td>"Kiro needs Z only sometimes (context-heavy)"</td><td>Power</td><td>On-demand MCP + steering bundle</td></tr>
+    <tr><td>"Kiro should delegate X with restricted tools"</td><td>Custom agent</td><td>Isolated, constrained execution</td></tr>
+    <tr><td>"This feature needs structured planning + verification"</td><td>Spec</td><td>Requirements &rarr; design &rarr; PBT verification</td></tr>
+  </table>
+
+  <h2>Your Tangible Win</h2>
+
+  <p>You've now seen every Kiro concept applied together in a realistic configuration. You have a complete reference design you can adapt for your own Angular project, a decision framework for choosing mechanisms, and an understanding of how the pieces connect.</p>
+
+  <p>You started this course knowing how to use Kiro for code generation. You now know how to <strong>shape</strong> Kiro - its knowledge, its automation, its tools, its constraints, and its verification - for yourself and your team.</p>
+
+  <h2>What To Do Next</h2>
+
+  <ol>
+    <li><strong>Audit your current project's <code>.kiro/</code></strong> - what's there? What's missing?</li>
+    <li><strong>Start with steering</strong> - add one always-on file with your core conventions</li>
+    <li><strong>Add one hook</strong> - lint-on-save is the lowest-risk, highest-value starting point</li>
+    <li><strong>Create one skill</strong> - the commit-message skill is immediately useful</li>
+    <li><strong>Try a bugfix spec</strong> - next bug, use the bugfix spec workflow and observe the PBT verification</li>
+    <li><strong>Set up Jira MCP</strong> - connect Kiro to your ticket system (see <a href="mcp-setup-guides.html">MCP Setup Guides</a>)</li>
+  </ol>
+
+  <h2>Course Complete</h2>
+
+  <p>16 lessons covering: steering, context management, hooks, skills, MCP (using + building), powers, sub-agents, custom agents, ACP, property-based testing, specs as living artifacts, model selection, multi-root workspaces, Kiro CLI, and this capstone.</p>
+
+  <p>If you want to go deeper on any topic (especially PBT or spec strategy), come back to this workspace and ask. The learning records track where you are, and new lessons can be added.</p>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <div class="recommended">
+    <strong>Recommended resources:</strong>
+    <a href="https://kiro.dev/docs/">Kiro Documentation</a>, <a href="https://kiro.dev/docs/steering/">Steering</a>, <a href="https://kiro.dev/docs/hooks/">Hooks</a>, <a href="https://kiro.dev/docs/skills/">Skills</a>, and <a href="https://kiro.dev/docs/specs/">Specs</a>.
+  </div>
+
+  <div class="footer-nav">
+    <a href="15-kiro-cli.html">&larr; Prev: Kiro CLI</a>
+    <a href="index.html">Index</a>
+  </div>
+
+    </main>
+  </div>
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

@@ -431,51 +431,51 @@ div.card[data-v]          → 0 IDs, 2 (class+attr), 1 elem   = (0, 2, 1)
   <div class="quiz" id="quiz1">
     <h3>Question 1</h3>
     <p>In the cascade resolution order, what is checked BEFORE specificity?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Source order</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Inheritance</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Origin/importance, inline styles, and layers</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Selector complexity</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Source order</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Inheritance</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Origin/importance, inline styles, and layers</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Selector complexity</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz2">
     <h3>Question 2</h3>
     <p>An element has style="color: blue" and a stylesheet rule .card { color: red !important }. Which wins?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Inline (blue) - inline always beats stylesheets</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">!important (red) - importance beats inline</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Neither - they cancel each other out</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Depends on specificity of .card</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Inline (blue) - inline always beats stylesheets</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">!important (red) - importance beats inline</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Neither - they cancel each other out</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Depends on specificity of .card</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz3">
     <h3>Question 3</h3>
     <p>Selector A has specificity (0, 3, 0). Selector B has specificity (1, 0, 0). Same layer, same origin. Which wins?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">A - higher total count (3 vs 1)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">B - one ID beats any number of classes</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Tie - need to check source order</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Depends on which came later in the file</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">A - higher total count (3 vs 1)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">B - one ID beats any number of classes</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Tie - need to check source order</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Depends on which came later in the file</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz4">
     <h3>Question 4</h3>
     <p>A property has no declaration on an element. It's an inheriting property (like color). What value does it get?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">transparent - the default for all CSS</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The initial value defined in the spec</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">The parent element's computed value</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">It remains undefined until JavaScript sets it</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">transparent - the default for all CSS</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The initial value defined in the spec</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">The parent element's computed value</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">It remains undefined until JavaScript sets it</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz5">
     <h3>Question 5</h3>
     <p>Two rules in the same layer have the same specificity. How is the winner determined?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The one with more properties wins</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">They merge - both apply</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">It's random - depends on browser</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Last in source order wins</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The one with more properties wins</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">They merge - both apply</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">It's random - depends on browser</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Last in source order wins</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="recommended">

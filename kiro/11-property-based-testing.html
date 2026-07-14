@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>Property-Based Testing - Lesson 11 | Teach Me</title>
+  <meta name="description" content="Property-based testing with Kiro: specs as executable properties, automated verification, and testing strategies.">
+  <link rel="canonical" href="https://teachmeskills.dev/kiro/11-property-based-testing.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/kiro/11-property-based-testing.html">
+  <meta property="og:title" content="Property-Based Testing - Lesson 11 | Teach Me">
+  <meta property="og:description" content="Property-based testing with Kiro: specs as executable properties, automated verification, and testing strategies.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Property-Based Testing - Lesson 11 | Teach Me">
+  <meta name="twitter:description" content="Property-based testing with Kiro: specs as executable properties, automated verification, and testing strategies.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header"><a href="index.html">Kiro Course</a></div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-steering-the-foundation.html">1. Steering</a></li>
+        <li><a href="02-context-management.html">2. Context Management</a></li>
+        <li><a href="03-hooks.html">3. Hooks</a></li>
+        <li><a href="04-skills.html">4. Skills</a></li>
+        <li><a href="05-mcp-using.html">5. MCP: Using</a></li>
+        <li><a href="06-mcp-building.html">6. MCP: Building</a></li>
+        <li><a href="07-powers.html">7. Powers</a></li>
+        <li><a href="08-subagents.html">8. Sub-agents</a></li>
+        <li><a href="09-custom-agents.html">9. Custom Agents</a></li>
+        <li><a href="10-acp.html">10. ACP</a></li>
+        <li class="current"><a href="11-property-based-testing.html">11. Property Testing</a></li>
+        <li><a href="12-specs-as-living-artifacts.html">12. Specs</a></li>
+        <li><a href="13-model-selection.html">13. Model Selection</a></li>
+        <li><a href="14-multi-root-workspaces.html">14. Multi-root</a></li>
+        <li><a href="15-kiro-cli.html">15. Kiro CLI</a></li>
+        <li><a href="16-capstone-team-setup.html">16. Capstone</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="steering-reference.html">Steering Reference</a></li>
+        <li><a href="mcp-setup-guides.html">MCP Setup Guides</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 11</p>
+  <h1>Property-Based Testing</h1>
+
+  <h2>The Problem with Traditional Unit Tests</h2>
+
+  <p>A traditional unit test is <strong>example-based</strong>: you pick specific inputs, define expected outputs, and verify they match.</p>
+
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>// Example-based test
+it('should add item to cart', () => {
+  const cart = new Cart();
+  cart.add(item1);
+  expect(cart.items.length).toBe(1);
+});</code></pre></div>
+
+  <p>The weakness: you're limited to the scenarios you think of. You test the happy path, maybe a few edge cases, and call it done. But the bugs that reach production are almost always in cases you didn't think to test.</p>
+
+  <p>This is even worse when AI writes both the code <em>and</em> the tests - the same blind spots exist in both.</p>
+
+  <h2>What Property-Based Testing Is</h2>
+
+  <p><strong>Note:</strong> PBT is an independent testing technique (originating in Haskell's QuickCheck, 1999) - not something Kiro invented. You can use fast-check directly in any project without Kiro. It's covered here because Kiro has built PBT into its spec workflow as the primary verification mechanism for generated code. Understanding PBT helps you understand what Kiro is doing during the "verify" step, and gives you a technique you can adopt independently of Kiro.</p>
+
+  <p>Instead of testing specific examples, you define <strong>properties</strong> - universal statements about how your system should behave for <em>any</em> valid input.</p>
+
+  <h3>What is a "property"?</h3>
+
+  <p>A property is a rule of the form: "for any valid input meeting certain preconditions, some expected behaviour must hold." Examples:</p>
+
+  <ul>
+    <li>"For any two numbers, <code>add(a, b)</code> equals <code>add(b, a)</code>" (commutativity)</li>
+    <li>"For any user and any active listing, adding it to favourites means it appears in their list" (invariant)</li>
+    <li>"For any order, the total is never negative" (contract)</li>
+    <li>"For any valid email string, <code>isValidEmail()</code> returns true" (correctness)</li>
+    <li>"For any item added then removed from a cart, the cart returns to its previous state" (round-trip)</li>
+  </ul>
+
+  <p>These are fundamentally different from "when I pass 'test@example.com', it returns true." Properties describe the <em>general rule</em>, not a specific instance.</p>
+
+  <h3>How fast-check executes properties</h3>
+
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>import * as fc from 'fast-check';
+
+// 1. Define an ARBITRARY - a generator for random valid inputs
+const arbitraryEmail = fc.emailAddress();
+const arbitraryUser = fc.record({
+  id: fc.uuid(),
+  name: fc.string({ minLength: 1, maxLength: 100 }),
+  email: arbitraryEmail,
+});
+
+// 2. Define the PROPERTY - what must always be true
+fc.assert(
+  fc.property(arbitraryUser, (user) => {
+    // This runs HUNDREDS of times with different random users
+    const created = createUser(user);
+    const fetched = getUser(created.id);
+
+    // The property: creating then fetching should return the same data
+    expect(fetched.name).toBe(user.name);
+    expect(fetched.email).toBe(user.email);
+  })
+);
+
+// 3. If any generated user causes a failure, fast-check SHRINKS:
+//    "Failed with user { name: '🎭', email: 'a+b@c.com' }"
+//    → shrinks to minimal failing case
+//    "Minimal failure: user { name: '\\', email: 'a@b.c' }"</code></pre></div>
+
+  <p>The framework does three things:</p>
+  <ol>
+    <li><strong>Generates</strong> - creates hundreds of random valid inputs based on your arbitrary definitions</li>
+    <li><strong>Checks</strong> - runs your property assertion against each one</li>
+    <li><strong>Shrinks</strong> - when a failure is found, reduces the input to the smallest case that still fails (making the bug obvious)</li>
+  </ol>
+
+  <h2>How Kiro Uses This - The Full Picture</h2>
+
+  <p>PBT isn't just a testing pattern you could use yourself - it's <strong>built into Kiro's spec workflow</strong> as the primary mechanism for verifying that generated code matches your intent. Here's why this matters:</p>
+
+  <h3>The AI-specific problem</h3>
+
+  <p>When AI generates code, who verifies it's correct? Traditionally:</p>
+  <ul>
+    <li>The AI writes code → the AI writes tests → same blind spots in both</li>
+    <li>You review manually → but for complex logic, you'd miss the same edge cases the AI did</li>
+  </ul>
+
+  <p>Kiro's solution: separate the concerns. The <strong>spec</strong> (your requirements) is the source of truth. Code and tests are derived <em>independently</em> from it:</p>
+
+  <div class="key-concept">
+    <strong>The key insight:</strong> Kiro derives property tests from the <strong>spec</strong>, not from the code. The spec produces both the code and the tests as two independent outputs. When they disagree, the code is wrong - because the spec represents your intent. This is fundamentally different from "write tests for this code", which can only confirm what the code does, not whether it's correct.
+  </div>
+
+  <p>If tests were derived from the code, they'd just validate internal consistency - the code does what the code does. Circular. By deriving tests from the spec instead, you get genuine verification: does the code do what you <em>intended</em>?</p>
+
+  <h3>The concrete flow in a Kiro spec session</h3>
+
+  <p>When you run a spec, this happens behind the scenes:</p>
+
+  <div class="demo">
+    <svg width="100%" height="680" viewBox="0 0 680 680" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagram showing the spec-to-verification flow: spec requirements are extracted into properties, then into fast-check tests, then verified against generated code">
+      <!-- Background - fixed light so text is always legible -->
+      <rect width="680" height="680" rx="12" fill="#f8f8f6"/>
+
+      <!-- Stage 1: SPEC -->
+      <rect x="60" y="30" width="560" height="90" rx="8" fill="#ede9fe" stroke="#6366f1" stroke-width="1.5"/>
+      <rect x="60" y="30" width="560" height="24" rx="8" fill="#c4b5fd"/>
+      <text x="340" y="47" font-size="11" font-weight="700" fill="#1e1b4b" text-anchor="middle" font-family="system-ui, sans-serif">YOUR SPEC (requirements.md)</text>
+      <text x="340" y="75" font-size="11.5" fill="#1e1b4b" text-anchor="middle" font-family="'SF Mono', monospace">"WHEN a user submits an order with items totalling over &#xA3;50,</text>
+      <text x="340" y="95" font-size="11.5" fill="#1e1b4b" text-anchor="middle" font-family="'SF Mono', monospace">THE System SHALL apply a 10% discount"</text>
+
+      <!-- Arrow 1 -->
+      <line x1="340" y1="120" x2="340" y2="155" stroke="#5b21b6" stroke-width="2"/>
+      <polygon points="340,160 335,152 345,152" fill="#5b21b6"/>
+      <text x="358" y="143" font-size="10.5" fill="#5b21b6" font-family="system-ui, sans-serif" font-weight="600">Kiro extracts testable properties</text>
+
+      <!-- Stage 2: PROPERTIES -->
+      <rect x="60" y="165" width="560" height="120" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+      <rect x="60" y="165" width="560" height="24" rx="8" fill="#c4b5fd"/>
+      <text x="340" y="182" font-size="11" font-weight="700" fill="#1e1b4b" text-anchor="middle" font-family="system-ui, sans-serif">PROPERTIES</text>
+      <circle cx="82" cy="210" r="3.5" fill="#6d28d9"/>
+      <text x="94" y="214" font-size="11" fill="#1f2937" font-family="system-ui, sans-serif">For ANY set of items where total &gt; 50: discount = total * 0.1</text>
+      <circle cx="82" cy="232" r="3.5" fill="#6d28d9"/>
+      <text x="94" y="236" font-size="11" fill="#1f2937" font-family="system-ui, sans-serif">For ANY set of items where total &#x2264; 50: discount = 0</text>
+      <circle cx="82" cy="254" r="3.5" fill="#6d28d9"/>
+      <text x="94" y="258" font-size="11" fill="#1f2937" font-family="system-ui, sans-serif">Discount is NEVER negative</text>
+      <circle cx="82" cy="276" r="3.5" fill="#6d28d9"/>
+      <text x="94" y="280" font-size="11" fill="#1f2937" font-family="system-ui, sans-serif">Discount NEVER exceeds the order total</text>
+
+      <!-- Arrow 2 -->
+      <line x1="340" y1="285" x2="340" y2="320" stroke="#0369a1" stroke-width="2"/>
+      <polygon points="340,325 335,317 345,317" fill="#0369a1"/>
+      <text x="358" y="307" font-size="10.5" fill="#0369a1" font-family="system-ui, sans-serif" font-weight="600">Kiro generates fast-check tests</text>
+
+      <!-- Stage 3: PROPERTY-BASED TESTS -->
+      <rect x="60" y="330" width="560" height="145" rx="8" fill="#e0f2fe" stroke="#0369a1" stroke-width="1.5"/>
+      <rect x="60" y="330" width="560" height="24" rx="8" fill="#7dd3fc"/>
+      <text x="340" y="347" font-size="11" font-weight="700" fill="#0c4a6e" text-anchor="middle" font-family="system-ui, sans-serif">PROPERTY-BASED TESTS</text>
+      <text x="82" y="372" font-size="10.5" fill="#1e1b4b" font-family="'SF Mono', monospace">fc.property(arbitraryOrderItems(), (items) =&gt; {</text>
+      <text x="100" y="389" font-size="10.5" fill="#1e1b4b" font-family="'SF Mono', monospace">const total = sum(items.map(i =&gt; i.price));</text>
+      <text x="100" y="406" font-size="10.5" fill="#1e1b4b" font-family="'SF Mono', monospace">const discount = calculateDiscount(items);</text>
+      <text x="100" y="423" font-size="10.5" fill="#1e1b4b" font-family="'SF Mono', monospace">if (total &gt; 50) expect(discount).toBeCloseTo(total * 0.1);</text>
+      <text x="100" y="440" font-size="10.5" fill="#1e1b4b" font-family="'SF Mono', monospace">else expect(discount).toBe(0);</text>
+      <text x="100" y="457" font-size="10.5" fill="#1e1b4b" font-family="'SF Mono', monospace">expect(discount).toBeGreaterThanOrEqual(0);</text>
+      <text x="82" y="470" font-size="10.5" fill="#1e1b4b" font-family="'SF Mono', monospace">});</text>
+
+      <!-- Arrow 3 -->
+      <line x1="340" y1="475" x2="340" y2="510" stroke="#047857" stroke-width="2"/>
+      <polygon points="340,515 335,507 345,507" fill="#047857"/>
+      <text x="358" y="497" font-size="10.5" fill="#047857" font-family="system-ui, sans-serif" font-weight="600">Tests run against generated code</text>
+
+      <!-- Stage 4: VERIFICATION -->
+      <rect x="60" y="520" width="560" height="130" rx="8" fill="#d1fae5" stroke="#047857" stroke-width="1.5"/>
+      <rect x="60" y="520" width="560" height="24" rx="8" fill="#6ee7b7"/>
+      <text x="340" y="537" font-size="11" font-weight="700" fill="#052e16" text-anchor="middle" font-family="system-ui, sans-serif">VERIFICATION</text>
+
+      <!-- Check mark -->
+      <text x="82" y="567" font-size="13" fill="#047857" font-family="system-ui, sans-serif">&#x2713;</text>
+      <text x="100" y="567" font-size="11" fill="#1f2937" font-family="system-ui, sans-serif">247 random inputs passed</text>
+
+      <!-- Cross mark -->
+      <text x="82" y="592" font-size="13" fill="#b91c1c" font-family="system-ui, sans-serif">&#x2717;</text>
+      <text x="100" y="592" font-size="11" fill="#7f1d1d" font-weight="600" font-family="system-ui, sans-serif">FAILED: items = [{price: 25.01}, {price: 25.00}]</text>
+      <text x="100" y="612" font-size="10.5" fill="#374151" font-family="system-ui, sans-serif">Expected discount: 5.001, Got: 5.00 (rounding bug)</text>
+
+      <!-- Fix arrow -->
+      <text x="82" y="640" font-size="13" fill="#4338ca" font-family="system-ui, sans-serif">&#x2192;</text>
+      <text x="100" y="640" font-size="11" fill="#3730a3" font-weight="600" font-family="system-ui, sans-serif">Kiro fixes the code and re-runs</text>
+    </svg>
+    <p class="demo-caption">The spec-to-verification pipeline: requirements are translated into properties, then into fast-check tests, then run against generated code. Failures feed back into code fixes automatically.</p>
+  </div>
+
+  <p>Notice: the property test found a rounding bug with a specific combination (£25.01 + £25.00 = £50.01 - just over the threshold). A hand-written test would likely have used round numbers and missed this.</p>
+
+  <h3>Where you see this in the IDE</h3>
+
+  <p>In a spec session:</p>
+  <ul>
+    <li>When Kiro executes tasks, look for a <strong>"Verify correctness"</strong> or <strong>"Run property tests"</strong> step</li>
+    <li>If verification fails, Kiro <strong>automatically fixes the code</strong> and re-runs - you see the feedback loop in the chat</li>
+    <li>The generated test file (usually <code>*.property.spec.ts</code> or similar) is committed alongside your code</li>
+    <li>These tests become part of your test suite - they run in CI like any other test</li>
+  </ul>
+
+  <h3>What makes this Kiro-specific (not just "use fast-check yourself")</h3>
+
+  <table>
+    <tr><th>If you used fast-check yourself</th><th>What Kiro does differently</th></tr>
+    <tr><td>You decide what properties to test</td><td>Kiro derives properties from your natural-language spec</td></tr>
+    <tr><td>You write the arbitraries (random generators)</td><td>Kiro generates appropriate arbitraries for your domain types</td></tr>
+    <tr><td>You run tests manually</td><td>Kiro runs them automatically as part of code generation</td></tr>
+    <tr><td>Failures require you to fix the code</td><td>Kiro uses failures as feedback to fix its own generated code</td></tr>
+    <tr><td>Properties might miss requirements</td><td>Properties are traced back to specific requirements - nothing is missed</td></tr>
+  </table>
+
+  <p>The key insight: PBT in Kiro isn't a tool you use - it's part of the <strong>code generation feedback loop</strong>. Kiro generates code, then immediately tries to break it with property tests, then fixes what breaks. You get more correct code on the first pass.</p>
+
+  <h3>When does Kiro NOT use PBT?</h3>
+
+  <ul>
+    <li><strong>Vibe mode</strong> - PBT is tied to specs. In vibe mode, there are no formal requirements to derive properties from.</li>
+    <li><strong>Pure UI work</strong> - template changes, styling, layout. PBT tests logic, not appearance.</li>
+    <li><strong>Simple file operations</strong> - renaming, moving, configuration changes.</li>
+    <li><strong>When requirements are vague</strong> - "make it look better" can't be translated into testable properties. Clear, specific requirements produce better PBT.</li>
+  </ul>
+
+  <div class="key-concept">
+    <strong>Practical tip:</strong> Write your spec requirements in EARS format ("WHEN X, THE System SHALL Y") and PBT quality improves dramatically. The more precise your requirements, the better the properties Kiro derives. Vague requirements → vague properties → weak tests.
+  </div>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <h3>How to make PBT work harder for you</h3>
+
+  <ol>
+    <li><strong>Use spec mode for logic-heavy features</strong> - PBT only triggers in spec mode, not vibe</li>
+    <li><strong>Write precise requirements</strong> - "SHALL apply 10% discount" is testable; "should handle discounts" isn't</li>
+    <li><strong>Include boundary conditions in requirements</strong> - "WHEN total is exactly £50" forces Kiro to test the boundary</li>
+    <li><strong>Keep the generated property tests</strong> - they're valuable regression protection even after the initial generation</li>
+    <li><strong>Ask explicitly</strong> - "Verify this implementation against the spec using property-based tests" if Kiro doesn't do it automatically</li>
+  </ol>
+
+  <h2>Concrete Example</h2>
+
+  <p>Your spec requirement:</p>
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>WHEN a user adds a listing to favourites,
+THE System SHALL display it in their favourites list.</code></pre></div>
+
+  <p>Traditional test (example-based):</p>
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>it('user A adds listing #5 to favourites', () => {
+  addToFavourites(userA, listing5);
+  expect(getFavourites(userA)).toContain(listing5);
+});</code></pre></div>
+
+  <p>Property-based test (what Kiro generates):</p>
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>it('any user adding any active listing to favourites should see it in their list', () => {
+  fc.assert(
+    fc.property(
+      arbitraryUser(),
+      arbitraryActiveListing(),
+      (user, listing) => {
+        addToFavourites(user, listing);
+        expect(getFavourites(user)).toContain(listing);
+      }
+    )
+  );
+});</code></pre></div>
+
+  <p>The property test checks this with: users with special characters in names, listings with extreme prices, users with empty favourites lists, users with 1000 existing favourites, and hundreds more combinations - catching edge cases you'd never think to write manually.</p>
+
+  <h2>What This Catches That Unit Tests Miss</h2>
+
+  <ul>
+    <li><strong>Boundary conditions</strong> - empty strings, zero values, maximum lengths</li>
+    <li><strong>Encoding issues</strong> - special characters, unicode, emoji in inputs</li>
+    <li><strong>Ordering bugs</strong> - operations that should be commutative but aren't</li>
+    <li><strong>State-dependent failures</strong> - bugs that only appear with specific combinations</li>
+    <li><strong>Off-by-one errors</strong> - tested with ranges that hit exact boundaries</li>
+  </ul>
+
+  <div class="key-concept">
+    <strong>Why PBT catches what reviews miss:</strong> A seemingly correct implementation of API key storage could pass all hand-written tests but fail a property-based test - because PBT generates keys with special characters, extreme lengths, and unicode that no one thought to test manually. Code review checks logic, not exhaustive input combinations.
+  </div>
+
+  <h2>How to Trigger PBT in Kiro</h2>
+
+  <p>Property-based testing is part of the <strong>spec workflow</strong>. When you use spec mode:</p>
+
+  <ol>
+    <li>Create a spec with clear requirements (EARS-format helps)</li>
+    <li>Kiro generates the implementation tasks</li>
+    <li>When tasks execute, Kiro generates property-based tests alongside the code</li>
+    <li>Look for a "Verify" or "Correctness" step - that's where PBT runs</li>
+  </ol>
+
+  <p>You can also ask explicitly: "Generate property-based tests for this service" or "Verify this code against the spec using PBT."</p>
+
+  <h2>The Library: fast-check</h2>
+
+  <p>Kiro uses <a href="https://github.com/dubzzz/fast-check">fast-check</a> for TypeScript/JavaScript PBT. It provides:</p>
+
+  <ul>
+    <li><strong>Arbitraries</strong> - generators for random data (strings, numbers, arrays, records, custom types)</li>
+    <li><strong>Properties</strong> - assertions that should hold for all generated inputs</li>
+    <li><strong>Shrinking</strong> - when a test fails, it automatically reduces the input to the minimal failing case</li>
+  </ul>
+
+  <h3>Where AI stops and fast-check starts</h3>
+
+  <p>fast-check has no AI in it. It's purely algorithmic - deterministic pseudo-random generation based on type constraints. It predates the AI era (2017). The division of labour:</p>
+
+  <table>
+    <tr><th></th><th>AI (Kiro)</th><th>fast-check (no AI)</th></tr>
+    <tr><td><strong>Does what</strong></td><td>Reads your spec, decides what properties to test, writes the fast-check code</td><td>Executes the tests - generates random inputs, checks assertions, shrinks failures</td></tr>
+    <tr><td><strong>Kind of "smart"</strong></td><td>Understanding intent, reasoning about requirements</td><td>Exhaustive exploration of input space, minimal counterexample finding</td></tr>
+    <tr><td><strong>Deterministic?</strong></td><td>No - LLM output varies</td><td>Yes - same seed produces same inputs</td></tr>
+  </table>
+
+  <p>The AI's job is <em>writing</em> the property tests. fast-check's job is <em>running</em> them exhaustively. Two different kinds of "smart" working together.</p>
+
+  <p>fast-check integrates with Jest, Vitest, and other test runners you're already using. It's not a separate framework - it plugs into your existing test setup.</p>
+
+  <h2>PBT vs Unit Tests: Complementary, Not Replacement</h2>
+
+  <table>
+    <tr><th></th><th>Unit tests (example-based)</th><th>Property-based tests</th></tr>
+    <tr><td><strong>What you define</strong></td><td>Specific input → expected output</td><td>A rule that must hold for ALL valid inputs</td></tr>
+    <tr><td><strong>Coverage</strong></td><td>Only the cases you thought of</td><td>Hundreds of randomly generated cases</td></tr>
+    <tr><td><strong>Finds</strong></td><td>Regressions in known scenarios</td><td>Edge cases you never considered</td></tr>
+    <tr><td><strong>Readability</strong></td><td>Clear - one input, one output</td><td>More abstract - describes a general rule</td></tr>
+    <tr><td><strong>Speed</strong></td><td>Fast (few cases)</td><td>Slower (hundreds of cases)</td></tr>
+    <tr><td><strong>Best for</strong></td><td>Critical paths, specific bug fixes</td><td>Invariants, contracts, spec compliance</td></tr>
+  </table>
+
+  <p>You keep both. Unit tests for clarity and regression coverage. Property tests for finding bugs you didn't think to look for.</p>
+
+  <h2>Keep Your Specs - They're Not Disposable</h2>
+
+  <p>Since specs are the source from which both code and tests are derived, they're living documentation - not scaffolding you discard once the feature ships. Reasons to commit them to git alongside the code:</p>
+
+  <ul>
+    <li><strong>Re-verification</strong> - change the code later, re-run property tests to confirm it still satisfies the original intent</li>
+    <li><strong>Onboarding</strong> - new team members read the spec to understand <em>what</em> the feature should do, not just <em>how</em> it's implemented</li>
+    <li><strong>Spec evolution</strong> - when requirements change, update the spec and Kiro re-derives tests for the new behaviour</li>
+    <li><strong>Traceability</strong> - every test traces back to a specific requirement. When a test fails, you know which requirement is violated.</li>
+  </ul>
+
+  <p>Kiro stores specs in <code>.kiro/specs/</code> and they're designed to be committed. They're the "why" that outlives any particular implementation.</p>
+
+  <h2>When Kiro Does This Automatically</h2>
+
+  <p>In spec mode, Kiro will often generate PBT without you asking - it's part of the verification step. You'll see it when:</p>
+
+  <ul>
+    <li>A spec has clear, testable requirements</li>
+    <li>The code involves data transformations, state changes, or business logic</li>
+    <li>Kiro detects invariants in your requirements (anything with "shall always", "for any", "regardless of")</li>
+  </ul>
+
+  <p>For purely UI/template work, PBT is less relevant - it shines with logic, not layout.</p>
+
+  <h2>Your Tangible Win</h2>
+
+  <p>You now understand what property-based testing is, how it differs from example-based testing, why it catches bugs that unit tests miss, and how Kiro uses it as part of the spec-to-code verification loop. You know it uses fast-check, integrates with your existing test runner, and triggers automatically in spec mode for logic-heavy requirements.</p>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <h2>Quiz</h2>
+
+  <div class="quiz" role="group">
+    <h3>A property-based test differs from a unit test in that:</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">It tests more slowly but with better coverage</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">It defines a rule that must hold for any valid input, then generates hundreds of random inputs to verify</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">It replaces unit tests entirely</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="quiz" role="group">
+    <h3>Kiro's PBT flow in spec mode starts from:</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The generated code - Kiro infers properties from implementations</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">The spec requirements - Kiro translates them into testable properties</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Existing unit tests - Kiro converts them to property tests</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="quiz" role="group">
+    <h3>"Shrinking" in fast-check means:</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Reducing the number of tests to run faster</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Compressing test output for readability</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">When a test fails, automatically reducing the input to the smallest case that still fails</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="recommended">
+    <strong>Recommended resources:</strong>
+    <a href="https://kiro.dev/docs/specs/correctness/">Kiro: Correctness with Property-Based Tests</a> and <a href="https://github.com/dubzzz/fast-check">fast-check on GitHub</a>.
+  </div>
+
+  <div class="footer-nav">
+    <a href="10-acp.html">&larr; Prev: Agent Client Protocol</a>
+    <a href="index.html">Index</a>
+    <a href="12-specs-as-living-artifacts.html">Next: Specs as Living Artifacts &rarr;</a>
+  </div>
+
+    </main>
+  </div>
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

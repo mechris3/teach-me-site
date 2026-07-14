@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>Context Management - Lesson 2 | Teach Me</title>
+  <meta name="description" content="Understanding Kiro's context window: what goes in, the token budget, compaction, active files, and how to manage context effectively across sessions.">
+  <link rel="canonical" href="https://teachmeskills.dev/kiro/02-context-management.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/kiro/02-context-management.html">
+  <meta property="og:title" content="Context Management - Lesson 2 | Teach Me">
+  <meta property="og:description" content="Understanding Kiro's context window: what goes in, the token budget, compaction, active files, and how to manage context effectively across sessions.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Context Management - Lesson 2 | Teach Me">
+  <meta name="twitter:description" content="Understanding Kiro's context window: what goes in, the token budget, compaction, active files, and how to manage context effectively across sessions.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header"><a href="index.html">Kiro Course</a></div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-steering-the-foundation.html">1. Steering</a></li>
+        <li class="current"><a href="02-context-management.html">2. Context Management</a></li>
+        <li><a href="03-hooks.html">3. Hooks</a></li>
+        <li><a href="04-skills.html">4. Skills</a></li>
+        <li><a href="05-mcp-using.html">5. MCP: Using</a></li>
+        <li><a href="06-mcp-building.html">6. MCP: Building</a></li>
+        <li><a href="07-powers.html">7. Powers</a></li>
+        <li><a href="08-subagents.html">8. Sub-agents</a></li>
+        <li><a href="09-custom-agents.html">9. Custom Agents</a></li>
+        <li><a href="10-acp.html">10. ACP</a></li>
+        <li><a href="11-property-based-testing.html">11. Property Testing</a></li>
+        <li><a href="12-specs-as-living-artifacts.html">12. Specs</a></li>
+        <li><a href="13-model-selection.html">13. Model Selection</a></li>
+        <li><a href="14-multi-root-workspaces.html">14. Multi-root</a></li>
+        <li><a href="15-kiro-cli.html">15. Kiro CLI</a></li>
+        <li><a href="16-capstone-team-setup.html">16. Capstone</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="steering-reference.html">Steering Reference</a></li>
+        <li><a href="mcp-setup-guides.html">MCP Setup Guides</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 2</p>
+  <h1>Context Management</h1>
+
+  <h2>What This Lesson Is About</h2>
+
+  <p>Every time you send a message, Kiro assembles a <strong>context window</strong> - the complete set of information the model can see when generating a response. Understanding what goes in, in what order, and what happens when space runs out is the difference between Kiro working with full awareness vs. working half-blind.</p>
+
+  <h2>What Goes Into the Context Window</h2>
+
+  <p>Here's everything that can end up in the context, roughly in the order Kiro assembles it:</p>
+
+  <div class="demo">
+    <svg width="100%" height="520" viewBox="0 0 680 520" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagram showing the layers of Kiro's context window from system prompt at the top to tool results at the bottom">
+      <!-- Background -->
+      <rect width="680" height="520" rx="12" fill="var(--demo-svg-bg, #f3f2ed)"/>
+
+      <!-- Title -->
+      <text x="340" y="30" font-size="13" font-weight="600" fill="var(--text, #1a1a2e)" text-anchor="middle" font-family="system-ui, sans-serif">Context Window Assembly Order</text>
+
+      <!-- Layer 1: System prompt -->
+      <rect x="40" y="48" width="420" height="38" rx="6" fill="#6366f1" opacity="0.15" stroke="#6366f1" stroke-width="1.5"/>
+      <text x="56" y="72" font-size="12" font-weight="600" fill="var(--text, #1a1a2e)" font-family="system-ui, sans-serif">1. System prompt</text>
+      <text x="480" y="72" font-size="10.5" fill="var(--muted, #666)" font-family="system-ui, sans-serif">Fixed, you can't change this</text>
+
+      <!-- Layer 2-3: Steering -->
+      <rect x="40" y="96" width="420" height="62" rx="6" fill="#8b5cf6" opacity="0.12" stroke="#8b5cf6" stroke-width="1.5"/>
+      <text x="56" y="118" font-size="12" font-weight="600" fill="var(--text, #1a1a2e)" font-family="system-ui, sans-serif">2. Always-on steering files</text>
+      <text x="480" y="118" font-size="10.5" fill="var(--muted, #666)" font-family="system-ui, sans-serif">.kiro/steering/ (inclusion: auto)</text>
+      <text x="56" y="142" font-size="12" font-weight="600" fill="var(--text, #1a1a2e)" font-family="system-ui, sans-serif">3. Global steering files</text>
+      <text x="480" y="142" font-size="10.5" fill="var(--muted, #666)" font-family="system-ui, sans-serif">~/.kiro/steering/ (inclusion: auto)</text>
+
+      <!-- Layer 4-5: Active file -->
+      <rect x="40" y="168" width="420" height="62" rx="6" fill="#0ea5e9" opacity="0.12" stroke="#0ea5e9" stroke-width="1.5"/>
+      <text x="56" y="190" font-size="12" font-weight="600" fill="var(--text, #1a1a2e)" font-family="system-ui, sans-serif">4. Active file context</text>
+      <text x="480" y="190" font-size="10.5" fill="var(--muted, #666)" font-family="system-ui, sans-serif">Your currently active editor tab</text>
+      <text x="56" y="214" font-size="12" font-weight="600" fill="var(--text, #1a1a2e)" font-family="system-ui, sans-serif">5. fileMatch steering (if triggered)</text>
+      <text x="480" y="214" font-size="10.5" fill="var(--muted, #666)" font-family="system-ui, sans-serif">Activated by files entering context</text>
+
+      <!-- Layer 6: Conversation history -->
+      <rect x="40" y="240" width="420" height="38" rx="6" fill="#10b981" opacity="0.12" stroke="#10b981" stroke-width="1.5"/>
+      <text x="56" y="264" font-size="12" font-weight="600" fill="var(--text, #1a1a2e)" font-family="system-ui, sans-serif">6. Conversation history</text>
+      <text x="480" y="264" font-size="10.5" fill="var(--muted, #666)" font-family="system-ui, sans-serif">Previous messages in this session</text>
+
+      <!-- Layer 7-9: Your message -->
+      <rect x="40" y="288" width="420" height="86" rx="6" fill="#f59e0b" opacity="0.12" stroke="#f59e0b" stroke-width="1.5"/>
+      <text x="56" y="312" font-size="12" font-weight="600" fill="var(--text, #1a1a2e)" font-family="system-ui, sans-serif">7. Your current message</text>
+      <text x="480" y="312" font-size="10.5" fill="var(--muted, #666)" font-family="system-ui, sans-serif">What you just typed</text>
+      <text x="56" y="336" font-size="12" font-weight="600" fill="var(--text, #1a1a2e)" font-family="system-ui, sans-serif">8. Explicit context you attached</text>
+      <text x="480" y="336" font-size="10.5" fill="var(--muted, #666)" font-family="system-ui, sans-serif">#File, #Folder, #Problems, etc.</text>
+      <text x="56" y="360" font-size="12" font-weight="600" fill="var(--text, #1a1a2e)" font-family="system-ui, sans-serif">9. Manual steering (if invoked)</text>
+      <text x="480" y="360" font-size="10.5" fill="var(--muted, #666)" font-family="system-ui, sans-serif">/ or # invoked steering</text>
+
+      <!-- Layer 10: Tool results -->
+      <rect x="40" y="384" width="420" height="38" rx="6" fill="#ef4444" opacity="0.12" stroke="#ef4444" stroke-width="1.5"/>
+      <text x="56" y="408" font-size="12" font-weight="600" fill="var(--text, #1a1a2e)" font-family="system-ui, sans-serif">10. Tool results</text>
+      <text x="480" y="408" font-size="10.5" fill="var(--muted, #666)" font-family="system-ui, sans-serif">Files read, commands run, searches</text>
+
+      <!-- Arrow indicating order -->
+      <line x1="20" y1="55" x2="20" y2="415" stroke="var(--muted, #999)" stroke-width="1.5" stroke-dasharray="4 3"/>
+      <polygon points="20,420 16,412 24,412" fill="var(--muted, #999)"/>
+      <text x="20" y="445" font-size="9" fill="var(--muted, #666)" text-anchor="middle" font-family="system-ui, sans-serif">Assembly</text>
+      <text x="20" y="457" font-size="9" fill="var(--muted, #666)" text-anchor="middle" font-family="system-ui, sans-serif">order</text>
+
+      <!-- Legend -->
+      <rect x="40" y="472" width="10" height="10" rx="2" fill="#6366f1" opacity="0.3"/>
+      <text x="56" y="481" font-size="9.5" fill="var(--muted, #666)" font-family="system-ui, sans-serif">Always present</text>
+      <rect x="160" y="472" width="10" height="10" rx="2" fill="#0ea5e9" opacity="0.3"/>
+      <text x="176" y="481" font-size="9.5" fill="var(--muted, #666)" font-family="system-ui, sans-serif">Conditional</text>
+      <rect x="270" y="472" width="10" height="10" rx="2" fill="#f59e0b" opacity="0.3"/>
+      <text x="286" y="481" font-size="9.5" fill="var(--muted, #666)" font-family="system-ui, sans-serif">Per-message</text>
+      <rect x="380" y="472" width="10" height="10" rx="2" fill="#ef4444" opacity="0.3"/>
+      <text x="396" y="481" font-size="9.5" fill="var(--muted, #666)" font-family="system-ui, sans-serif">Agent-driven</text>
+    </svg>
+    <p class="demo-caption">The context window is assembled top-to-bottom. Items higher in the stack are always present; lower items are conditional or generated during the session.</p>
+  </div>
+
+  <p>Not everything here is present every time. Only items 1, 2 (if they exist), 6, and 7 are guaranteed. Everything else depends on what's active, what you've referenced, and what the agent has done.</p>
+
+  <h2>Context Keys: The # Menu</h2>
+
+  <p>When you type <code>#</code> in the chat input, you get a menu of things you can explicitly pull into context. These are the built-in context keys:</p>
+
+  <table>
+    <tr><th>Context Key</th><th>What it adds</th></tr>
+    <tr><td><code>#File</code></td><td>Contents of a specific file you select</td></tr>
+    <tr><td><code>#Folder</code></td><td>File tree structure of a folder (not file contents)</td></tr>
+    <tr><td><code>#Problems</code></td><td>Current diagnostics/errors from your editor</td></tr>
+    <tr><td><code>#Terminal</code></td><td>Recent terminal output</td></tr>
+    <tr><td><code>#Git Diff</code></td><td>Your current uncommitted changes</td></tr>
+    <tr><td><em>Manual steering files</em></td><td>Content of any <code>inclusion: manual</code> steering file</td></tr>
+  </table>
+
+  <p>These are additive - each one you select injects more content into the context for that message. Choose deliberately; each one uses tokens.</p>
+
+  <h2>The Token Budget</h2>
+
+  <p>The context window has a fixed size (determined by the model - up to 1M tokens for the latest Claude models, though some models still use 200K). Everything listed above competes for space in that window. This is why always-on steering should be concise: it takes up space on <em>every single message</em>, leaving less room for the actual work.</p>
+
+  <p>Here's a rough sense of the cost:</p>
+
+  <table>
+    <tr><th>Content</th><th>Typical token cost</th></tr>
+    <tr><td>System prompt</td><td>~3,000 - 5,000 tokens (fixed)</td></tr>
+    <tr><td>A steering file</td><td>200 - 2,000 tokens per file</td></tr>
+    <tr><td>A source code file</td><td>500 - 5,000 tokens (depends on size)</td></tr>
+    <tr><td>Conversation history (10 exchanges)</td><td>5,000 - 20,000 tokens</td></tr>
+    <tr><td><code>#Git Diff</code> (moderate changes)</td><td>1,000 - 10,000 tokens</td></tr>
+  </table>
+
+  <p>You don't need to count tokens manually. The point is: context is a finite resource, and everything in the diagram above shares it.</p>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <h2>What Happens When Space Runs Out: Compaction</h2>
+
+  <p>As a conversation gets long, the accumulated history eventually approaches the context window limit. When this happens, Kiro performs <strong>compaction</strong> - it summarises older parts of the conversation into a condensed form, freeing up space for new content.</p>
+
+  <p>What gets compacted:</p>
+  <ul>
+    <li><strong>Older conversation turns</strong> - early messages and their responses get summarised</li>
+    <li><strong>Tool results from earlier turns</strong> - the full file contents Kiro read earlier get condensed into summaries of what was learned</li>
+  </ul>
+
+  <p>What is <em>never</em> compacted:</p>
+  <ul>
+    <li><strong>Steering files</strong> - they're re-injected fresh every message, never summarised</li>
+    <li><strong>Your current message</strong> - always present in full</li>
+    <li><strong>The system prompt</strong> - always present in full</li>
+  </ul>
+
+  <div class="key-concept">
+    <strong>Practical implication:</strong> After a long session, Kiro may lose the details of files it read 20 messages ago. If you notice it making assumptions about code it read earlier, it may be working from a compacted summary. Referencing the file again (with <code>#File</code> or asking Kiro to re-read it) brings the full content back into context.
+  </div>
+
+  <h2>The Active Editor File</h2>
+
+  <p>Kiro automatically includes your <strong>currently active editor tab</strong> as context. You've seen this in our sessions - the <code>&lt;ACTIVE-EDITOR-FILE&gt;</code> section that appears in the environment context.</p>
+
+  <p>This is significant because:</p>
+  <ul>
+    <li>It triggers fileMatch steering without you explicitly referencing anything</li>
+    <li>It gives Kiro awareness of what you're looking at, even if you don't mention it</li>
+    <li>Switching tabs changes what Kiro sees - if you switch to a CSS file, any TS-specific fileMatch steering deactivates</li>
+  </ul>
+
+  <p>Files that are merely <em>open</em> in background tabs are not included. Only the active (focused) tab counts.</p>
+
+  <h3>Split editor layouts</h3>
+
+  <p>If you have two files side-by-side in a split layout, only the pane <em>with focus</em> (the one with the blinking cursor) counts as active. The other pane is treated the same as a background tab - Kiro sees its name in the open files list but not its content.</p>
+
+  <h3>The "unwanted active file" problem</h3>
+
+  <p>The active file is determined by whether an <em>editor pane</em> has focus. If you click into the chat input to type your message, the editor loses focus and Kiro reports no active file - meaning no file content is sent.</p>
+
+  <p>So in practice: if you click into the chat panel before sending, no active file is included. The active file only gets sent if you had an editor pane focused when you triggered the message (e.g. via a keyboard shortcut that doesn't move focus from the editor).</p>
+
+  <p>This makes it less intrusive than it might sound - but it's still worth being aware of, especially if you use keyboard shortcuts that keep editor focus.</p>
+
+  <h2>Open Editor Files vs Active File</h2>
+
+  <p>Kiro also receives a list of the <em>names</em> of files you have open in editor tabs (the <code>&lt;OPEN-EDITOR-FILES&gt;</code> list). This gives Kiro awareness of what you're working on - useful for understanding your context - but it does <strong>not</strong> include their contents. Only the active file's content is injected.</p>
+
+  <p>You can't see the raw context Kiro receives - there's no "show context" panel in the IDE. But you can infer its effect: Kiro may reference files you have open without you explicitly mentioning them, because it can see their names in this list.</p>
+
+  <h2>How This Connects to Steering</h2>
+
+  <p>Now you can see the full picture from <a href="01-steering-the-foundation.html">Lesson 1</a>:</p>
+
+  <ul>
+    <li><strong>Always-on steering</strong> - occupies space on every message, regardless. Budget it carefully.</li>
+    <li><strong>fileMatch steering</strong> - only enters the context when a matching file is the active tab, is referenced via <code>#</code>, or is read by the agent. Free when not relevant.</li>
+    <li><strong>Manual steering</strong> - only enters the context when you invoke it. Zero cost by default.</li>
+  </ul>
+
+  <p>This is <em>why</em> the inclusion modes exist: they're tools for managing a scarce resource (context window space) efficiently.</p>
+
+  <h2>Practical Tips</h2>
+
+  <ul>
+    <li><strong>Start sessions with context, not history.</strong> In a new session, Kiro has no memory of previous sessions. If you need continuity, use steering files or reference key files - don't rely on Kiro "remembering."</li>
+    <li><strong>Use <code>#File</code> deliberately.</strong> Adding a large file uses tokens. If you only need Kiro to see a function, mention the function name and let the agent read just that part.</li>
+    <li><strong>Watch for stale context in long sessions.</strong> If Kiro seems to forget earlier decisions, it's likely been compacted. Re-state what matters or re-reference the file.</li>
+    <li><strong>Steering is your session memory.</strong> Anything you want Kiro to always know should be in steering, not repeated in chat. Steering is re-injected fresh; chat history gets compacted.</li>
+  </ul>
+
+  <h2>Your Tangible Win</h2>
+
+  <p>You now understand the full lifecycle of context in Kiro: what goes in, what triggers conditional content, what happens in long sessions, and how to manage it. You can make informed decisions about where to put information (steering vs. chat vs. explicit references) based on how long it needs to persist and how often it's relevant.</p>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <h2>Quiz</h2>
+
+  <div class="quiz" role="group">
+    <h3>Your always-on steering files total 3,000 tokens. In a session with 50 messages, how many tokens have those steering files consumed in total?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">3,000 (loaded once at session start)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">150,000 (3,000 &times; 50 messages)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">3,000 on input, 0 on output</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="quiz" role="group">
+    <h3>You're in a long session and Kiro makes wrong assumptions about a file it read 30 messages ago. What's the most likely cause?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">A bug in Kiro</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The file was modified since it was read</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">The full file content was compacted into a summary to free up context space</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="quiz" role="group">
+    <h3>You have 5 files open in editor tabs. How many of their contents does Kiro see?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">All 5 - open files are included</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">1 - only the active (focused) tab's content is included</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">0 - Kiro only sees files you explicitly reference</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="recommended">
+    <strong>Recommended resources:</strong>
+    <a href="https://kiro.dev/docs/cli/chat/context/">Kiro Docs: Context Management</a>
+  </div>
+
+  <div class="footer-nav">
+    <a href="01-steering-the-foundation.html">&larr; Prev: Steering</a>
+    <a href="index.html">Index</a>
+    <a href="03-hooks.html">Next: Hooks &rarr;</a>
+  </div>
+
+    </main>
+  </div>
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

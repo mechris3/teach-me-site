@@ -554,51 +554,51 @@ p  { font-size: --fluid-type(1rem, 1.25rem); }</code></pre>
   <div class="quiz" id="quiz1">
     <h3>Question 1</h3>
     <p>What must a custom function name start with?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">@  -  like other at-rules</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">--  -  like custom properties</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">fn-  -  a dedicated prefix</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Any valid identifier works</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">@  -  like other at-rules</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">--  -  like custom properties</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">fn-  -  a dedicated prefix</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Any valid identifier works</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz2">
     <h3>Question 2</h3>
     <p>What descriptor do you use to specify what a @function returns?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">return: value;</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">output: value;</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">result: value;</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">value: value;</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">return: value;</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">output: value;</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">result: value;</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">value: value;</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz3">
     <h3>Question 3</h3>
     <p>A function has two result descriptors  -  one inside @media and one outside. Which value is returned when the media query matches?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The first result  -  early return wins</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">The @media result  -  last matching result wins</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Both are combined into a list</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">It's invalid  -  only one result allowed</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The first result  -  early return wins</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">The @media result  -  last matching result wins</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Both are combined into a list</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">It's invalid  -  only one result allowed</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz4">
     <h3>Question 4</h3>
     <p>You define: @function --space(--n &lt;number&gt;: 1). How do you call it to get the default?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">--space(default)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">--space()</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">--space</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">var(--space)</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">--space(default)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">--space()</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">--space</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">var(--space)</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz5">
     <h3>Question 5</h3>
     <p>How do you pass a comma-separated value as a single argument?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Quote it: --fn("1px, 2px, 3px")</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Wrap in braces: --fn({1px, 2px, 3px})</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Escape commas: --fn(1px\, 2px\, 3px)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Use semicolons: --fn(1px; 2px; 3px)</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Quote it: --fn("1px, 2px, 3px")</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Wrap in braces: --fn({1px, 2px, 3px})</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Escape commas: --fn(1px\, 2px\, 3px)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Use semicolons: --fn(1px; 2px; 3px)</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="recommended">

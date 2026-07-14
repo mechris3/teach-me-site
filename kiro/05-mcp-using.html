@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>MCP Servers: Using - Lesson 5 | Teach Me</title>
+  <meta name="description" content="Using MCP servers in Kiro: configuration format, tools, prompts, resources, and elicitation.">
+  <link rel="canonical" href="https://teachmeskills.dev/kiro/05-mcp-using.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/kiro/05-mcp-using.html">
+  <meta property="og:title" content="MCP Servers: Using - Lesson 5 | Teach Me">
+  <meta property="og:description" content="Using MCP servers in Kiro: configuration format, tools, prompts, resources, and elicitation.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="MCP Servers: Using - Lesson 5 | Teach Me">
+  <meta name="twitter:description" content="Using MCP servers in Kiro: configuration format, tools, prompts, resources, and elicitation.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header"><a href="index.html">Kiro Course</a></div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-steering-the-foundation.html">1. Steering</a></li>
+        <li><a href="02-context-management.html">2. Context Management</a></li>
+        <li><a href="03-hooks.html">3. Hooks</a></li>
+        <li><a href="04-skills.html">4. Skills</a></li>
+        <li class="current"><a href="05-mcp-using.html">5. MCP: Using</a></li>
+        <li><a href="06-mcp-building.html">6. MCP: Building</a></li>
+        <li><a href="07-powers.html">7. Powers</a></li>
+        <li><a href="08-subagents.html">8. Sub-agents</a></li>
+        <li><a href="09-custom-agents.html">9. Custom Agents</a></li>
+        <li><a href="10-acp.html">10. ACP</a></li>
+        <li><a href="11-property-based-testing.html">11. Property Testing</a></li>
+        <li><a href="12-specs-as-living-artifacts.html">12. Specs</a></li>
+        <li><a href="13-model-selection.html">13. Model Selection</a></li>
+        <li><a href="14-multi-root-workspaces.html">14. Multi-root</a></li>
+        <li><a href="15-kiro-cli.html">15. Kiro CLI</a></li>
+        <li><a href="16-capstone-team-setup.html">16. Capstone</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="steering-reference.html">Steering Reference</a></li>
+        <li><a href="mcp-setup-guides.html">MCP Setup Guides</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 5</p>
+  <h1>MCP Servers: Using</h1>
+
+  <h2>What MCP Is</h2>
+
+  <p><strong>Model Context Protocol (MCP)</strong> is an open protocol that lets Kiro communicate with external servers to gain new capabilities. If built-in tools are what Kiro can do natively (read files, run commands, search), MCP servers extend that with anything else - databases, APIs, documentation, cloud services, third-party tools.</p>
+
+  <p>An MCP server is just a program that exposes capabilities over a standard interface. Kiro connects to it, discovers what it offers, and can then use those capabilities as tools during your session.</p>
+
+  <h2>What MCP Servers Can Expose</h2>
+
+  <p>An MCP server can provide three types of capabilities:</p>
+
+  <table>
+    <tr><th>Capability</th><th>What it is</th><th>Who decides when to use it</th></tr>
+    <tr><td><strong>Tools</strong></td><td>Actions the model can invoke (query a DB, call an API, search docs)</td><td>The model decides (like built-in tools)</td></tr>
+    <tr><td><strong>Prompts</strong></td><td>Pre-written prompt templates the server offers</td><td>You invoke them explicitly</td></tr>
+    <tr><td><strong>Resources</strong></td><td>Data the server makes available (file contents, API responses, schemas)</td><td>The application/model reads them as context</td></tr>
+  </table>
+
+  <p>Most MCP servers you'll use primarily expose <strong>tools</strong>. Prompts and resources are less common but useful for specific integrations.</p>
+
+  <h2>Where MCP Config Lives</h2>
+
+  <p>MCP servers are configured via JSON files:</p>
+
+  <table>
+    <tr><th>Scope</th><th>Location</th><th>Applies to</th></tr>
+    <tr><td>Workspace</td><td><code>.kiro/settings/mcp.json</code></td><td>This workspace only</td></tr>
+    <tr><td>User (global)</td><td><code>~/.kiro/settings/mcp.json</code></td><td>All workspaces</td></tr>
+  </table>
+
+  <p>If the same server is defined in both, workspace config wins (same precedence as steering). In multi-root workspaces, each folder can have its own <code>.kiro/settings/mcp.json</code>.</p>
+
+  <h2>The Configuration Format</h2>
+
+  <p>Here's the complete structure:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>{
+  "mcpServers": {
+    "github": {
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_TOKEN": "your-token-here"
+      },
+      "disabled": false
+    }
+  }
+}</code></pre>
+  </div>
+
+  <p>Each server entry has:</p>
+
+  <table>
+    <tr><th>Field</th><th>Required</th><th>What it does</th></tr>
+    <tr><td><code>command</code></td><td>Yes (for stdio)</td><td>The command to launch the server process</td></tr>
+    <tr><td><code>args</code></td><td>No</td><td>Arguments passed to the command</td></tr>
+    <tr><td><code>env</code></td><td>No</td><td>Environment variables set for the server process (API keys, config)</td></tr>
+    <tr><td><code>disabled</code></td><td>No</td><td>Set to <code>true</code> to disable without removing the config</td></tr>
+  </table>
+
+  <h2>Two Transport Types</h2>
+
+  <p>MCP servers connect to Kiro via one of two transports:</p>
+
+  <h3>1. stdio (local process)</h3>
+
+  <p>The server runs as a local subprocess on your machine. Kiro launches it, communicates over stdin/stdout. This is the most common type.</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>{
+  "mcpServers": {
+    "aws-docs": {
+      "command": "uvx",
+      "args": ["awslabs.aws-documentation-mcp-server@latest"],
+      "env": {
+        "FASTMCP_LOG_LEVEL": "ERROR"
+      }
+    }
+  }
+}</code></pre>
+  </div>
+
+  <p>The <code>command</code> is typically <code>npx</code> (for Node-based servers - most natural if you're in a JavaScript/TypeScript environment), <code>uvx</code> (for Python-based servers), or <code>docker</code>/<code>podman</code> (for containerised servers).</p>
+
+  <h3>2. Streamable HTTP (remote server)</h3>
+
+  <p>The server runs somewhere else (cloud, shared infrastructure) and Kiro connects over HTTPS. No local process needed.</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>{
+  "mcpServers": {
+    "my-remote-server": {
+      "url": "https://mcp.internal.example.com/mcp",
+      "headers": {
+        "Authorization": "Bearer your-token-here"
+      }
+    }
+  }
+}</code></pre>
+  </div>
+
+  <p>Remote servers use <code>url</code> instead of <code>command</code>, and <code>headers</code> for authentication.</p>
+
+  <div class="key-concept">
+    <strong>Security note:</strong> stdio servers run locally with your full privileges - same access as Kiro itself (files, env vars, credentials). Only install MCP servers from sources you trust. Remote servers are sandboxed by the network boundary, but still receive whatever data you send them.
+  </div>
+
+  <h2>Context Cost of MCP Servers</h2>
+
+  <p>This is important: every MCP server you connect loads its <strong>tool definitions</strong> (names, descriptions, parameter schemas) into the context window at startup. Five servers might collectively add 100+ tool definitions consuming 50,000+ tokens - potentially 40% of your context window - before you even type a prompt.</p>
+
+  <p>This is why you should:</p>
+  <ul>
+    <li>Only enable servers you're actively using</li>
+    <li>Use <code>"disabled": true</code> to turn off servers you're not using right now</li>
+    <li>Consider Powers (Lesson 7) which solve this by loading MCP servers on-demand</li>
+  </ul>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <h2>How to Add an MCP Server</h2>
+
+  <p>Three methods:</p>
+
+  <ol>
+    <li><strong>Edit <code>mcp.json</code> directly</strong> - create/edit <code>.kiro/settings/mcp.json</code> in your workspace</li>
+    <li><strong>Use the MCP Servers panel</strong> - click the "+" in the MCP Servers section of the Kiro sidebar (the ghost icon tab)</li>
+    <li><strong>Ask Kiro</strong> - "add the AWS documentation MCP server" and Kiro will configure it for you</li>
+  </ol>
+
+  <p>After adding or changing config, servers reconnect automatically - no restart needed.</p>
+
+  <h2>Common MCP Servers</h2>
+
+  <table>
+    <tr><th>Server</th><th>What it does</th><th>Command</th></tr>
+    <tr><td>GitHub</td><td>Interact with repos, PRs, issues</td><td><code>npx @modelcontextprotocol/server-github</code></td></tr>
+    <tr><td>Atlassian (Jira + Confluence)</td><td>Search/create issues, read Confluence pages</td><td><code>npx @aashari/mcp-server-atlassian-jira</code></td></tr>
+    <tr><td>Slack</td><td>Read messages, post replies, search history</td><td><code>npx @anthropic/slack-mcp-server</code></td></tr>
+    <tr><td>SonarQube</td><td>Access code quality metrics and issues</td><td><code>npx sonarqube-mcp-server</code></td></tr>
+    <tr><td>PostgreSQL</td><td>Query and manage PostgreSQL databases</td><td><code>npx @modelcontextprotocol/server-postgres</code></td></tr>
+    <tr><td>Memory</td><td>Persistent key-value memory across sessions</td><td><code>npx @modelcontextprotocol/server-memory</code></td></tr>
+    <tr><td>AWS Docs</td><td>Search and read AWS documentation</td><td><code>uvx awslabs.aws-documentation-mcp-server@latest</code></td></tr>
+    <tr><td>Filesystem</td><td>Read/write files in specified directories</td><td><code>npx @modelcontextprotocol/server-filesystem</code></td></tr>
+  </table>
+
+  <p>Most use <code>npx</code> (Node-based) or <code>uvx</code> (Python-based) to download and run the server on first use - no separate installation step. There's also a combined Atlassian server (<code>uvx mcp-atlassian</code>) that covers both Jira and Confluence together if you use both.</p>
+
+  <h2>What <code>uvx</code> Is</h2>
+
+  <p>You'll see <code>uvx</code> as the command for many MCP servers. It's part of <code>uv</code>, a Python package manager. It downloads and runs a Python package without installing it globally - similar to <code>npx</code> for Node.</p>
+
+  <p>If you don't have it installed, install <code>uv</code> via Homebrew:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>brew install uv</code></pre>
+  </div>
+
+  <p>Once installed, <code>uvx</code> handles downloading and running MCP server packages automatically.</p>
+
+  <h2>Elicitation: When Servers Ask You Questions</h2>
+
+  <p>Some MCP servers support <strong>elicitation</strong> - they can request additional input from you during tool execution. For example, a database server might ask "Which table do you want to query?" before proceeding.</p>
+
+  <p>When this happens, Kiro surfaces the question to you in the chat. You respond, and the answer is passed back to the server. It's a back-and-forth conversation between you and the MCP server, mediated by Kiro.</p>
+
+  <h2>Viewing Connected Servers</h2>
+
+  <p>To see what's currently connected:</p>
+  <ul>
+    <li>Open the Kiro sidebar (ghost icon) and look for "MCP Servers"</li>
+    <li>Each connected server shows its status and the tools it exposes</li>
+    <li>You can reconnect or disable servers from this panel</li>
+  </ul>
+
+  <h2>How MCP Relates to What You Already Know</h2>
+
+  <ul>
+    <li><strong>Tools</strong> (from Lesson 3): MCP tools work identically to built-in tools from the agent's perspective. Hooks can gate them with <code>@mcp</code> matchers.</li>
+    <li><strong>Context</strong> (from Lesson 2): MCP tool definitions consume context tokens. More servers = less room for everything else.</li>
+    <li><strong>Powers</strong> (Lesson 7): Powers solve the context-bloat problem by only loading MCP servers when relevant keywords are mentioned.</li>
+  </ul>
+
+  <h2>Your Tangible Win</h2>
+
+  <p>You can now configure MCP servers (both local and remote), understand the context cost they impose, know how to manage them efficiently, and understand how they integrate with hooks and the broader Kiro system. You know where the config lives, what the JSON schema looks like, and how to add/disable/reconnect servers.</p>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <h2>Quiz</h2>
+
+  <div class="quiz" role="group">
+    <h3>You have 5 MCP servers configured but only use 2 daily. What's the most efficient approach?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Leave all 5 enabled - the unused ones don't cost anything</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Set "disabled": true on the 3 you're not using - their tool definitions won't consume context tokens</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Delete the configs for unused servers and re-add them when needed</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="quiz" role="group">
+    <h3>A workspace mcp.json and your user-level mcp.json both define a server called "github". Which one does Kiro use?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">The workspace config - more specific scope wins</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The user-level config - global always takes precedence</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Both - they merge together</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="quiz" role="group">
+    <h3>What's the main difference between a stdio and streamable HTTP MCP server?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">stdio is faster, HTTP is more reliable</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">stdio runs as a local process on your machine; HTTP connects to a remote server over the network</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">stdio only works on Linux; HTTP works everywhere</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="recommended">
+    <strong>Recommended resources:</strong>
+    <a href="https://kiro.dev/docs/mcp">MCP Overview</a>, <a href="https://kiro.dev/docs/mcp/configuration/">MCP Configuration</a>, <a href="https://kiro.dev/docs/mcp/usage/">MCP Usage (Tools, Prompts, Resources)</a>, and the <a href="mcp-setup-guides.html">MCP Setup Guides</a> reference.
+  </div>
+
+  <div class="footer-nav">
+    <a href="04-skills.html">&larr; Prev: Skills</a>
+    <a href="index.html">Index</a>
+    <a href="06-mcp-building.html">Next: MCP Servers: Building &rarr;</a>
+  </div>
+
+    </main>
+  </div>
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

@@ -458,31 +458,31 @@
   <div class="quiz" id="quiz1">
     <h3>Question 1</h3>
     <p>A <code>&lt;rect&gt;</code> has <code>fill="blue"</code> as an attribute and <code>.box { fill: red; }</code> in CSS. What colour is it?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Blue  -  attributes are directly on the element, so they win</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Red  -  CSS rules override presentation attributes</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">It depends on the order they appear in the source</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Neither  -  they cancel out and the default (black) is used</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Blue  -  attributes are directly on the element, so they win</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Red  -  CSS rules override presentation attributes</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">It depends on the order they appear in the source</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Neither  -  they cancel out and the default (black) is used</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz2">
     <h3>Question 2</h3>
     <p>What's the effective specificity of a presentation attribute in SVG?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Same as an inline style (highest priority)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Equivalent to an element selector (0,0,1)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Lower than any CSS rule  -  effectively specificity 0,0,0 in the author stylesheet</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Same as a class selector (0,1,0)</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Same as an inline style (highest priority)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Equivalent to an element selector (0,0,1)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Lower than any CSS rule  -  effectively specificity 0,0,0 in the author stylesheet</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Same as a class selector (0,1,0)</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz3">
     <h3>Question 3</h3>
     <p>You set <code>opacity="0.5"</code> on a <code>&lt;g&gt;</code> element containing 3 overlapping circles. What happens?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Each circle becomes 50% transparent  -  you see darker areas where they overlap</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">The group is composited as a unit first, then 50% opacity is applied  -  overlapping areas look solid within the group</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Only the group's background becomes transparent, child elements are unaffected</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The opacity is multiplied  -  each child gets 0.5 &times; 0.5 &times; 0.5 = 0.125 opacity</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Each circle becomes 50% transparent  -  you see darker areas where they overlap</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">The group is composited as a unit first, then 50% opacity is applied  -  overlapping areas look solid within the group</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Only the group's background becomes transparent, child elements are unaffected</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The opacity is multiplied  -  each child gets 0.5 &times; 0.5 &times; 0.5 = 0.125 opacity</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="ad-footer" aria-label="Advertisement">Ad</div>

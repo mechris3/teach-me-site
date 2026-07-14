@@ -453,51 +453,51 @@
   <div class="quiz" id="quiz1">
     <h3>Question 1</h3>
     <p>Why can't you transition an unregistered custom property?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The browser blocks transitions on -- properties</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">The browser doesn't know the type, so can't interpolate</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Transitions only work on standard CSS properties</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">You need to add will-change for custom properties</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The browser blocks transitions on -- properties</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">The browser doesn't know the type, so can't interpolate</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Transitions only work on standard CSS properties</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">You need to add will-change for custom properties</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz2">
     <h3>Question 2</h3>
     <p>What are the three required descriptors in an @property rule?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">name, type, default</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">syntax, cascade, fallback</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">syntax, inherits, initial-value</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">type, scope, initial-value</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">name, type, default</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">syntax, cascade, fallback</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">syntax, inherits, initial-value</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">type, scope, initial-value</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz3">
     <h3>Question 3</h3>
     <p>You register --size with syntax "&lt;length&gt;" and initial-value 16px. Someone sets --size: red. What does var(--size) resolve to?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">red  -  the browser doesn't validate</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">0px  -  invalid values become zero</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">16px  -  falls back to initial-value</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">nothing  -  the declaration is dropped</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">red  -  the browser doesn't validate</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">0px  -  invalid values become zero</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">16px  -  falls back to initial-value</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">nothing  -  the declaration is dropped</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz4">
     <h3>Question 4</h3>
     <p>You want to animate a gradient's colour stop from 20% to 80%. What syntax do you register the property with?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">syntax: "&lt;gradient&gt;";</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">syntax: "&lt;percentage&gt;";</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">syntax: "&lt;number&gt;";</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">syntax: "&lt;length&gt;";</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">syntax: "&lt;gradient&gt;";</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">syntax: "&lt;percentage&gt;";</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">syntax: "&lt;number&gt;";</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">syntax: "&lt;length&gt;";</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz5">
     <h3>Question 5</h3>
     <p>A property is registered with inherits: false. A parent sets it to orange. A child reads it with var(). What does the child get?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">orange  -  custom properties always inherit</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">the initial-value  -  inherits: false blocks it</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">transparent  -  no value means transparent</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">an error  -  you must set it on every element</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">orange  -  custom properties always inherit</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">the initial-value  -  inherits: false blocks it</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">transparent  -  no value means transparent</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">an error  -  you must set it on every element</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="ad-footer" aria-label="Advertisement">Ad</div>

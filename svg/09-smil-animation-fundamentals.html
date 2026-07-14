@@ -897,54 +897,54 @@
 
   <h2>Quiz</h2>
 
-  <div class="quiz">
+  <div class="quiz" role="group">
     <h3>Question 1</h3>
     <p>What does <code>fill="freeze"</code> on an <code>&lt;animate&gt;</code> element do?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Sets the fill colour of the parent element to frozen blue</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Holds the final animated value after the animation ends</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Pauses the animation at its current frame indefinitely</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Prevents the animation from being overridden by CSS</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Sets the fill colour of the parent element to frozen blue</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Holds the final animated value after the animation ends</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Pauses the animation at its current frame indefinitely</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Prevents the animation from being overridden by CSS</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
-  <div class="quiz">
+  <div class="quiz" role="group">
     <h3>Question 2</h3>
     <p>What is the difference between <code>calcMode="linear"</code> and <code>calcMode="paced"</code> when animating through the values <code>"0;100;300"</code>?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Linear uses cubic easing; paced uses no easing at all</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Linear plays in order; paced randomises the value sequence</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Linear spends equal time on each segment; paced maintains constant velocity across all segments</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Linear requires keyTimes; paced requires keySplines values</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Linear uses cubic easing; paced uses no easing at all</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Linear plays in order; paced randomises the value sequence</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Linear spends equal time on each segment; paced maintains constant velocity across all segments</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Linear requires keyTimes; paced requires keySplines values</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
-  <div class="quiz">
+  <div class="quiz" role="group">
     <h3>Question 3</h3>
     <p>How do you make a SMIL animation start when the user clicks the animated element?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Set <code>trigger="onclick"</code> on the animate element</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Set <code>begin="click"</code> on the animate element</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Wrap the animate in an <code>&lt;event type="click"&gt;</code> element</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Add a JavaScript click handler that calls animate.start()</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Set <code>trigger="onclick"</code> on the animate element</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Set <code>begin="click"</code> on the animate element</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Wrap the animate in an <code>&lt;event type="click"&gt;</code> element</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Add a JavaScript click handler that calls animate.start()</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
-  <div class="quiz">
+  <div class="quiz" role="group">
     <h3>Question 4</h3>
     <p>What constraint must be met to animate the <code>d</code> attribute (path morphing)?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Both paths must have the same total length in user units</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Both paths must use only cubic bezier commands (C/c)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Both path strings must have the same number and type of commands</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The paths must be defined in the same defs block</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Both paths must have the same total length in user units</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Both paths must use only cubic bezier commands (C/c)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Both path strings must have the same number and type of commands</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The paths must be defined in the same defs block</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
-  <div class="quiz">
+  <div class="quiz" role="group">
     <h3>Question 5</h3>
     <p>What does <code>accumulate="sum"</code> do on a repeating animation?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Adds all animated values together into a single final value</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Each repeat cycle starts from where the previous cycle ended</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Sums the animation with the element's base CSS value</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Adds a cumulative delay between each repeat cycle</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Adds all animated values together into a single final value</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Each repeat cycle starts from where the previous cycle ended</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Sums the animation with the element's base CSS value</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Adds a cumulative delay between each repeat cycle</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="ad-footer" aria-label="Advertisement">Ad</div>

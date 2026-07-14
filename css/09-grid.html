@@ -743,51 +743,51 @@ grid-template-columns: repeat(3, [col-start] 1fr [col-end]);
   <div class="quiz" id="quiz1">
     <h3>Question 1</h3>
     <p>What does the <code>fr</code> unit represent?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">A fixed fraction of the total container width</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">A fraction of the remaining free space after fixed tracks are laid out</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">A percentage converted to pixels at render time</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">A font-relative unit like em or rem</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">A fixed fraction of the total container width</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">A fraction of the remaining free space after fixed tracks are laid out</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">A percentage converted to pixels at render time</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">A font-relative unit like em or rem</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz2">
     <h3>Question 2</h3>
     <p>What is the difference between <code>auto-fill</code> and <code>auto-fit</code>?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">auto-fill creates flexible tracks; auto-fit creates fixed tracks</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">auto-fill works only with minmax(); auto-fit works with any value</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">auto-fill keeps empty tracks; auto-fit collapses empty tracks so items stretch to fill</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">They are interchangeable  -  no practical difference</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">auto-fill creates flexible tracks; auto-fit creates fixed tracks</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">auto-fill works only with minmax(); auto-fit works with any value</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">auto-fill keeps empty tracks; auto-fit collapses empty tracks so items stretch to fill</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">They are interchangeable  -  no practical difference</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz3">
     <h3>Question 3</h3>
     <p>How do you make a grid item span from the first column line to the last?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">grid-column: full;</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">grid-column: 1 / -1;</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">grid-column: span all;</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">grid-column: 0 / end;</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">grid-column: full;</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">grid-column: 1 / -1;</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">grid-column: span all;</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">grid-column: 0 / end;</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz4">
     <h3>Question 4</h3>
     <p>What problem does subgrid solve?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">It makes nested grids inherit their parent's gap value</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">It allows grid items to overflow their cells</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">It lets nested grids inherit parent track definitions, aligning content across sibling items</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">It enables transitions on grid-template-columns</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">It makes nested grids inherit their parent's gap value</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">It allows grid items to overflow their cells</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">It lets nested grids inherit parent track definitions, aligning content across sibling items</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">It enables transitions on grid-template-columns</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz5">
     <h3>Question 5</h3>
     <p>Which single CSS declaration creates a responsive card grid that adapts without media queries?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">display: flex; flex-wrap: wrap;</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">grid-template-columns: auto auto auto;</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">grid-auto-flow: dense;</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">display: flex; flex-wrap: wrap;</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">grid-template-columns: auto auto auto;</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">grid-auto-flow: dense;</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="recommended">

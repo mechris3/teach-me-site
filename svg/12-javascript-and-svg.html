@@ -530,54 +530,54 @@ ro.observe(svg);</code></pre>
 
   <h2>Quiz</h2>
 
-  <div class="quiz">
+  <div class="quiz" role="group">
     <h3>Question 1</h3>
     <p>Why must you use <code>createElementNS</code> instead of <code>createElement</code> for SVG elements?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">createElement doesn't accept SVG tag names as valid strings</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">SVG elements live in a different XML namespace than HTML elements</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">createElement creates elements that can't have attributes set on them</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">createElement is deprecated in modern browsers for all new elements</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">createElement doesn't accept SVG tag names as valid strings</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">SVG elements live in a different XML namespace than HTML elements</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">createElement creates elements that can't have attributes set on them</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">createElement is deprecated in modern browsers for all new elements</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
-  <div class="quiz">
+  <div class="quiz" role="group">
     <h3>Question 2</h3>
     <p>What does <code>svg.getScreenCTM().inverse()</code> give you?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The SVG element's position on the page in pixels</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">A matrix that converts screen pixel coordinates to SVG user coordinates</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The inverse of all CSS transforms applied to the SVG element</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">A matrix that converts SVG coordinates to screen pixel coordinates</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The SVG element's position on the page in pixels</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">A matrix that converts screen pixel coordinates to SVG user coordinates</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The inverse of all CSS transforms applied to the SVG element</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">A matrix that converts SVG coordinates to screen pixel coordinates</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
-  <div class="quiz">
+  <div class="quiz" role="group">
     <h3>Question 3</h3>
     <p>What does <code>path.getPointAtLength(path.getTotalLength() * 0.75)</code> return?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The control point at 75% of the path's Bezier curves</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The coordinates of the path's end reduced by 25%</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">The x,y coordinates at 75% of the distance along the path</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">A point that is 75% of the way between the path's start and end in a straight line</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The control point at 75% of the path's Bezier curves</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The coordinates of the path's end reduced by 25%</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">The x,y coordinates at 75% of the distance along the path</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">A point that is 75% of the way between the path's start and end in a straight line</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
-  <div class="quiz">
+  <div class="quiz" role="group">
     <h3>Question 4</h3>
     <p>What does <code>setPointerCapture</code> do during a drag operation?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Prevents the default browser drag behaviour (text selection, image ghost)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Locks the cursor to the dragged element's visual bounds</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Routes all subsequent pointer events to the capturing element regardless of pointer position</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Prevents other pointer event listeners on the page from firing</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Prevents the default browser drag behaviour (text selection, image ghost)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Locks the cursor to the dragged element's visual bounds</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Routes all subsequent pointer events to the capturing element regardless of pointer position</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Prevents other pointer event listeners on the page from firing</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
-  <div class="quiz">
+  <div class="quiz" role="group">
     <h3>Question 5</h3>
     <p>Which WAAPI feature has no equivalent in CSS <code>@keyframes</code>?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Animating transform and opacity simultaneously on one element</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Using easing functions like ease-in-out between keyframes</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Seeking to a specific time in the animation with currentTime</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Running an animation with infinite repetition count</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Animating transform and opacity simultaneously on one element</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Using easing functions like ease-in-out between keyframes</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Seeking to a specific time in the animation with currentTime</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Running an animation with infinite repetition count</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="ad-footer" aria-label="Advertisement">Ad</div>

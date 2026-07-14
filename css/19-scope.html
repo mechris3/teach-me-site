@@ -354,51 +354,51 @@
   <div class="quiz" id="quiz1">
     <h3>Question 1</h3>
     <p>What does the "to" clause in @scope (.card) to (.slot) define?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The element the scope transitions to</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">The lower boundary - styles stop applying at (and inside) .slot</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">An animation endpoint for the scope</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">A selector that inherits from the scope</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The element the scope transitions to</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">The lower boundary - styles stop applying at (and inside) .slot</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">An animation endpoint for the scope</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">A selector that inherits from the scope</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz2">
     <h3>Question 2</h3>
     <p>An element is inside both @scope(.blue) and @scope(.red) - same specificity, same layer. Which wins?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Last in source order</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">The one whose scope root is the closer ancestor (proximity)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The one with more characters in the selector</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Neither - they cancel each other out</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Last in source order</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">The one whose scope root is the closer ancestor (proximity)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The one with more characters in the selector</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Neither - they cancel each other out</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz3">
     <h3>Question 3</h3>
     <p>Where does scope proximity sit in the cascade resolution order?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Before layers - it's the first thing checked</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Same level as specificity</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">After specificity, before source order</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">After source order - it's the final tiebreaker</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Before layers - it's the first thing checked</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Same level as specificity</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">After specificity, before source order</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">After source order - it's the final tiebreaker</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz4">
     <h3>Question 4</h3>
     <p>What does :scope refer to inside @scope (.card)?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The :root element</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">The .card element itself (the scope root)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The nearest positioned ancestor</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The element being styled</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The :root element</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">The .card element itself (the scope root)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The nearest positioned ancestor</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The element being styled</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz5">
     <h3>Question 5</h3>
     <p>How does @scope (.card) to (.card) prevent style leakage into nested cards?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">It removes the nested .card from the DOM</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Styles stop at the nested .card boundary - it starts its own scope</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">It increases specificity so nested cards can't override</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">It applies Shadow DOM isolation automatically</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">It removes the nested .card from the DOM</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Styles stop at the nested .card boundary - it starts its own scope</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">It increases specificity so nested cards can't override</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">It applies Shadow DOM isolation automatically</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="recommended">

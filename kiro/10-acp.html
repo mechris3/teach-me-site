@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>Agent Client Protocol - Lesson 10 | Teach Me</title>
+  <meta name="description" content="Agent Client Protocol (ACP): using Kiro's agent in other editors and environments via the open protocol.">
+  <link rel="canonical" href="https://teachmeskills.dev/kiro/10-acp.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/kiro/10-acp.html">
+  <meta property="og:title" content="Agent Client Protocol - Lesson 10 | Teach Me">
+  <meta property="og:description" content="Agent Client Protocol (ACP): using Kiro's agent in other editors and environments via the open protocol.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Agent Client Protocol - Lesson 10 | Teach Me">
+  <meta name="twitter:description" content="Agent Client Protocol (ACP): using Kiro's agent in other editors and environments via the open protocol.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header"><a href="index.html">Kiro Course</a></div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-steering-the-foundation.html">1. Steering</a></li>
+        <li><a href="02-context-management.html">2. Context Management</a></li>
+        <li><a href="03-hooks.html">3. Hooks</a></li>
+        <li><a href="04-skills.html">4. Skills</a></li>
+        <li><a href="05-mcp-using.html">5. MCP: Using</a></li>
+        <li><a href="06-mcp-building.html">6. MCP: Building</a></li>
+        <li><a href="07-powers.html">7. Powers</a></li>
+        <li><a href="08-subagents.html">8. Sub-agents</a></li>
+        <li><a href="09-custom-agents.html">9. Custom Agents</a></li>
+        <li class="current"><a href="10-acp.html">10. ACP</a></li>
+        <li><a href="11-property-based-testing.html">11. Property Testing</a></li>
+        <li><a href="12-specs-as-living-artifacts.html">12. Specs</a></li>
+        <li><a href="13-model-selection.html">13. Model Selection</a></li>
+        <li><a href="14-multi-root-workspaces.html">14. Multi-root</a></li>
+        <li><a href="15-kiro-cli.html">15. Kiro CLI</a></li>
+        <li><a href="16-capstone-team-setup.html">16. Capstone</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="steering-reference.html">Steering Reference</a></li>
+        <li><a href="mcp-setup-guides.html">MCP Setup Guides</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 10</p>
+  <h1>Agent Client Protocol (ACP)</h1>
+
+  <h2>What ACP Is</h2>
+
+  <p>The <strong>Agent Client Protocol (ACP)</strong> is an open standard that standardises communication between code editors and AI coding agents. To understand why this matters, it helps to know about LSP:</p>
+
+  <h3>A quick detour: LSP (Language Server Protocol)</h3>
+
+  <p>Before LSP, every editor had to build its own support for every language. TypeScript in VS Code? Someone builds a TS plugin for VS Code. TypeScript in Vim? Someone builds a <em>different</em> TS plugin for Vim. N editors × M languages = N×M integrations to maintain.</p>
+
+  <p>LSP fixed this: a "language server" is built once (for TypeScript, Python, etc.) and any editor that speaks the LSP protocol can use it. Now it's N + M - one server per language, one LSP client per editor. You use LSP right now in Kiro - it's how you get autocomplete, go-to-definition, and error highlighting for TypeScript without Kiro needing to understand TypeScript itself.</p>
+
+  <h3>ACP = LSP, but for AI agents</h3>
+
+  <p>Same problem, new domain. Before ACP: each AI agent (Kiro, Gemini, etc.) needs custom integration for each editor. After ACP: any agent that implements ACP works in any editor that supports it. One standard, universal compatibility.</p>
+
+  <h2>Why It Matters</h2>
+
+  <p>Without ACP, each AI agent needs a custom integration for each editor. With ACP:</p>
+
+  <ul>
+    <li><strong>Users</strong> - can use their preferred agent in their preferred editor (not locked into one pairing)</li>
+    <li><strong>Agent developers</strong> - build once, work everywhere (no per-editor integration)</li>
+    <li><strong>Editor makers</strong> - get AI capabilities from any ACP-compatible agent without building their own</li>
+  </ul>
+
+  <h2>How Kiro Uses ACP</h2>
+
+  <p>The <strong>Kiro CLI</strong> implements ACP. This means you can use Kiro's agent in:</p>
+
+  <ul>
+    <li><strong>JetBrains IDEs</strong> (IntelliJ, WebStorm, PyCharm, etc.) - via the ACP agent registry</li>
+    <li><strong>Zed</strong> - the editor that co-created ACP</li>
+    <li><strong>Neovim, Eclipse, Emacs, Toad</strong> - and other ACP-compatible editors</li>
+  </ul>
+
+  <p>Your steering, skills, hooks, MCP servers, and custom agents all work through ACP - the protocol carries the full Kiro experience, not just chat.</p>
+
+  <div class="key-concept">
+    <strong>For you right now:</strong> Since you use the Kiro IDE daily, ACP doesn't change your workflow. It's relevant if you (or team members) want Kiro's capabilities in a different editor - like WebStorm for Angular development. The setup is: install Kiro CLI, configure it as an ACP agent in the other editor, and everything works.
+  </div>
+
+  <h2>The Protocol at a Glance</h2>
+
+  <p>ACP uses JSON-RPC over stdio (same transport as MCP). Here's what the messages look like on the wire:</p>
+
+  <h3>Editor sends a user message to the agent</h3>
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "conversation/sendMessage",
+  "params": {
+    "conversationId": "conv-123",
+    "message": {
+      "role": "user",
+      "content": "Refactor UserService to use signals"
+    },
+    "context": {
+      "activeFile": "src/app/services/user.service.ts",
+      "workspace": "/home/dev/my-angular-app"
+    }
+  }
+}</code></pre></div>
+
+  <h3>Agent responds with a file edit</h3>
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "messages": [{
+      "role": "assistant",
+      "content": "I'll refactor UserService to use signals instead of BehaviorSubjects."
+    }],
+    "actions": [{
+      "type": "editFile",
+      "path": "src/app/services/user.service.ts",
+      "edits": [{
+        "range": { "start": { "line": 5, "character": 0 }, "end": { "line": 12, "character": 1 } },
+        "newText": "  currentUser = signal&lt;User | null&gt;(null);\n"
+      }]
+    }]
+  }
+}</code></pre></div>
+
+  <h3>Agent requests permission to run a command</h3>
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>{
+  "jsonrpc": "2.0",
+  "method": "agent/requestPermission",
+  "params": {
+    "type": "executeCommand",
+    "command": "ng lint",
+    "reason": "Running lint to verify changes"
+  }
+}</code></pre></div>
+
+  <p>The editor then shows a permission dialog and responds with approval or denial. All plain text JSON - you could read it directly if you piped the stdio stream to a file.</p>
+
+  <h3>Key insight: the agent never directly edits files</h3>
+
+  <p>The AI doesn't touch the filesystem directly for code edits. It sends structured instructions ("edit this range in this file with this text") and the IDE applies them. This is what enables:</p>
+
+  <ul>
+    <li>Showing you diffs before applying changes</li>
+    <li>Supervised mode's accept/reject per hunk</li>
+    <li>Undo history in the editor</li>
+    <li>File watchers and formatters running on the result</li>
+    <li>Hooks firing (PostFileSave, etc.)</li>
+  </ul>
+
+  <p>The agent always operates through an intermediary - it's a request/response model, not raw disk access.</p>
+
+  <div class="key-concept">
+    <strong>Exception: shell commands.</strong> When the agent uses <code>execute_bash</code>, that <em>does</em> run directly with your system privileges. The command executes outside the editor's mediation layer. This is why shell commands get permission gates and hooks can block them - there's no "undo" for a shell command.
+  </div>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <p>The protocol handles:</p>
+
+  <table>
+    <tr><th>Capability</th><th>What it does</th></tr>
+    <tr><td>Context provision</td><td>Editor sends project context (files, workspace, diagnostics) to the agent</td></tr>
+    <tr><td>Rich updates</td><td>Agent sends file edits, terminal commands, and UI actions back to the editor</td></tr>
+    <tr><td>Permissions</td><td>Editor manages approval flows for file writes, commands, etc.</td></tr>
+    <tr><td>Session management</td><td>Handles conversation state, model selection, configuration</td></tr>
+  </table>
+
+  <h2>ACP vs MCP</h2>
+
+  <p>These are complementary, not competing:</p>
+
+  <table>
+    <tr><th></th><th>ACP</th><th>MCP</th></tr>
+    <tr><td><strong>Direction</strong></td><td>Editor ↔ Agent</td><td>Agent ↔ External tools</td></tr>
+    <tr><td><strong>Purpose</strong></td><td>Connects an agent to an IDE</td><td>Connects an agent to external services</td></tr>
+    <tr><td><strong>Who implements</strong></td><td>Agents (like Kiro CLI) and editors (like Zed, JetBrains)</td><td>Tool providers (GitHub, Jira, databases)</td></tr>
+    <tr><td><strong>Analogy</strong></td><td>LSP (editor ↔ language server)</td><td>Database drivers (app ↔ database)</td></tr>
+  </table>
+
+  <p>MCP gives the agent tools. ACP gives the agent a home in an editor. Kiro uses both.</p>
+
+  <h2>Who's Involved</h2>
+
+  <ul>
+    <li><strong>Zed</strong> - co-created the protocol, initial reference implementation</li>
+    <li><strong>JetBrains</strong> - launched an ACP agent registry for their IDEs</li>
+    <li><strong>Kiro CLI</strong> - implements ACP so the Kiro agent works in any compatible editor</li>
+    <li><strong>Google (Gemini CLI)</strong> - initial third-party agent using ACP</li>
+    <li>Open spec: <a href="https://agentclientprotocol.com">agentclientprotocol.com</a>, <a href="https://github.com/agentclientprotocol/agent-client-protocol">GitHub repo</a></li>
+  </ul>
+
+  <h2>When This Becomes Relevant to You</h2>
+
+  <ul>
+    <li>If you want to use Kiro's agent in WebStorm (JetBrains) for Angular work</li>
+    <li>If team members use different editors but you want shared Kiro config (steering, hooks, skills) to work everywhere</li>
+    <li>If you want to try Zed but keep your Kiro agent and all its configuration</li>
+    <li>If you build a custom agent (Lesson 9) and want it available in multiple editors</li>
+  </ul>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <h2>Quiz</h2>
+
+  <div class="quiz" role="group">
+    <h3>ACP is most similar to:</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">LSP - standardises communication between editors and a service (agents instead of language servers)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">MCP - standardises communication between agents and external tools</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">HTTP - a general transport protocol</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="quiz" role="group">
+    <h3>You want to use Kiro's agent in WebStorm. What do you need?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Install the Kiro IDE extension for JetBrains</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Install Kiro CLI and configure it as an ACP agent in WebStorm</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">This isn't possible - Kiro only works in its own IDE</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="recommended">
+    <strong>Recommended resources:</strong>
+    <a href="https://kiro.dev/docs/cli/acp/">Kiro CLI: ACP</a> and <a href="https://agentclientprotocol.com/get-started/introduction">Agent Client Protocol spec</a>.
+  </div>
+
+  <div class="footer-nav">
+    <a href="09-custom-agents.html">&larr; Prev: Custom Agents</a>
+    <a href="index.html">Index</a>
+    <a href="11-property-based-testing.html">Next: Property-Based Testing &rarr;</a>
+  </div>
+
+    </main>
+  </div>
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

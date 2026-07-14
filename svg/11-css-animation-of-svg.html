@@ -1059,54 +1059,54 @@
 
   <h2>Quiz</h2>
 
-  <div class="quiz">
+  <div class="quiz" role="group">
     <h3>Question 1</h3>
     <p>What is the default <code>transform-origin</code> for SVG elements in modern browsers (SVG 2)?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">50% 50% of the element's bounding box (its own centre)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">0 0 of the element's bounding box (its top-left corner)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">0 0 of the SVG viewport (the canvas top-left corner)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The element's cx/cy attributes if they exist</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">50% 50% of the element's bounding box (its own centre)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">0 0 of the element's bounding box (its top-left corner)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">0 0 of the SVG viewport (the canvas top-left corner)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The element's cx/cy attributes if they exist</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
-  <div class="quiz">
+  <div class="quiz" role="group">
     <h3>Question 2</h3>
     <p>In the stroke drawing technique, what do you animate to make a path appear to draw itself?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">stroke-dasharray from 0 to the path length</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">stroke-dashoffset from the path length to 0</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">stroke-width from 0 to the desired width</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">path length from 0 to 1 using pathLength</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">stroke-dasharray from 0 to the path length</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">stroke-dashoffset from the path length to 0</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">stroke-width from 0 to the desired width</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">path length from 0 to 1 using pathLength</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
-  <div class="quiz">
+  <div class="quiz" role="group">
     <h3>Question 3</h3>
     <p>What does <code>animation-fill-mode: backwards</code> do when combined with <code>animation-delay</code>?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Plays the animation in reverse after it completes</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Holds the final keyframe state after the animation ends</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Applies the first keyframe styles during the delay period</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Resets the element to its original styles after the delay</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Plays the animation in reverse after it completes</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Holds the final keyframe state after the animation ends</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Applies the first keyframe styles during the delay period</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Resets the element to its original styles after the delay</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
-  <div class="quiz">
+  <div class="quiz" role="group">
     <h3>Question 4</h3>
     <p>Which of these SVG attributes can NOT be animated with CSS transitions (as of current browser support)?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">fill (colour of the shape)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">stroke-dashoffset (dash position)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">viewBox (the coordinate window)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">opacity (transparency of the element)</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">fill (colour of the shape)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">stroke-dashoffset (dash position)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">viewBox (the coordinate window)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">opacity (transparency of the element)</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
-  <div class="quiz">
+  <div class="quiz" role="group">
     <h3>Question 5</h3>
     <p>What does <code>transform-box: fill-box</code> do on an SVG element?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Sets the fill colour to match the element's box model</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Makes percentage transform-origin resolve against the element's own bounding box</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Clips the transform to stay within the element's bounds</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Forces the element to use border-box sizing for layout</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Sets the fill colour to match the element's box model</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Makes percentage transform-origin resolve against the element's own bounding box</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Clips the transform to stay within the element's bounds</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Forces the element to use border-box sizing for layout</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="ad-footer" aria-label="Advertisement">Ad</div>

@@ -10,8 +10,33 @@
 
 ## Courses
 
+- [Kiro Mastery](https://teachmeskills.dev/kiro/): A 16-lesson course covering Kiro configuration, extension, and advanced features from steering to team setup.
 - [CSS Mastery](https://teachmeskills.dev/css/): A 24-lesson advanced course covering modern CSS from custom properties to scroll-driven animations.
 - [SVG - From Coordinates to Animation](https://teachmeskills.dev/svg/): A 13-lesson course covering SVG from first principles through to complex animation.
+
+## Kiro Mastery Lessons
+
+- [Steering - The Foundation](https://teachmeskills.dev/kiro/01-steering-the-foundation.html): inclusion modes, scopes, file references, persistent context
+- [Context Management](https://teachmeskills.dev/kiro/02-context-management.html): context window assembly, token budget, compaction, active files
+- [Hooks](https://teachmeskills.dev/kiro/03-hooks.html): triggers, matchers, actions, exit codes, automation
+- [Skills](https://teachmeskills.dev/kiro/04-skills.html): front-matter, auto-activation, writing reusable skills
+- [MCP Servers: Using](https://teachmeskills.dev/kiro/05-mcp-using.html): config format, tools, prompts, resources, elicitation
+- [MCP Servers: Building](https://teachmeskills.dev/kiro/06-mcp-building.html): TypeScript SDK, Zod schemas, testing with MCP Inspector
+- [Powers](https://teachmeskills.dev/kiro/07-powers.html): installing, using, and creating power packages
+- [Sub-agents](https://teachmeskills.dev/kiro/08-subagents.html): parallel execution, context isolation, delegation
+- [Custom Agents](https://teachmeskills.dev/kiro/09-custom-agents.html): config files, tool scoping, prompt injection
+- [Agent Client Protocol](https://teachmeskills.dev/kiro/10-acp.html): using Kiro's agent in other editors
+- [Property-Based Testing](https://teachmeskills.dev/kiro/11-property-based-testing.html): specs as executable properties, fast-check, shrinking
+- [Specs as Living Artifacts](https://teachmeskills.dev/kiro/12-specs-as-living-artifacts.html): feature vs bugfix specs, EARS notation, spec lifecycle
+- [Model Selection](https://teachmeskills.dev/kiro/13-model-selection.html): auto routing, credit multipliers, when to override
+- [Multi-root Workspaces](https://teachmeskills.dev/kiro/14-multi-root-workspaces.html): per-folder steering and MCP scoping
+- [Kiro CLI](https://teachmeskills.dev/kiro/15-kiro-cli.html): terminal workflows, session memory, headless mode
+- [Capstone: Team Setup](https://teachmeskills.dev/kiro/16-capstone-team-setup.html): combining everything for a real project
+
+## Kiro Reference
+
+- [Steering Reference](https://teachmeskills.dev/kiro/steering-reference.html): quick reference for steering file locations, schema, inclusion modes, and patterns
+- [MCP Server Setup Guides](https://teachmeskills.dev/kiro/mcp-setup-guides.html): step-by-step setup for GitHub, Jira, and Confluence MCP servers
 
 ## SVG Lessons
 

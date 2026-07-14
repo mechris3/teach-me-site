@@ -600,51 +600,51 @@ applyTheme(getTheme());</code></pre>
   <div class="quiz" id="quiz1">
     <h3>Question 1</h3>
     <p>In the three-tier model, which layer do components reference directly?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Primitive tokens (raw palette values)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Semantic tokens (purpose-based names)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The brand file directly</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Hard-coded hex values</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Primitive tokens (raw palette values)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Semantic tokens (purpose-based names)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The brand file directly</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Hard-coded hex values</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz2">
     <h3>Question 2</h3>
     <p>How does scoped theming (e.g. a dark hero on a light page) work with custom properties?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Each component checks a theme service and applies inline styles</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Set data-theme on the container; token overrides inherit into all descendants</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Use Shadow DOM to encapsulate the dark styles</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Duplicate all component CSS with dark variants</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Each component checks a theme service and applies inline styles</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Set data-theme on the container; token overrides inherit into all descendants</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Use Shadow DOM to encapsulate the dark styles</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Duplicate all component CSS with dark variants</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz3">
     <h3>Question 3</h3>
     <p>Why should semantic tokens use purpose names (--color-primary) rather than appearance names (--color-blue)?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Browser performance is better with abstract names</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The CSS spec requires semantic naming</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">When brands/themes swap, "blue" might become coral, but "primary" always means primary</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">It reduces the number of custom properties needed</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Browser performance is better with abstract names</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The CSS spec requires semantic naming</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">When brands/themes swap, "blue" might become coral, but "primary" always means primary</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">It reduces the number of custom properties needed</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz4">
     <h3>Question 4</h3>
     <p>What causes "flash of wrong theme" and how do you prevent it?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">CSS transitions on token values; fix with transition: none</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Theme JS runs after first paint; fix by restoring theme in a blocking head script</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The browser caches the wrong stylesheet; fix with cache-busting</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Custom properties don't update fast enough; fix with !important</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">CSS transitions on token values; fix with transition: none</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Theme JS runs after first paint; fix by restoring theme in a blocking head script</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The browser caches the wrong stylesheet; fix with cache-busting</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Custom properties don't update fast enough; fix with !important</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz5">
     <h3>Question 5</h3>
     <p>When is light-dark() preferable over class-based token swapping?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Always - it's newer and replaces the class approach</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Only in Safari, where class swapping doesn't work</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Simple sites where dark mode is the only theming concern (few tokens, no brands)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Multi-brand apps with three or more themes</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Always - it's newer and replaces the class approach</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Only in Safari, where class swapping doesn't work</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Simple sites where dark mode is the only theming concern (few tokens, no brands)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Multi-brand apps with three or more themes</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="recommended">

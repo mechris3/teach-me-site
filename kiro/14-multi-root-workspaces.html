@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>Multi-root Workspaces - Lesson 14 | Teach Me</title>
+  <meta name="description" content="Multi-root workspaces in Kiro: per-folder steering and MCP scoping for monorepos and multi-project setups.">
+  <link rel="canonical" href="https://teachmeskills.dev/kiro/14-multi-root-workspaces.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/kiro/14-multi-root-workspaces.html">
+  <meta property="og:title" content="Multi-root Workspaces - Lesson 14 | Teach Me">
+  <meta property="og:description" content="Multi-root workspaces in Kiro: per-folder steering and MCP scoping for monorepos and multi-project setups.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Multi-root Workspaces - Lesson 14 | Teach Me">
+  <meta name="twitter:description" content="Multi-root workspaces in Kiro: per-folder steering and MCP scoping for monorepos and multi-project setups.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header"><a href="index.html">Kiro Course</a></div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-steering-the-foundation.html">1. Steering</a></li>
+        <li><a href="02-context-management.html">2. Context Management</a></li>
+        <li><a href="03-hooks.html">3. Hooks</a></li>
+        <li><a href="04-skills.html">4. Skills</a></li>
+        <li><a href="05-mcp-using.html">5. MCP: Using</a></li>
+        <li><a href="06-mcp-building.html">6. MCP: Building</a></li>
+        <li><a href="07-powers.html">7. Powers</a></li>
+        <li><a href="08-subagents.html">8. Sub-agents</a></li>
+        <li><a href="09-custom-agents.html">9. Custom Agents</a></li>
+        <li><a href="10-acp.html">10. ACP</a></li>
+        <li><a href="11-property-based-testing.html">11. Property Testing</a></li>
+        <li><a href="12-specs-as-living-artifacts.html">12. Specs</a></li>
+        <li><a href="13-model-selection.html">13. Model Selection</a></li>
+        <li class="current"><a href="14-multi-root-workspaces.html">14. Multi-root</a></li>
+        <li><a href="15-kiro-cli.html">15. Kiro CLI</a></li>
+        <li><a href="16-capstone-team-setup.html">16. Capstone</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="steering-reference.html">Steering Reference</a></li>
+        <li><a href="mcp-setup-guides.html">MCP Setup Guides</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 14</p>
+  <h1>Multi-root Workspaces</h1>
+
+  <h2>What Multi-root Workspaces Are</h2>
+
+  <p>A typical Kiro workspace has a single root folder - one project, one <code>.kiro/</code> directory. A <strong>multi-root workspace</strong> brings multiple folders into a single IDE window. Each folder is an independent "root" with its own configuration.</p>
+
+  <p>You'd use this when working across related but separate projects simultaneously - for example:</p>
+  <ul>
+    <li>An Angular frontend and a Node.js backend in one window</li>
+    <li>A shared component library and the app that consumes it</li>
+    <li>A monorepo with multiple packages where each needs different Kiro config</li>
+  </ul>
+
+  <h2>How to Create One</h2>
+
+  <ul>
+    <li><strong>File &rarr; Add Folder to Workspace...</strong> - adds another root folder</li>
+    <li><strong>Drag and drop</strong> a folder from Finder into the Explorer view</li>
+    <li>Save as a <code>.code-workspace</code> file to reopen the same multi-root layout later</li>
+  </ul>
+
+  <h2>Why It Matters for Kiro Configuration</h2>
+
+  <p>Each root folder gets its own <code>.kiro/</code> directory - its own steering, hooks, skills, agents, specs, and MCP config. This means:</p>
+
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>my-workspace/
+├── frontend/                    # Root 1
+│   └── .kiro/
+│       ├── steering/            # Angular-specific steering
+│       ├── hooks/               # Frontend-specific hooks
+│       ├── skills/              # Frontend skills
+│       └── settings/mcp.json    # MCP servers for frontend work
+│
+├── backend/                     # Root 2
+│   └── .kiro/
+│       ├── steering/            # Node/Express steering
+│       ├── hooks/               # Backend-specific hooks
+│       └── settings/mcp.json    # Database MCP, different API servers
+│
+└── shared-lib/                  # Root 3
+    └── .kiro/
+        └── steering/            # Library-specific conventions</code></pre></div>
+
+  <p>Each root is configured independently. When you're working in a frontend file, the frontend steering applies. When you switch to a backend file, the backend steering applies.</p>
+
+  <h2>Scoping Rules</h2>
+
+  <table>
+    <tr><th>Feature</th><th>Scoping in multi-root</th></tr>
+    <tr><td>Steering</td><td>Each folder's <code>.kiro/steering/</code> applies to that folder only</td></tr>
+    <tr><td>MCP servers</td><td>Each folder's <code>.kiro/settings/mcp.json</code> is independent. Later workspace folders override earlier ones if there's a name conflict.</td></tr>
+    <tr><td>Hooks</td><td>Each folder's <code>.kiro/hooks/</code> applies to events in that folder</td></tr>
+    <tr><td>Skills</td><td>Each folder's <code>.kiro/skills/</code> is available when working in that folder</td></tr>
+    <tr><td>Specs</td><td>Each folder's <code>.kiro/specs/</code> belongs to that project</td></tr>
+    <tr><td>Global config</td><td><code>~/.kiro/</code> applies across ALL folders (as always)</td></tr>
+  </table>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <h2>MCP Precedence in Multi-root</h2>
+
+  <p>MCP configs are merged with this precedence (highest wins last):</p>
+
+  <div class="demo">
+    <svg width="100%" height="260" viewBox="0 0 580 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagram showing MCP config precedence: user config is overridden by workspace folder 1, which is overridden by workspace folder 2">
+      <!-- Background - fixed light -->
+      <rect width="580" height="260" rx="12" fill="#f8f8f6"/>
+
+      <!-- Title -->
+      <text x="290" y="28" font-size="12" font-weight="600" fill="#1f2937" text-anchor="middle" font-family="system-ui, sans-serif">MCP Config Precedence (highest wins last)</text>
+
+      <!-- Layer 1: User config (lowest) -->
+      <rect x="60" y="48" width="360" height="44" rx="8" fill="#e0f2fe" stroke="#0369a1" stroke-width="1.5"/>
+      <text x="80" y="67" font-size="11" font-weight="600" fill="#1e1b4b" font-family="'SF Mono', monospace">~/.kiro/settings/mcp.json</text>
+      <text x="80" y="84" font-size="10" fill="#374151" font-family="system-ui, sans-serif">User config (global)</text>
+      <text x="440" y="74" font-size="10" fill="#0c4a6e" font-weight="700" font-family="system-ui, sans-serif">&#x2193; lowest priority</text>
+
+      <!-- Arrow 1 -->
+      <line x1="240" y1="92" x2="240" y2="112" stroke="#5b21b6" stroke-width="1.5"/>
+      <polygon points="240,116 236,110 244,110" fill="#5b21b6"/>
+      <text x="256" y="108" font-size="9.5" fill="#5b21b6" font-family="system-ui, sans-serif" font-weight="600">overridden by</text>
+
+      <!-- Layer 2: Workspace folder 1 -->
+      <rect x="60" y="120" width="360" height="44" rx="8" fill="#ede9fe" stroke="#6d28d9" stroke-width="1.5"/>
+      <text x="80" y="139" font-size="11" font-weight="600" fill="#1e1b4b" font-family="'SF Mono', monospace">frontend/.kiro/settings/mcp.json</text>
+      <text x="80" y="156" font-size="10" fill="#374151" font-family="system-ui, sans-serif">Workspace folder 1</text>
+
+      <!-- Arrow 2 -->
+      <line x1="240" y1="164" x2="240" y2="184" stroke="#4338ca" stroke-width="1.5"/>
+      <polygon points="240,188 236,182 244,182" fill="#4338ca"/>
+      <text x="256" y="180" font-size="9.5" fill="#4338ca" font-family="system-ui, sans-serif" font-weight="600">overridden by</text>
+
+      <!-- Layer 3: Workspace folder 2 (highest) -->
+      <rect x="60" y="192" width="360" height="44" rx="8" fill="#c4b5fd" stroke="#3730a3" stroke-width="2"/>
+      <text x="80" y="211" font-size="11" font-weight="600" fill="#1e1b4b" font-family="'SF Mono', monospace">backend/.kiro/settings/mcp.json</text>
+      <text x="80" y="228" font-size="10" fill="#374151" font-family="system-ui, sans-serif">Workspace folder 2</text>
+      <text x="440" y="216" font-size="10" fill="#3730a3" font-weight="700" font-family="system-ui, sans-serif">&#x2191; highest priority</text>
+
+      <!-- Priority gradient bar -->
+      <defs>
+        <linearGradient id="priority-grad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#7dd3fc"/>
+          <stop offset="100%" stop-color="#6d28d9"/>
+        </linearGradient>
+      </defs>
+      <rect x="32" y="52" width="8" height="180" rx="4" fill="url(#priority-grad)"/>
+      <text x="36" y="248" font-size="8.5" fill="#374151" text-anchor="middle" font-family="system-ui, sans-serif">Priority</text>
+    </svg>
+    <p class="demo-caption">Later workspace folders override earlier ones. User-level config has the lowest precedence. Name servers uniquely to avoid collisions.</p>
+  </div>
+
+  <p>If your frontend and backend both define a server named "github" with different tokens, the later folder in the workspace order wins. Name servers uniquely to avoid collisions.</p>
+
+  <div class="key-concept">
+    <strong>Practical tip:</strong> Put truly shared MCP servers (GitHub, Jira) in your global <code>~/.kiro/settings/mcp.json</code> so they work regardless of which folder you're in. Only put folder-specific servers (database for backend, component docs for frontend) in the per-folder config.
+  </div>
+
+  <h2>When Multi-root Helps vs. When It Doesn't</h2>
+
+  <table>
+    <tr><th>Good use cases</th><th>Better as single-root</th></tr>
+    <tr><td>Frontend + backend in one window</td><td>A monorepo where all code shares conventions</td></tr>
+    <tr><td>App + shared library development</td><td>A single Angular project</td></tr>
+    <tr><td>Projects that need different MCP servers or steering</td><td>Projects that share all configuration</td></tr>
+    <tr><td>Microservices with independent configs</td><td>Tightly coupled code that references across folders constantly</td></tr>
+  </table>
+
+  <p>If everything in your workspace uses the same steering, same MCP, same hooks - multi-root adds complexity without benefit. Use it when the roots genuinely need different configuration.</p>
+
+  <h2>Connection to What You Know</h2>
+
+  <ul>
+    <li><strong>Steering</strong> (Lesson 1) - fileMatch patterns work relative to the folder root, not the workspace root. <code>src/app/**/*.ts</code> in folder 1's steering matches folder 1's files only.</li>
+    <li><strong>Context</strong> (Lesson 2) - the active file determines which folder's steering/config is "live" at any moment.</li>
+    <li><strong>MCP</strong> (Lesson 5) - per-folder MCP means your backend can have database access without loading those tool definitions when you're working on frontend.</li>
+  </ul>
+
+  <h2>Your Tangible Win</h2>
+
+  <p>You understand how multi-root workspaces scope Kiro's configuration per-folder, how MCP precedence works, and when multi-root adds value vs. unnecessary complexity. You can set up a frontend + backend workspace where each root has tailored steering, hooks, and MCP access.</p>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <h2>Quiz</h2>
+
+  <div class="quiz" role="group">
+    <h3>You have a frontend folder and a backend folder in a multi-root workspace. You're editing a backend file. Which steering applies?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Both frontend and backend steering combined</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">The backend folder's steering + global steering</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Only global steering - multi-root disables per-folder steering</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="quiz" role="group">
+    <h3>Where should shared MCP servers (GitHub, Jira) be configured in a multi-root workspace?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">In every folder's mcp.json (duplicated)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">In global ~/.kiro/settings/mcp.json - available regardless of active folder</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">In the first folder's mcp.json only</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="recommended">
+    <strong>Recommended resources:</strong>
+    <a href="https://kiro.dev/docs/editor/multi-root-workspaces/">Multi-root Workspaces</a>.
+  </div>
+
+  <div class="footer-nav">
+    <a href="13-model-selection.html">&larr; Prev: Model Selection</a>
+    <a href="index.html">Index</a>
+    <a href="15-kiro-cli.html">Next: Kiro CLI &rarr;</a>
+  </div>
+
+    </main>
+  </div>
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

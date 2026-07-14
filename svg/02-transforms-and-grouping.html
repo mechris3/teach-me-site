@@ -780,31 +780,31 @@
   <div class="quiz" id="quiz1">
     <h3>Question 1</h3>
     <p>What does SVG's <code>rotate(45)</code> rotate around by default?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The centre of the element's bounding box</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">The origin (0, 0) of the current coordinate system</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The centre of the viewport</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The centre of the viewBox</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The centre of the element's bounding box</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">The origin (0, 0) of the current coordinate system</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The centre of the viewport</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The centre of the viewBox</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz2">
     <h3>Question 2</h3>
     <p>Given <code>transform="translate(50, 0) scale(2)"</code> on a rect at <code>x="10"</code>, where does the rect's left edge end up?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">At x = 60 (translated 50, then scaled doesn't move it further)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">At x = 20 (only the scale applies, doubling the position)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">At x = 70 (scale doubles 10 to 20, then translate adds 50)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">At x = 120 (translate 50, then scale doubles the result)</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">At x = 60 (translated 50, then scaled doesn't move it further)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">At x = 20 (only the scale applies, doubling the position)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">At x = 70 (scale doubles 10 to 20, then translate adds 50)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">At x = 120 (translate 50, then scale doubles the result)</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz3">
     <h3>Question 3</h3>
     <p>What's the difference between <code>&lt;g&gt;</code> and nested <code>&lt;svg&gt;</code>?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">They are interchangeable for grouping</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)"><code>&lt;g&gt;</code> creates a new viewport, <code>&lt;svg&gt;</code> does not</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)"><code>&lt;g&gt;</code> inherits the parent coordinate system; nested <code>&lt;svg&gt;</code> establishes a new one</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)"><code>&lt;g&gt;</code> cannot have transforms applied</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">They are interchangeable for grouping</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)"><code>&lt;g&gt;</code> creates a new viewport, <code>&lt;svg&gt;</code> does not</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)"><code>&lt;g&gt;</code> inherits the parent coordinate system; nested <code>&lt;svg&gt;</code> establishes a new one</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)"><code>&lt;g&gt;</code> cannot have transforms applied</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="ad-footer" aria-label="Advertisement">Ad</div>

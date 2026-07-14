@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>Kiro CLI - Lesson 15 | Teach Me</title>
+  <meta name="description" content="Kiro CLI: terminal workflows, session memory, file references, and headless agent execution.">
+  <link rel="canonical" href="https://teachmeskills.dev/kiro/15-kiro-cli.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/kiro/15-kiro-cli.html">
+  <meta property="og:title" content="Kiro CLI - Lesson 15 | Teach Me">
+  <meta property="og:description" content="Kiro CLI: terminal workflows, session memory, file references, and headless agent execution.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Kiro CLI - Lesson 15 | Teach Me">
+  <meta name="twitter:description" content="Kiro CLI: terminal workflows, session memory, file references, and headless agent execution.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header"><a href="index.html">Kiro Course</a></div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-steering-the-foundation.html">1. Steering</a></li>
+        <li><a href="02-context-management.html">2. Context Management</a></li>
+        <li><a href="03-hooks.html">3. Hooks</a></li>
+        <li><a href="04-skills.html">4. Skills</a></li>
+        <li><a href="05-mcp-using.html">5. MCP: Using</a></li>
+        <li><a href="06-mcp-building.html">6. MCP: Building</a></li>
+        <li><a href="07-powers.html">7. Powers</a></li>
+        <li><a href="08-subagents.html">8. Sub-agents</a></li>
+        <li><a href="09-custom-agents.html">9. Custom Agents</a></li>
+        <li><a href="10-acp.html">10. ACP</a></li>
+        <li><a href="11-property-based-testing.html">11. Property Testing</a></li>
+        <li><a href="12-specs-as-living-artifacts.html">12. Specs</a></li>
+        <li><a href="13-model-selection.html">13. Model Selection</a></li>
+        <li><a href="14-multi-root-workspaces.html">14. Multi-root</a></li>
+        <li class="current"><a href="15-kiro-cli.html">15. Kiro CLI</a></li>
+        <li><a href="16-capstone-team-setup.html">16. Capstone</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="steering-reference.html">Steering Reference</a></li>
+        <li><a href="mcp-setup-guides.html">MCP Setup Guides</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 15</p>
+  <h1>Kiro CLI</h1>
+
+  <h2>What the CLI Is</h2>
+
+  <p>The Kiro CLI is the same agent you use in the IDE, but living in your terminal. It reads your codebase, writes code, runs commands, and asks before doing anything destructive - same capabilities, different interface.</p>
+
+  <p>It's not a replacement for the IDE - it's a complementary surface. Some workflows are better in the terminal.</p>
+
+  <h2>When CLI Over IDE</h2>
+
+  <table>
+    <tr><th>Use the CLI when</th><th>Use the IDE when</th></tr>
+    <tr><td>You're already in the terminal and want to stay there</td><td>You need visual diffs, file tree, editor features</td></tr>
+    <tr><td>Headless/CI automation (no UI needed)</td><td>Interactive development with visual feedback</td></tr>
+    <tr><td>Quick one-off tasks without opening the IDE</td><td>Long sessions with multiple files open</td></tr>
+    <tr><td>SSH'd into a remote machine</td><td>Local development on your Mac</td></tr>
+    <tr><td>Running in scripts or pipelines</td><td>Collaborative/pair-programming with the agent</td></tr>
+  </table>
+
+  <h2>Getting Started</h2>
+
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code># Install - check kiro.dev/docs/cli/quick-start for the current method
+# Common options include Homebrew, npm, or the official installer script
+
+# Start an interactive chat in the current directory
+kiro
+
+# Start with a specific prompt
+kiro "explain how the auth service works"</code></pre></div>
+
+  <p>The CLI uses the same <code>.kiro/</code> configuration as the IDE - steering, hooks, skills, MCP, custom agents all apply.</p>
+
+  <h2>Key CLI Features</h2>
+
+  <h3>File references with @path</h3>
+
+  <p>Include file contents directly in your message without a tool call:</p>
+
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>kiro "refactor this service @src/app/services/user.service.ts to use signals"</code></pre></div>
+
+  <p>The file content is expanded inline before sending - saves tokens by avoiding a read_file tool call. Use <code>@folder/</code> (with trailing slash) to include a directory tree structure.</p>
+
+  <h3>Session memory</h3>
+
+  <p>The CLI automatically saves all chat sessions per-directory. When you start a session where you previously chatted, you can resume:</p>
+
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code># Resume the last session in this directory
+kiro --resume
+
+# List previous sessions
+kiro session list</code></pre></div>
+
+  <p>This means you can close the terminal, come back tomorrow, and pick up where you left off.</p>
+
+  <h3>Slash commands</h3>
+
+  <p>Within an interactive session, slash commands provide shortcuts. Available commands may vary by CLI version - use <code>/help</code> to see what's available in yours:</p>
+
+  <table>
+    <tr><th>Command</th><th>What it does</th></tr>
+    <tr><td><code>/compact</code></td><td>Manually compact conversation history to free context space</td></tr>
+    <tr><td><code>/plan</code></td><td>Switch to the planning agent (read-only research → structured plan)</td></tr>
+    <tr><td><code>/model</code></td><td>Change the active model</td></tr>
+    <tr><td><code>/trust</code></td><td>Manage tool permissions</td></tr>
+    <tr><td><code>/knowledge</code></td><td>Persistent knowledge base (experimental) - stores info across sessions</td></tr>
+    <tr><td><code>/help</code></td><td>Show all available commands</td></tr>
+  </table>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <h3>Headless mode (CI/CD)</h3>
+
+  <p>Run Kiro without an interactive terminal - for automation:</p>
+
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code># In a CI pipeline
+kiro --headless --prompt "review this PR for security issues" --api-key $KIRO_API_KEY</code></pre></div>
+
+  <p>Use cases: automated code review on PRs, test generation in CI, build failure troubleshooting, documentation generation.</p>
+
+  <h3>Tool permissions</h3>
+
+  <p>The CLI has explicit permission management:</p>
+  <ul>
+    <li><strong>Ask</strong> (default for destructive actions) - prompts you before running</li>
+    <li><strong>Trust</strong> - auto-approve specific tools or commands</li>
+    <li><strong>Deny</strong> - block specific tools entirely</li>
+  </ul>
+
+  <p>You can trust specific command patterns: <code>/trust "ng lint"</code> means lint commands run without asking.</p>
+
+  <h2>CLI-Specific Features Not in the IDE</h2>
+
+  <ul>
+    <li><strong>Session persistence and resume</strong> - conversations saved automatically, resumable across terminal sessions</li>
+    <li><strong>Headless mode</strong> - non-interactive execution for CI/CD pipelines</li>
+    <li><strong><code>/plan</code> agent</strong> - dedicated planning mode that researches then hands off to execution</li>
+    <li><strong><code>/knowledge</code></strong> - experimental persistent knowledge base across sessions</li>
+    <li><strong><code>@path</code> file references</strong> - inline file expansion (IDE uses <code>#File</code> instead)</li>
+    <li><strong>Custom agents with full YAML config</strong> - more elaborate than the IDE's markdown format (from Lesson 9)</li>
+  </ul>
+
+  <h2>Shared Configuration</h2>
+
+  <p>The CLI reads the same config as the IDE:</p>
+
+  <table>
+    <tr><th>Config</th><th>Shared?</th></tr>
+    <tr><td>Steering (<code>.kiro/steering/</code>)</td><td>Yes - same files</td></tr>
+    <tr><td>MCP servers (<code>.kiro/settings/mcp.json</code>)</td><td>Yes - same config</td></tr>
+    <tr><td>Global config (<code>~/.kiro/</code>)</td><td>Yes - same location</td></tr>
+    <tr><td>Skills (<code>.kiro/skills/</code>)</td><td>Yes - same files</td></tr>
+    <tr><td>Custom agents</td><td>Yes (though CLI supports richer format)</td></tr>
+    <tr><td>Hooks (<code>.kiro/hooks/</code>)</td><td>Yes - same hooks</td></tr>
+  </table>
+
+  <p>This means everything you configure for the IDE works in the CLI too. No duplication needed.</p>
+
+  <div class="key-concept">
+    <strong>The KIRO_HOME variable:</strong> Set <code>KIRO_HOME</code> to redirect the global <code>~/.kiro</code> directory to a different location. Useful for maintaining separate profiles on the same machine (e.g. work vs personal).
+  </div>
+
+  <h2>Practical Scenarios</h2>
+
+  <h3>"I'm in the terminal and don't want to switch to the IDE"</h3>
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>kiro "add error handling to the payment service - wrap all HTTP calls in try/catch with structured logging"</code></pre></div>
+
+  <h3>"I want to review the PR changes before merging"</h3>
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>kiro "review the git diff for security issues and potential bugs @$(git diff --name-only)"</code></pre></div>
+
+  <h3>"I want to automate code review in CI"</h3>
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>kiro --headless --prompt "review this diff for: security issues, missing error handling, and Angular best practices. Output a summary." --api-key $KIRO_API_KEY</code></pre></div>
+
+  <h2>Your Tangible Win</h2>
+
+  <p>You now know the CLI exists as a complementary surface, when to use it over the IDE, its unique features (session persistence, headless mode, @path references, /plan agent), and that it shares all your IDE configuration. If you ever need terminal-native workflows or CI automation, you know where to look.</p>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <h2>Quick Check</h2>
+
+  <div class="quiz" role="group">
+    <h3>The @path syntax in CLI does what?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Expands file contents inline into your message - avoids a tool call, saves tokens</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Creates a symlink to the file for the agent to read later</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Attaches the file as a binary blob</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="quiz" role="group">
+    <h3>Which CLI feature has no equivalent in the IDE?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Steering support</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Headless mode for CI/CD automation</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">MCP server connections</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="recommended">
+    <strong>Recommended resources:</strong>
+    <a href="https://kiro.dev/docs/cli/">CLI Overview</a>, <a href="https://kiro.dev/docs/cli/quick-start/">Quick Start</a>, <a href="https://kiro.dev/docs/cli/headless/">Headless Mode</a>, <a href="https://kiro.dev/docs/cli/chat/file-references/">File References</a>, <a href="https://kiro.dev/docs/cli/chat/session-management/">Session Management</a>.
+  </div>
+
+  <div class="footer-nav">
+    <a href="14-multi-root-workspaces.html">&larr; Prev: Multi-root Workspaces</a>
+    <a href="index.html">Index</a>
+    <a href="16-capstone-team-setup.html">Next: Capstone: Team Setup &rarr;</a>
+  </div>
+
+    </main>
+  </div>
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

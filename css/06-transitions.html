@@ -611,51 +611,51 @@ transition: all 0.3s ease;</code></pre>
   <div class="quiz" id="quiz1">
     <h3>Question 1</h3>
     <p>Where should the transition declaration go  -  on the base state or the hover/active state?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Base state  -  so it applies in both directions</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Hover state  -  that's where the change happens</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Either  -  it doesn't matter where you put it</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">A separate @transition rule at the top of the file</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Base state  -  so it applies in both directions</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Hover state  -  that's where the change happens</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Either  -  it doesn't matter where you put it</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">A separate @transition rule at the top of the file</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz2">
     <h3>Question 2</h3>
     <p>Which two properties are cheapest to transition (GPU composited)?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">width and height</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">background and color</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">transform and opacity</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">padding and margin</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">width and height</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">background and color</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">transform and opacity</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">padding and margin</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz3">
     <h3>Question 3</h3>
     <p>You want an element to start moving slowly and accelerate. Which timing function?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">ease-out  -  decelerates at the end</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">ease-in  -  starts slow, gets faster</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">ease  -  slow at start and end equally</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">linear  -  constant speed throughout</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">ease-out  -  decelerates at the end</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">ease-in  -  starts slow, gets faster</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">ease  -  slow at start and end equally</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">linear  -  constant speed throughout</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz4">
     <h3>Question 4</h3>
     <p>Can you transition height from 0 to auto?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Yes  -  auto is a valid target for any transition</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">No  -  browser can't interpolate to unknown value (use workarounds)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Only if you set transition-behavior: allow-discrete</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Only with a registered @property for height</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Yes  -  auto is a valid target for any transition</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">No  -  browser can't interpolate to unknown value (use workarounds)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Only if you set transition-behavior: allow-discrete</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Only with a registered @property for height</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz5">
     <h3>Question 5</h3>
     <p>What does transition-behavior: allow-discrete enable?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Allows transitions on unregistered custom properties</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Makes all transitions run on the GPU</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Lets discrete properties like display participate in transitions</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Enables transitions to fire on page load</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Allows transitions on unregistered custom properties</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Makes all transitions run on the GPU</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Lets discrete properties like display participate in transitions</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Enables transitions to fire on page load</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="recommended">

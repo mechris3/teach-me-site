@@ -508,51 +508,51 @@
   <div class="quiz" id="quiz1">
     <h3>Question 1</h3>
     <p>What does <code>&amp;</code> represent in CSS nesting?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">The parent selector (the outer rule's selector)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The nearest HTML parent element</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">A placeholder for any class name</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The document root selector</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">The parent selector (the outer rule's selector)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The nearest HTML parent element</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">A placeholder for any class name</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The document root selector</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz2">
     <h3>Question 2</h3>
     <p>What is the difference between <code>&amp;.featured</code> and <code>&amp; .featured</code>?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">They are identical  -  the space doesn't matter</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">&amp;.featured = same element (compound). &amp; .featured = descendant (with space)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">&amp;.featured targets children, &amp; .featured targets siblings</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">&amp;.featured is invalid syntax</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">They are identical  -  the space doesn't matter</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">&amp;.featured = same element (compound). &amp; .featured = descendant (with space)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">&amp;.featured targets children, &amp; .featured targets siblings</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">&amp;.featured is invalid syntax</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz3">
     <h3>Question 3</h3>
     <p>Does nesting change specificity compared to the flat equivalent?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Yes  -  nesting increases specificity by one level per depth</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Yes  -  nested selectors get a specificity bonus</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">No  -  specificity is identical to the equivalent flat selector</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Only if you use &amp; explicitly</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Yes  -  nesting increases specificity by one level per depth</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Yes  -  nested selectors get a specificity bonus</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">No  -  specificity is identical to the equivalent flat selector</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Only if you use &amp; explicitly</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz4">
     <h3>Question 4</h3>
     <p>What does nesting a <code>@media</code> rule inside a selector do?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Creates a scoped media query that only applies to that selector's children</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">De-sugars to a normal @media block wrapping that selector  -  just co-locates the code</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Increases the media query's priority in the cascade</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Makes the media query inherit the parent's specificity</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Creates a scoped media query that only applies to that selector's children</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">De-sugars to a normal @media block wrapping that selector  -  just co-locates the code</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Increases the media query's priority in the cascade</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Makes the media query inherit the parent's specificity</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz5">
     <h3>Question 5</h3>
     <p>What is a good maximum nesting depth to maintain readable CSS?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">1 level  -  never nest deeper than one level</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">2-3 levels  -  keeps specificity manageable</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">5-6 levels  -  matches typical DOM depth</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">No limit  -  nesting depth doesn't affect specificity</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">1 level  -  never nest deeper than one level</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">2-3 levels  -  keeps specificity manageable</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">5-6 levels  -  matches typical DOM depth</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">No limit  -  nesting depth doesn't affect specificity</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="recommended">

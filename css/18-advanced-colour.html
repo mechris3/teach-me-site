@@ -457,51 +457,51 @@ document.documentElement.classList.add('force-dark');
   <div class="quiz" id="quiz1">
     <h3>Question 1</h3>
     <p>What does the L in oklch represent, and how is it different from HSL's L?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Luminance - it's the same as HSL's lightness</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Perceptual lightness - calibrated to human vision (unlike HSL's mathematical average)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Luminosity - measures screen brightness in nits</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Level - a discrete step from 0 to 10</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Luminance - it's the same as HSL's lightness</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Perceptual lightness - calibrated to human vision (unlike HSL's mathematical average)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Luminosity - measures screen brightness in nits</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Level - a discrete step from 0 to 10</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz2">
     <h3>Question 2</h3>
     <p>What does oklch(from var(--brand) l c calc(h + 180)) do?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Inverts the colour (like a negative)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Creates the complementary colour (180 degree hue shift, same lightness and chroma)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Doubles the brightness</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Rotates the colour 180 times</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Inverts the colour (like a negative)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Creates the complementary colour (180 degree hue shift, same lightness and chroma)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Doubles the brightness</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Rotates the colour 180 times</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz3">
     <h3>Question 3</h3>
     <p>What happens if a wide-gamut oklch colour can't be displayed on an sRGB screen?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The browser shows an error</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The colour is replaced with black</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">The browser gamut-maps it to the closest displayable colour</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The declaration is ignored entirely</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The browser shows an error</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The colour is replaced with black</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">The browser gamut-maps it to the closest displayable colour</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The declaration is ignored entirely</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz4">
     <h3>Question 4</h3>
     <p>What does light-dark(white, #1a1a2e) return?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Always white - light comes first</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">A mix of white and dark</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">white in light mode, #1a1a2e in dark mode (based on active color-scheme)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Depends on the time of day</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Always white - light comes first</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">A mix of white and dark</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">white in light mode, #1a1a2e in dark mode (based on active color-scheme)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Depends on the time of day</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz5">
     <h3>Question 5</h3>
     <p>To desaturate a colour using relative colour syntax in oklch, which channel do you reduce?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">L (lightness)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">C (chroma)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">H (hue)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Alpha</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">L (lightness)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">C (chroma)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">H (hue)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Alpha</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="recommended">

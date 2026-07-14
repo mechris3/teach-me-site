@@ -950,51 +950,51 @@ element.addEventListener('animationiteration', (e) =&gt; { /* fired at start of 
   <div class="quiz" id="quiz1">
     <h3>Question 1</h3>
     <p>What's the key difference between transitions and animations?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Animations use GPU, transitions don't</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Animations can run autonomously; transitions need a trigger</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Transitions can loop, animations can't</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">They're interchangeable - just different syntax</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Animations use GPU, transitions don't</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Animations can run autonomously; transitions need a trigger</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Transitions can loop, animations can't</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">They're interchangeable - just different syntax</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz2">
     <h3>Question 2</h3>
     <p>What does animation-fill-mode: both do?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Plays the animation in both directions alternately</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Applies both transform and opacity at once</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Shows first keyframe during delay AND holds last keyframe after end</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Runs on both desktop and mobile browsers</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Plays the animation in both directions alternately</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Applies both transform and opacity at once</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Shows first keyframe during delay AND holds last keyframe after end</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Runs on both desktop and mobile browsers</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz3">
     <h3>Question 3</h3>
     <p>How do you make a scroll-driven animation instead of time-based?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Set animation-duration to scroll</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Set animation-timeline: scroll() or view()</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Use @keyframes with scroll percentages</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Add scroll-behavior: animated to the container</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Set animation-duration to scroll</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Set animation-timeline: scroll() or view()</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Use @keyframes with scroll percentages</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Add scroll-behavior: animated to the container</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz4">
     <h3>Question 4</h3>
     <p>You want a looping animation that reverses direction each cycle. What animation-direction value?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">reverse</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">alternate</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">both</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">infinite</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">reverse</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">alternate</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">both</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">infinite</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz5">
     <h3>Question 5</h3>
     <p>In animation-range: entry 0% entry 100%, what does "entry 0%" mean?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The element is at the top of the viewport</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">The element's top edge hits the bottom of the viewport</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The element is 0% visible (fully hidden)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The scroll container is at 0% scroll position</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The element is at the top of the viewport</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">The element's top edge hits the bottom of the viewport</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The element is 0% visible (fully hidden)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The scroll container is at 0% scroll position</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="recommended">

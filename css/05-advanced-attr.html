@@ -585,51 +585,51 @@ svg-icon {
   <div class="quiz" id="quiz1">
     <h3>Question 1</h3>
     <p>What was the old limitation of attr() before the upgrade?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">It only worked on data- attributes</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">It only returned strings and only worked in content:</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">It only worked in Chrome browsers</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">It required JavaScript to function</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">It only worked on data- attributes</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">It only returned strings and only worked in content:</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">It only worked in Chrome browsers</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">It required JavaScript to function</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz2">
     <h3>Question 2</h3>
     <p>How do you tell the browser that data-size should be parsed as a length?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">attr(data-size, &lt;length&gt;)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">attr(data-size as length)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">attr(data-size type(&lt;length&gt;), fallback)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">attr(data-size, type: length)</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">attr(data-size, &lt;length&gt;)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">attr(data-size as length)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">attr(data-size type(&lt;length&gt;), fallback)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">attr(data-size, type: length)</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz3">
     <h3>Question 3</h3>
     <p>Can you transition a value read from attr()?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Yes  -  once typed, it interpolates like any value</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">No  -  attributes aren't tracked for interpolation</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Only if you also register it with @property</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Only for colour and length types</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Yes  -  once typed, it interpolates like any value</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">No  -  attributes aren't tracked for interpolation</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Only if you also register it with @property</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Only for colour and length types</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz4">
     <h3>Question 4</h3>
     <p>An element has no data-size attribute. You use: font-size: attr(data-size type(&lt;length&gt;), 1rem). What happens?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The declaration is skipped entirely</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">1rem is used  -  the fallback applies</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">0px  -  missing attributes default to zero</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">inherit  -  falls back to parent value</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The declaration is skipped entirely</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">1rem is used  -  the fallback applies</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">0px  -  missing attributes default to zero</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">inherit  -  falls back to parent value</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz5">
     <h3>Question 5</h3>
     <p>A child element wants to read data-theme from its parent. Can it use attr(data-theme)?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Yes  -  attr() inherits like custom properties</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">No  -  attr() only reads the element's own attributes</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Only if the parent has display: contents</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Only with the inherit keyword as fallback</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Yes  -  attr() inherits like custom properties</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">No  -  attr() only reads the element's own attributes</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Only if the parent has display: contents</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Only with the inherit keyword as fallback</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="recommended">

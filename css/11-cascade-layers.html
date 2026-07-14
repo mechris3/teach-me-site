@@ -548,51 +548,51 @@ div#header .nav-link { ... }
   <div class="quiz" id="quiz1">
     <h3>Question 1</h3>
     <p>Where do layers sit relative to specificity in the cascade resolution order?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Below  -  specificity is checked before layers</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Above  -  layer priority is checked first</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Same level  -  they're combined into one score</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">It depends on whether !important is used</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Below  -  specificity is checked before layers</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Above  -  layer priority is checked first</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Same level  -  they're combined into one score</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">It depends on whether !important is used</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz2">
     <h3>Question 2</h3>
     <p>Given <code>@layer reset, base, components, utilities</code>  -  which layer has the highest normal priority?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">reset  -  first declared gets priority</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">components  -  it has the most specific selectors</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">utilities  -  last declared wins</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">They all have equal priority</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">reset  -  first declared gets priority</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">components  -  it has the most specific selectors</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">utilities  -  last declared wins</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">They all have equal priority</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz3">
     <h3>Question 3</h3>
     <p>What beats all layered styles in the cascade?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Styles with higher specificity selectors</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Styles using !important</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Unlayered styles (CSS not inside any @layer)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Inline styles only</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Styles with higher specificity selectors</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Styles using !important</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Unlayered styles (CSS not inside any @layer)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Inline styles only</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz4">
     <h3>Question 4</h3>
     <p>For <code>!important</code> rules, how is layer priority resolved?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Same as normal  -  last declared wins</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Inverted  -  first declared layer wins</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">!important ignores layers entirely</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">All !important rules have equal priority</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Same as normal  -  last declared wins</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Inverted  -  first declared layer wins</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">!important ignores layers entirely</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">All !important rules have equal priority</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz5">
     <h3>Question 5</h3>
     <p>How do you put third-party CSS into a named layer?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">@layer vendor { @include "library.css"; }</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">link rel="stylesheet" layer="vendor" href="library.css"</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">@import url("library.css") layer(vendor)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">@layer(vendor) url("library.css")</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">@layer vendor { @include "library.css"; }</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">link rel="stylesheet" layer="vendor" href="library.css"</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">@import url("library.css") layer(vendor)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">@layer(vendor) url("library.css")</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="recommended">

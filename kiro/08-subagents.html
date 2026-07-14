@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>Sub-agents - Lesson 8 | Teach Me</title>
+  <meta name="description" content="Kiro sub-agents: parallel execution, context isolation, delegation patterns for complex tasks.">
+  <link rel="canonical" href="https://teachmeskills.dev/kiro/08-subagents.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/kiro/08-subagents.html">
+  <meta property="og:title" content="Sub-agents - Lesson 8 | Teach Me">
+  <meta property="og:description" content="Kiro sub-agents: parallel execution, context isolation, delegation patterns for complex tasks.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Sub-agents - Lesson 8 | Teach Me">
+  <meta name="twitter:description" content="Kiro sub-agents: parallel execution, context isolation, delegation patterns for complex tasks.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header"><a href="index.html">Kiro Course</a></div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-steering-the-foundation.html">1. Steering</a></li>
+        <li><a href="02-context-management.html">2. Context Management</a></li>
+        <li><a href="03-hooks.html">3. Hooks</a></li>
+        <li><a href="04-skills.html">4. Skills</a></li>
+        <li><a href="05-mcp-using.html">5. MCP: Using</a></li>
+        <li><a href="06-mcp-building.html">6. MCP: Building</a></li>
+        <li><a href="07-powers.html">7. Powers</a></li>
+        <li class="current"><a href="08-subagents.html">8. Sub-agents</a></li>
+        <li><a href="09-custom-agents.html">9. Custom Agents</a></li>
+        <li><a href="10-acp.html">10. ACP</a></li>
+        <li><a href="11-property-based-testing.html">11. Property Testing</a></li>
+        <li><a href="12-specs-as-living-artifacts.html">12. Specs</a></li>
+        <li><a href="13-model-selection.html">13. Model Selection</a></li>
+        <li><a href="14-multi-root-workspaces.html">14. Multi-root</a></li>
+        <li><a href="15-kiro-cli.html">15. Kiro CLI</a></li>
+        <li><a href="16-capstone-team-setup.html">16. Capstone</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="steering-reference.html">Steering Reference</a></li>
+        <li><a href="mcp-setup-guides.html">MCP Setup Guides</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 8</p>
+  <h1>Sub-agents</h1>
+
+  <h2>What Sub-agents Are</h2>
+
+  <p>A sub-agent is a separate agent instance that Kiro spawns to handle a focused task. It runs in its <strong>own isolated context window</strong> - meaning it doesn't share the main conversation's history, and its work doesn't pollute the main agent's context.</p>
+
+  <p>When it finishes, it returns its results to the main agent, which incorporates them into the conversation.</p>
+
+  <h2>Why They Exist</h2>
+
+  <p>Two problems they solve:</p>
+
+  <ol>
+    <li><strong>Context preservation</strong> - if Kiro needs to read 20 files to answer a question, doing that in the main conversation eats your context budget. A sub-agent does the exploration in its own window, then returns a concise summary. Your main context stays lean.</li>
+    <li><strong>Parallelism</strong> - Kiro can run multiple sub-agents at the same time. "Update the tests AND update the docs" can happen concurrently rather than sequentially.</li>
+  </ol>
+
+  <h2>The Built-in Sub-agents</h2>
+
+  <p>Kiro has several built-in sub-agents in the IDE. The two you'll encounter most often:</p>
+
+  <table>
+    <tr><th>Sub-agent</th><th>Purpose</th><th>When Kiro uses it</th></tr>
+    <tr><td><strong>Context gatherer</strong></td><td>Explores the codebase to find relevant files and understand structure</td><td>When it needs to understand an unfamiliar area before making changes</td></tr>
+    <tr><td><strong>General purpose</strong></td><td>Executes any task - code changes, file operations, research</td><td>When parallelising independent tasks</td></tr>
+  </table>
+
+  <p>There are also specialised built-in sub-agents for tasks like creating custom agent configurations and performing semantic code reviews. Each has its own context window, tools, and decision-making. They can read files, run commands, and make changes - same capabilities as the main agent.</p>
+
+  <h2>Automatic vs Manual Launch</h2>
+
+  <h3>Automatic</h3>
+
+  <p>Kiro decides on its own when to use sub-agents. For complex tasks, it may spin up a context gatherer to explore before acting, or launch parallel general-purpose agents to work on independent parts simultaneously. You don't need to ask - it happens transparently.</p>
+
+  <p>You'll see sub-agent activity in the chat as collapsible sections showing what each agent did.</p>
+
+  <h3>Manual</h3>
+
+  <p>You can explicitly instruct Kiro to use sub-agents:</p>
+
+  <ul>
+    <li>"Run subagents to update the unit tests and the documentation in parallel"</li>
+    <li>"Use a subagent to explore how the auth service works, then come back and fix this bug"</li>
+    <li>"Investigate files X, Y, and Z in parallel"</li>
+  </ul>
+
+  <p>When you say "in parallel" or "use subagents", Kiro takes the hint and delegates accordingly.</p>
+
+  <h2>Context Isolation: The Key Mechanic</h2>
+
+  <p>This is the important part to understand. Each sub-agent gets:</p>
+
+  <ul>
+    <li>Its <strong>own</strong> fresh context window</li>
+    <li>Access to the <strong>same tools</strong> (file read/write, bash, MCP tools, etc.)</li>
+    <li>A <strong>prompt</strong> describing what it needs to do</li>
+    <li>Optionally, <strong>specific files</strong> pre-loaded for reference</li>
+  </ul>
+
+  <p>What it does NOT get:</p>
+  <ul>
+    <li>The main conversation's history</li>
+    <li>Results from other sub-agents running in parallel</li>
+    <li>Awareness of what the main agent is doing at the same time</li>
+  </ul>
+
+  <div class="key-concept">
+    <strong>Why this matters:</strong> A sub-agent exploring 20 files to find relevant context uses tokens in its own window. When it reports back, only the concise result enters the main conversation - not all 20 files. This is how sub-agents keep the main context lean.
+  </div>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <h2>Custom Sub-agents</h2>
+
+  <p>Beyond the two built-in ones, you can create <strong>custom sub-agents</strong> for specialised tasks. This is where it connects to Custom Agents (covered in <a href="09-custom-agents.html">Lesson 9</a>) - you define an agent configuration with specific tools, MCP servers, and prompts, then Kiro can spawn it as a sub-agent when relevant.</p>
+
+  <p>Example use cases for custom sub-agents:</p>
+  <ul>
+    <li>A <strong>frontend agent</strong> that knows about your Angular components and browser tooling</li>
+    <li>A <strong>backend agent</strong> that has access to your database MCP server and API docs</li>
+    <li>A <strong>test agent</strong> that specialises in writing and running tests</li>
+    <li>A <strong>docs agent</strong> that updates documentation following your team's format</li>
+  </ul>
+
+  <p>Each stays focused on its domain, managing its own context efficiently.</p>
+
+  <h2>When Sub-agents Help vs. When They Don't</h2>
+
+  <table>
+    <tr><th>Good use cases</th><th>Don't bother when</th></tr>
+    <tr><td>Exploring unfamiliar code before making changes</td><td>The task is simple and linear</td></tr>
+    <tr><td>Independent tasks that can run in parallel</td><td>Tasks are tightly dependent on each other</td></tr>
+    <tr><td>Keeping main context clean during research</td><td>You need to see every step interactively</td></tr>
+    <tr><td>Large-scale changes across many files</td><td>You're editing one file</td></tr>
+    <tr><td>Different domains (frontend + backend) simultaneously</td><td>Everything is in one domain</td></tr>
+  </table>
+
+  <h2>What You See in the UI</h2>
+
+  <p>When sub-agents run, you'll see:</p>
+  <ul>
+    <li>A collapsible section in the chat showing each sub-agent's work</li>
+    <li>Real-time updates as sub-agents read files, run commands, and make changes</li>
+    <li>The final result integrated into the main conversation when they complete</li>
+  </ul>
+
+  <p>Sub-agents are only available in <strong>Autopilot mode</strong> - they don't run in Supervised mode (where you approve each action individually).</p>
+
+  <h2>Practical Example</h2>
+
+  <p>You ask: "Refactor the user service to use signals instead of BehaviorSubjects"</p>
+
+  <p>Kiro might:</p>
+  <ol>
+    <li>Launch a <strong>context gatherer</strong> sub-agent to find all files that use <code>UserService</code> and understand the dependency graph</li>
+    <li>Based on the gathered context, plan the refactor</li>
+    <li>Launch <strong>parallel general-purpose</strong> sub-agents to:
+      <ul>
+        <li>Update the service itself</li>
+        <li>Update the components that consume it</li>
+        <li>Update the related tests</li>
+      </ul>
+    </li>
+    <li>Synthesize the results back into the main conversation</li>
+  </ol>
+
+  <p>You see one coherent result, but the work was distributed across multiple agents with isolated contexts.</p>
+
+  <h2>Your Tangible Win</h2>
+
+  <p>You now understand what sub-agents are, why context isolation matters, how to trigger them manually, and when they're worth using. You know the two built-in types (context gatherer and general purpose) and that custom sub-agents are possible for specialised domains.</p>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <h2>Quiz</h2>
+
+  <div class="quiz" role="group">
+    <h3>A sub-agent reads 15 files while exploring your codebase. How many of those files' contents end up in the main conversation's context?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">All 15 - the main agent inherits everything</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">None directly - only the sub-agent's concise result/summary enters the main context</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Only the files that were relevant to the final answer</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="quiz" role="group">
+    <h3>You want Kiro to update tests and docs simultaneously. How do you trigger parallel sub-agents?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Configure sub-agents in .kiro/settings/</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Just ask - "update the tests and docs in parallel" or "use subagents to..."</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Sub-agents only run automatically - you can't trigger them manually</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="quiz" role="group">
+    <h3>Sub-agents are available in which autonomy mode?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Autopilot only</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Both Autopilot and Supervised</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Supervised only (since they need approval)</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="recommended">
+    <strong>Recommended resources:</strong>
+    <a href="https://kiro.dev/docs/chat/subagents/">Kiro Docs: Sub-agents (IDE)</a>.
+  </div>
+
+  <div class="footer-nav">
+    <a href="07-powers.html">&larr; Prev: Powers</a>
+    <a href="index.html">Index</a>
+    <a href="09-custom-agents.html">Next: Custom Agents &rarr;</a>
+  </div>
+
+    </main>
+  </div>
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

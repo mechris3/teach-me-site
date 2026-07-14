@@ -629,54 +629,54 @@
 
   <h2>Quiz</h2>
 
-  <div class="quiz">
+  <div class="quiz" role="group">
     <h3>Question 1</h3>
     <p>In <code>&lt;animateTransform type="rotate" from="0 100 100" to="360 100 100"&gt;</code>, what do the <code>100 100</code> numbers represent?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The size of the rotation in pixels</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">The x,y coordinates of the rotation centre</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The scale factor to apply after rotation</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The translation to apply before rotation</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The size of the rotation in pixels</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">The x,y coordinates of the rotation centre</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The scale factor to apply after rotation</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The translation to apply before rotation</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
-  <div class="quiz">
+  <div class="quiz" role="group">
     <h3>Question 2</h3>
     <p>What happens if you have two <code>&lt;animateTransform&gt;</code> elements on one element without <code>additive="sum"</code>?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">They compose automatically (both run)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">The second one replaces the first (only one runs)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The browser throws an error and neither runs</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">They average their values for a blended result</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">They compose automatically (both run)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">The second one replaces the first (only one runs)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The browser throws an error and neither runs</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">They average their values for a blended result</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
-  <div class="quiz">
+  <div class="quiz" role="group">
     <h3>Question 3</h3>
     <p>What does <code>rotate="auto"</code> on <code>&lt;animateMotion&gt;</code> do?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Rotates the element 360 degrees over the animation duration</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Automatically calculates the shortest rotation path</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Orients the element tangent to the path (faces direction of travel)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Randomly rotates the element at each keyframe</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Rotates the element 360 degrees over the animation duration</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Automatically calculates the shortest rotation path</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Orients the element tangent to the path (faces direction of travel)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Randomly rotates the element at each keyframe</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
-  <div class="quiz">
+  <div class="quiz" role="group">
     <h3>Question 4</h3>
     <p>What is the default <code>calcMode</code> for <code>&lt;animateMotion&gt;</code>?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">linear (constant time per segment)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">paced (constant velocity along entire path)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">spline (eased with keySplines)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">discrete (jumps between positions)</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">linear (constant time per segment)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">paced (constant velocity along entire path)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">spline (eased with keySplines)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">discrete (jumps between positions)</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
-  <div class="quiz">
+  <div class="quiz" role="group">
     <h3>Question 5</h3>
     <p>What does animating the <code>viewBox</code> attribute achieve?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Resizes the SVG element on the HTML page</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Moves all child elements to new positions</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Creates a zoom/pan camera effect without moving any elements</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Changes the coordinate system scale permanently</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Resizes the SVG element on the HTML page</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Moves all child elements to new positions</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Creates a zoom/pan camera effect without moving any elements</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Changes the coordinate system scale permanently</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="ad-footer" aria-label="Advertisement">Ad</div>

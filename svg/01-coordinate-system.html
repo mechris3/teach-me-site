@@ -545,31 +545,31 @@
   <div class="quiz" id="quiz1">
     <h3>Question 1</h3>
     <p>If an SVG has <code>width="200" height="200" viewBox="0 0 400 400"</code>, how large is one user unit on screen?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">1 CSS pixel</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">0.5 CSS pixels</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">2 CSS pixels</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Depends on preserveAspectRatio</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">1 CSS pixel</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">0.5 CSS pixels</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">2 CSS pixels</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Depends on preserveAspectRatio</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz2">
     <h3>Question 2</h3>
     <p>What does changing the viewBox <code>min-x</code> value do?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Moves the SVG element on the page</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Shifts all child elements to the right</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Pans the camera  -  shifts which part of the canvas is visible</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Changes the origin of the coordinate system permanently</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Moves the SVG element on the page</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Shifts all child elements to the right</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Pans the camera  -  shifts which part of the canvas is visible</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Changes the origin of the coordinate system permanently</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz3">
     <h3>Question 3</h3>
     <p>Which <code>preserveAspectRatio</code> value is equivalent to CSS <code>object-fit: cover</code>?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">xMidYMid meet</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">xMidYMid slice</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">none</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">xMinYMin meet</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">xMidYMid meet</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">xMidYMid slice</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">none</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">xMinYMin meet</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="ad-footer" aria-label="Advertisement">Ad</div>

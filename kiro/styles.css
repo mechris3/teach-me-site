@@ -1,0 +1,20 @@
+/* ===========================
+   Kiro Course — Course-Specific Styles
+   =========================== */
+
+/* Kiro course demo variables */
+:root[data-theme="dark"] {
+  --kiro-demo-bg: #2c313a;
+}
+
+:root[data-theme="light"] {
+  --kiro-demo-bg: #f3f2ed;
+}
+
+/* Dark mode fixes for demos with hardcoded light backgrounds */
+:root[data-theme="dark"] .main-content .config-demo,
+:root[data-theme="dark"] .main-content .hook-demo,
+:root[data-theme="dark"] .main-content .mcp-demo,
+:root[data-theme="dark"] .main-content .agent-demo {
+  color: #1a1a2e;
+}

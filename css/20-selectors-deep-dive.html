@@ -476,51 +476,51 @@ tr:not(:first-child):hover {
   <div class="quiz" id="quiz1">
     <h3>Question 1</h3>
     <p>Given &lt;div&gt; containing: &lt;h2&gt;, &lt;p&gt;, &lt;p&gt; - what does p:nth-child(1) select?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The first paragraph</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Nothing - child #1 is an h2, not a p</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The h2 element</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Both paragraphs</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The first paragraph</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Nothing - child #1 is an h2, not a p</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The h2 element</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Both paragraphs</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz2">
     <h3>Question 2</h3>
     <p>You want "the 2nd &lt;p&gt; among siblings of mixed types." Which is the classic, widely-supported selector for this?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">p:nth-child(2) - counts only p elements</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">p:nth-of-type(2) - counts only p elements</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">div > p:nth-child(2) - scopes to div</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">p:nth-child(2n) - selects even p elements</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">p:nth-child(2) - counts only p elements</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">p:nth-of-type(2) - counts only p elements</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">div > p:nth-child(2) - scopes to div</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">p:nth-child(2n) - selects even p elements</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz3">
     <h3>Question 3</h3>
     <p>What's the difference between :focus and :focus-visible?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">:focus-visible is for visible elements, :focus is for hidden ones</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">:focus fires on any focus; :focus-visible only when browser thinks indicator should show (keyboard nav)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">:focus-visible has higher specificity</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">They're identical - :focus-visible is just newer syntax</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">:focus-visible is for visible elements, :focus is for hidden ones</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">:focus fires on any focus; :focus-visible only when browser thinks indicator should show (keyboard nav)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">:focus-visible has higher specificity</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">They're identical - :focus-visible is just newer syntax</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz4">
     <h3>Question 4</h3>
     <p>What does :placeholder-shown match?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">An input that has a placeholder attribute defined</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">An input currently showing its placeholder (i.e. the field is empty)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The placeholder text itself</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Any input that has ever shown a placeholder</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">An input that has a placeholder attribute defined</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">An input currently showing its placeholder (i.e. the field is empty)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The placeholder text itself</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Any input that has ever shown a placeholder</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz5">
     <h3>Question 5</h3>
     <p>What does [href$=".pdf"] select?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Links that contain ".pdf" anywhere</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Links that start with ".pdf"</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Links whose href ends with ".pdf"</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Only the first PDF link on the page</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Links that contain ".pdf" anywhere</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Links that start with ".pdf"</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Links whose href ends with ".pdf"</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Only the first PDF link on the page</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="recommended">

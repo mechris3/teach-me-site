@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>Model Selection - Lesson 13 | Teach Me</title>
+  <meta name="description" content="Kiro model selection: auto routing, when to pick which model, cost vs capability trade-offs.">
+  <link rel="canonical" href="https://teachmeskills.dev/kiro/13-model-selection.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/kiro/13-model-selection.html">
+  <meta property="og:title" content="Model Selection - Lesson 13 | Teach Me">
+  <meta property="og:description" content="Kiro model selection: auto routing, when to pick which model, cost vs capability trade-offs.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Model Selection - Lesson 13 | Teach Me">
+  <meta name="twitter:description" content="Kiro model selection: auto routing, when to pick which model, cost vs capability trade-offs.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header"><a href="index.html">Kiro Course</a></div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-steering-the-foundation.html">1. Steering</a></li>
+        <li><a href="02-context-management.html">2. Context Management</a></li>
+        <li><a href="03-hooks.html">3. Hooks</a></li>
+        <li><a href="04-skills.html">4. Skills</a></li>
+        <li><a href="05-mcp-using.html">5. MCP: Using</a></li>
+        <li><a href="06-mcp-building.html">6. MCP: Building</a></li>
+        <li><a href="07-powers.html">7. Powers</a></li>
+        <li><a href="08-subagents.html">8. Sub-agents</a></li>
+        <li><a href="09-custom-agents.html">9. Custom Agents</a></li>
+        <li><a href="10-acp.html">10. ACP</a></li>
+        <li><a href="11-property-based-testing.html">11. Property Testing</a></li>
+        <li><a href="12-specs-as-living-artifacts.html">12. Specs</a></li>
+        <li class="current"><a href="13-model-selection.html">13. Model Selection</a></li>
+        <li><a href="14-multi-root-workspaces.html">14. Multi-root</a></li>
+        <li><a href="15-kiro-cli.html">15. Kiro CLI</a></li>
+        <li><a href="16-capstone-team-setup.html">16. Capstone</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="steering-reference.html">Steering Reference</a></li>
+        <li><a href="mcp-setup-guides.html">MCP Setup Guides</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 13</p>
+  <h1>Model Selection</h1>
+
+  <h2>The Models Available</h2>
+
+  <p>Kiro gives you access to multiple AI models with different strengths. The current lineup (as of June 2026 - check <a href="https://kiro.dev/docs/models/">kiro.dev/docs/models</a> for the latest):</p>
+
+  <div class="key-concept">
+    <strong>Note:</strong> Model availability changes frequently. Check <a href="https://kiro.dev/docs/models/">kiro.dev/docs/models</a> for the current lineup. The tables below show model tiers and how to think about selection - specific model names and multipliers will change over time.
+  </div>
+
+  <h3>Model tiers</h3>
+  <p>Kiro offers models across a capability/cost spectrum. The exact names change as new models release, but the tiers are stable:</p>
+  <table>
+    <tr><th>Tier</th><th>Examples</th><th>Best for</th></tr>
+    <tr><td><strong>Frontier (Opus-class)</strong></td><td>Claude Opus 4</td><td>Complex architecture, long-horizon projects, self-verification. Most capable, highest cost.</td></tr>
+    <tr><td><strong>Balanced (Sonnet-class)</strong></td><td>Claude Sonnet 4</td><td>Strong all-rounder for everyday coding. Approaches frontier intelligence at lower cost.</td></tr>
+    <tr><td><strong>Fast (Haiku-class)</strong></td><td>Claude Haiku</td><td>Simple tasks, boilerplate, quick questions. Fast and cheap.</td></tr>
+    <tr><td><strong>Open weight</strong></td><td>Varies (check docs)</td><td>Cost-efficient alternatives. Lower multipliers stretch your budget on volume work.</td></tr>
+  </table>
+
+  <p>Each tier has a different credit multiplier. Frontier models cost more per task; fast and open-weight models cost a fraction. The exact multipliers are shown in the model selector dropdown in the IDE.</p>
+
+  <h2>What "Auto" Does</h2>
+
+  <p><strong>Auto</strong> (the default) routes each task to the optimal model automatically. It considers:</p>
+
+  <ul>
+    <li>Task complexity - harder problems get routed to more capable models</li>
+    <li>Cost efficiency - doesn't use Opus for simple tasks that Sonnet handles well</li>
+    <li>Task type - file navigation might use a lighter model, architecture decisions a heavier one</li>
+  </ul>
+
+  <p>Auto has a credit multiplier of 1.0x (baseline). Everything else is measured relative to this.</p>
+
+  <div class="key-concept">
+    <strong>For most daily work, Auto is the right choice.</strong> It optimises cost/quality without you thinking about it. Only switch to a specific model when you have a reason - you're not going to out-decide the router on routine tasks.
+  </div>
+
+  <h2>When to Override Auto</h2>
+
+  <table>
+    <tr><th>Situation</th><th>Model to pick</th><th>Why</th></tr>
+    <tr><td>Complex architecture decision, large refactor</td><td>Opus (frontier)</td><td>Maximum reasoning power - worth the higher cost</td></tr>
+    <tr><td>Running a long spec with many tasks</td><td>Sonnet or open weight</td><td>Many tasks adds up - use a cost-efficient model for the volume</td></tr>
+    <tr><td>Quick boilerplate generation</td><td>Haiku or open weight</td><td>Fast, cheap - no need for heavy reasoning</td></tr>
+    <tr><td>You're hitting credit limits</td><td>Open weight models</td><td>Lowest multipliers stretch your budget dramatically</td></tr>
+    <tr><td>You need maximum reliability (production-critical)</td><td>Opus (frontier)</td><td>Highest accuracy, fewest mistakes on complex logic</td></tr>
+    <tr><td>Exploratory/prototyping</td><td>Haiku or open weight</td><td>Speed matters more than perfection</td></tr>
+  </table>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <h2>How Credit Multipliers Work</h2>
+
+  <p>Credits are your usage currency. Each model tier has a multiplier relative to Auto (1.0x baseline). A task that costs 10 credits on Auto would cost more on Opus-class models and less on Haiku-class or open weight models. The exact multipliers are visible in the model selector dropdown.</p>
+
+  <p>For a long spec run with 20+ tasks, the model choice can mean an order-of-magnitude difference in credit consumption. Match the model to the task complexity.</p>
+
+  <h2>How to Change Models</h2>
+
+  <p>In the IDE: click the model name in the chat header (usually shows "Auto") and select from the dropdown.</p>
+
+  <p>You can change mid-session - switch to Opus for a hard problem, then back to Auto for the rest.</p>
+
+  <p>In custom agents (Lesson 9), you can specify a model per agent - so a research agent might use Haiku (cheap, just reading files) while a refactoring agent uses Opus (needs strong reasoning).</p>
+
+  <h2>Practical Strategy</h2>
+
+  <ol>
+    <li><strong>Default to Auto</strong> - let Kiro route unless you have a specific reason</li>
+    <li><strong>Use Opus for decisions</strong> - architecture, complex refactoring, tricky bugs</li>
+    <li><strong>Use Haiku/open weight for volume</strong> - boilerplate, repetitive tasks, exploration</li>
+    <li><strong>Watch your credits</strong> - if you're burning through them, drop to a lighter model for routine work</li>
+    <li><strong>Match model to spec task complexity</strong> - not every task in a spec needs the same model</li>
+  </ol>
+
+  <h2>Your Tangible Win</h2>
+
+  <p>You can now make informed model choices: default to Auto for daily work, switch to Opus for hard problems, use open weight models to stretch your budget on volume tasks. You understand credit multipliers and can match model capability to task complexity.</p>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <h2>Quiz</h2>
+
+  <div class="quiz" role="group">
+    <h3>You're running a 25-task spec that's mostly straightforward implementation. Which model saves the most credits without sacrificing quality?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Opus - best quality guarantees</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Sonnet or open weight - good quality at lower cost for volume work</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The cheapest open weight model available</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="quiz" role="group">
+    <h3>When is Auto NOT the right choice?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Never - Auto is always optimal</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">When you know the task is very complex (want guaranteed Opus) or very simple (want to save credits with Haiku/open weight)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Always - you should always pick manually for best results</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="recommended">
+    <strong>Recommended resources:</strong>
+    <a href="https://kiro.dev/docs/models/">Models Overview</a> and <a href="https://kiro.dev/docs/chat/model-selection">Model Selection (IDE)</a>.
+  </div>
+
+  <div class="footer-nav">
+    <a href="12-specs-as-living-artifacts.html">&larr; Prev: Specs as Living Artifacts</a>
+    <a href="index.html">Index</a>
+    <a href="14-multi-root-workspaces.html">Next: Multi-root Workspaces &rarr;</a>
+  </div>
+
+    </main>
+  </div>
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

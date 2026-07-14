@@ -516,51 +516,51 @@
   <div class="quiz" id="quiz1">
     <h3>Question 1</h3>
     <p>What property makes an element a query container for size-based container queries?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">container-name</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">container-type: inline-size</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">display: container</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">contain: layout</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">container-name</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">container-type: inline-size</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">display: container</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">contain: layout</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz2">
     <h3>Question 2</h3>
     <p>Why is <code>container-type: inline-size</code> preferred over <code>container-type: size</code>?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">inline-size has better browser support</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">size doesn't support named containers</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Tracking height creates circular dependencies in layout calculations</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">size is deprecated and will be removed</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">inline-size has better browser support</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">size doesn't support named containers</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Tracking height creates circular dependencies in layout calculations</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">size is deprecated and will be removed</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz3">
     <h3>Question 3</h3>
     <p>What does the <code>cqi</code> unit represent?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">1% of the viewport's inline size</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">1% of the container's block size</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">1% of the container's inline size (width)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">1 pixel relative to the container</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">1% of the viewport's inline size</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">1% of the container's block size</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">1% of the container's inline size (width)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">1 pixel relative to the container</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz4">
     <h3>Question 4</h3>
     <p>If you write <code>@container (min-width: 400px)</code> without specifying a container name, what does it query?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The document root element</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The viewport width (like a media query)</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">The nearest ancestor with container-type set</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">It throws a CSS error and is ignored</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The document root element</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The viewport width (like a media query)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">The nearest ancestor with container-type set</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">It throws a CSS error and is ignored</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="quiz" id="quiz5">
     <h3>Question 5</h3>
     <p>What can style queries currently check in container queries?</p>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">Any computed CSS property on the container</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The container's display type and position</div>
-    <div class="quiz-option" onclick="checkAnswer(this, true)">Custom property values on the container</div>
-    <div class="quiz-option" onclick="checkAnswer(this, false)">The container's class list and attributes</div>
-    <p class="quiz-feedback"></p>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Any computed CSS property on the container</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The container's display type and position</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Custom property values on the container</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The container's class list and attributes</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
   </div>
 
   <div class="recommended">

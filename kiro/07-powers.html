@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>Powers - Lesson 7 | Teach Me</title>
+  <meta name="description" content="Kiro Powers: installing, using, and creating power packages that bundle documentation, steering, and MCP servers.">
+  <link rel="canonical" href="https://teachmeskills.dev/kiro/07-powers.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/kiro/07-powers.html">
+  <meta property="og:title" content="Powers - Lesson 7 | Teach Me">
+  <meta property="og:description" content="Kiro Powers: installing, using, and creating power packages that bundle documentation, steering, and MCP servers.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Powers - Lesson 7 | Teach Me">
+  <meta name="twitter:description" content="Kiro Powers: installing, using, and creating power packages that bundle documentation, steering, and MCP servers.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header"><a href="index.html">Kiro Course</a></div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-steering-the-foundation.html">1. Steering</a></li>
+        <li><a href="02-context-management.html">2. Context Management</a></li>
+        <li><a href="03-hooks.html">3. Hooks</a></li>
+        <li><a href="04-skills.html">4. Skills</a></li>
+        <li><a href="05-mcp-using.html">5. MCP: Using</a></li>
+        <li><a href="06-mcp-building.html">6. MCP: Building</a></li>
+        <li class="current"><a href="07-powers.html">7. Powers</a></li>
+        <li><a href="08-subagents.html">8. Sub-agents</a></li>
+        <li><a href="09-custom-agents.html">9. Custom Agents</a></li>
+        <li><a href="10-acp.html">10. ACP</a></li>
+        <li><a href="11-property-based-testing.html">11. Property Testing</a></li>
+        <li><a href="12-specs-as-living-artifacts.html">12. Specs</a></li>
+        <li><a href="13-model-selection.html">13. Model Selection</a></li>
+        <li><a href="14-multi-root-workspaces.html">14. Multi-root</a></li>
+        <li><a href="15-kiro-cli.html">15. Kiro CLI</a></li>
+        <li><a href="16-capstone-team-setup.html">16. Capstone</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="steering-reference.html">Steering Reference</a></li>
+        <li><a href="mcp-setup-guides.html">MCP Setup Guides</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 7</p>
+  <h1>Powers</h1>
+
+  <h2>The Problem Powers Solve</h2>
+
+  <p>You learned in Lesson 5 that every MCP server you connect loads its tool definitions into context - potentially tens of thousands of tokens. Connect five servers and you've burned 40% of your context window before typing a word.</p>
+
+  <p>Powers solve this by making everything <strong>on-demand</strong>. A power bundles documentation + MCP servers + steering into a single package that only activates when you mention relevant keywords. Zero context cost until needed.</p>
+
+  <h2>What a Power Contains</h2>
+
+  <p>A power is a directory (usually in a GitHub repo) with this structure:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>my-power/
+├── POWER.md          # Required - metadata + instructions
+├── mcp.json          # Optional - MCP server config
+└── steering/         # Optional - additional steering files
+    ├── workflows.md
+    └── best-practices.md</code></pre>
+  </div>
+
+  <p>Each piece serves a role:</p>
+
+  <table>
+    <tr><th>File</th><th>Purpose</th></tr>
+    <tr><td><code>POWER.md</code></td><td>Front-matter (name, description, keywords) + instructions for the agent</td></tr>
+    <tr><td><code>mcp.json</code></td><td>MCP servers the power needs - same format as <code>.kiro/settings/mcp.json</code></td></tr>
+    <tr><td><code>steering/</code></td><td>Additional steering files loaded when the power activates</td></tr>
+  </table>
+
+  <h2>The POWER.md File</h2>
+
+  <p>This is the entry point - and the filename is a hard requirement, not just convention. It must be called exactly <code>POWER.md</code> (uppercase) at the root of the power directory. Kiro looks for this specific filename to identify a directory as a power.</p>
+
+  <p>It has YAML front-matter followed by markdown instructions:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>---
+name: "angular-patterns"
+displayName: "Angular Patterns"
+description: "Best practices and patterns for Angular development"
+keywords: ["angular", "component", "service", "rxjs", "signal", "standalone"]
+---
+
+# Onboarding
+
+When this power activates, ensure the project uses Angular 17+ with standalone components.
+
+# Steering Instructions
+
+You are an expert in modern Angular development. Follow these patterns:
+
+## Workflow: Creating Components
+
+1. Always create standalone components
+2. Use signals for state management where possible
+3. Prefer the inject() function over constructor injection
+...</code></pre>
+  </div>
+
+  <h3>Front-matter Schema (Complete)</h3>
+
+  <table>
+    <tr><th>Field</th><th>Required</th><th>What it does</th></tr>
+    <tr><td><code>name</code></td><td>Yes</td><td>Power identifier (kebab-case)</td></tr>
+    <tr><td><code>displayName</code></td><td>Yes</td><td>Human-readable name shown in the UI</td></tr>
+    <tr><td><code>description</code></td><td>Yes</td><td>What the power does (shown when browsing powers)</td></tr>
+    <tr><td><code>keywords</code></td><td>No</td><td>Array of terms that trigger activation when mentioned in conversation</td></tr>
+  </table>
+
+  <h2>How Activation Works</h2>
+
+  <p>Powers load dynamically based on your conversation:</p>
+
+  <ol>
+    <li>You install a power (adds it to your Kiro config)</li>
+    <li>At rest, only the power's metadata (name + keywords) is loaded - negligible cost</li>
+    <li>When you mention a keyword in conversation (e.g. "angular" or "signal"), Kiro evaluates installed powers</li>
+    <li>If a power matches, its full content loads: POWER.md instructions, steering files, and MCP server connections</li>
+  </ol>
+
+  <p>This is the key difference from raw MCP servers: with direct MCP config, tool definitions are loaded at all times. With powers, they load only when relevant.</p>
+
+  <div class="key-concept">
+    <strong>Compare to skills:</strong> Skills also load on-demand via keyword matching. Powers are like skills on steroids - they can also bring MCP servers and steering files along. Think of a power as: skill + MCP servers + steering, bundled together.
+  </div>
+
+  <h2>Installing Powers</h2>
+
+  <h3>From the Powers panel</h3>
+  <ol>
+    <li>Open the Kiro sidebar (ghost icon)</li>
+    <li>Find the "Powers" section</li>
+    <li>Browse available powers from launch partners (Datadog, Figma, Netlify, Stripe, Supabase, etc.)</li>
+    <li>Click to install</li>
+  </ol>
+
+  <h3>From GitHub</h3>
+  <ol>
+    <li>In the Powers panel, click "Add power from GitHub"</li>
+    <li>Enter the repository (e.g. <code>kirodotdev/powers</code>)</li>
+    <li>Select the specific power from the repo</li>
+  </ol>
+
+  <p>When you install a power that includes MCP servers, Kiro automatically registers them in your <code>~/.kiro/settings/mcp.json</code>.</p>
+
+  <h3>Available powers from launch partners</h3>
+  <p>Browse the registry at <a href="https://kiro.dev/powers/">kiro.dev/powers</a>. Current partners include: Datadog, Dynatrace, Figma, Neon, Netlify, Postman, Supabase, Stripe, Strands SDK, AWS Aurora, ElevenLabs, Miro, and others.</p>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <h2>Creating Your Own Power</h2>
+
+  <p>Creating a power is straightforward - it's just a directory in a GitHub repo. Here's a practical example for your team:</p>
+
+  <h3>Example: An Angular Library Power</h3>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>angular-lib-power/
+├── POWER.md
+├── mcp.json
+└── steering/
+    └── component-api.md</code></pre>
+  </div>
+
+  <p><code>POWER.md</code>:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>---
+name: "our-angular-lib"
+displayName: "Our Angular Component Library"
+description: "Patterns and API docs for the team's shared Angular component library"
+keywords: ["component library", "shared components", "ui-kit", "design system"]
+---
+
+# Onboarding
+
+This power provides access to our team's Angular component library documentation.
+The MCP server exposes tools for searching component APIs and usage examples.
+
+# Steering Instructions
+
+When working with components from our shared library (@our-company/ui-kit):
+
+## Naming
+- All components are prefixed with `app-`
+- Services are suffixed with `.service.ts`
+
+## Usage Patterns
+- Import directly from the package: `import { ButtonComponent } from '@our-company/ui-kit'`
+- All components are standalone - add to `imports` array directly
+- Check the component API docs via the `search-components` tool before guessing props</code></pre>
+  </div>
+
+  <p><code>mcp.json</code>:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>{
+  "mcpServers": {
+    "component-docs": {
+      "command": "node",
+      "args": ["/path/to/component-docs-mcp/dist/index.js"]
+    }
+  }
+}</code></pre>
+  </div>
+
+  <h2>Powers vs Direct MCP vs Skills vs Steering</h2>
+
+  <table>
+    <tr><th></th><th>Direct MCP</th><th>Skills</th><th>Steering</th><th>Powers</th></tr>
+    <tr><td><strong>Context cost at rest</strong></td><td>Full tool definitions always loaded</td><td>Only name + description</td><td>Full content (if auto)</td><td>Only keywords</td></tr>
+    <tr><td><strong>Can include MCP servers</strong></td><td>It IS an MCP server</td><td>No</td><td>No</td><td>Yes</td></tr>
+    <tr><td><strong>Can include steering</strong></td><td>No</td><td>No (but has instructions)</td><td>It IS steering</td><td>Yes</td></tr>
+    <tr><td><strong>Activation</strong></td><td>Always active</td><td>Keyword or slash</td><td>Always/fileMatch/manual</td><td>Keyword</td></tr>
+    <tr><td><strong>Shareable via GitHub</strong></td><td>As mcp.json config</td><td>As .md files</td><td>As .md files</td><td>Yes - designed for it</td></tr>
+    <tr><td><strong>Best for</strong></td><td>Always-needed tools</td><td>Specific workflows</td><td>Background knowledge</td><td>Domain expertise + tools</td></tr>
+  </table>
+
+  <h2>When to Use a Power vs. the Alternatives</h2>
+
+  <ul>
+    <li><strong>Use a power when</strong> you need tools + context + guidance bundled together, especially for a specific domain or technology</li>
+    <li><strong>Use raw MCP when</strong> you need the tools available at all times (e.g. GitHub, Jira - things you use every session)</li>
+    <li><strong>Use a skill when</strong> you need workflow instructions but no external tools</li>
+    <li><strong>Use steering when</strong> you need persistent background rules, not on-demand domain knowledge</li>
+  </ul>
+
+  <h2>How Powers Work Under the Hood</h2>
+
+  <p>When a power activates:</p>
+  <ol>
+    <li>Kiro loads the full <code>POWER.md</code> content into context (like a skill body loading)</li>
+    <li>Any steering files in the power's <code>steering/</code> directory are injected into context</li>
+    <li>Any MCP servers defined in the power's <code>mcp.json</code> are connected (if not already running)</li>
+    <li>The MCP tool definitions from those servers are now available to the model</li>
+  </ol>
+
+  <p>When the power deactivates (conversation moves to a different topic), the steering and tool definitions are unloaded. This is the context-efficiency win - you only pay for what you're using right now.</p>
+
+  <h2>Your Tangible Win</h2>
+
+  <p>You now understand what powers are, why they exist (context efficiency), how to install them, and how to create your own. You can make informed decisions about when to use a power vs. direct MCP vs. skills vs. steering. You also know the complete POWER.md schema and directory structure.</p>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <h2>Quiz</h2>
+
+  <div class="quiz" role="group">
+    <h3>What problem do powers solve that direct MCP configuration doesn't?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Powers are faster than MCP servers</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Powers load MCP tool definitions on-demand instead of always - saving context tokens</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Powers replace MCP servers entirely</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="quiz" role="group">
+    <h3>A power contains POWER.md, mcp.json, and a steering/ folder. What's required?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">All three are required</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Only POWER.md is required - mcp.json and steering/ are optional</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">POWER.md and mcp.json are required, steering/ is optional</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="quiz" role="group">
+    <h3>You use Jira every single session. Should it be a power or direct MCP config?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Direct MCP - you always need it, so on-demand loading adds no value</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">A power - it's an external tool, so it belongs in a power</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Either - they're functionally identical</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="recommended">
+    <strong>Recommended resources:</strong>
+    <a href="https://kiro.dev/docs/powers/">Powers Overview</a>, <a href="https://kiro.dev/docs/powers/create/">Create Powers</a>, <a href="https://kiro.dev/docs/powers/installation/">Install Powers</a>. Browse available powers: <a href="https://kiro.dev/powers/">kiro.dev/powers</a>. Official powers repo: <a href="https://github.com/kirodotdev/powers">kirodotdev/powers on GitHub</a>.
+  </div>
+
+  <div class="footer-nav">
+    <a href="06-mcp-building.html">&larr; Prev: MCP Servers: Building</a>
+    <a href="index.html">Index</a>
+    <a href="08-subagents.html">Next: Sub-agents &rarr;</a>
+  </div>
+
+    </main>
+  </div>
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

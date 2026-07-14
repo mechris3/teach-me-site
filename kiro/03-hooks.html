@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>Hooks - Lesson 3 | Teach Me</title>
+  <meta name="description" content="Kiro hooks: triggers, matchers, actions, exit codes. Automate tasks on file save, tool use, session start, and more.">
+  <link rel="canonical" href="https://teachmeskills.dev/kiro/03-hooks.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/kiro/03-hooks.html">
+  <meta property="og:title" content="Hooks - Lesson 3 | Teach Me">
+  <meta property="og:description" content="Kiro hooks: triggers, matchers, actions, exit codes. Automate tasks on file save, tool use, session start, and more.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Hooks - Lesson 3 | Teach Me">
+  <meta name="twitter:description" content="Kiro hooks: triggers, matchers, actions, exit codes. Automate tasks on file save, tool use, session start, and more.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header"><a href="index.html">Kiro Course</a></div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-steering-the-foundation.html">1. Steering</a></li>
+        <li><a href="02-context-management.html">2. Context Management</a></li>
+        <li class="current"><a href="03-hooks.html">3. Hooks</a></li>
+        <li><a href="04-skills.html">4. Skills</a></li>
+        <li><a href="05-mcp-using.html">5. MCP: Using</a></li>
+        <li><a href="06-mcp-building.html">6. MCP: Building</a></li>
+        <li><a href="07-powers.html">7. Powers</a></li>
+        <li><a href="08-subagents.html">8. Sub-agents</a></li>
+        <li><a href="09-custom-agents.html">9. Custom Agents</a></li>
+        <li><a href="10-acp.html">10. ACP</a></li>
+        <li><a href="11-property-based-testing.html">11. Property Testing</a></li>
+        <li><a href="12-specs-as-living-artifacts.html">12. Specs</a></li>
+        <li><a href="13-model-selection.html">13. Model Selection</a></li>
+        <li><a href="14-multi-root-workspaces.html">14. Multi-root</a></li>
+        <li><a href="15-kiro-cli.html">15. Kiro CLI</a></li>
+        <li><a href="16-capstone-team-setup.html">16. Capstone</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="steering-reference.html">Steering Reference</a></li>
+        <li><a href="mcp-setup-guides.html">MCP Setup Guides</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 3</p>
+  <h1>Hooks</h1>
+
+  <h2>What Hooks Are</h2>
+
+  <p>Hooks let you <strong>automate agent actions in response to events</strong> - without you typing a prompt. Something happens in the IDE (a file is saved, a tool is about to run, a session starts), and a hook fires: running a shell command, injecting a prompt, or blocking an action.</p>
+
+  <p>If steering is "what Kiro knows," hooks are "what Kiro does automatically."</p>
+
+  <h2>Where Hooks Live</h2>
+
+  <p>Hook files are JSON, stored at:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>.kiro/hooks/&lt;id&gt;.json</code></pre>
+  </div>
+
+  <p>Each file can contain multiple hooks. The <code>&lt;id&gt;</code> is a short dashed identifier you choose (e.g. <code>lint-on-save</code>, <code>security-checks</code>).</p>
+
+  <h2>The Hook Schema</h2>
+
+  <p>Here's the complete structure:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Human-readable name",
+      "trigger": "PostFileSave",
+      "matcher": "\\.(ts|tsx)$",
+      "action": {
+        "type": "command",
+        "command": "npm run lint"
+      }
+    }
+  ]
+}</code></pre>
+  </div>
+
+  <p>A hook has four parts:</p>
+
+  <table>
+    <tr><th>Field</th><th>What it does</th></tr>
+    <tr><td><code>name</code></td><td>Display name (shown in the Agent Hooks panel)</td></tr>
+    <tr><td><code>trigger</code></td><td>The event that fires this hook (PascalCase)</td></tr>
+    <tr><td><code>matcher</code></td><td>Optional regex to filter <em>which</em> instances of the trigger fire the hook</td></tr>
+    <tr><td><code>action</code></td><td>What to do: run a <code>command</code> or inject an <code>agent</code> prompt</td></tr>
+  </table>
+
+  <h2>What Are "Tools"?</h2>
+
+  <p>Tools are the actions the agent can perform - the mechanism by which Kiro actually <em>does things</em> rather than just generating text. Every time Kiro reads a file, edits code, runs a command, or searches the web, it's invoking a tool. There are two sources:</p>
+
+  <p><strong>Built-in tools</strong> - always available:</p>
+  <ul>
+    <li><code>fs_write</code> - create/overwrite a file</li>
+    <li><code>str_replace</code> - edit part of a file</li>
+    <li><code>fs_append</code> - append to a file</li>
+    <li><code>read_file</code> - read a file</li>
+    <li><code>execute_bash</code> - run a shell command</li>
+    <li><code>grep_search</code> - search file contents</li>
+    <li><code>file_search</code> - find files by name</li>
+    <li><code>web_fetch</code> - fetch a URL</li>
+    <li><code>remote_web_search</code> - search the web</li>
+    <li>...and others (semantic rename, smart relocate, list directory, etc.)</li>
+  </ul>
+
+  <p><strong>MCP tools</strong> - provided by MCP servers you've configured. These extend the agent with external capabilities (databases, APIs, documentation, etc.). Covered in <a href="05-mcp-using.html">Lesson 5</a>.</p>
+
+  <p>When hooks reference "tools" - PreToolUse, PostToolUse, the matcher categories like <code>@builtin</code> and <code>@mcp</code> - this is what they mean. Every action Kiro takes on your behalf is a tool invocation that hooks can intercept.</p>
+
+  <h2>All Triggers (Complete List)</h2>
+
+  <p>There are exactly 10 trigger events:</p>
+
+  <table>
+    <tr><th>Trigger</th><th>When it fires</th><th>Matcher tests against</th></tr>
+    <tr><td><code>SessionStart</code></td><td>A new session begins</td><td> - </td></tr>
+    <tr><td><code>UserPromptSubmit</code></td><td>You send a message</td><td> - </td></tr>
+    <tr><td><code>PreToolUse</code></td><td>Before the agent invokes a tool</td><td>Tool name</td></tr>
+    <tr><td><code>PostToolUse</code></td><td>After the agent invokes a tool</td><td>Tool name</td></tr>
+    <tr><td><code>PreTaskExec</code></td><td>Before a spec task is set to in_progress</td><td> - </td></tr>
+    <tr><td><code>PostTaskExec</code></td><td>After a spec task is set to completed</td><td> - </td></tr>
+    <tr><td><code>PostFileSave</code></td><td>When you save a file</td><td>File path</td></tr>
+    <tr><td><code>PostFileCreate</code></td><td>When you create a new file</td><td>File path</td></tr>
+    <tr><td><code>PostFileDelete</code></td><td>When you delete a file</td><td>File path</td></tr>
+    <tr><td><code>Stop</code></td><td>When the agent finishes its turn</td><td> - </td></tr>
+  </table>
+
+  <p>Triggers marked " - " in the matcher column always fire (matcher is ignored).</p>
+
+  <h2>The Two Action Types</h2>
+
+  <h3>1. Command - run a shell command</h3>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>{
+  "type": "command",
+  "command": "npm run lint --fix"
+}</code></pre>
+  </div>
+
+  <p>Runs a shell command. The command receives JSON on stdin with session context (useful for advanced hooks that need to know what file triggered them, etc.).</p>
+
+  <h3>2. Agent - inject a prompt</h3>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>{
+  "type": "agent",
+  "prompt": "Before writing this file, verify it follows our error handling patterns: all async functions must have try/catch with structured logging."
+}</code></pre>
+  </div>
+
+  <p>Appends a text prompt to the model context. Think of this as event-triggered steering - it's like an always-on steering file that only activates when a specific event fires.</p>
+
+  <div class="key-concept">
+    <strong>Key difference:</strong> A <code>command</code> action runs outside Kiro (in your shell). An <code>agent</code> action runs inside Kiro (injected into the model's context). Use <code>command</code> for tooling (lint, format, test). Use <code>agent</code> for guiding Kiro's behaviour.
+  </div>
+
+  <h2>Exit Codes (Command Actions)</h2>
+
+  <p>When a command hook runs, its exit code determines what happens next:</p>
+
+  <table>
+    <tr><th>Exit code</th><th>Meaning</th><th>Effect</th></tr>
+    <tr><td><code>0</code></td><td>Success</td><td>stdout is forwarded to the agent (for SessionStart, UserPromptSubmit, PreToolUse)</td></tr>
+    <tr><td><code>2</code></td><td>Block</td><td>The triggering action is prevented (only works for PreToolUse, UserPromptSubmit, PreTaskExec). stderr is forwarded.</td></tr>
+    <tr><td>Any other</td><td>Silent failure</td><td>Hook is considered failed. No block, no forwarded output.</td></tr>
+  </table>
+
+  <p>You don't "read" exit codes - you <strong>produce</strong> them. Your shell command finishes with an exit code, and Kiro reacts to it. You control this by writing a command or script that exits with the appropriate code based on your logic.</p>
+
+  <h3>How exit codes work in shell</h3>
+
+  <p>Every shell command produces an exit code. <code>0</code> means success, anything else means failure. You control it with:</p>
+
+  <ul>
+    <li><code>exit 0</code> - explicitly exit with success</li>
+    <li><code>exit 2</code> - explicitly exit with "block"</li>
+    <li>A command's natural exit code - e.g. <code>grep</code> exits 0 if it finds a match, 1 if it doesn't</li>
+  </ul>
+
+  <h3>Example: Block writes to files containing "DO NOT EDIT"</h3>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>{
+  "version": "v1",
+  "hooks": [{
+    "name": "Protect generated files",
+    "trigger": "PreToolUse",
+    "matcher": "fs_write|str_replace",
+    "action": {
+      "type": "command",
+      "command": "bash -c 'INPUT=$(cat); FILE=$(echo \"$INPUT\" | grep -o '\"path\":\"[^\"]*\"' | head -1 | cut -d'\"' -f4); if [ -f \"$FILE\" ] && head -5 \"$FILE\" | grep -q \"DO NOT EDIT\"; then echo \"This file is auto-generated and should not be edited directly\" >&2; exit 2; else exit 0; fi'"
+    }
+  }]
+}</code></pre>
+  </div>
+
+  <p>What this does: reads the JSON input from stdin (which contains the tool parameters including the file path), checks if the target file contains "DO NOT EDIT" in its first 5 lines, and exits with code 2 (block) if it does. The stderr message is forwarded to the agent so it understands <em>why</em> the write was blocked.</p>
+
+  <h3>Example: Forward additional context on session start</h3>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>{
+  "version": "v1",
+  "hooks": [{
+    "name": "Load project status",
+    "trigger": "SessionStart",
+    "action": {
+      "type": "command",
+      "command": "cat .kiro/project-status.txt"
+    }
+  }]
+}</code></pre>
+  </div>
+
+  <p>Since <code>cat</code> exits 0 on success, its stdout (the file contents) is forwarded to the agent as additional context at the start of every session.</p>
+
+  <h3>Example: Block prompts that mention production deployment</h3>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>{
+  "version": "v1",
+  "hooks": [{
+    "name": "Block prod deploy prompts",
+    "trigger": "UserPromptSubmit",
+    "action": {
+      "type": "command",
+      "command": "bash -c 'INPUT=$(cat); if echo \"$INPUT\" | grep -qi \"deploy.*prod\"; then echo \"Production deployments must go through the CI pipeline\" >&2; exit 2; else exit 0; fi'"
+    }
+  }]
+}</code></pre>
+  </div>
+
+  <p>For UserPromptSubmit hooks, session context (including the user's message) is passed as JSON on stdin. This hook reads it, checks for production deployment mentions, and exits with code 2 (block) if found.</p>
+
+  <h3>Example: Lint check that doesn't block (informational)</h3>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>{
+  "version": "v1",
+  "hooks": [{
+    "name": "Lint report",
+    "trigger": "PostFileSave",
+    "matcher": "\\.(ts|tsx)$",
+    "action": {
+      "type": "command",
+      "command": "bash -c 'INPUT=$(cat); FILE=$(echo \"$INPUT\" | jq -r .filePath // empty); npx eslint --format compact \"$FILE\" || true'"
+    }
+  }]
+}</code></pre>
+  </div>
+
+  <p>The hook reads the file path from the stdin JSON payload. The <code>|| true</code> ensures the command always exits 0, even if eslint finds errors. Since PostFileSave can't block anything, the exit code here just determines whether the output is forwarded. Using <code>|| true</code> means lint output is always sent to the agent (which may then offer to fix the issues).</p>
+
+  <div class="key-concept">
+    <strong>The stdin JSON:</strong> For PreToolUse and PostToolUse hooks, the command receives JSON on stdin containing session context and the tool invocation parameters. This is how your script knows <em>which</em> file is being written to, <em>which</em> command is being run, etc. Parse it with <code>jq</code>, <code>grep</code>, or whatever your script prefers.
+  </div>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <h2>PreToolUse: The Permission Hook</h2>
+
+  <p>PreToolUse deserves special attention. It fires before the agent uses a tool, and the matcher regex tests against the <strong>tool name</strong>. You can target specific tools or use built-in categories:</p>
+
+  <table>
+    <tr><th>Matcher value</th><th>Targets</th><th>Example use case</th></tr>
+    <tr><td><code>fs_write|str_replace|fs_append</code></td><td>Specific built-in tools by name</td><td>Gate all file writes</td></tr>
+    <tr><td><code>execute_bash</code></td><td>A single specific tool</td><td>Review shell commands before running</td></tr>
+    <tr><td><code>read</code></td><td>All built-in file read tools</td><td>Log which files the agent reads</td></tr>
+    <tr><td><code>write</code></td><td>All built-in file write tools</td><td>Enforce code standards on writes</td></tr>
+    <tr><td><code>shell</code></td><td>All built-in shell tools</td><td>Block dangerous commands</td></tr>
+    <tr><td><code>web</code></td><td>All built-in web tools</td><td>Restrict external fetches</td></tr>
+    <tr><td><code>spec</code></td><td>All built-in spec tools</td><td>Add context before spec generation</td></tr>
+    <tr><td><code>@builtin</code></td><td>All built-in tools (any category)</td><td>Universal gate on built-in actions</td></tr>
+    <tr><td><code>@mcp</code></td><td>All MCP tools (any server)</td><td>Gate all external integrations</td></tr>
+    <tr><td><code>@mcp.*sql.*</code></td><td>MCP tools with "sql" in the name</td><td>Gate database-related MCP tools</td></tr>
+    <tr><td><code>@mcp.*github.*</code></td><td>MCP tools with "github" in the name</td><td>Gate GitHub operations</td></tr>
+    <tr><td><code>@powers</code></td><td>All Powers tools</td><td>Gate tools exposed by installed powers</td></tr>
+    <tr><td><code>*</code></td><td>Everything (built-in + MCP + powers)</td><td>Universal gate on all agent actions</td></tr>
+  </table>
+
+  <p>Prefixes starting with <code>@</code> are matched by regex, so you can write patterns like <code>@mcp.*sql.*</code> to narrow down to specific MCP tools by name. You can combine multiple tool names with <code>|</code> (regex OR).</p>
+
+  <div class="key-concept">
+    <strong>Note on category matchers:</strong> The word-based categories (<code>read</code>, <code>write</code>, <code>shell</code>, <code>web</code>, <code>spec</code>) and the <code>@</code>-prefixed categories (<code>@builtin</code>, <code>@mcp</code>, <code>@powers</code>) may behave differently between the IDE and CLI. The <code>@</code>-prefixed categories are well-documented across both. If a word-based category doesn't work as expected in the IDE, try the specific tool names with regex OR instead (e.g. <code>fs_write|str_replace|fs_append</code>).
+  </div>
+
+  <h3>Concrete examples of PreToolUse hooks</h3>
+
+  <h4>Block all MCP tools in a specific project</h4>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>{
+  "version": "v1",
+  "hooks": [{
+    "name": "No MCP tools",
+    "trigger": "PreToolUse",
+    "matcher": "@mcp",
+    "action": {
+      "type": "command",
+      "command": "echo 'MCP tools are disabled in this workspace' >&2; exit 2"
+    }
+  }]
+}</code></pre>
+  </div>
+
+  <h4>Require confirmation before running any shell command</h4>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>{
+  "version": "v1",
+  "hooks": [{
+    "name": "Confirm shell commands",
+    "trigger": "PreToolUse",
+    "matcher": "shell",
+    "action": {
+      "type": "command",
+      "command": "echo '{\"hookSpecificOutput\":{\"permissionDecision\":\"ask\",\"permissionDecisionReason\":\"Shell command requires confirmation\"}}'"
+    }
+  }]
+}</code></pre>
+  </div>
+
+  <h4>Add instructions before any file write (agent action type)</h4>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>{
+  "version": "v1",
+  "hooks": [{
+    "name": "Write standards",
+    "trigger": "PreToolUse",
+    "matcher": "write",
+    "action": {
+      "type": "agent",
+      "prompt": "Before writing: ensure the file has appropriate imports sorted, no unused variables, and follows the project's naming conventions."
+    }
+  }]
+}</code></pre>
+  </div>
+
+  <h4>Gate database MCP tools with a script that checks branch</h4>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>{
+  "version": "v1",
+  "hooks": [{
+    "name": "Block DB writes on main",
+    "trigger": "PreToolUse",
+    "matcher": "@mcp.*sql.*",
+    "action": {
+      "type": "command",
+      "command": "bash -c 'BRANCH=$(git rev-parse --abbrev-ref HEAD); if [ \"$BRANCH\" = \"main\" ]; then echo \"Cannot use database tools on main branch\" >&2; exit 2; fi; exit 0'"
+    }
+  }]
+}</code></pre>
+  </div>
+
+  <h4>Log all tool usage (non-blocking)</h4>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>{
+  "version": "v1",
+  "hooks": [{
+    "name": "Audit log",
+    "trigger": "PreToolUse",
+    "matcher": "*",
+    "action": {
+      "type": "command",
+      "command": "bash -c 'cat >> .kiro/tool-audit.log; exit 0'"
+    }
+  }]
+}</code></pre>
+  </div>
+
+  <p>This reads the stdin JSON (tool name + parameters) and appends it to an audit log. Exits 0 so it never blocks - purely informational.</p>
+
+  <p>A PreToolUse command hook can also return a special JSON response on stdout to prompt the user for confirmation:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>{"hookSpecificOutput":{"permissionDecision":"ask","permissionDecisionReason":"This writes to a production config file"}}</code></pre>
+  </div>
+
+  <p>When <code>permissionDecision</code> is <code>"ask"</code>, the user gets a confirmation dialog before the tool proceeds.</p>
+
+  <h2>Practical Examples</h2>
+
+  <h3>Lint TypeScript on save</h3>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>{
+  "version": "v1",
+  "hooks": [{
+    "name": "Lint on Save",
+    "trigger": "PostFileSave",
+    "matcher": "\\.(ts|html)$",
+    "action": { "type": "command", "command": "bash -c 'FILE=$(cat | jq -r .filePath); npx ng lint --files \"$FILE\"'" }
+  }]
+}</code></pre>
+  </div>
+
+  <h3>Remind the agent about error handling before writing files</h3>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>{
+  "version": "v1",
+  "hooks": [{
+    "name": "Error handling reminder",
+    "trigger": "PreToolUse",
+    "matcher": "fs_write|str_replace",
+    "action": {
+      "type": "agent",
+      "prompt": "Before writing: ensure all async functions use try/catch with our structured logger. Never swallow errors silently."
+    }
+  }]
+}</code></pre>
+  </div>
+
+  <h3>Run tests after the agent finishes a spec task</h3>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>{
+  "version": "v1",
+  "hooks": [{
+    "name": "Test after task",
+    "trigger": "PostTaskExec",
+    "action": { "type": "command", "command": "npm test" }
+  }]
+}</code></pre>
+  </div>
+
+  <h3>Block writes to production config without confirmation</h3>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code>{
+  "version": "v1",
+  "hooks": [{
+    "name": "Protect prod config",
+    "trigger": "PreToolUse",
+    "matcher": "fs_write|str_replace|fs_append",
+    "action": {
+      "type": "command",
+      "command": "echo '{\"hookSpecificOutput\":{\"permissionDecision\":\"ask\",\"permissionDecisionReason\":\"This may modify a production configuration file\"}}'"
+    }
+  }]
+}</code></pre>
+  </div>
+
+  <h2>Creating Hooks: Two Methods</h2>
+
+  <p>You can create hooks in two ways:</p>
+
+  <ol>
+    <li><strong>Ask Kiro to create one</strong> - describe what you want and Kiro uses the <code>createHook</code> tool to write the JSON file for you.</li>
+    <li><strong>Use the UI</strong> - open the command palette (Cmd+Shift+P) and search for "Open Kiro Hook UI", or look for the "Agent Hooks" section in the Kiro explorer panel.</li>
+  </ol>
+
+  <p>You can also write the JSON file manually in <code>.kiro/hooks/</code>, but the above methods handle the schema for you.</p>
+
+  <h2>Hooks vs Steering: When to Use Which</h2>
+
+  <table>
+    <tr><th>Use steering when...</th><th>Use hooks when...</th></tr>
+    <tr><td>The instruction applies broadly</td><td>The action should fire on a specific event</td></tr>
+    <tr><td>You want persistent context</td><td>You want to run external tooling (lint, test, format)</td></tr>
+    <tr><td>The rule is informational</td><td>The rule needs enforcement (blocking)</td></tr>
+    <tr><td>You control "what Kiro knows"</td><td>You control "what Kiro does automatically"</td></tr>
+  </table>
+
+  <h2>Your Tangible Win</h2>
+
+  <p>You can now design hooks that automate your workflow - from simple lint-on-save to security gates that block dangerous operations. You know the complete trigger set, both action types, exit code semantics, and when to choose hooks over steering.</p>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <h2>Quiz</h2>
+
+  <div class="quiz" role="group">
+    <h3>You want to prevent the agent from ever deleting files in your production directory. Which trigger and exit code?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">PostFileDelete with exit code 0</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">PreToolUse with exit code 2</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">PostToolUse with exit code 2</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="quiz" role="group">
+    <h3>You want the agent to always consider accessibility when writing JSX components. What action type?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">agent (inject a prompt reminding about accessibility)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">command (run an accessibility checker)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Either - they do the same thing</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="quiz" role="group">
+    <h3>A command hook exits with code 5. What happens?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The triggering action is blocked</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">stdout is forwarded to the agent</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Silent failure - nothing happens, no block</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="recommended">
+    <strong>Recommended resources:</strong>
+    <a href="https://kiro.dev/docs/hooks/">Kiro Docs: Hooks</a>,
+    <a href="https://kiro.dev/docs/hooks/types">Hook Types</a>,
+    <a href="https://kiro.dev/docs/hooks/actions/">Hook Actions</a>,
+    <a href="https://kiro.dev/docs/hooks/examples/">Hook Examples</a>
+  </div>
+
+  <div class="footer-nav">
+    <a href="02-context-management.html">&larr; Prev: Context Management</a>
+    <a href="index.html">Index</a>
+    <a href="04-skills.html">Next: Skills &rarr;</a>
+  </div>
+
+    </main>
+  </div>
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>
