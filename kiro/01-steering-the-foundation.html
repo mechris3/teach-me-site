@@ -18,6 +18,7 @@
   <meta name="twitter:description" content="Steering files are persistent instructions injected into Kiro's context. Learn the three inclusion modes, two scopes, file references, and how steering connects to every other Kiro feature.">
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -112,7 +113,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>---
+    <pre><code class="language-yaml">---
 inclusion: auto
 ---
 
@@ -128,7 +129,7 @@ Always use TypeScript strict mode...</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>---
+    <pre><code class="language-yaml">---
 inclusion: fileMatch
 fileMatchPattern: "src/app/services/**/*.ts"
 ---
@@ -147,7 +148,7 @@ All HTTP services must use HttpClient with typed responses and handle errors wit
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>---
+    <pre><code class="language-yaml">---
 inclusion: manual
 ---
 
@@ -176,7 +177,7 @@ When creating a new migration...</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>Follow the API patterns defined in #[[file:docs/api-spec.yaml]]</code></pre>
+    <pre><code class="language-javascript">Follow the API patterns defined in #[[file:docs/api-spec.yaml]]</code></pre>
   </div>
 
   <p>This is <strong>Kiro-specific syntax</strong>, not standard markdown. Kiro intercepts this directive and expands it - replacing it with the referenced file's actual content before anything reaches the model. Standard markdown has no concept of <code>#[[file:...]]</code>. So steering files are markdown <em>plus</em> this one special directive.</p>
@@ -210,7 +211,7 @@ When creating a new migration...</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>.kiro/steering/
+    <pre><code class="language-plaintext">.kiro/steering/
 ├── conventions.md          # Always-on: code style, naming, tooling
 ├── architecture.md         # Always-on: high-level structure, key patterns
 ├── api-standards.md        # fileMatch: "src/app/services/**/*.ts" — HTTP/API conventions
@@ -285,5 +286,8 @@ When creating a new migration...</code></pre>
 
   <script src="/scripts.js"></script>
   <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
+  <script src="/vendor/prism-yaml.min.js"></script>
+  <script src="/vendor/prism-bash.min.js"></script>
 </body>
 </html>

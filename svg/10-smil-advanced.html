@@ -18,6 +18,7 @@
   <meta name="twitter:description" content="animateTransform, animateMotion along paths, viewBox animation for zoom effects, and reliable sequencing patterns.">
   <link rel="stylesheet" href="/styles.css">
  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -92,7 +93,7 @@
   <h3>Rotation</h3>
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"&gt;
+    <pre><code class="language-markup">&lt;svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"&gt;
   &lt;rect x="75" y="75" width="50" height="50" fill="coral"&gt;
     &lt;animateTransform
       attributeName="transform"
@@ -125,7 +126,7 @@
   <h3>Scale (pulse effect)</h3>
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"&gt;
+    <pre><code class="language-markup">&lt;svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"&gt;
   &lt;!-- Group to set the scaling origin via translate --&gt;
   &lt;g transform="translate(100, 100)"&gt;
     &lt;circle cx="0" cy="0" r="30" fill="#61afef"&gt;
@@ -162,7 +163,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;rect x="-25" y="-25" width="50" height="50" fill="coral"&gt;
+    <pre><code class="language-markup">&lt;rect x="-25" y="-25" width="50" height="50" fill="coral"&gt;
   &lt;!-- First: rotate around origin --&gt;
   &lt;animateTransform attributeName="transform" type="rotate"
     from="0" to="360" dur="4s" repeatCount="indefinite"/&gt;
@@ -210,7 +211,7 @@
   <h3>Basic motion along a curve</h3>
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"&gt;
+    <pre><code class="language-markup">&lt;svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"&gt;
   &lt;!-- Show the path for reference --&gt;
   &lt;path d="M 50,150 C 100,20 300,20 350,150"
         fill="none" stroke="grey" stroke-dasharray="4 2"/&gt;
@@ -240,7 +241,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"&gt;
+    <pre><code class="language-markup">&lt;svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"&gt;
   &lt;path d="M 50,100 C 100,20 200,180 250,100 S 350,20 380,100"
         fill="none" stroke="grey" stroke-dasharray="4 2"/&gt;
 
@@ -282,7 +283,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"&gt;
+    <pre><code class="language-markup">&lt;svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"&gt;
   &lt;defs&gt;
     &lt;path id="track" d="M 30,100 Q 200,20 370,100"/&gt;
   &lt;/defs&gt;
@@ -327,7 +328,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg"&gt;
+    <pre><code class="language-markup">&lt;svg viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg"&gt;
   &lt;circle cx="50" cy="50" r="15" fill="coral"&gt;
     &lt;animate attributeName="cx" from="50" to="350"
              dur="1s" begin="0s" fill="freeze"/&gt;
@@ -364,7 +365,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg"&gt;
+    <pre><code class="language-markup">&lt;svg viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg"&gt;
   &lt;g style="cursor:pointer"&gt;
     &lt;circle cx="50" cy="50" r="20" fill="coral"&gt;
       &lt;animate attributeName="cx" from="50" to="350"
@@ -398,7 +399,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg"&gt;
+    <pre><code class="language-markup">&lt;svg viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg"&gt;
   &lt;circle cx="50" cy="50" r="15" fill="coral"&gt;
     &lt;!-- Runs at 0s, then again at 4s, then again at 8s... --&gt;
     &lt;animate attributeName="cx" from="50" to="350"
@@ -450,7 +451,7 @@
   <h3>Hover effect with SMIL</h3>
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"&gt;
+    <pre><code class="language-markup">&lt;svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"&gt;
   &lt;circle cx="100" cy="100" r="40" fill="coral" style="cursor:pointer"&gt;
     &lt;!-- Grow on hover --&gt;
     &lt;animate attributeName="r" from="40" to="55"
@@ -483,7 +484,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"
+    <pre><code class="language-markup">&lt;svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"
      style="cursor:pointer"&gt;
   &lt;!-- Scene content --&gt;
   &lt;circle cx="100" cy="100" r="20" fill="coral"/&gt;
@@ -520,7 +521,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg"&gt;
+    <pre><code class="language-markup">&lt;svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg"&gt;
   &lt;defs&gt;
     &lt;path id="orbit1" d="M 150,50 A 100,100 0 1 1 149.99,50" fill="none"/&gt;
     &lt;path id="orbit2" d="M 150,80 A 70,70 0 1 1 149.99,80" fill="none"/&gt;
@@ -581,7 +582,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"&gt;
+    <pre><code class="language-markup">&lt;svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"&gt;
   &lt;path d="M 40,160 Q 100,20 160,160" fill="none"
         stroke="coral" stroke-width="3"
         stroke-dasharray="300" stroke-dashoffset="300"&gt;
@@ -712,5 +713,6 @@
   <script src="/scripts.js"></script>
  <script src="scripts.js"></script>
  <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
 </body>
 </html>

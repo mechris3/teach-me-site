@@ -18,6 +18,7 @@
   <meta name="twitter:description" content="Architect a scalable token system for multi-brand theming, dark/light modes, and scoped theme regions in pure CSS with Angular integration patterns.">
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
   <style>
     .token-tier { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin: 1rem 0; }
     .token-card { border: 1px solid #e0e0e0; border-radius: 6px; padding: 1rem; background: white; }
@@ -136,7 +137,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* === TIER 1: Primitives — raw palette, never used directly in components === */
+    <pre><code class="language-css">/* === TIER 1: Primitives — raw palette, never used directly in components === */
 :root {
   --blue-500: #3a86ff;
   --blue-700: #1a5fd4;
@@ -201,7 +202,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Primitives — ALWAYS truthful, never redefined per theme */
+    <pre><code class="language-css">/* Primitives — ALWAYS truthful, never redefined per theme */
 :root {
   --gray-50: #fefefe;    /* always light */
   --gray-900: #0d0d1a;   /* always dark */
@@ -226,7 +227,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>:root {
+    <pre><code class="language-css">:root {
   color-scheme: light dark;
 
   /* Each semantic token declares both values inline */
@@ -245,7 +246,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Primitives stay the same regardless of theme */
+    <pre><code class="language-css">/* Primitives stay the same regardless of theme */
 :root {
   --blue-500: #3a86ff;
   --blue-300: #6eaaff;
@@ -317,7 +318,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Each brand class sets its own token values */
+    <pre><code class="language-css">/* Each brand class sets its own token values */
 .brand-a {
   --brand-primary: #3a86ff;
   --brand-surface: #f0f7ff;
@@ -362,7 +363,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- HTML — two regions on the same page with different themes --&gt;
+    <pre><code class="language-css">&lt;!-- HTML — two regions on the same page with different themes --&gt;
 &lt;div class="layout" data-theme="light"&gt;
   &lt;div class="card"&gt;
     &lt;h4&gt;Light region&lt;/h4&gt;
@@ -402,7 +403,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>// theme.service.ts
+    <pre><code class="language-javascript">// theme.service.ts
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
   private theme = signal&lt;'light' | 'dark' | 'system'&gt;('system');
@@ -431,7 +432,7 @@ export class AppComponent {
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>// angular.json — each build configuration includes a different brand file
+    <pre><code class="language-javascript">// angular.json — each build configuration includes a different brand file
 "configurations": {
   "fintech": { "styles": ["src/styles/tokens.css", "src/styles/brand-fintech.css"] },
   "food":    { "styles": ["src/styles/tokens.css", "src/styles/brand-food.css"] }
@@ -442,7 +443,7 @@ export class AppComponent {
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>// theme-scope.directive.ts — apply a theme to any container
+    <pre><code class="language-javascript">// theme-scope.directive.ts — apply a theme to any container
 @Directive({
   selector: '[appThemeScope]',
   host: { '[attr.data-theme]': 'appThemeScope()' }
@@ -465,7 +466,7 @@ export class ThemeScopeDirective {
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* 1. Respect system preference by default */
+    <pre><code class="language-css">/* 1. Respect system preference by default */
 :root {
   color-scheme: light dark;
   --color-surface: light-dark(#fefefe, #1a1a2e);
@@ -481,7 +482,7 @@ export class ThemeScopeDirective {
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>// theme-toggle.ts — the JS side
+    <pre><code class="language-javascript">// theme-toggle.ts — the JS side
 const STORAGE_KEY = 'theme-preference';
 
 function getTheme(): 'light' | 'dark' | 'system' {
@@ -507,7 +508,7 @@ applyTheme(getTheme());</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Pattern: --{category}-{property}-{variant}-{state} */
+    <pre><code class="language-css">/* Pattern: --{category}-{property}-{variant}-{state} */
 
 /* Colours */
 --color-primary                /* default primary */
@@ -550,7 +551,7 @@ applyTheme(getTheme());</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Brand defines ONE base colour in oklch */
+    <pre><code class="language-css">/* Brand defines ONE base colour in oklch */
 :root {
   --brand-hue: 250;
   --brand-chroma: 0.15;
@@ -580,7 +581,7 @@ applyTheme(getTheme());</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>styles/
+    <pre><code class="language-css">styles/
 ├── tokens/
 │   ├── primitives.css       /* raw palette, spacing scale, radii */
 │   ├── semantic-light.css   /* semantic tokens for light theme */
@@ -699,5 +700,6 @@ applyTheme(getTheme());</code></pre>
     }
   })();
   </script>
+  <script src="/vendor/prism.min.js"></script>
 </body>
 </html>

@@ -18,6 +18,7 @@
   <meta name="twitter:description" content="Learn CSS container queries to make components responsive to their parent's size instead of the viewport, with container query units and style queries.">
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
   <style>
     .resize-wrapper { resize: horizontal; overflow: hidden; border: 2px dashed var(--border); border-radius: 6px; padding: 1rem; min-width: 200px; max-width: 100%; width: 100%; }
     .resize-hint { font-size: 0.7rem; color: #999; margin-bottom: 0.75rem; text-align: right; }
@@ -116,7 +117,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Step 1: Make the parent a container */
+    <pre><code class="language-css">/* Step 1: Make the parent a container */
 .card-wrapper {
   container-type: inline-size;
 }
@@ -149,7 +150,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>.card-wrapper {
+    <pre><code class="language-css">.card-wrapper {
   container-type: inline-size;
   container-name: card-container;
 }
@@ -217,7 +218,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Track only width (most common) */
+    <pre><code class="language-css">/* Track only width (most common) */
 .wrapper {
   container-type: inline-size;
 }
@@ -243,7 +244,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Name your containers */
+    <pre><code class="language-css">/* Name your containers */
 .sidebar {
   container-type: inline-size;
   container-name: sidebar;
@@ -334,7 +335,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>.container {
+    <pre><code class="language-css">.container {
   container-type: inline-size;
 }
 
@@ -372,7 +373,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Container sets a custom property */
+    <pre><code class="language-css">/* Container sets a custom property */
 .theme-wrapper {
   container-type: normal;  /* style queries don't need size containment */
   --theme: light;
@@ -410,7 +411,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Instead of trying to query "is this container flex?" (not possible)
+    <pre><code class="language-css">/* Instead of trying to query "is this container flex?" (not possible)
    set a custom property that signals the state: */
 
 .container.is-flex {
@@ -488,7 +489,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Progressive enhancement pattern */
+    <pre><code class="language-css">/* Progressive enhancement pattern */
 .card {
   /* Base styles  -  works everywhere */
   display: flex;
@@ -587,5 +588,6 @@
 
   <script src="/scripts.js"></script>
   <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
 </body>
 </html>

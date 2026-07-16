@@ -18,6 +18,7 @@
   <meta name="twitter:description" content="Register custom properties with @property for type safety, controlled inheritance, and the ability to animate values that were previously impossible to transition.">
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
   <style>
     /* Demo: Animating a hue */
     @property --hue {
@@ -234,7 +235,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Unregistered  -  browser can't interpolate, hard swap */
+    <pre><code class="language-css">/* Unregistered  -  browser can't interpolate, hard swap */
 .no-register-box {
   --bg-color: #3a86ff;
   background: var(--bg-color);
@@ -263,7 +264,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>@property --reg-color {
+    <pre><code class="language-css">@property --reg-color {
   syntax: "&lt;color&gt;";       /* 1. What TYPE of value this holds */
   inherits: false;          /* 2. Does it cascade to children? */
   initial-value: #3a86ff;   /* 3. Default when not explicitly set */
@@ -302,7 +303,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>@property --flexible {
+    <pre><code class="language-css">@property --flexible {
   syntax: "&lt;length&gt; | &lt;percentage&gt;";  /* accepts either */
   inherits: false;
   initial-value: 0px;
@@ -339,7 +340,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>@property --card-accent {
+    <pre><code class="language-css">@property --card-accent {
   syntax: "&lt;color&gt;";
   inherits: false;         /* children don't get parent's value */
   initial-value: #3a86ff;  /* they get this instead */
@@ -368,7 +369,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>@property --safe-size {
+    <pre><code class="language-css">@property --safe-size {
   syntax: "&lt;length&gt;";
   inherits: false;
   initial-value: 16px;
@@ -397,7 +398,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>@property --hue {
+    <pre><code class="language-css">@property --hue {
   syntax: "&lt;number&gt;";
   inherits: false;
   initial-value: 220;
@@ -424,7 +425,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>@property --stop {
+    <pre><code class="language-css">@property --stop {
   syntax: "&lt;percentage&gt;";
   inherits: false;
   initial-value: 30%;
@@ -525,5 +526,6 @@
 
   <script src="/scripts.js"></script>
   <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
 </body>
 </html>

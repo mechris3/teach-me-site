@@ -18,6 +18,7 @@
   <meta name="twitter:description" content="Learn CSS logical properties for writing-mode-aware layout using block/inline axes, flow-relative directions, and shorthand properties that adapt to text direction.">
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
   <style>
     .logical-box { background: #f0f7ff; color: #1a1a2e; border: 1px solid var(--border); border-radius: 6px; font-size: 0.8rem; display: inline-block; }
     .rtl-wrapper { direction: rtl; }
@@ -240,7 +241,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- HTML --&gt;
+    <pre><code class="language-css">&lt;!-- HTML --&gt;
 &lt;div class="box"&gt;Content&lt;/div&gt;
 
 .box {
@@ -274,7 +275,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>.callout {
+    <pre><code class="language-css">.callout {
   border-inline-start: 4px solid blue;  /* left in LTR, right in RTL */
   padding-inline-start: 1rem;           /* same  -  adapts with direction */
   padding-block: 0.5rem;                /* top + bottom  -  always the same */
@@ -304,7 +305,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- HTML --&gt;
+    <pre><code class="language-css">&lt;!-- HTML --&gt;
 &lt;div class="centered"&gt;Content&lt;/div&gt;
 
 .centered {
@@ -329,7 +330,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- HTML --&gt;
+    <pre><code class="language-css">&lt;!-- HTML --&gt;
 &lt;div class="parent"&gt;
   &lt;div class="positioned"&gt;Badge&lt;/div&gt;
 &lt;/div&gt;
@@ -353,7 +354,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Physical */
+    <pre><code class="language-css">/* Physical */
 border-top-left-radius: 8px;
 
 /* Logical */
@@ -475,5 +476,6 @@ border-end-end-radius: 8px;      /* block-end + inline-end corner */</code></pre
 
   <script src="/scripts.js"></script>
   <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
 </body>
 </html>

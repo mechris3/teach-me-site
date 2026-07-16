@@ -18,6 +18,7 @@
   <meta name="twitter:description" content="Kiro CLI: terminal workflows, session memory, file references, and headless agent execution.">
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -87,7 +88,7 @@
 
   <h2>Getting Started</h2>
 
-  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code># Install - check kiro.dev/docs/cli/quick-start for the current method
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code class="language-bash"># Install - check kiro.dev/docs/cli/quick-start for the current method
 # Common options include Homebrew, npm, or the official installer script
 
 # Start an interactive chat in the current directory
@@ -104,7 +105,7 @@ kiro "explain how the auth service works"</code></pre></div>
 
   <p>Include file contents directly in your message without a tool call:</p>
 
-  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>kiro "refactor this service @src/app/services/user.service.ts to use signals"</code></pre></div>
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code class="language-bash">kiro "refactor this service @src/app/services/user.service.ts to use signals"</code></pre></div>
 
   <p>The file content is expanded inline before sending - saves tokens by avoiding a read_file tool call. Use <code>@folder/</code> (with trailing slash) to include a directory tree structure.</p>
 
@@ -112,7 +113,7 @@ kiro "explain how the auth service works"</code></pre></div>
 
   <p>The CLI automatically saves all chat sessions per-directory. When you start a session where you previously chatted, you can resume:</p>
 
-  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code># Resume the last session in this directory
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code class="language-bash"># Resume the last session in this directory
 kiro --resume
 
 # List previous sessions
@@ -140,7 +141,7 @@ kiro session list</code></pre></div>
 
   <p>Run Kiro without an interactive terminal - for automation:</p>
 
-  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code># In a CI pipeline
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code class="language-bash"># In a CI pipeline
 kiro --headless --prompt "review this PR for security issues" --api-key $KIRO_API_KEY</code></pre></div>
 
   <p>Use cases: automated code review on PRs, test generation in CI, build failure troubleshooting, documentation generation.</p>
@@ -190,13 +191,13 @@ kiro --headless --prompt "review this PR for security issues" --api-key $KIRO_AP
   <h2>Practical Scenarios</h2>
 
   <h3>"I'm in the terminal and don't want to switch to the IDE"</h3>
-  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>kiro "add error handling to the payment service - wrap all HTTP calls in try/catch with structured logging"</code></pre></div>
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code class="language-bash">kiro "add error handling to the payment service - wrap all HTTP calls in try/catch with structured logging"</code></pre></div>
 
   <h3>"I want to review the PR changes before merging"</h3>
-  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>kiro "review the git diff for security issues and potential bugs @$(git diff --name-only)"</code></pre></div>
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code class="language-bash">kiro "review the git diff for security issues and potential bugs @$(git diff --name-only)"</code></pre></div>
 
   <h3>"I want to automate code review in CI"</h3>
-  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>kiro --headless --prompt "review this diff for: security issues, missing error handling, and Angular best practices. Output a summary." --api-key $KIRO_API_KEY</code></pre></div>
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code class="language-bash">kiro --headless --prompt "review this diff for: security issues, missing error handling, and Angular best practices. Output a summary." --api-key $KIRO_API_KEY</code></pre></div>
 
   <h2>Your Tangible Win</h2>
 
@@ -244,5 +245,8 @@ kiro --headless --prompt "review this PR for security issues" --api-key $KIRO_AP
 
   <script src="/scripts.js"></script>
   <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
+  <script src="/vendor/prism-yaml.min.js"></script>
+  <script src="/vendor/prism-bash.min.js"></script>
 </body>
 </html>

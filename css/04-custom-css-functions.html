@@ -18,6 +18,7 @@
   <meta name="twitter:description" content="Learn how to create reusable custom CSS functions with @function - native parametrised value computation with typed parameters, defaults, and conditional logic.">
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
   <style>
     /* Demo: --double function */
     @function --double(--value) {
@@ -162,7 +163,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>@function --double(--value) {
+    <pre><code class="language-css">@function --double(--value) {
   result: calc(var(--value) * 2);
 }</code></pre>
   </div>
@@ -171,7 +172,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>.box {
+    <pre><code class="language-css">.box {
   padding: --double(8px);   /* → 16px */
   margin: --double(1rem);   /* → 2rem */
 }</code></pre>
@@ -189,7 +190,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>@function --tint(--color &lt;color&gt;, --amount &lt;percentage&gt;: 50%) returns &lt;color&gt; {
+    <pre><code class="language-css">@function --tint(--color &lt;color&gt;, --amount &lt;percentage&gt;: 50%) returns &lt;color&gt; {
   result: color-mix(in oklch, var(--color), white var(--amount));
 }</code></pre>
   </div>
@@ -206,7 +207,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>.card {
+    <pre><code class="language-css">.card {
   background: --tint(#3a86ff, 30%);       /* light blue */
   border-color: --tint(#3a86ff);          /* uses default 50% */
 }</code></pre>
@@ -218,7 +219,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>@function --fluid(--min &lt;length&gt;, --max &lt;length&gt;, --vw &lt;length&gt;: 2vw) returns &lt;length&gt; {
+    <pre><code class="language-css">@function --fluid(--min &lt;length&gt;, --max &lt;length&gt;, --vw &lt;length&gt;: 2vw) returns &lt;length&gt; {
   result: clamp(var(--min), calc(var(--vw) + var(--min)), var(--max));
 }
 
@@ -243,7 +244,7 @@ padding: --fluid(0.75rem, 2rem, 3vw);</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>@function --double(--value) {
+    <pre><code class="language-css">@function --double(--value) {
   result: calc(var(--value) * 2);
 }
 
@@ -268,7 +269,7 @@ padding: --fluid(0.75rem, 2rem, 3vw);</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>@function --fluid(--min &lt;length&gt;, --max &lt;length&gt;, --vw &lt;length&gt;: 2vw) returns &lt;length&gt; {
+    <pre><code class="language-css">@function --fluid(--min &lt;length&gt;, --max &lt;length&gt;, --vw &lt;length&gt;: 2vw) returns &lt;length&gt; {
   result: clamp(var(--min), calc(var(--vw) + var(--min)), var(--max));
 }
 
@@ -290,7 +291,7 @@ padding: --fluid(0.75rem, 2rem, 3vw);</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>@function --elevation(--level &lt;integer&gt;) {
+    <pre><code class="language-css">@function --elevation(--level &lt;integer&gt;) {
   --base-shadow: 0px;
   --blur: calc(var(--level) * 4px);
   --spread: calc(var(--level) * 1px);
@@ -311,7 +312,7 @@ padding: --fluid(0.75rem, 2rem, 3vw);</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>@function --shade(--color &lt;color&gt;, --amount &lt;percentage&gt;: 30%) returns &lt;color&gt; {
+    <pre><code class="language-css">@function --shade(--color &lt;color&gt;, --amount &lt;percentage&gt;: 30%) returns &lt;color&gt; {
   result: color-mix(in oklch, var(--color), black var(--amount));
 }
 
@@ -335,7 +336,7 @@ padding: --fluid(0.75rem, 2rem, 3vw);</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>@function --responsive-padding(--sm &lt;length&gt;, --lg &lt;length&gt;) {
+    <pre><code class="language-css">@function --responsive-padding(--sm &lt;length&gt;, --lg &lt;length&gt;) {
   result: var(--lg);
 
   @media (width &lt; 768px) {
@@ -360,7 +361,7 @@ padding: --fluid(0.75rem, 2rem, 3vw);</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Syntax */
+    <pre><code class="language-css">/* Syntax */
 if( &lt;condition&gt; : &lt;value-if-true&gt; ; else: &lt;value-if-false&gt; )
 
 /* The condition can be: */
@@ -373,7 +374,7 @@ if( style(--theme: dark) : ... ; else: ... )     /* style query (custom property
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>@function --responsive-padding(--sm &lt;length&gt;, --lg &lt;length&gt;) returns &lt;length&gt; {
+    <pre><code class="language-css">@function --responsive-padding(--sm &lt;length&gt;, --lg &lt;length&gt;) returns &lt;length&gt; {
   result: if(media(width &lt; 768px): var(--sm); else: var(--lg));
 }
 
@@ -386,7 +387,7 @@ if( style(--theme: dark) : ... ; else: ... )     /* style query (custom property
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Inline conditional without @function */
+    <pre><code class="language-css">/* Inline conditional without @function */
 .card {
   padding: if(media(width &lt; 768px): 1rem; else: 2rem);
   background: if(style(--theme: dark): #1a1a2e; else: white);
@@ -416,7 +417,7 @@ if( style(--theme: dark) : ... ; else: ... )     /* style query (custom property
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>@function --longest(--list &lt;length&gt;#, --extra &lt;length&gt;) {
+    <pre><code class="language-css">@function --longest(--list &lt;length&gt;#, --extra &lt;length&gt;) {
   result: calc(max(var(--list)) + var(--extra));
 }
 
@@ -484,7 +485,7 @@ if( style(--theme: dark) : ... ; else: ... )     /* style query (custom property
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>@function --space(--multiplier &lt;number&gt;: 1) returns &lt;length&gt; {
+    <pre><code class="language-css">@function --space(--multiplier &lt;number&gt;: 1) returns &lt;length&gt; {
   --base: 0.5rem;
   result: calc(var(--base) * var(--multiplier));
 }
@@ -500,7 +501,7 @@ if( style(--theme: dark) : ... ; else: ... )     /* style query (custom property
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>@function --tint(--color &lt;color&gt;, --amount &lt;percentage&gt;: 50%) returns &lt;color&gt; {
+    <pre><code class="language-css">@function --tint(--color &lt;color&gt;, --amount &lt;percentage&gt;: 50%) returns &lt;color&gt; {
   result: color-mix(in oklch, var(--color), white var(--amount));
 }
 
@@ -526,7 +527,7 @@ if( style(--theme: dark) : ... ; else: ... )     /* style query (custom property
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>@function --fluid-type(--min &lt;length&gt;, --max &lt;length&gt;) returns &lt;length&gt; {
+    <pre><code class="language-css">@function --fluid-type(--min &lt;length&gt;, --max &lt;length&gt;) returns &lt;length&gt; {
   /* Grows from min at 320px viewport to max at 1200px viewport */
   --slope: calc((var(--max) - var(--min)) / (1200 - 320));
   result: clamp(var(--min), calc(var(--min) + (100vw - 320px) * var(--slope)), var(--max));
@@ -625,5 +626,6 @@ p  { font-size: --fluid-type(1rem, 1.25rem); }</code></pre>
 
   <script src="/scripts.js"></script>
   <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
 </body>
 </html>

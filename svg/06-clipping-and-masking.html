@@ -18,6 +18,7 @@
   <meta name="twitter:description" content="clipPath for hard geometric crops, mask for soft gradient fades. Luminance vs alpha masking, practical reveal animations.">
   <link rel="stylesheet" href="/styles.css">
  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -96,7 +97,7 @@
   <h3>Basic structure</h3>
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg viewBox="0 0 200 200"&gt;
+    <pre><code class="language-markup">&lt;svg viewBox="0 0 200 200"&gt;
   &lt;defs&gt;
     &lt;clipPath id="circle-clip"&gt;
       &lt;circle cx="100" cy="100" r="80"/&gt;
@@ -197,7 +198,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;defs&gt;
+    <pre><code class="language-markup">&lt;defs&gt;
   &lt;clipPath id="text-clip"&gt;
     &lt;text x="250" y="110" font-size="80" font-weight="900"
           text-anchor="middle"&gt;SVG&lt;/text&gt;
@@ -261,7 +262,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;defs&gt;
+    <pre><code class="language-markup">&lt;defs&gt;
   &lt;!-- A gradient from white (visible) to black (hidden) --&gt;
   &lt;linearGradient id="fade-grad"&gt;
     &lt;stop offset="0%" stop-color="white"/&gt;
@@ -305,7 +306,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;defs&gt;
+    <pre><code class="language-markup">&lt;defs&gt;
   &lt;!-- Radial gradient: white centre (visible) to black edges (hidden) --&gt;
   &lt;radialGradient id="soft-grad" cx="0.5" cy="0.5" r="0.5"&gt;
     &lt;stop offset="0%" stop-color="white"/&gt;
@@ -408,7 +409,7 @@
   <p>In luminance mode, the browser computes the luminance (perceived brightness) of each rendered pixel in the mask using the standard formula:</p>
 
   <div class="code-wrapper">
-    <pre><code>luminance = 0.2126 * R + 0.7152 * G + 0.0722 * B
+    <pre><code class="language-markup">luminance = 0.2126 * R + 0.7152 * G + 0.0722 * B
 
 where R, G, B are in the range 0–1</code></pre>
   </div>
@@ -479,7 +480,7 @@ where R, G, B are in the range 0–1</code></pre>
   <h3>How to set mask mode</h3>
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- SVG 2 / CSS approach --&gt;
+    <pre><code class="language-markup">&lt;!-- SVG 2 / CSS approach --&gt;
 &lt;mask id="my-mask" style="mask-type: alpha"&gt;
   &lt;!-- mask content --&gt;
 &lt;/mask&gt;
@@ -583,7 +584,7 @@ where R, G, B are in the range 0–1</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;defs&gt;
+    <pre><code class="language-markup">&lt;defs&gt;
   &lt;clipPath id="avatar-clip"&gt;
     &lt;circle cx="100" cy="100" r="90"/&gt;
   &lt;/clipPath&gt;
@@ -651,7 +652,7 @@ where R, G, B are in the range 0–1</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;defs&gt;
+    <pre><code class="language-markup">&lt;defs&gt;
   &lt;mask id="reveal-mask"&gt;
     &lt;!-- This circle grows to reveal content --&gt;
     &lt;circle cx="200" cy="150" r="0" fill="white"&gt;
@@ -696,7 +697,7 @@ where R, G, B are in the range 0–1</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;defs&gt;
+    <pre><code class="language-markup">&lt;defs&gt;
   &lt;clipPath id="sliding-clip"&gt;
     &lt;rect x="0" y="0" width="200" height="300"&gt;
       &lt;!-- Slide the clip rect to reveal content --&gt;
@@ -729,7 +730,7 @@ where R, G, B are in the range 0–1</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg"&gt;
+    <pre><code class="language-markup">&lt;svg viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg"&gt;
   &lt;!-- Embed a raster image --&gt;
   &lt;image href="photo.jpg" x="20" y="20" width="260" height="160"
          preserveAspectRatio="xMidYMid slice"/&gt;
@@ -829,7 +830,7 @@ where R, G, B are in the range 0–1</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg width="600" height="500" viewBox="0 0 600 500" xmlns="http://www.w3.org/2000/svg"&gt;
+    <pre><code class="language-markup">&lt;svg width="600" height="500" viewBox="0 0 600 500" xmlns="http://www.w3.org/2000/svg"&gt;
   &lt;defs&gt;
     &lt;!-- 1. Circular clip --&gt;
     &lt;clipPath id="ex-circle-clip"&gt;
@@ -894,5 +895,6 @@ where R, G, B are in the range 0–1</code></pre>
   <script src="/scripts.js"></script>
  <script src="scripts.js"></script>
  <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
 </body>
 </html>

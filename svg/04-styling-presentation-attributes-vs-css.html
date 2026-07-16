@@ -18,6 +18,7 @@
   <meta name="twitter:description" content="How SVG's cascade differs from HTML. Presentation attributes, CSS overrides, inheritance, currentColor, and embedding context.">
   <link rel="stylesheet" href="/styles.css">
  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -75,7 +76,7 @@
   <p>Style properties written directly as XML attributes on the element:</p>
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;rect fill="#e06c75" stroke="#528bcc" stroke-width="2"/&gt;</code></pre>
+    <pre><code class="language-markup">&lt;rect fill="#e06c75" stroke="#528bcc" stroke-width="2"/&gt;</code></pre>
   </div>
   <p>These look like regular HTML attributes, but they're actually CSS properties expressed as attributes. They're unique to SVG  -  HTML has no equivalent mechanism.</p>
 
@@ -83,7 +84,7 @@
   <p>The familiar <code>style=""</code> attribute, exactly as in HTML:</p>
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;rect style="fill: #e06c75; stroke: #528bcc; stroke-width: 2px;"/&gt;</code></pre>
+    <pre><code class="language-markup">&lt;rect style="fill: #e06c75; stroke: #528bcc; stroke-width: 2px;"/&gt;</code></pre>
   </div>
   <p>Same syntax as CSS. Same highest-priority behaviour you know from HTML.</p>
 
@@ -91,7 +92,7 @@
   <p>Selectors targeting SVG elements, in a <code>&lt;style&gt;</code> block or external stylesheet:</p>
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;style&gt;
+    <pre><code class="language-markup">&lt;style&gt;
   .my-rect { fill: #e06c75; stroke: #528bcc; stroke-width: 2px; }
 &lt;/style&gt;
 &lt;rect class="my-rect"/&gt;</code></pre>
@@ -139,7 +140,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg viewBox="0 0 200 100"&gt;
+    <pre><code class="language-markup">&lt;svg viewBox="0 0 200 100"&gt;
   &lt;style&gt;
     .my-rect { fill: red; }
   &lt;/style&gt;
@@ -218,7 +219,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;g fill="coral" stroke="#b04950" stroke-width="2"&gt;
+    <pre><code class="language-markup">&lt;g fill="coral" stroke="#b04950" stroke-width="2"&gt;
   &lt;circle cx="80" cy="70" r="35"/&gt;
   &lt;rect x="150" y="35" width="70" height="70" rx="6"/&gt;
   &lt;polygon points="300,35 340,105 260,105"/&gt;
@@ -261,7 +262,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- The SVG inherits 'color' from its parent/context --&gt;
+    <pre><code class="language-markup">&lt;!-- The SVG inherits 'color' from its parent/context --&gt;
 &lt;svg style="color: navy;" viewBox="0 0 100 100" width="60"&gt;
   &lt;circle fill="currentColor" cx="50" cy="50" r="40"/&gt;
 &lt;/svg&gt;
@@ -348,7 +349,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>@layer base, theme;
+    <pre><code class="language-css">@layer base, theme;
 
 @layer base {
   circle { fill: gray; }
@@ -391,7 +392,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;style&gt;
+    <pre><code class="language-markup">&lt;style&gt;
   .morphing-circle {
     cx: 50px;
     cy: 50px;
@@ -424,7 +425,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg"&gt;
+    <pre><code class="language-markup">&lt;svg viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg"&gt;
   &lt;switch&gt;
     &lt;text systemLanguage="fr" x="10" y="35" font-size="18"&gt;Bonjour&lt;/text&gt;
     &lt;text systemLanguage="de" x="10" y="35" font-size="18"&gt;Hallo&lt;/text&gt;
@@ -498,7 +499,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg width="500" height="300" viewBox="0 0 500 300" xmlns="http://www.w3.org/2000/svg"&gt;
+    <pre><code class="language-markup">&lt;svg width="500" height="300" viewBox="0 0 500 300" xmlns="http://www.w3.org/2000/svg"&gt;
   &lt;style&gt;
     /* 2. CSS override  -  these will beat the presentation attributes below */
     .override-me { fill: #c678dd; stroke: #9b59b6; }
@@ -550,5 +551,6 @@
   <script src="/scripts.js"></script>
  <script src="scripts.js"></script>
  <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
 </body>
 </html>

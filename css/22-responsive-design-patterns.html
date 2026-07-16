@@ -18,6 +18,7 @@
   <meta name="twitter:description" content="Compose intrinsic responsive layouts using auto-fill grids, container queries, clamp() fluid type, flex-wrap sidebars, and named grid areas with minimal breakpoints.">
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
   <style>
     .resize-wrapper { resize: horizontal; overflow: hidden; border: 2px dashed #e0e0e0; border-radius: 8px; padding: 1rem; min-width: 200px; max-width: 100%; }
     .resize-hint { font-size: 0.7rem; color: #999; text-align: right; margin-top: 0.5rem; }
@@ -129,7 +130,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Fluid type — no breakpoints */
+    <pre><code class="language-css">/* Fluid type — no breakpoints */
 h3 {
   /* min: 1rem, preferred: 0.5rem + 2vw, max: 2rem */
   font-size: clamp(1rem, 0.5rem + 2vw, 2rem);
@@ -174,7 +175,7 @@ p {
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* The magic one-liner */
+    <pre><code class="language-css">/* The magic one-liner */
 .auto-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
@@ -214,7 +215,7 @@ p {
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Establish the containment context */
+    <pre><code class="language-css">/* Establish the containment context */
 .card-wrapper {
   container-type: inline-size;
 }
@@ -256,7 +257,7 @@ p {
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* The pancake stack */
+    <pre><code class="language-css">/* The pancake stack */
 .page {
   display: grid;
   grid-template-rows: auto 1fr auto;
@@ -282,7 +283,7 @@ p {
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* The layout reads like a visual map */
+    <pre><code class="language-css">/* The layout reads like a visual map */
 .layout {
   display: grid;
   grid-template:
@@ -337,7 +338,7 @@ p {
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Intrinsic sidebar — no breakpoints */
+    <pre><code class="language-css">/* Intrinsic sidebar — no breakpoints */
 .with-sidebar {
   display: flex;
   flex-wrap: wrap;
@@ -369,7 +370,7 @@ p {
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Fluid spacing — gap and padding scale with viewport */
+    <pre><code class="language-css">/* Fluid spacing — gap and padding scale with viewport */
 .fluid-section {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -387,7 +388,7 @@ p {
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* WHAT ARE YOU MAKING RESPONSIVE?
+    <pre><code class="language-css">/* WHAT ARE YOU MAKING RESPONSIVE?
 
    The VIEWPORT (page-level layout):
    → media queries + grid-template rearrangement
@@ -496,5 +497,6 @@ p {
 
   <script src="/scripts.js"></script>
   <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
 </body>
 </html>

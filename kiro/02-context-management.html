@@ -18,6 +18,7 @@
   <meta name="twitter:description" content="Understanding Kiro's context window: what goes in, the token budget, compaction, active files, and how to manage context effectively across sessions.">
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -79,7 +80,7 @@
   <div class="demo">
     <svg width="100%" height="520" viewBox="0 0 680 520" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagram showing the layers of Kiro's context window from system prompt at the top to tool results at the bottom">
       <!-- Background -->
-      <rect width="680" height="520" rx="12" fill="var(--demo-svg-bg, #f3f2ed)"/>
+      <rect width="680" height="520" rx="12" fill="var(--bg-raised, #f3f2ed)"/>
 
       <!-- Title -->
       <text x="340" y="30" font-size="13" font-weight="600" fill="var(--text, #1a1a2e)" text-anchor="middle" font-family="system-ui, sans-serif">Context Window Assembly Order</text>
@@ -305,5 +306,8 @@
 
   <script src="/scripts.js"></script>
   <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
+  <script src="/vendor/prism-yaml.min.js"></script>
+  <script src="/vendor/prism-bash.min.js"></script>
 </body>
 </html>

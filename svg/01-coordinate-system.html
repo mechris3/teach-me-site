@@ -18,6 +18,7 @@
   <meta name="twitter:description" content="Understanding SVG's viewport, viewBox, and user coordinate system. The camera analogy for how SVG maps abstract coordinates to screen pixels.">
   <link rel="stylesheet" href="/styles.css">
  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -217,7 +218,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg width="400" height="300"&gt;
+    <pre><code class="language-markup">&lt;svg width="400" height="300"&gt;
   &lt;!-- content here --&gt;
 &lt;/svg&gt;</code></pre>
   </div>
@@ -278,7 +279,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg width="400" height="300" viewBox="0 0 800 600"&gt;
+    <pre><code class="language-markup">&lt;svg width="400" height="300" viewBox="0 0 800 600"&gt;
   &lt;!-- coordinate system now runs 0-800 horizontally, 0-600 vertically --&gt;
   &lt;!-- but it's all rendered into the 400x300 viewport --&gt;
 &lt;/svg&gt;</code></pre>
@@ -334,7 +335,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg width="400" height="200" viewBox="0 0 100 100"
+    <pre><code class="language-markup">&lt;svg width="400" height="200" viewBox="0 0 100 100"
      preserveAspectRatio="xMidYMid meet"&gt;</code></pre>
   </div>
 
@@ -409,7 +410,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg width="400" height="300" viewBox="0 0 400 300"&gt;
+    <pre><code class="language-markup">&lt;svg width="400" height="300" viewBox="0 0 400 300"&gt;
   &lt;!-- outer coordinate system --&gt;
   &lt;rect x="0" y="0" width="400" height="300" fill="#eee"/&gt;
 
@@ -495,7 +496,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"
+    <pre><code class="language-markup">&lt;svg viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"
      role="img" aria-labelledby="svg-title svg-desc"&gt;
   &lt;title id="svg-title"&gt;Company Logo&lt;/title&gt;
   &lt;desc id="svg-desc"&gt;A blue circle with the letter K inside,
@@ -627,5 +628,6 @@
     }
   </script>
  <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
 </body>
 </html>

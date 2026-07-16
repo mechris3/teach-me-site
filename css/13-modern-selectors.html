@@ -18,6 +18,7 @@
   <meta name="twitter:description" content="Master modern CSS pseudo-class functions :has(), :is(), :where(), and :not() for powerful conditional selection, concise selector lists, and precise specificity control.">
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
   <style>
     .has-demo-card {
       border: 1px solid var(--border);
@@ -223,7 +224,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- HTML --&gt;
+    <pre><code class="language-css">&lt;!-- HTML --&gt;
 &lt;div class="card"&gt;
   &lt;img src="..."&gt;
   &lt;p&gt;Card with image&lt;/p&gt;
@@ -252,7 +253,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- HTML --&gt;
+    <pre><code class="language-css">&lt;!-- HTML --&gt;
 &lt;div class="card"&gt;
   &lt;label&gt;&lt;input type="checkbox"&gt; Accept terms&lt;/label&gt;
 &lt;/div&gt;
@@ -270,7 +271,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Direct child only */
+    <pre><code class="language-css">/* Direct child only */
 .card:has(&gt; img) { }        /* card with img as direct child */
 
 /* Sibling */
@@ -306,7 +307,7 @@ h2:has(+ p) { }             /* h2 immediately followed by a p */
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- HTML --&gt;
+    <pre><code class="language-css">&lt;!-- HTML --&gt;
 &lt;div class="article"&gt;
   &lt;h3&gt;Heading 3&lt;/h3&gt;
   &lt;h4&gt;Heading 4&lt;/h4&gt;
@@ -343,7 +344,7 @@ h2:has(+ p) { }             /* h2 immediately followed by a p */
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- HTML --&gt;
+    <pre><code class="language-css">&lt;!-- HTML --&gt;
 &lt;div class="article"&gt;
   &lt;h3&gt;I'm green&lt;/h3&gt;
   &lt;h4&gt;I'm coral&lt;/h4&gt;
@@ -380,7 +381,7 @@ h2:has(+ p) { }             /* h2 immediately followed by a p */
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- HTML --&gt;
+    <pre><code class="language-css">&lt;!-- HTML --&gt;
 &lt;div class="list"&gt;
   &lt;div class="item"&gt;Active&lt;/div&gt;
   &lt;div class="item"&gt;Active&lt;/div&gt;
@@ -399,7 +400,7 @@ h2:has(+ p) { }             /* h2 immediately followed by a p */
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Exclude multiple things */
+    <pre><code class="language-css">/* Exclude multiple things */
 .item:not(.disabled, .hidden) { }
 
 /* Exclude elements with a specific child (combined with :has) */
@@ -421,7 +422,7 @@ h2:has(+ p) { }             /* h2 immediately followed by a p */
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- HTML --&gt;
+    <pre><code class="language-css">&lt;!-- HTML --&gt;
 &lt;article class="featured"&gt;&lt;img&gt;Featured&lt;/article&gt;
 &lt;article&gt;&lt;img&gt;Non-featured with image&lt;/article&gt;
 &lt;article&gt;No image&lt;/article&gt;
@@ -438,7 +439,7 @@ article:has(&gt; img):not(.featured) {
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Specificity examples: */
+    <pre><code class="language-css">/* Specificity examples: */
 :is(.card, #main)        → (1, 0, 0)  /* takes #main's specificity */
 :where(.card, #main)     → (0, 0, 0)  /* always zero */
 :not(.disabled)          → (0, 1, 0)  /* specificity of .disabled */
@@ -534,5 +535,6 @@ article:has(&gt; img):not(.featured) {
 
   <script src="/scripts.js"></script>
   <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
 </body>
 </html>

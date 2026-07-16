@@ -18,6 +18,7 @@
   <meta name="twitter:description" content="Understand how the Flexbox algorithm works - flex-basis, flex-grow, flex-shrink, alignment, wrapping, and practical layout patterns.">
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
   <style>
     .flex-container { display: flex; border: 2px solid var(--border); border-radius: 6px; padding: 0.5rem; gap: 0.5rem; margin-bottom: 0.75rem; min-height: 60px; align-items: stretch; }
     .flex-item { background: var(--accent); color: white; padding: 0.5rem 0.75rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; display: flex; align-items: center; justify-content: center; text-align: center; }
@@ -150,7 +151,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>.row    { display: flex; flex-direction: row; }    /* default */
+    <pre><code class="language-css">.row    { display: flex; flex-direction: row; }    /* default */
 .column { display: flex; flex-direction: column; }</code></pre>
   </div>
 
@@ -225,7 +226,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Row: justify-content works horizontally */
+    <pre><code class="language-css">/* Row: justify-content works horizontally */
 .row { display: flex; flex-direction: row; justify-content: center; }
 
 /* Column: justify-content works VERTICALLY */
@@ -255,7 +256,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>justify-content: flex-start;     /* pack to start */
+    <pre><code class="language-css">justify-content: flex-start;     /* pack to start */
 justify-content: center;         /* center items */
 justify-content: flex-end;       /* pack to end */
 justify-content: space-between;  /* first item at start, last at end, equal gaps between */
@@ -278,7 +279,7 @@ justify-content: space-evenly;   /* truly equal gaps everywhere */</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>align-items: stretch;    /* fill height (default) */
+    <pre><code class="language-css">align-items: stretch;    /* fill height (default) */
 align-items: flex-start; /* top of container */
 align-items: center;     /* vertically centered */
 align-items: flex-end;   /* bottom of container */
@@ -304,7 +305,7 @@ align-items: baseline;   /* align text baselines */</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>.item-1 { flex-basis: 100px; }  /* exactly 100px as starting point */
+    <pre><code class="language-css">.item-1 { flex-basis: 100px; }  /* exactly 100px as starting point */
 .item-2 { flex-basis: 200px; }  /* exactly 200px */
 .item-3 { flex-basis: auto; }   /* use width/content size */</code></pre>
   </div>
@@ -342,7 +343,7 @@ align-items: baseline;   /* align text baselines */</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* No growth - items stay at flex-basis */
+    <pre><code class="language-css">/* No growth - items stay at flex-basis */
 .item { flex-grow: 0; }
 
 /* Equal growth - each gets same share of free space */
@@ -375,7 +376,7 @@ align-items: baseline;   /* align text baselines */</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* All items shrink equally (default) */
+    <pre><code class="language-css">/* All items shrink equally (default) */
 .item { flex-shrink: 1; }
 
 /* This item won't shrink - others absorb all the overflow */
@@ -404,7 +405,7 @@ align-items: baseline;   /* align text baselines */</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>flex: &lt;grow&gt; &lt;shrink&gt; &lt;basis&gt;;
+    <pre><code class="language-css">flex: &lt;grow&gt; &lt;shrink&gt; &lt;basis&gt;;
 
 /* Common patterns: */
 flex: 0 1 auto;   /* default - don't grow, can shrink, basis is content/width */
@@ -435,7 +436,7 @@ flex: auto;       /* same as flex: 1 1 auto - grow and shrink from content size 
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>.container {
+    <pre><code class="language-css">.container {
   display: flex;
   flex-wrap: wrap;
 }
@@ -465,7 +466,7 @@ flex: auto;       /* same as flex: 1 1 auto - grow and shrink from content size 
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>.container {
+    <pre><code class="language-css">.container {
   display: flex;
   gap: 1rem;           /* both row and column gap */
   /* or: */
@@ -497,7 +498,7 @@ flex: auto;       /* same as flex: 1 1 auto - grow and shrink from content size 
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* The problem: */
+    <pre><code class="language-css">/* The problem: */
 .item {
   flex: 1;
   white-space: nowrap;
@@ -524,7 +525,7 @@ flex: auto;       /* same as flex: 1 1 auto - grow and shrink from content size 
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>1. Set each item's "hypothetical main size" = flex-basis (or width if basis is auto)
+    <pre><code class="language-css">1. Set each item's "hypothetical main size" = flex-basis (or width if basis is auto)
 2. Sum all hypothetical sizes + gaps
 3. Compare to container size:
    - If sum < container → FREE SPACE exists → distribute via flex-grow
@@ -555,7 +556,7 @@ flex: auto;       /* same as flex: 1 1 auto - grow and shrink from content size 
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>.page {
+    <pre><code class="language-css">.page {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -578,7 +579,7 @@ flex: auto;       /* same as flex: 1 1 auto - grow and shrink from content size 
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>.layout {
+    <pre><code class="language-css">.layout {
   display: flex;
   gap: 1rem;
 }
@@ -598,7 +599,7 @@ flex: auto;       /* same as flex: 1 1 auto - grow and shrink from content size 
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>.container {
+    <pre><code class="language-css">.container {
   display: flex;
   justify-content: center;  /* horizontal */
   align-items: center;      /* vertical */
@@ -683,5 +684,6 @@ flex: auto;       /* same as flex: 1 1 auto - grow and shrink from content size 
 
   <script src="/scripts.js"></script>
   <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
 </body>
 </html>

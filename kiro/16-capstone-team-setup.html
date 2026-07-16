@@ -18,6 +18,7 @@
   <meta name="twitter:description" content="Capstone project: combining steering, hooks, skills, MCP servers, powers, and custom agents into a complete team setup.">
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -78,7 +79,7 @@
 
   <h2>The Complete .kiro/ Directory</h2>
 
-  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>.kiro/
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code class="language-plaintext">.kiro/
 ├── steering/
 │   ├── conventions.md              # Always-on: team-wide code standards
 │   ├── architecture.md             # Always-on: project structure, key decisions
@@ -114,7 +115,7 @@
   <h3>Steering: What Kiro Always Knows</h3>
 
   <p><strong>conventions.md</strong> (always-on) - kept short, cross-cutting:</p>
-  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>---
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code class="language-yaml">---
 inclusion: auto
 ---
 
@@ -128,7 +129,7 @@ inclusion: auto
 - Commit format: [branch-name] Short title\n\n- Details</code></pre></div>
 
   <p><strong>component-patterns.md</strong> (fileMatch) - only loads when working on components:</p>
-  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>---
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code class="language-yaml">---
 inclusion: fileMatch
 fileMatchPattern: "src/app/**/*.component.ts"
 ---
@@ -142,7 +143,7 @@ fileMatchPattern: "src/app/**/*.component.ts"
 - Prefer computed() over manual derivation</code></pre></div>
 
   <p><strong>deployment-guide.md</strong> (manual) - large, only needed occasionally:</p>
-  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>---
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code class="language-yaml">---
 inclusion: manual
 ---
 
@@ -153,7 +154,7 @@ Refer to deployment procedures in #[[file:docs/deployment/runbook.md]]
   <h3>Hooks: What Happens Automatically</h3>
 
   <p><strong>lint-on-save.json</strong> - catch issues immediately:</p>
-  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>{
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code class="language-json">{
   "version": "v1",
   "hooks": [{
     "name": "Lint on Save",
@@ -164,7 +165,7 @@ Refer to deployment procedures in #[[file:docs/deployment/runbook.md]]
 }</code></pre></div>
 
   <p><strong>test-after-task.json</strong> - verify spec tasks:</p>
-  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>{
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code class="language-json">{
   "version": "v1",
   "hooks": [{
     "name": "Run Tests After Task",
@@ -174,7 +175,7 @@ Refer to deployment procedures in #[[file:docs/deployment/runbook.md]]
 }</code></pre></div>
 
   <p><strong>protect-prod-config.json</strong> - safety gate:</p>
-  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>{
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code class="language-json">{
   "version": "v1",
   "hooks": [{
     "name": "Protect Production Config",
@@ -192,7 +193,7 @@ Refer to deployment procedures in #[[file:docs/deployment/runbook.md]]
   <h3>Skills: Reusable Team Workflows</h3>
 
   <p><strong>commit-message.md</strong>:</p>
-  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>---
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code class="language-yaml">---
 name: commit-message
 description: Generate a commit message from the current changes
 argument-hint: "Any extra context about this change?"
@@ -213,7 +214,7 @@ argument-hint: "Any extra context about this change?"
 ```</code></pre></div>
 
   <p><strong>new-feature.md</strong>:</p>
-  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>---
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code class="language-yaml">---
 name: new-feature
 description: Scaffold a new feature module with component, service, routes, and tests
 argument-hint: "Feature name, e.g. 'user-settings'"
@@ -235,7 +236,7 @@ When asked to create a new feature:
   <h3>MCP: External Tool Access</h3>
 
   <p><strong>.kiro/settings/mcp.json</strong> - project-specific servers only (shared ones live in <code>~/.kiro/settings/mcp.json</code>):</p>
-  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>{
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code class="language-json">{
   "mcpServers": {
     "project-docs": {
       "command": "node",
@@ -250,7 +251,7 @@ When asked to create a new feature:
   <h3>Custom Agents: Specialised Delegation</h3>
 
   <p><strong>researcher.md</strong> - read-only exploration:</p>
-  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>---
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code class="language-yaml">---
 description: Explore and analyse code without making changes
 tools:
   - read_file
@@ -367,5 +368,8 @@ When investigating, always check: component hierarchy, service dependencies, rou
 
   <script src="/scripts.js"></script>
   <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
+  <script src="/vendor/prism-yaml.min.js"></script>
+  <script src="/vendor/prism-bash.min.js"></script>
 </body>
 </html>

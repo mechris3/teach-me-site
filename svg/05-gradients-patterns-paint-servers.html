@@ -18,6 +18,7 @@
   <meta name="twitter:description" content="Linear and radial gradients, repeating patterns, gradientUnits, objectBoundingBox vs userSpaceOnUse, and gradientTransform.">
   <link rel="stylesheet" href="/styles.css">
  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -81,7 +82,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg viewBox="0 0 200 100"&gt;
+    <pre><code class="language-markup">&lt;svg viewBox="0 0 200 100"&gt;
   &lt;defs&gt;
     &lt;linearGradient id="myGrad"&gt;
       &lt;stop offset="0%" stop-color="navy"/&gt;
@@ -168,7 +169,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;defs&gt;
+    <pre><code class="language-markup">&lt;defs&gt;
   &lt;!-- Horizontal: left to right (default) --&gt;
   &lt;linearGradient id="horiz"&gt;
     &lt;stop offset="0%" stop-color="#e06c75"/&gt;
@@ -268,7 +269,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;defs&gt;
+    <pre><code class="language-markup">&lt;defs&gt;
   &lt;!-- 3D sphere: focal point offset to upper-left --&gt;
   &lt;radialGradient id="sphere" cx="0.5" cy="0.5" r="0.5" fx="0.35" fy="0.3"&gt;
     &lt;stop offset="0%" stop-color="#fff"/&gt;
@@ -326,7 +327,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- objectBoundingBox: coordinates are 0-1, relative to each element --&gt;
+    <pre><code class="language-markup">&lt;!-- objectBoundingBox: coordinates are 0-1, relative to each element --&gt;
 &lt;linearGradient id="obb" gradientUnits="objectBoundingBox"
                 x1="0" y1="0" x2="1" y2="0"&gt;
   &lt;stop offset="0%" stop-color="red"/&gt;
@@ -351,7 +352,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;linearGradient id="rotated" gradientTransform="rotate(45)"&gt;
+    <pre><code class="language-markup">&lt;linearGradient id="rotated" gradientTransform="rotate(45)"&gt;
   &lt;stop offset="0%" stop-color="navy"/&gt;
   &lt;stop offset="100%" stop-color="gold"/&gt;
 &lt;/linearGradient&gt;
@@ -437,7 +438,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;defs&gt;
+    <pre><code class="language-markup">&lt;defs&gt;
   &lt;!-- Dot pattern: 20x20 tile with a centred circle --&gt;
   &lt;pattern id="dots" patternUnits="userSpaceOnUse"
            width="20" height="20"&gt;
@@ -476,7 +477,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;defs&gt;
+    <pre><code class="language-markup">&lt;defs&gt;
   &lt;!-- Base gradient with shared stops --&gt;
   &lt;linearGradient id="base-grad"&gt;
     &lt;stop offset="0%" stop-color="navy"/&gt;
@@ -498,7 +499,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;defs&gt;
+    <pre><code class="language-markup">&lt;defs&gt;
   &lt;linearGradient id="tile-bg"&gt;
     &lt;stop offset="0%" stop-color="#2c313a"/&gt;
     &lt;stop offset="100%" stop-color="#3e4451"/&gt;
@@ -557,7 +558,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg width="600" height="500" viewBox="0 0 600 500" xmlns="http://www.w3.org/2000/svg"&gt;
+    <pre><code class="language-markup">&lt;svg width="600" height="500" viewBox="0 0 600 500" xmlns="http://www.w3.org/2000/svg"&gt;
   &lt;defs&gt;
     &lt;!-- 1. Navy to gold linear gradient --&gt;
     &lt;linearGradient id="ex-navy-gold"&gt;
@@ -620,5 +621,6 @@
   <script src="/scripts.js"></script>
  <script src="scripts.js"></script>
  <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
 </body>
 </html>

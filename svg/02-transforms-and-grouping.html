@@ -18,6 +18,7 @@
   <meta name="twitter:description" content="How SVG transforms move coordinate systems, not shapes. Translate, rotate, scale, skew, chaining, and the g element.">
   <link rel="stylesheet" href="/styles.css">
  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -329,7 +330,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg width="300" height="150" viewBox="0 0 300 150"&gt;
+    <pre><code class="language-markup">&lt;svg width="300" height="150" viewBox="0 0 300 150"&gt;
   &lt;!-- Original position --&gt;
   &lt;rect x="10" y="10" width="50" height="30" fill="#61afef"/&gt;
 
@@ -357,7 +358,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;rect x="60" y="20" width="80" height="40" fill="#98c379"
+    <pre><code class="language-markup">&lt;rect x="60" y="20" width="80" height="40" fill="#98c379"
       transform="rotate(30)"/&gt;</code></pre>
   </div>
 
@@ -391,7 +392,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;rect x="20" y="20" width="40" height="30" fill="#e5c07b"
+    <pre><code class="language-markup">&lt;rect x="20" y="20" width="40" height="30" fill="#e5c07b"
       transform="scale(2)"/&gt;
 &lt;!-- Effective position: x=40, y=40, width=80, height=60 --&gt;</code></pre>
   </div>
@@ -455,7 +456,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;rect x="100" y="60" width="80" height="50" fill="#98c379"
+    <pre><code class="language-markup">&lt;rect x="100" y="60" width="80" height="50" fill="#98c379"
       transform="translate(140, 85) scale(1.5) translate(-140, -85)"/&gt;</code></pre>
   </div>
 
@@ -470,7 +471,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;rect x="100" y="60" width="80" height="50" fill="#98c379"
+    <pre><code class="language-markup">&lt;rect x="100" y="60" width="80" height="50" fill="#98c379"
       style="transform: scale(1.5); transform-origin: 140px 85px;"/&gt;</code></pre>
   </div>
 
@@ -502,7 +503,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;rect transform="translate(100, 50) rotate(45) scale(1.5)"/&gt;</code></pre>
+    <pre><code class="language-markup">&lt;rect transform="translate(100, 50) rotate(45) scale(1.5)"/&gt;</code></pre>
   </div>
 
   <div class="key-concept">
@@ -539,7 +540,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg width="300" height="200" viewBox="0 0 300 200"&gt;
+    <pre><code class="language-markup">&lt;svg width="300" height="200" viewBox="0 0 300 200"&gt;
   &lt;g transform="translate(50, 30) rotate(15, 100, 70)"&gt;
     &lt;rect x="60" y="40" width="80" height="60" fill="#61afef"/&gt;
     &lt;circle cx="140" cy="70" r="20" fill="#e06c75"/&gt;
@@ -618,7 +619,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- Approach 1: SVG transform attribute with explicit centre --&gt;
+    <pre><code class="language-markup">&lt;!-- Approach 1: SVG transform attribute with explicit centre --&gt;
 &lt;rect x="50" y="30" width="100" height="60"
       transform="rotate(45, 100, 60)"/&gt;
 &lt;!-- 100 = x + width/2, 60 = y + height/2 --&gt;
@@ -642,7 +643,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg viewBox="0 0 200 200"&gt;              &lt;!-- UCS established by viewBox --&gt;
+    <pre><code class="language-markup">&lt;svg viewBox="0 0 200 200"&gt;              &lt;!-- UCS established by viewBox --&gt;
   &lt;g transform="translate(50, 50)"&gt;       &lt;!-- local system: shifted --&gt;
     &lt;g transform="rotate(30)"&gt;            &lt;!-- nested local: shifted + rotated --&gt;
       &lt;rect x="0" y="0" width="40" height="40"/&gt;  &lt;!-- drawn in shifted+rotated space --&gt;
@@ -706,7 +707,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg viewBox="0 0 300 100" xmlns="http://www.w3.org/2000/svg"&gt;
+    <pre><code class="language-markup">&lt;svg viewBox="0 0 300 100" xmlns="http://www.w3.org/2000/svg"&gt;
   &lt;defs&gt;
     &lt;!-- Defined but not rendered --&gt;
     &lt;circle id="dot" r="10"/&gt;
@@ -751,7 +752,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg xmlns="http://www.w3.org/2000/svg" style="display:none"&gt;
+    <pre><code class="language-markup">&lt;svg xmlns="http://www.w3.org/2000/svg" style="display:none"&gt;
   &lt;symbol id="icon-star" viewBox="0 0 24 24"&gt;
     &lt;polygon points="12,2 15,9 22,9 16,14 18,21 12,17 6,21 8,14 2,9 9,9"/&gt;
   &lt;/symbol&gt;
@@ -863,5 +864,6 @@
     updateTransform();
   </script>
  <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
 </body>
 </html>

@@ -18,6 +18,7 @@
   <meta name="twitter:description" content="Multi-root workspaces in Kiro: per-folder steering and MCP scoping for monorepos and multi-project setups.">
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -91,7 +92,7 @@
 
   <p>Each root folder gets its own <code>.kiro/</code> directory - its own steering, hooks, skills, agents, specs, and MCP config. This means:</p>
 
-  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>my-workspace/
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code class="language-plaintext">my-workspace/
 ├── frontend/                    # Root 1
 │   └── .kiro/
 │       ├── steering/            # Angular-specific steering
@@ -249,5 +250,8 @@
 
   <script src="/scripts.js"></script>
   <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
+  <script src="/vendor/prism-yaml.min.js"></script>
+  <script src="/vendor/prism-bash.min.js"></script>
 </body>
 </html>

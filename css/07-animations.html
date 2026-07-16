@@ -18,6 +18,7 @@
   <meta name="twitter:description" content="Master CSS animations with @keyframes, fill modes, direction, scroll-driven animations, and practical patterns like staggered entrances and loading spinners.">
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
   <style>
     /* Demo: basic keyframes */
     @keyframes slide-in {
@@ -377,7 +378,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>@keyframes slide-in {
+    <pre><code class="language-css">@keyframes slide-in {
   from { transform: translateX(-100%); opacity: 0; }
   to   { transform: translateX(0); opacity: 1; }
 }</code></pre>
@@ -387,7 +388,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>@keyframes bounce {
+    <pre><code class="language-css">@keyframes bounce {
   0%   { transform: translateY(0); }
   30%  { transform: translateY(-40px); }
   50%  { transform: translateY(0); }
@@ -411,7 +412,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>animation: &lt;name&gt; &lt;duration&gt; &lt;timing&gt; &lt;delay&gt; &lt;count&gt; &lt;direction&gt; &lt;fill-mode&gt; &lt;play-state&gt;;
+    <pre><code class="language-css">animation: &lt;name&gt; &lt;duration&gt; &lt;timing&gt; &lt;delay&gt; &lt;count&gt; &lt;direction&gt; &lt;fill-mode&gt; &lt;play-state&gt;;
 
 /* Example */
 animation: slide-in 0.6s ease-out 0s 1 normal both running;
@@ -436,7 +437,7 @@ animation: slide-in 0.6s;</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>@keyframes slide-in {
+    <pre><code class="language-css">@keyframes slide-in {
   from { transform: translateX(-100%); opacity: 0; }
   to   { transform: translateX(0); opacity: 1; }
 }
@@ -533,8 +534,10 @@ animation: slide-in 0.6s;</code></pre>
     <text x="510" y="243" font-size="10" font-weight="600" fill="#1a1a2e" font-family="monospace">fill: both</text>
     <text x="510" y="260" font-size="9" fill="#444" font-family="monospace">→ "to" (100%) keyframe</text>
 
-    <!-- Active animation region (shared across all rows) -->
-    <rect x="230" y="90" width="250" height="185" rx="4" fill="none" stroke="var(--accent, #1a73e8)" stroke-width="1.5" stroke-dasharray="6"/>
+    <!-- Active animation region (shared across all rows) — marching dashes -->
+    <rect x="230" y="90" width="250" height="185" rx="4" fill="none" stroke="var(--accent, #1a73e8)" stroke-width="1.5" stroke-dasharray="6">
+      <animate attributeName="stroke-dashoffset" from="0" to="-48" dur="2s" repeatCount="indefinite"/>
+    </rect>
     <text x="355" y="190" font-size="10" fill="var(--accent, #1a73e8)" text-anchor="middle" font-family="monospace" font-style="italic">animating...</text>
 
     <!-- Legend -->
@@ -554,7 +557,7 @@ animation: slide-in 0.6s;</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>@keyframes fade-in {
+    <pre><code class="language-css">@keyframes fade-in {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
@@ -589,7 +592,7 @@ animation: slide-in 0.6s;</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>@keyframes fade-in {
+    <pre><code class="language-css">@keyframes fade-in {
   from { opacity: 0; transform: translateY(20px); }
   to   { opacity: 1; transform: translateY(0); }
 }
@@ -625,7 +628,7 @@ animation: slide-in 0.6s;</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>@keyframes slide-right {
+    <pre><code class="language-css">@keyframes slide-right {
   from { transform: translateX(0); }
   to   { transform: translateX(150px); }
 }
@@ -656,7 +659,7 @@ animation: slide-in 0.6s;</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>@keyframes spin {
+    <pre><code class="language-css">@keyframes spin {
   to { transform: rotate(360deg); }
 }
 
@@ -680,7 +683,7 @@ animation: slide-in 0.6s;</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>@media (prefers-reduced-motion: reduce) {
+    <pre><code class="language-css">@media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
@@ -717,7 +720,7 @@ animation: slide-in 0.6s;</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>@keyframes grow-width {
+    <pre><code class="language-css">@keyframes grow-width {
   from { transform: scaleX(0); }
   to   { transform: scaleX(1); }
 }
@@ -743,7 +746,7 @@ animation: slide-in 0.6s;</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>animation-timeline: scroll( &lt;scroller&gt;  &lt;axis&gt; );
+    <pre><code class="language-css">animation-timeline: scroll( &lt;scroller&gt;  &lt;axis&gt; );
 
 /* Defaults: */
 animation-timeline: scroll(nearest block);</code></pre>
@@ -770,7 +773,7 @@ animation-timeline: scroll(nearest block);</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Track the page scroll (full-page progress bar) */
+    <pre><code class="language-css">/* Track the page scroll (full-page progress bar) */
 animation-timeline: scroll(root block);
 
 /* Track a horizontal carousel scroll */
@@ -804,7 +807,7 @@ animation-timeline: scroll();</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>@keyframes reveal {
+    <pre><code class="language-css">@keyframes reveal {
   from { opacity: 0; transform: translateY(30px); }
   to   { opacity: 1; transform: translateY(0); }
 }
@@ -839,7 +842,7 @@ animation-timeline: scroll();</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>.element {
+    <pre><code class="language-css">.element {
   animation:
     fade-in 0.5s ease both,
     slide-up 0.5s ease both,
@@ -866,7 +869,7 @@ animation-timeline: scroll();</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>@keyframes fade-up {
+    <pre><code class="language-css">@keyframes fade-up {
   from { opacity: 0; transform: translateY(20px); }
   to   { opacity: 1; transform: translateY(0); }
 }
@@ -897,7 +900,7 @@ animation-timeline: scroll();</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>@keyframes spin {
+    <pre><code class="language-css">@keyframes spin {
   to { transform: rotate(360deg); }
 }
 
@@ -920,7 +923,7 @@ animation-timeline: scroll();</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>@keyframes pulse {
+    <pre><code class="language-css">@keyframes pulse {
   from { transform: scale(1); opacity: 1; }
   to   { transform: scale(1.05); opacity: 0.8; }
 }
@@ -936,7 +939,7 @@ animation-timeline: scroll();</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>element.addEventListener('animationstart', (e) =&gt; { /* fired when animation begins */ });
+    <pre><code class="language-css">element.addEventListener('animationstart', (e) =&gt; { /* fired when animation begins */ });
 element.addEventListener('animationend', (e) =&gt; { /* fired when animation completes */ });
 element.addEventListener('animationiteration', (e) =&gt; { /* fired at start of each loop */ });</code></pre>
   </div>
@@ -1042,5 +1045,6 @@ element.addEventListener('animationiteration', (e) =&gt; { /* fired at start of 
     }
   </script>
   <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
 </body>
 </html>

@@ -18,6 +18,7 @@
   <meta name="twitter:description" content="SVG's declarative animation system. The animate element, timing, easing with calcMode and keySplines, additive and accumulative animation.">
   <link rel="stylesheet" href="/styles.css">
  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -80,7 +81,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;circle cx="50" cy="50" r="20" fill="coral"&gt;
+    <pre><code class="language-markup">&lt;circle cx="50" cy="50" r="20" fill="coral"&gt;
   &lt;!-- This animate element is a CHILD of the circle --&gt;
   &lt;animate
     attributeName="r"
@@ -136,7 +137,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- Two-value animation (from/to) --&gt;
+    <pre><code class="language-markup">&lt;!-- Two-value animation (from/to) --&gt;
 &lt;rect width="50" height="50" fill="coral"&gt;
   &lt;animate attributeName="x" from="0" to="300" dur="3s"
            repeatCount="indefinite"/&gt;
@@ -184,7 +185,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- Starts immediately --&gt;
+    <pre><code class="language-markup">&lt;!-- Starts immediately --&gt;
 &lt;animate ... begin="0s"/&gt;
 
 &lt;!-- Starts 2 seconds after document load --&gt;
@@ -199,7 +200,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg"&gt;
+    <pre><code class="language-markup">&lt;svg viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg"&gt;
   &lt;circle cx="80" cy="60" r="30" fill="coral" style="cursor:pointer"&gt;
     &lt;animate attributeName="cx" from="80" to="320" dur="1s"
              begin="click" fill="freeze"/&gt;
@@ -225,7 +226,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg"&gt;
+    <pre><code class="language-markup">&lt;svg viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg"&gt;
   &lt;circle cx="50" cy="60" r="20" fill="coral" style="cursor:pointer"&gt;
     &lt;!-- Step 1: move right (starts on click) --&gt;
     &lt;animate attributeName="cx" from="50" to="350" dur="1.5s"
@@ -254,7 +255,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- Syncbase syntax (Lesson 10 will cover this in depth) --&gt;
+    <pre><code class="language-markup">&lt;!-- Syncbase syntax (Lesson 10 will cover this in depth) --&gt;
 &lt;animate id="anim1" attributeName="cx" from="50" to="300"
          dur="2s" fill="freeze"/&gt;
 
@@ -292,7 +293,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg"&gt;
+    <pre><code class="language-markup">&lt;svg viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg"&gt;
   &lt;!-- fill="remove" (default)  -  snaps back --&gt;
   &lt;circle cx="80" cy="60" r="30" fill="coral"&gt;
     &lt;animate attributeName="r" from="30" to="10" dur="2s"
@@ -369,7 +370,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg"&gt;
+    <pre><code class="language-markup">&lt;svg viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg"&gt;
   &lt;!-- Linear (for comparison) --&gt;
   &lt;circle cx="30" cy="40" r="15" fill="grey" opacity="0.4"&gt;
     &lt;animate attributeName="cx" values="30;370;30"
@@ -411,7 +412,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- values has 4 entries, so keyTimes needs 4 entries --&gt;
+    <pre><code class="language-markup">&lt;!-- values has 4 entries, so keyTimes needs 4 entries --&gt;
 &lt;animate attributeName="cx"
          values="50;200;350;200"
          keyTimes="0;0.2;0.5;1"
@@ -436,7 +437,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;circle cx="200" cy="60" r="30" fill="coral"&gt;
+    <pre><code class="language-markup">&lt;circle cx="200" cy="60" r="30" fill="coral"&gt;
   &lt;!-- Change colour to blue after 2 seconds --&gt;
   &lt;set attributeName="fill" to="#61afef" begin="2s" fill="freeze"/&gt;
 &lt;/circle&gt;</code></pre>
@@ -457,7 +458,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- Colour change on click --&gt;
+    <pre><code class="language-markup">&lt;!-- Colour change on click --&gt;
 &lt;circle cx="100" cy="60" r="30" fill="coral" style="cursor:pointer"&gt;
   &lt;set attributeName="fill" to="#61afef" begin="click" fill="freeze"/&gt;
 &lt;/circle&gt;
@@ -475,7 +476,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg viewBox="0 0 300 100" xmlns="http://www.w3.org/2000/svg"&gt;
+    <pre><code class="language-markup">&lt;svg viewBox="0 0 300 100" xmlns="http://www.w3.org/2000/svg"&gt;
   &lt;!-- Click to change colour (set is inside the clickable element) --&gt;
   &lt;rect x="50" y="20" width="200" height="60" rx="8"
         fill="coral" style="cursor:pointer"&gt;
@@ -511,7 +512,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;circle cx="200" cy="60" r="40" fill="coral"&gt;
+    <pre><code class="language-markup">&lt;circle cx="200" cy="60" r="40" fill="coral"&gt;
   &lt;animate attributeName="fill"
            values="coral;#61afef;#98c379;#e5c07b;coral"
            dur="6s" repeatCount="indefinite"/&gt;
@@ -567,7 +568,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- Without accumulate: bounces between 0 and 100 each cycle --&gt;
+    <pre><code class="language-markup">&lt;!-- Without accumulate: bounces between 0 and 100 each cycle --&gt;
 &lt;rect x="0" y="10" width="30" height="30" fill="coral"&gt;
   &lt;animate attributeName="x" from="0" to="100" dur="2s"
            repeatCount="3" fill="freeze"/&gt;
@@ -600,7 +601,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- additive="replace" (default): animated value IS the x value --&gt;
+    <pre><code class="language-markup">&lt;!-- additive="replace" (default): animated value IS the x value --&gt;
 &lt;rect x="100" y="10" width="30" height="30" fill="coral"&gt;
   &lt;animate attributeName="x" from="0" to="50" dur="2s"
            repeatCount="indefinite"/&gt;
@@ -637,7 +638,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;circle cx="200" cy="60" r="20" fill="coral"&gt;
+    <pre><code class="language-markup">&lt;circle cx="200" cy="60" r="20" fill="coral"&gt;
   &lt;!-- Animate position --&gt;
   &lt;animate attributeName="cx" values="50;350;50"
            dur="4s" repeatCount="indefinite"/&gt;
@@ -681,7 +682,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;style&gt;
+    <pre><code class="language-markup">&lt;style&gt;
   .styled { fill: blue; }  /* CSS wins over presentation attr */
 &lt;/style&gt;
 
@@ -744,7 +745,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"&gt;
+    <pre><code class="language-markup">&lt;svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"&gt;
   &lt;circle cx="100" cy="100" r="40" fill="none"
           stroke="coral" stroke-width="3" opacity="0.8"&gt;
     &lt;!-- Radius breathes in and out --&gt;
@@ -781,7 +782,7 @@
   <h2>14. Practical Example: Loading Spinner</h2>
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"&gt;
+    <pre><code class="language-markup">&lt;svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"&gt;
   &lt;circle cx="50" cy="50" r="40" fill="none"
           stroke="#61afef" stroke-width="6"
           stroke-dasharray="200" stroke-dashoffset="200"
@@ -980,5 +981,6 @@
   <script src="/scripts.js"></script>
  <script src="scripts.js"></script>
  <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
 </body>
 </html>

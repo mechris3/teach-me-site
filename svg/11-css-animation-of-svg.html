@@ -18,6 +18,7 @@
   <meta name="twitter:description" content="CSS transitions and keyframes on SVG elements. The transform-origin gotcha, stroke drawing technique, and staggered animations.">
   <link rel="stylesheet" href="/styles.css">
  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -102,7 +103,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;style&gt;
+    <pre><code class="language-markup">&lt;style&gt;
   .hover-circle {
     fill: coral;
     stroke: #333;
@@ -150,7 +151,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;style&gt;
+    <pre><code class="language-markup">&lt;style&gt;
   .icon-path {
     fill: none;
     stroke: var(--muted);
@@ -200,7 +201,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;style&gt;
+    <pre><code class="language-markup">&lt;style&gt;
   @keyframes pulse {
     0%, 100% { opacity: 1; transform: scale(1); }
     50%      { opacity: 0.6; transform: scale(1.3); }
@@ -237,7 +238,7 @@
   <h3>Multi-step colour cycling</h3>
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;style&gt;
+    <pre><code class="language-markup">&lt;style&gt;
   @keyframes color-cycle {
     0%   { fill: coral; }
     25%  { fill: #e5c07b; }
@@ -278,7 +279,7 @@
   <h3>Spinning loader</h3>
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;style&gt;
+    <pre><code class="language-markup">&lt;style&gt;
   @keyframes spin {
     to { transform: rotate(360deg); }
   }
@@ -341,7 +342,7 @@
   <h3>The problem in action</h3>
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;style&gt;
+    <pre><code class="language-markup">&lt;style&gt;
   @keyframes spin {
     to { transform: rotate(360deg); }
   }
@@ -469,7 +470,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;style&gt;
+    <pre><code class="language-markup">&lt;style&gt;
   @keyframes spin {
     to { transform: rotate(360deg); }
   }
@@ -533,7 +534,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;style&gt;
+    <pre><code class="language-markup">&lt;style&gt;
   @keyframes draw {
     to { stroke-dashoffset: 0; }
   }
@@ -705,7 +706,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;style&gt;
+    <pre><code class="language-markup">&lt;style&gt;
   @keyframes segmented-draw {
     from { stroke-dasharray: 0 50; }  /* zero-width dashes, 50-unit gaps */
     to   { stroke-dasharray: 50 0; }  /* 50-unit dashes, zero gaps (solid) */
@@ -765,7 +766,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- pathLength="100" means dasharray/dashoffset work in percentages --&gt;
+    <pre><code class="language-markup">&lt;!-- pathLength="100" means dasharray/dashoffset work in percentages --&gt;
 &lt;path pathLength="100"
       stroke-dasharray="0 10"
       d="M 20,80 C 60,10 140,10 180,80 S 300,150 340,80"&gt;
@@ -790,7 +791,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;style&gt;
+    <pre><code class="language-markup">&lt;style&gt;
   @keyframes draw { to { stroke-dashoffset: 0; } }
   .letter {
     fill: none;
@@ -853,7 +854,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;style&gt;
+    <pre><code class="language-markup">&lt;style&gt;
   @keyframes draw { to { stroke-dashoffset: 0; } }
   @keyframes fill-in { to { fill-opacity: 1; } }
 
@@ -922,7 +923,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;style&gt;
+    <pre><code class="language-markup">&lt;style&gt;
   @keyframes float {
     0%, 100% { transform: translateY(0); }
     50%      { transform: translateY(-10px); }
@@ -963,7 +964,7 @@
   <h3>Staggered child animations with nth-child</h3>
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;style&gt;
+    <pre><code class="language-markup">&lt;style&gt;
   @keyframes pop-in {
     from { transform: scaleY(0); opacity: 0; }
     to   { transform: scaleY(1); opacity: 1; }
@@ -1153,5 +1154,6 @@
     }
   </script>
  <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
 </body>
 </html>

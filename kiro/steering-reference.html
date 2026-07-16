@@ -18,6 +18,7 @@
   <meta name="twitter:description" content="Quick reference for Kiro steering files: locations, front-matter schema, inclusion modes, glob patterns, and best practices.">
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -77,7 +78,7 @@
   <h2>Front-matter Options (Complete Schema)</h2>
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>---
+    <pre><code class="language-yaml">---
 inclusion: auto | fileMatch | manual
 fileMatchPattern: "glob/pattern/**/*.ts"   # required when inclusion: fileMatch
 ---</code></pre>
@@ -95,7 +96,7 @@ fileMatchPattern: "glob/pattern/**/*.ts"   # required when inclusion: fileMatch
   <h2>File References</h2>
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>Refer to #[[file:relative/path/from/workspace-root.yaml]]</code></pre>
+    <pre><code class="language-javascript">Refer to #[[file:relative/path/from/workspace-root.yaml]]</code></pre>
   </div>
   <p>Loads the referenced file's content into context alongside the steering file. Chain multiple references in one file.</p>
 
@@ -153,5 +154,8 @@ fileMatchPattern: "glob/pattern/**/*.ts"   # required when inclusion: fileMatch
 
   <script src="/scripts.js"></script>
   <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
+  <script src="/vendor/prism-yaml.min.js"></script>
+  <script src="/vendor/prism-bash.min.js"></script>
 </body>
 </html>

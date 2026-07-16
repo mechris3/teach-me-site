@@ -18,6 +18,7 @@
   <meta name="twitter:description" content="Learn CSS @scope for proximity-based styling with upper and lower boundaries, creating true component isolation without frameworks or Shadow DOM.">
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
   <style>
     @scope (.scope-card) {
       p { color: #3a86ff; font-weight: 500; }
@@ -107,7 +108,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>Cascade resolution: origin → inline → layers → specificity → SCOPE PROXIMITY → source order</code></pre>
+    <pre><code class="language-css">Cascade resolution: origin → inline → layers → specificity → SCOPE PROXIMITY → source order</code></pre>
   </div>
 
   <h2>Basic @scope - scoping styles to a subtree</h2>
@@ -123,7 +124,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- HTML --&gt;
+    <pre><code class="language-css">&lt;!-- HTML --&gt;
 &lt;p&gt;I'm outside the scope — normal styling.&lt;/p&gt;
 &lt;div class="card"&gt;
   &lt;h3 class="title"&gt;Card Title&lt;/h3&gt;
@@ -157,7 +158,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- HTML --&gt;
+    <pre><code class="language-css">&lt;!-- HTML --&gt;
 &lt;div class="outer"&gt;
   &lt;p&gt;I get styled (between root and limit).&lt;/p&gt;
   &lt;div class="inner"&gt;
@@ -199,7 +200,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- HTML --&gt;
+    <pre><code class="language-css">&lt;!-- HTML --&gt;
 &lt;div class="theme-blue"&gt;
   &lt;span class="badge"&gt;Blue (closest scope is blue)&lt;/span&gt;
   &lt;div class="theme-coral"&gt;
@@ -267,7 +268,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>@scope (.card) {
+    <pre><code class="language-css">@scope (.card) {
   :scope {
     /* Styles the .card element itself (the root) */
     border: 1px solid gray;
@@ -302,7 +303,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- HTML --&gt;
+    <pre><code class="language-css">&lt;!-- HTML --&gt;
 &lt;div class="card"&gt;
   &lt;p&gt;Outer card content&lt;/p&gt;
   &lt;div class="card"&gt;
@@ -323,7 +324,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- HTML --&gt;
+    <pre><code class="language-css">&lt;!-- HTML --&gt;
 &lt;section class="light-region"&gt;
   &lt;p&gt;Light themed content&lt;/p&gt;
 &lt;/section&gt;
@@ -424,5 +425,6 @@
 
   <script src="/scripts.js"></script>
   <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
 </body>
 </html>

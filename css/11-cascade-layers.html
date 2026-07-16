@@ -18,6 +18,7 @@
   <meta name="twitter:description" content="Learn CSS cascade layers (@layer) to manage specificity at scale, control priority between resets, components, and utilities without specificity wars.">
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
   <style>
     @layer reset, base, components, utilities;
   </style>
@@ -139,7 +140,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Specificity: (0, 1, 0) */
+    <pre><code class="language-css">/* Specificity: (0, 1, 0) */
 .button { background: blue; }
 
 /* Specificity: (0, 2, 0) - wins over .button */
@@ -182,7 +183,7 @@ div#header .nav-link { ... }
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Declare layer order upfront (recommended) */
+    <pre><code class="language-css">/* Declare layer order upfront (recommended) */
 @layer reset, base, components, utilities;
 
 /* Now add styles to each layer - order of these blocks doesn't matter */
@@ -225,7 +226,7 @@ div#header .nav-link { ... }
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Declaration order: A first, B second (B has higher priority) */
+    <pre><code class="language-css">/* Declaration order: A first, B second (B has higher priority) */
 @layer A, B;
 
 /* Definition order doesn't matter - even though A's styles
@@ -249,7 +250,7 @@ div#header .nav-link { ... }
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>@layer utilities {
+    <pre><code class="language-css">@layer utilities {
   /* Even with !important specificity tricks... */
   .special-box { background: gold; }
 }
@@ -274,7 +275,7 @@ div#header .nav-link { ... }
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>@layer reset, vendor, base, layout, components, utilities;
+    <pre><code class="language-css">@layer reset, vendor, base, layout, components, utilities;
 
 /* 1. reset - Normalize browser defaults */
 @layer reset {
@@ -354,7 +355,7 @@ div#header .nav-link { ... }
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>@layer reset, base, components, utilities;
+    <pre><code class="language-css">@layer reset, base, components, utilities;
 
 @layer reset {
   /* !important here has HIGHEST priority among layered !important */
@@ -385,7 +386,7 @@ div#header .nav-link { ... }
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Import third-party CSS into a dedicated layer */
+    <pre><code class="language-css">/* Import third-party CSS into a dedicated layer */
 @import url("https://cdn.example.com/library.css") layer(vendor);
 
 /* Or import into a new anonymous layer */
@@ -402,7 +403,7 @@ div#header .nav-link { ... }
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Real-world example: taming a UI library */
+    <pre><code class="language-css">/* Real-world example: taming a UI library */
 @layer reset, vendor, theme, components, utilities;
 
 @import url("open-props/style.css") layer(vendor);
@@ -433,7 +434,7 @@ div#header .nav-link { ... }
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Dot notation for declaring nested layers */
+    <pre><code class="language-css">/* Dot notation for declaring nested layers */
 @layer components.buttons, components.cards, components.forms;
 
 /* Block nesting syntax */
@@ -463,7 +464,7 @@ div#header .nav-link { ... }
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Anonymous layer - cannot be referenced later */
+    <pre><code class="language-css">/* Anonymous layer - cannot be referenced later */
 @layer {
   .legacy-widget { color: grey; font-size: 14px; }
 }
@@ -531,7 +532,7 @@ div#header .nav-link { ... }
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Feature detection if needed */
+    <pre><code class="language-css">/* Feature detection if needed */
 @supports at-rule(@layer) {
   /* Layer-aware styles */
 }
@@ -619,5 +620,6 @@ div#header .nav-link { ... }
 
   <script src="/scripts.js"></script>
   <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
 </body>
 </html>

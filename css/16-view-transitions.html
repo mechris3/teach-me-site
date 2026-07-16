@@ -18,6 +18,7 @@
   <meta name="twitter:description" content="Learn CSS View Transitions API for animating between DOM states including same-document transitions, cross-document navigation, and shared element morphing.">
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
   <style>
     .demo-btn { font-family: var(--sans); font-size: 0.8rem; padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: 4px; background: white; color: #1a1a2e; cursor: pointer; margin-bottom: 0.75rem; transition: border-color 0.15s; }
     .demo-btn:hover { border-color: var(--accent); }
@@ -151,7 +152,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>.card {
+    <pre><code class="language-css">.card {
   view-transition-name: demo-card;
 }
 
@@ -176,7 +177,7 @@ function toggleCard() {
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>TIME ──────────────────────────────────────────────────────────────────────►
+    <pre><code class="language-css">TIME ──────────────────────────────────────────────────────────────────────►
 
 PHASE 1: CAPTURE OLD STATE
   - Browser FREEZES rendering
@@ -222,7 +223,7 @@ PHASE 5: CLEANUP
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>.card {
+    <pre><code class="language-css">.card {
   view-transition-name: hero-card;  /* must be unique on the page */
 }
 
@@ -250,7 +251,7 @@ PHASE 5: CLEANUP
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* The key: both the thumbnail and the expanded view share
+    <pre><code class="language-css">/* The key: both the thumbnail and the expanded view share
    the same view-transition-name. The browser morphs between them. */
 
 .thumb:nth-child(1) { view-transition-name: thumb-1; }
@@ -276,7 +277,7 @@ function expandThumb(index) {
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>::view-transition
+    <pre><code class="language-css">::view-transition
 ├── ::view-transition-group(name)
 │   ├── ::view-transition-image-pair(name)
 │   │   ├── ::view-transition-old(name)   ← the "before" snapshot
@@ -305,7 +306,7 @@ function expandThumb(index) {
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>.slide-panel {
+    <pre><code class="language-css">.slide-panel {
   view-transition-name: slide-demo;
 }
 
@@ -330,7 +331,7 @@ function expandThumb(index) {
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Add to BOTH pages (source and destination) */
+    <pre><code class="language-css">/* Add to BOTH pages (source and destination) */
 @view-transition {
   navigation: auto;
 }
@@ -361,7 +362,7 @@ function expandThumb(index) {
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Each item needs a unique view-transition-name */
+    <pre><code class="language-css">/* Each item needs a unique view-transition-name */
 .item:nth-child(1) { view-transition-name: item-1; }
 .item:nth-child(2) { view-transition-name: item-2; }
 .item:nth-child(3) { view-transition-name: item-3; }
@@ -395,7 +396,7 @@ function shuffleList() {
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>.panel.active {
+    <pre><code class="language-css">.panel.active {
   display: block;
   view-transition-name: tab-content;
 }
@@ -420,7 +421,7 @@ function switchTab(id) {
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Always include this - disable view transition animations for users
+    <pre><code class="language-css">/* Always include this - disable view transition animations for users
    who prefer reduced motion */
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-group(*),
@@ -595,5 +596,6 @@ function switchTab(id) {
     }
   </script>
   <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
 </body>
 </html>

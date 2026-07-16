@@ -18,6 +18,7 @@
   <meta name="twitter:description" content="Kiro skills: front-matter configuration, auto-activation, writing reusable skills for your team.">
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -116,7 +117,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>---
+    <pre><code class="language-yaml">---
 name: deploy
 description: Deploy the application to staging or production environments
 argument-hint: "Which environment? (staging/production)"
@@ -185,7 +186,7 @@ When asked to deploy, follow these steps:
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>---
+    <pre><code class="language-yaml">---
 name: api-review
 description: Review API endpoint code for correctness and standards compliance
 ---
@@ -217,7 +218,7 @@ and ensure all endpoints match the schema in #[[file:docs/openapi.yaml]]
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>---
+    <pre><code class="language-yaml">---
 name: commit-message
 description: Generate a git commit message from the current staged or unstaged changes
 argument-hint: "Any additional context about the change?"
@@ -257,7 +258,7 @@ Generate the commit message in this format:
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>---
+    <pre><code class="language-yaml">---
 name: pr-review
 description: Review a pull request for code quality, security, and standards compliance
 argument-hint: "Which PR or branch to review?"
@@ -385,5 +386,8 @@ When reviewing a PR, follow this process:
 
   <script src="/scripts.js"></script>
   <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
+  <script src="/vendor/prism-yaml.min.js"></script>
+  <script src="/vendor/prism-bash.min.js"></script>
 </body>
 </html>

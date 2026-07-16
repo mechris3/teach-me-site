@@ -18,6 +18,7 @@
   <meta name="twitter:description" content="A reference for all CSS punctuation, prefixes, symbols, and structural elements - selectors, combinators, at-rules, custom properties, and more.">
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
   <style>
     .symbol { font-family: var(--mono, 'SF Mono', 'Fira Code', 'Consolas', monospace); font-size: 1.1em; color: var(--accent, #3a86ff); font-weight: 700; min-width: 3rem; display: inline-block; }
   </style>
@@ -171,7 +172,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>  #main   .card   :hover   >   .title   ::before   [data-v]
+    <pre><code class="language-css">  #main   .card   :hover   >   .title   ::before   [data-v]
   ├──┤    ├───┤   ├────┤   │   ├────┤   ├──────┤   ├──────┤
    ID     CLASS   PSEUDO  COMB  CLASS   PSEUDO    ATTRIBUTE
                   CLASS   INATOR        ELEMENT   SELECTOR</code></pre>
@@ -204,7 +205,7 @@
   <p>Selects an element in a particular <strong>state</strong> or <strong>position</strong>. The element itself exists in the DOM - the pseudo-class is a condition on it.</p>
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>:hover        /* mouse is over it */
+    <pre><code class="language-css">:hover        /* mouse is over it */
 :focus        /* it has keyboard focus */
 :first-child  /* it's the first child of its parent */
 :not(.x)      /* it does NOT match .x */
@@ -220,7 +221,7 @@
   <p>Targets something the browser <strong>generates</strong> that doesn't exist as a real DOM element. You're styling a "virtual" piece of the element.</p>
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>::before           /* generated content before the element's content */
+    <pre><code class="language-css">::before           /* generated content before the element's content */
 ::after            /* generated content after the element's content */
 ::placeholder      /* placeholder text in inputs */
 ::selection        /* text the user has highlighted */
@@ -236,7 +237,7 @@
   <p>The <code>--</code> prefix marks something as user-defined. The spec reserves this prefix so your names never collide with current or future CSS properties.</p>
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Custom properties (variables) */
+    <pre><code class="language-css">/* Custom properties (variables) */
 --color-primary: #3a86ff;        /* declaration */
 color: var(--color-primary);     /* usage */
 
@@ -253,7 +254,7 @@ view-transition-name: --hero;    /* view transitions (-- optional here) */
   <p>Introduces a <strong>structural rule</strong> or <strong>directive</strong> - something that controls how CSS is applied rather than styling an element directly.</p>
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Conditional rules - apply styles under conditions */
+    <pre><code class="language-css">/* Conditional rules - apply styles under conditions */
 @media (width &lt; 768px) { }       /* viewport condition */
 @container (min-width: 400px) { } /* container condition */
 @supports (display: grid) { }    /* feature detection */
@@ -283,7 +284,7 @@ view-transition-name: --hero;    /* view transitions (-- optional here) */
   <p>Inside a nested rule, <code>&amp;</code> represents the outer/parent selector. Used to compose selectors.</p>
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>.card {
+    <pre><code class="language-css">.card {
   & .title { }     /* → .card .title (descendant) */
   &:hover { }      /* → .card:hover (pseudo-class on parent) */
   &.featured { }   /* → .card.featured (compound - same element) */
@@ -308,13 +309,13 @@ view-transition-name: --hero;    /* view transitions (-- optional here) */
   <p>Placed after a value to escalate it above normal cascade resolution. Jumps to a higher tier in the cascade (above layers and specificity).</p>
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>color: red !important;  /* wins over any normal declaration regardless of specificity */</code></pre>
+    <pre><code class="language-css">color: red !important;  /* wins over any normal declaration regardless of specificity */</code></pre>
   </div>
 
   <h3><span class="symbol">[]</span> Square brackets - attribute selector</h3>
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>[data-v]           /* has the attribute at all */
+    <pre><code class="language-css">[data-v]           /* has the attribute at all */
 [type="email"]     /* attribute equals value */
 [class~="card"]    /* attribute word list contains "card" */
 [href^="https"]    /* attribute starts with "https" */
@@ -363,5 +364,6 @@ view-transition-name: --hero;    /* view transitions (-- optional here) */
 
   <script src="/scripts.js"></script>
   <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
 </body>
 </html>

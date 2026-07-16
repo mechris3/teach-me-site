@@ -18,6 +18,7 @@
   <meta name="twitter:description" content="Learn CSS Anchor Positioning to position elements relative to any other element using anchor-name, position-anchor, the anchor() function, and position-try fallbacks.">
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
   <style>
     .anchor-area { position: relative; height: 200px; border: 1px solid var(--border); border-radius: 6px; overflow: visible; }
     .anchor-target { anchor-name: --my-button; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--accent); color: white; padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.85rem; font-weight: 600; }
@@ -116,7 +117,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Step 1: Name the anchor */
+    <pre><code class="language-css">/* Step 1: Name the anchor */
 .button {
   anchor-name: --my-button;
 }
@@ -136,7 +137,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* anchor() takes a side of the anchor element: */
+    <pre><code class="language-css">/* anchor() takes a side of the anchor element: */
 anchor(top)      /* the anchor's top edge position */
 anchor(bottom)   /* the anchor's bottom edge position */
 anchor(left)     /* the anchor's left edge position */
@@ -209,7 +210,7 @@ right: anchor(left);       /* "my right = anchor's left" → to the left */</cod
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>.anchor { anchor-name: --target; }
+    <pre><code class="language-css">.anchor { anchor-name: --target; }
 .label { position: absolute; position-anchor: --target; }
 
 /* The full 3x3 grid of positions: */
@@ -237,7 +238,7 @@ right: anchor(left);       /* "my right = anchor's left" → to the left */</cod
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* CSS - the tooltip is anchored to the button */
+    <pre><code class="language-css">/* CSS - the tooltip is anchored to the button */
 .button { anchor-name: --drag-btn; position: absolute; }
 .tooltip {
   position: absolute;
@@ -261,7 +262,7 @@ right: anchor(left);       /* "my right = anchor's left" → to the left */</cod
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>.tooltip {
+    <pre><code class="language-css">.tooltip {
   position: absolute;
   position-anchor: --edge-btn;
   bottom: anchor(top);          /* preferred: above the button */
@@ -311,7 +312,7 @@ right: anchor(left);       /* "my right = anchor's left" → to the left */</cod
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;button popovertarget="my-popup"&gt;Open&lt;/button&gt;
+    <pre><code class="language-markup">&lt;button popovertarget="my-popup"&gt;Open&lt;/button&gt;
 &lt;div id="my-popup" popover&gt;Content&lt;/div&gt;
 
 button { anchor-name: --pop-trigger; }
@@ -448,5 +449,6 @@ button { anchor-name: --pop-trigger; }
     })();
   </script>
   <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
 </body>
 </html>

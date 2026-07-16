@@ -18,6 +18,7 @@
   <meta name="twitter:description" content="Build your own MCP server from scratch using the MCP SDK. Tools, resources, prompts, and connecting to Kiro.">
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -189,7 +190,7 @@
   <p><strong>1. Initialize request</strong> (Kiro → Server):</p>
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>{
+    <pre><code class="language-json">{
   "jsonrpc": "2.0",
   "id": 1,
   "method": "initialize",
@@ -204,7 +205,7 @@
   <p><strong>2. Initialize response</strong> (Server → Kiro):</p>
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>{
+    <pre><code class="language-json">{
   "jsonrpc": "2.0",
   "id": 1,
   "result": {
@@ -220,7 +221,7 @@
   <p><strong>3. Tool discovery</strong> (Kiro → Server):</p>
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>{
+    <pre><code class="language-json">{
   "jsonrpc": "2.0",
   "id": 2,
   "method": "tools/list"
@@ -230,7 +231,7 @@
   <p><strong>4. Tool list response</strong> (Server → Kiro):</p>
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>{
+    <pre><code class="language-json">{
   "jsonrpc": "2.0",
   "id": 2,
   "result": {
@@ -254,7 +255,7 @@
   <p><strong>5. Tool call</strong> (Kiro → Server):</p>
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>{
+    <pre><code class="language-json">{
   "jsonrpc": "2.0",
   "id": 3,
   "method": "tools/call",
@@ -268,7 +269,7 @@
   <p><strong>6. Tool result</strong> (Server → Kiro):</p>
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>{
+    <pre><code class="language-json">{
   "jsonrpc": "2.0",
   "id": 3,
   "result": {
@@ -294,7 +295,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>mkdir my-mcp-server
+    <pre><code class="language-bash">mkdir my-mcp-server
 cd my-mcp-server
 npm init -y
 npm install @modelcontextprotocol/sdk zod
@@ -305,7 +306,7 @@ npm install -D typescript @types/node</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>{
+    <pre><code class="language-json">{
   "compilerOptions": {
     "target": "ES2022",
     "module": "Node16",
@@ -322,7 +323,7 @@ npm install -D typescript @types/node</code></pre>
   <p>Add to <code>package.json</code>:</p>
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>{
+    <pre><code class="language-json">{
   "type": "module",
   "bin": { "my-mcp-server": "./dist/index.js" },
   "scripts": {
@@ -340,7 +341,7 @@ npm install -D typescript @types/node</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>#!/usr/bin/env node
+    <pre><code class="language-bash">#!/usr/bin/env node
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
@@ -406,7 +407,7 @@ await server.connect(transport);</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>server.tool(
+    <pre><code class="language-javascript">server.tool(
   "search-components",
   "Search the Angular component library documentation",
   {
@@ -444,14 +445,14 @@ server.tool(
   <h3>Build</h3>
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>npm run build</code></pre>
+    <pre><code class="language-bash">npm run build</code></pre>
   </div>
 
   <h3>Test locally</h3>
   <p>You can test with the MCP Inspector (a debugging tool):</p>
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>npx @modelcontextprotocol/inspector node dist/index.js</code></pre>
+    <pre><code class="language-bash">npx @modelcontextprotocol/inspector node dist/index.js</code></pre>
   </div>
   <p>This opens a web UI where you can invoke tools and see responses.</p>
 
@@ -459,7 +460,7 @@ server.tool(
   <p>Add to your <code>.kiro/settings/mcp.json</code>:</p>
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>{
+    <pre><code class="language-json">{
   "mcpServers": {
     "my-team-tools": {
       "command": "node",
@@ -472,7 +473,7 @@ server.tool(
   <p>Or if you've published it to npm:</p>
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>{
+    <pre><code class="language-json">{
   "mcpServers": {
     "my-team-tools": {
       "command": "npx",
@@ -488,7 +489,7 @@ server.tool(
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>server.resource(
+    <pre><code class="language-javascript">server.resource(
   "component-guidelines",
   "file:///docs/component-guidelines",
   async (uri) => ({
@@ -507,7 +508,7 @@ server.tool(
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>server.prompt(
+    <pre><code class="language-javascript">server.prompt(
   "code-review",
   { file: z.string().describe("Path to the file to review") },
   ({ file }) => ({
@@ -528,14 +529,14 @@ server.tool(
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>// In your server code
+    <pre><code class="language-javascript">// In your server code
 const apiKey = process.env.MY_API_KEY;
 if (!apiKey) throw new Error("MY_API_KEY not set");</code></pre>
   </div>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>// In mcp.json
+    <pre><code class="language-javascript">// In mcp.json
 {
   "mcpServers": {
     "my-team-tools": {
@@ -629,5 +630,8 @@ if (!apiKey) throw new Error("MY_API_KEY not set");</code></pre>
 
   <script src="/scripts.js"></script>
   <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
+  <script src="/vendor/prism-yaml.min.js"></script>
+  <script src="/vendor/prism-bash.min.js"></script>
 </body>
 </html>

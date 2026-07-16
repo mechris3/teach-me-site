@@ -18,6 +18,7 @@
   <meta name="twitter:description" content="Kiro custom agents: config files, tool scoping, prompt injection, and creating specialised agents for your team.">
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -88,7 +89,7 @@
 
   <p>In the IDE, a custom agent is a <strong>markdown file</strong> with YAML front-matter. The body is the agent's system prompt - the instructions it follows when spawned.</p>
 
-  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>---
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code class="language-yaml">---
 name: frontend-agent
 description: Specialist in Angular components, templates, and browser tooling
 model: auto
@@ -159,7 +160,7 @@ You are a frontend specialist working on an Angular 18 application.
   <h2>Practical Examples</h2>
 
   <h3>Read-only research agent</h3>
-  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>---
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code class="language-yaml">---
 description: Research and analyse code without making changes
 tools:
   - read_file
@@ -178,7 +179,7 @@ When asked to investigate something:
 4. Suggest next steps (but don't implement them)</code></pre></div>
 
   <h3>Test writer agent</h3>
-  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>---
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code class="language-yaml">---
 description: Write and run unit tests for Angular components and services
 tools:
   - read_file
@@ -198,7 +199,7 @@ You are a testing specialist for an Angular application using Jest.
 - Aim for meaningful assertions, not just coverage</code></pre></div>
 
   <h3>Backend API agent</h3>
-  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>---
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code class="language-yaml">---
 description: Work with the Node.js/Express API layer and database
 tools:
   - read_file
@@ -358,5 +359,8 @@ You are a backend specialist working on the Express API.
 
   <script src="/scripts.js"></script>
   <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
+  <script src="/vendor/prism-yaml.min.js"></script>
+  <script src="/vendor/prism-bash.min.js"></script>
 </body>
 </html>

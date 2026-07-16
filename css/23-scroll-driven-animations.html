@@ -18,6 +18,7 @@
   <meta name="twitter:description" content="Replace JavaScript scroll libraries with native CSS scroll-driven animations using scroll() and view() timelines, animation-range, and named timelines.">
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
   <style>
     .scroll-box { height: 200px; overflow-y: scroll; border: 2px solid #e0e0e0; border-radius: 8px; padding: 1rem; position: relative; }
     .scroll-box .scroll-content { height: 600px; padding: 0.5rem; font-size: 0.8rem; color: var(--muted); }
@@ -119,7 +120,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* CSS — that's it. No JS. */
+    <pre><code class="language-css">/* CSS — that's it. No JS. */
 .progress-bar {
   position: fixed;
   top: 0;
@@ -168,7 +169,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* The indicator bar tracks THIS container's scroll progress */
+    <pre><code class="language-css">/* The indicator bar tracks THIS container's scroll progress */
 .indicator {
   position: sticky;
   top: 0;
@@ -212,7 +213,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* The reveal animation */
+    <pre><code class="language-css">/* The reveal animation */
 @keyframes fade-slide-in {
   from { opacity: 0; transform: translateY(20px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -238,7 +239,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Named ranges for view() timeline:
+    <pre><code class="language-css">/* Named ranges for view() timeline:
 
    cover    → full journey: first pixel enters to last pixel exits
    contain  → element is fully visible (both edges inside scrollport)
@@ -287,7 +288,7 @@ animation-range: entry 25% entry 75%;</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* The text inside shifts at a slower rate via scroll-driven animation */
+    <pre><code class="language-css">/* The text inside shifts at a slower rate via scroll-driven animation */
 .parallax-bg h2 {
   animation: parallax-shift linear;
   animation-timeline: scroll(nearest);
@@ -305,7 +306,7 @@ animation-range: entry 25% entry 75%;</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* BEFORE (JavaScript) */
+    <pre><code class="language-css">/* BEFORE (JavaScript) */
 // Reading progress bar
 window.addEventListener('scroll', () => {
   const progress = window.scrollY / (document.body.scrollHeight - window.innerHeight);
@@ -334,7 +335,7 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* === Properties === */
+    <pre><code class="language-css">/* === Properties === */
 animation-timeline: scroll() | view() | auto | none | &lt;custom-name&gt;;
 animation-range: normal | &lt;range-start&gt; &lt;range-end&gt;;
 
@@ -394,7 +395,7 @@ animation-range: entry 0% entry 100%; /* explicit start/end within a range */
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Header shrinks as you scroll down the page */
+    <pre><code class="language-css">/* Header shrinks as you scroll down the page */
 .site-header {
   position: sticky;
   top: 0;
@@ -444,7 +445,7 @@ animation-range: entry 0% entry 100%; /* explicit start/end within a range */
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Feature detection — provide fallback for unsupported browsers */
+    <pre><code class="language-css">/* Feature detection — provide fallback for unsupported browsers */
 @supports (animation-timeline: scroll()) {
   .progress-bar {
     animation: grow-progress linear;
@@ -539,5 +540,6 @@ animation-range: entry 0% entry 100%; /* explicit start/end within a range */
 
   <script src="/scripts.js"></script>
   <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
 </body>
 </html>

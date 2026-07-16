@@ -18,6 +18,7 @@
   <meta name="twitter:description" content="A complete animated solar system combining all SVG techniques: coordinate systems, gradients, filters, SMIL motion, and JavaScript interaction.">
   <link rel="stylesheet" href="/styles.css">
  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -177,7 +178,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg width="600" height="600" viewBox="0 0 600 600"&gt;
+    <pre><code class="language-markup">&lt;svg width="600" height="600" viewBox="0 0 600 600"&gt;
   &lt;!-- Dark space background --&gt;
   &lt;rect width="600" height="600" fill="#0d1117"/&gt;
 &lt;/svg&gt;</code></pre>
@@ -193,7 +194,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;g class="stars" opacity="0.6"&gt;
+    <pre><code class="language-markup">&lt;g class="stars" opacity="0.6"&gt;
   &lt;circle cx="45" cy="80" r="1" fill="white"/&gt;
   &lt;circle cx="120" cy="30" r="0.8" fill="white"/&gt;
   &lt;circle cx="200" cy="55" r="1.2" fill="white"/&gt;
@@ -208,7 +209,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;defs&gt;
+    <pre><code class="language-markup">&lt;defs&gt;
   &lt;!-- Circle as a path (for animateMotion) --&gt;
   &lt;!-- Arc from top, sweeps full circle back to start --&gt;
   &lt;path id="orbit-1" d="M 300,165 A 135,135 0 1 1 299.99,165" fill="none"/&gt;
@@ -232,7 +233,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;defs&gt;
+    <pre><code class="language-markup">&lt;defs&gt;
   &lt;!-- Glow: blur + layer original on top --&gt;
   &lt;filter id="sun-glow" x="-50%" y="-50%" width="200%" height="200%"&gt;
     &lt;feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur"/&gt;
@@ -263,7 +264,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- Mercury: fast inner orbit --&gt;
+    <pre><code class="language-markup">&lt;!-- Mercury: fast inner orbit --&gt;
 &lt;circle r="6" fill="#a8a29e"&gt;
   &lt;animateMotion dur="4s" repeatCount="indefinite"&gt;
     &lt;mpath href="#orbit-1"/&gt;
@@ -299,7 +300,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;defs&gt;
+    <pre><code class="language-markup">&lt;defs&gt;
   &lt;!-- Only show the bottom half of the ring --&gt;
   &lt;clipPath id="ring-clip"&gt;
     &lt;rect x="-30" y="2" width="60" height="30"/&gt;
@@ -320,7 +321,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;defs&gt;
+    <pre><code class="language-markup">&lt;defs&gt;
   &lt;!-- Irregular comet trajectory --&gt;
   &lt;path id="comet-path"
         d="M 50,50 C 200,100 500,150 550,500 C 400,550 100,400 50,50"/&gt;
@@ -354,7 +355,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;text font-size="8" fill="#64748b" font-family="monospace"&gt;
+    <pre><code class="language-markup">&lt;text font-size="8" fill="#64748b" font-family="monospace"&gt;
   &lt;textPath href="#orbit-3" startOffset="15%"&gt;
     outer orbit &amp;bull; Saturn
   &lt;/textPath&gt;
@@ -368,7 +369,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;script&gt;
+    <pre><code class="language-markup">&lt;script&gt;
 const svg = document.getElementById('solar-system');
 
 function togglePause() {
@@ -479,5 +480,6 @@ svg.addEventListener('click', (e) =&gt; {
     })();
   </script>
  <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
 </body>
 </html>

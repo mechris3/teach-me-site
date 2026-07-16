@@ -18,6 +18,7 @@
   <meta name="twitter:description" content="The namespace gotcha, createElementNS, coordinate conversion with getScreenCTM, Web Animations API, dragging, and path interrogation.">
   <link rel="stylesheet" href="/styles.css">
  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -73,7 +74,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>const SVG_NS = 'http://www.w3.org/2000/svg';
+    <pre><code class="language-javascript">const SVG_NS = 'http://www.w3.org/2000/svg';
 
 // WRONG  -  creates an HTML element that happens to be named "circle"
 const broken = document.createElement('circle');
@@ -111,7 +112,7 @@ document.querySelector('svg').appendChild(circle);</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>const rect = document.querySelector('rect');
+    <pre><code class="language-javascript">const rect = document.querySelector('rect');
 
 // Reading attributes
 const x = rect.getAttribute('x');          // "50" (string!)
@@ -141,7 +142,7 @@ rect.style.fill = 'coral';                // Works  -  fill is a CSS property to
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>const circle = document.querySelector('circle');
+    <pre><code class="language-javascript">const circle = document.querySelector('circle');
 
 // classList  -  toggle CSS animations, visibility classes
 circle.classList.add('pulse');
@@ -158,7 +159,7 @@ circle.dataset.label = 'Point C';
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>const SVG_NS = 'http://www.w3.org/2000/svg';
+    <pre><code class="language-javascript">const SVG_NS = 'http://www.w3.org/2000/svg';
 
 function createBarChart(container, data) {
   const svg = document.createElementNS(SVG_NS, 'svg');
@@ -196,7 +197,7 @@ createBarChart(document.getElementById('chart'), [80, 45, 90, 60, 75]);</code></
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>const SVG_NS = 'http://www.w3.org/2000/svg';
+    <pre><code class="language-javascript">const SVG_NS = 'http://www.w3.org/2000/svg';
 
 function svgEl(tag, attrs = {}, parent = null) {
   const el = document.createElementNS(SVG_NS, tag);
@@ -228,7 +229,7 @@ document.body.appendChild(svg);</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>const svg = document.querySelector('svg');
+    <pre><code class="language-javascript">const svg = document.querySelector('svg');
 
 svg.addEventListener('click', (e) =&gt; {
   // Convert client coords to SVG viewBox coords
@@ -281,7 +282,7 @@ svg.addEventListener('click', (e) =&gt; {
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- This circle has fill="none" but is still clickable --&gt;
+    <pre><code class="language-markup">&lt;!-- This circle has fill="none" but is still clickable --&gt;
 &lt;circle cx="100" cy="100" r="50"
         fill="none" stroke="coral" stroke-width="2"
         pointer-events="all"
@@ -303,7 +304,7 @@ svg.addEventListener('click', (e) =&gt; {
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>const circle = document.querySelector('circle');
+    <pre><code class="language-javascript">const circle = document.querySelector('circle');
 
 // Basic animation  -  same as @keyframes but from JS
 const anim = circle.animate([
@@ -346,7 +347,7 @@ anim.cancel();            // Remove animation entirely</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>const path = document.querySelector('path');
+    <pre><code class="language-javascript">const path = document.querySelector('path');
 
 // Stroke drawing via WAAPI  -  programmatic control over the draw
 const length = path.getTotalLength();
@@ -395,7 +396,7 @@ drawAnim.finished.then(() =&gt; {
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>const path = document.querySelector('path');
+    <pre><code class="language-javascript">const path = document.querySelector('path');
 
 // Total length (for stroke-draw animations)
 const len = path.getTotalLength();  // e.g. 347.2
@@ -452,7 +453,7 @@ function positionAt(element, path, percent) {
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>const svg = document.querySelector('svg');
+    <pre><code class="language-javascript">const svg = document.querySelector('svg');
 const draggable = document.querySelector('.draggable');
 
 let dragging = false;
@@ -503,7 +504,7 @@ svg.addEventListener('pointerup', () =&gt; { dragging = false; });</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>const svg = document.querySelector('svg');
+    <pre><code class="language-javascript">const svg = document.querySelector('svg');
 
 // ResizeObserver  -  fires when the SVG element's rendered size changes
 const ro = new ResizeObserver(entries =&gt; {
@@ -753,5 +754,6 @@ ro.observe(svg);</code></pre>
     })();
   </script>
  <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
 </body>
 </html>

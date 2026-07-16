@@ -18,6 +18,7 @@
   <meta name="twitter:description" content="CSS custom properties (variables) from the ground up. Declaration, scoping, fallbacks, var(), and how they differ from Sass variables.">
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
   <style>
     /* Demo: scoping */
     .scope-demo {
@@ -173,7 +174,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Declare */
+    <pre><code class="language-css">/* Declare */
 .card {
   --card-padding: 1.5rem;
   --card-radius: 8px;
@@ -198,7 +199,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>:root {
+    <pre><code class="language-css">:root {
   --brand: blue;    /* available everywhere (html element) */
 }
 
@@ -229,7 +230,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>.scope-demo {
+    <pre><code class="language-css">.scope-demo {
   --demo-color: #3a86ff;
   border: 2px solid var(--demo-color);
 }
@@ -252,7 +253,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>:root {
+    <pre><code class="language-css">:root {
   --spacing-sm: 0.5rem;
   --spacing-md: 1rem;
   --spacing-lg: 2rem;
@@ -269,7 +270,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>.element {
+    <pre><code class="language-css">.element {
   /* If --custom-bg isn't set on this element or any ancestor,
      use #e8f8f5 instead */
   background: var(--custom-bg, #e8f8f5);
@@ -293,7 +294,7 @@
   <div class="comparison">
     <div>
       <p class="label">Sass variable</p>
-      <pre><code>$color: blue;
+      <pre><code class="language-css">$color: blue;
 
 .a { color: $color; }
 
@@ -304,7 +305,7 @@ $color: red;
     </div>
     <div>
       <p class="label">Custom property</p>
-      <pre><code>:root { --color: blue; }
+      <pre><code class="language-css">:root { --color: blue; }
 
 .a { color: var(--color); }
 
@@ -330,7 +331,7 @@ $color: red;
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>.theme-demo {
+    <pre><code class="language-css">.theme-demo {
   --card-bg: #fff;
   --card-text: #1a1a2e;
   --card-border: #e0e0e0;
@@ -355,7 +356,7 @@ $color: red;
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>// Change a property on the root element
+    <pre><code class="language-javascript">// Change a property on the root element
 document.documentElement.style.setProperty('--color-primary', '#e76f51');
 
 // Change it on a specific element
@@ -370,7 +371,7 @@ myCard.style.setProperty('--card-padding', '2rem');</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Global design tokens */
+    <pre><code class="language-css">/* Global design tokens */
 --color-primary: #3a86ff;
 --spacing-md: 1rem;
 --font-body: system-ui, sans-serif;
@@ -462,5 +463,6 @@ myCard.style.setProperty('--card-padding', '2rem');</code></pre>
 
   <script src="/scripts.js"></script>
   <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
 </body>
 </html>

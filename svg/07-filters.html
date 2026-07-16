@@ -18,6 +18,7 @@
   <meta name="twitter:description" content="The SVG filter pipeline model. All 17 filter primitives, wiring inputs and outputs, drop shadows, blur, colour manipulation, lighting, and noise.">
   <link rel="stylesheet" href="/styles.css">
  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -79,7 +80,7 @@
   <h3>Basic structure</h3>
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg viewBox="0 0 300 200"&gt;
+    <pre><code class="language-markup">&lt;svg viewBox="0 0 300 200"&gt;
   &lt;defs&gt;
     &lt;filter id="my-filter"&gt;
       &lt;!-- Filter primitives go here --&gt;
@@ -113,7 +114,7 @@
   <p>Every filter has a <strong>filter region</strong>  -  the rectangular area in which the filter operates. By default, it extends 10% beyond the element's bounding box in each direction (same as masks):</p>
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;filter id="my-filter" x="-10%" y="-10%" width="120%" height="120%"&gt;
+    <pre><code class="language-markup">&lt;filter id="my-filter" x="-10%" y="-10%" width="120%" height="120%"&gt;
   &lt;!-- primitives here --&gt;
 &lt;/filter&gt;</code></pre>
   </div>
@@ -121,7 +122,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- Asymmetric: 5% extra left/right/top, 25% extra at the bottom --&gt;
+    <pre><code class="language-markup">&lt;!-- Asymmetric: 5% extra left/right/top, 25% extra at the bottom --&gt;
 &lt;filter x="-5%" y="-5%" width="110%" height="130%"&gt;
   &lt;feDropShadow dx="0" dy="10" stdDeviation="4"/&gt;
 &lt;/filter&gt;</code></pre>
@@ -153,7 +154,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;filter id="drop-shadow"&gt;
+    <pre><code class="language-markup">&lt;filter id="drop-shadow"&gt;
   &lt;!-- Step 1: blur the source graphic --&gt;
   &lt;feGaussianBlur in="SourceAlpha" stdDeviation="4" result="blurred"/&gt;
 
@@ -196,7 +197,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- Explicit wiring (verbose but clear) --&gt;
+    <pre><code class="language-markup">&lt;!-- Explicit wiring (verbose but clear) --&gt;
 &lt;filter id="a"&gt;
   &lt;feGaussianBlur in="SourceAlpha" stdDeviation="4" result="blurred"/&gt;
   &lt;feOffset in="blurred" dx="3" dy="3" result="shadow"/&gt;
@@ -212,7 +213,7 @@
   <p>You only need explicit <code>in</code>/<code>result</code> names when the pipeline <strong>branches</strong>  -  when a primitive needs to reference something other than "the previous output." Without names, implicit chaining gives you a straight line (A&rarr;B&rarr;C). But real filter pipelines often aren't straight lines:</p>
 
   <div class="code-wrapper">
-    <pre><code>SourceAlpha → feGaussianBlur → feOffset → ┐
+    <pre><code class="language-markup">SourceAlpha → feGaussianBlur → feOffset → ┐
                                             ├→ feMerge → output
 SourceGraphic ─────────────────────────────┘</code></pre>
   </div>
@@ -225,7 +226,7 @@ SourceGraphic ──────────────────────
   <p>The drop shadow: <code>feMerge</code> needs the original <code>SourceGraphic</code>, which isn't the previous output  -  the previous output is the offset shadow.</p>
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;filter id="shadow"&gt;
+    <pre><code class="language-markup">&lt;filter id="shadow"&gt;
   &lt;feGaussianBlur in="SourceAlpha" stdDeviation="4" result="blur"/&gt;
   &lt;feOffset in="blur" dx="3" dy="3" result="shadow"/&gt;
   &lt;feMerge&gt;
@@ -235,7 +236,7 @@ SourceGraphic ──────────────────────
 &lt;/filter&gt;</code></pre>
   </div>
   <div class="code-wrapper">
-    <pre><code>SourceAlpha → feGaussianBlur → feOffset ──→ ┐
+    <pre><code class="language-markup">SourceAlpha → feGaussianBlur → feOffset ──→ ┐
                                              ├→ feMerge → output
 SourceGraphic ───────────────────────────────┘
                               (reaches back)</code></pre>
@@ -245,7 +246,7 @@ SourceGraphic ──────────────────────
   <p>Suppose you want both a blurred shadow <em>and</em> a colour-shifted copy from the same blur operation:</p>
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;filter id="fan-out"&gt;
+    <pre><code class="language-markup">&lt;filter id="fan-out"&gt;
   &lt;feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blurred"/&gt;
 
   &lt;!-- Branch A: offset the blur --&gt;
@@ -263,7 +264,7 @@ SourceGraphic ──────────────────────
 &lt;/filter&gt;</code></pre>
   </div>
   <div class="code-wrapper">
-    <pre><code>                        ┌→ feOffset ────────→ ┐
+    <pre><code class="language-markup">                        ┌→ feOffset ────────→ ┐
 SourceGraphic → feBlur ─┤                      ├→ feMerge → output
                         └→ feColorMatrix ──────┤
 SourceGraphic ─────────────────────────────────┘
@@ -274,7 +275,7 @@ SourceGraphic ──────────────────────
   <p>Primitives like <code>feComposite</code>, <code>feBlend</code>, and <code>feDisplacementMap</code> require <em>two</em> explicit inputs. Implicit chaining can only provide one (the previous output), so you must name the other:</p>
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;filter id="two-inputs"&gt;
+    <pre><code class="language-markup">&lt;filter id="two-inputs"&gt;
   &lt;!-- Generate noise --&gt;
   &lt;feTurbulence baseFrequency="0.03" result="noise"/&gt;
 
@@ -284,7 +285,7 @@ SourceGraphic ──────────────────────
 &lt;/filter&gt;</code></pre>
   </div>
   <div class="code-wrapper">
-    <pre><code>feTurbulence ────────→ (noise) ─────────→ in2 ┐
+    <pre><code class="language-markup">feTurbulence ────────→ (noise) ─────────→ in2 ┐
                                                ├→ feDisplacementMap → output
 SourceGraphic ─────────────────────────→ in   ┘
           (two separate streams into one primitive)</code></pre>
@@ -335,7 +336,7 @@ SourceGraphic ──────────────────────
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;filter id="blur-example"&gt;
+    <pre><code class="language-markup">&lt;filter id="blur-example"&gt;
   &lt;!-- Single value: equal blur in x and y --&gt;
   &lt;feGaussianBlur stdDeviation="5"/&gt;
 
@@ -396,7 +397,7 @@ SourceGraphic ──────────────────────
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;filter id="drop-shadow"&gt;
+    <pre><code class="language-markup">&lt;filter id="drop-shadow"&gt;
   &lt;!-- 1. Blur the alpha channel (silhouette) --&gt;
   &lt;feGaussianBlur in="SourceAlpha" stdDeviation="4" result="blur"/&gt;
 
@@ -438,7 +439,7 @@ SourceGraphic ──────────────────────
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;filter id="coloured-shadow"&gt;
+    <pre><code class="language-markup">&lt;filter id="coloured-shadow"&gt;
   &lt;feGaussianBlur in="SourceAlpha" stdDeviation="4" result="blur"/&gt;
   &lt;feOffset in="blur" dx="4" dy="4" result="offsetBlur"/&gt;
 
@@ -481,7 +482,7 @@ SourceGraphic ──────────────────────
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;filter id="easy-shadow"&gt;
+    <pre><code class="language-markup">&lt;filter id="easy-shadow"&gt;
   &lt;feDropShadow dx="3" dy="4" stdDeviation="4"
                 flood-color="rgba(0,0,0,0.4)"/&gt;
 &lt;/filter&gt;</code></pre>
@@ -532,7 +533,7 @@ SourceGraphic ──────────────────────
   <p>The matrix is applied to each pixel's <code>[R, G, B, A, 1]</code> vector. The result is a new <code>[R', G', B', A']</code>:</p>
 
   <div class="code-wrapper">
-    <pre><code>| R' |   | a00 a01 a02 a03 a04 |   | R |
+    <pre><code class="language-markup">| R' |   | a00 a01 a02 a03 a04 |   | R |
 | G' | = | a10 a11 a12 a13 a14 | × | G |
 | B' |   | a20 a21 a22 a23 a24 |   | B |
 | A' |   | a30 a31 a32 a33 a34 |   | A |
@@ -546,7 +547,7 @@ SourceGraphic ──────────────────────
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- Desaturate (greyscale) --&gt;
+    <pre><code class="language-markup">&lt;!-- Desaturate (greyscale) --&gt;
 &lt;feColorMatrix type="saturate" values="0"/&gt;
 
 &lt;!-- Half saturation --&gt;
@@ -613,7 +614,7 @@ SourceGraphic ──────────────────────
   <h3>The identity matrix</h3>
   <p>The "do nothing" matrix (useful as a starting point for understanding):</p>
   <div class="code-wrapper">
-    <pre><code>1 0 0 0 0    &lt;!-- R' = 1*R + 0*G + 0*B + 0*A + 0 --&gt;
+    <pre><code class="language-markup">1 0 0 0 0    &lt;!-- R' = 1*R + 0*G + 0*B + 0*A + 0 --&gt;
 0 1 0 0 0    &lt;!-- G' = 0*R + 1*G + 0*B + 0*A + 0 --&gt;
 0 0 1 0 0    &lt;!-- B' = 0*R + 0*G + 1*B + 0*A + 0 --&gt;
 0 0 0 1 0    &lt;!-- A' = 0*R + 0*G + 0*B + 1*A + 0 --&gt;</code></pre>
@@ -621,7 +622,7 @@ SourceGraphic ──────────────────────
   <p>Modify individual cells to channel-swap, tint, or adjust brightness. For instance, swapping R and B channels:</p>
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;feColorMatrix type="matrix"
+    <pre><code class="language-markup">&lt;feColorMatrix type="matrix"
   values="0 0 1 0 0
           0 1 0 0 0
           1 0 0 0 0
@@ -648,7 +649,7 @@ SourceGraphic ──────────────────────
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;feMerge&gt;
+    <pre><code class="language-markup">&lt;feMerge&gt;
   &lt;feMergeNode in="background-effect"/&gt;   &lt;!-- bottom --&gt;
   &lt;feMergeNode in="middle-effect"/&gt;        &lt;!-- middle --&gt;
   &lt;feMergeNode in="SourceGraphic"/&gt;        &lt;!-- top --&gt;
@@ -744,7 +745,7 @@ SourceGraphic ──────────────────────
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;filter id="noise"&gt;
+    <pre><code class="language-markup">&lt;filter id="noise"&gt;
   &lt;feTurbulence type="fractalNoise"
     baseFrequency="0.05" numOctaves="3" seed="42"/&gt;
 &lt;/filter&gt;
@@ -791,7 +792,7 @@ SourceGraphic ──────────────────────
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;filter id="wavy"&gt;
+    <pre><code class="language-markup">&lt;filter id="wavy"&gt;
   &lt;feTurbulence type="turbulence" baseFrequency="0.02"
     numOctaves="2" result="noise"/&gt;
   &lt;feDisplacementMap in="SourceGraphic" in2="noise"
@@ -871,7 +872,7 @@ SourceGraphic ──────────────────────
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;filter id="emboss"&gt;
+    <pre><code class="language-markup">&lt;filter id="emboss"&gt;
   &lt;!-- Use source alpha as the bump map --&gt;
   &lt;feDiffuseLighting in="SourceGraphic" surfaceScale="3"
     diffuseConstant="1" lighting-color="white" result="light"&gt;
@@ -960,7 +961,7 @@ SourceGraphic ──────────────────────
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- Thicken (dilate) by 2 units --&gt;
+    <pre><code class="language-markup">&lt;!-- Thicken (dilate) by 2 units --&gt;
 &lt;filter id="thick"&gt;
   &lt;feMorphology operator="dilate" radius="2"/&gt;
 &lt;/filter&gt;
@@ -992,7 +993,7 @@ SourceGraphic ──────────────────────
   <p>Combine dilate + original to create a text outline effect (dilate creates the "stroke", then layer the original on top as the fill):</p>
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;filter id="text-outline"&gt;
+    <pre><code class="language-markup">&lt;filter id="text-outline"&gt;
   &lt;feMorphology in="SourceGraphic" operator="dilate"
     radius="2" result="expanded"/&gt;
   &lt;!-- Colour the expanded area --&gt;
@@ -1041,7 +1042,7 @@ SourceGraphic ──────────────────────
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;filter id="glow"&gt;
+    <pre><code class="language-markup">&lt;filter id="glow"&gt;
   &lt;!-- Blur the source to create the glow halo --&gt;
   &lt;feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur"/&gt;
 
@@ -1248,7 +1249,7 @@ SourceGraphic ──────────────────────
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg width="600" height="500" viewBox="0 0 600 500"
+    <pre><code class="language-markup">&lt;svg width="600" height="500" viewBox="0 0 600 500"
      xmlns="http://www.w3.org/2000/svg"&gt;
   &lt;defs&gt;
     &lt;!-- 1. Drop shadow --&gt;
@@ -1327,5 +1328,6 @@ SourceGraphic ──────────────────────
   <script src="/scripts.js"></script>
  <script src="scripts.js"></script>
  <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
 </body>
 </html>

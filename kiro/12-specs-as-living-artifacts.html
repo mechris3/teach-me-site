@@ -18,6 +18,7 @@
   <meta name="twitter:description" content="Kiro specs as living artifacts: feature vs bugfix specs, strategic spec management, and PBT integration.">
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -136,7 +137,7 @@
 
   <p>Each spec creates a directory:</p>
 
-  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>.kiro/specs/
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code class="language-plaintext">.kiro/specs/
 └── order-discount-rules/
     ├── requirements.md      # EARS-format requirements
     ├── design.md            # Technical design decisions
@@ -183,7 +184,7 @@
 
   <h2>Spec Lifecycle: From Creation to Maintenance</h2>
 
-  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>Create spec → Define requirements → Generate design → Generate tasks
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code class="language-javascript">Create spec → Define requirements → Generate design → Generate tasks
      │
      ▼
 Execute tasks (parallel where possible) → PBT verifies each task
@@ -263,7 +264,7 @@ Requirements change → Update spec → Kiro re-derives tests → Implement delt
 
   <p>Consider maintaining a manual steering file or reference doc that indexes your specs by domain - not for Kiro (it reads specs directly) but for humans navigating the project:</p>
 
-  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>---
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code class="language-yaml">---
 inclusion: manual
 ---
 
@@ -342,5 +343,8 @@ inclusion: manual
 
   <script src="/scripts.js"></script>
   <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
+  <script src="/vendor/prism-yaml.min.js"></script>
+  <script src="/vendor/prism-bash.min.js"></script>
 </body>
 </html>

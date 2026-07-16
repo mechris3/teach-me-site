@@ -18,6 +18,7 @@
   <meta name="twitter:description" content="Master CSS value functions: calc, min, max, clamp, and color-mix. Build responsive, flexible designs that adapt without media queries.">
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
   <style>
     /* Demo: calc */
     .calc-demo {
@@ -177,7 +178,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Subtract a fixed sidebar from a fluid container */
+    <pre><code class="language-css">/* Subtract a fixed sidebar from a fluid container */
 .main { width: calc(100% - 250px); }
 
 /* Add a rem offset to a viewport unit */
@@ -203,7 +204,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- HTML --&gt;
+    <pre><code class="language-css">&lt;!-- HTML --&gt;
 &lt;div class="calc-demo"&gt;
   &lt;div class="calc-sidebar"&gt;250px&lt;/div&gt;
   &lt;div class="calc-main"&gt;calc(100% - 250px)&lt;/div&gt;
@@ -231,7 +232,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* These are equivalent: */
+    <pre><code class="language-css">/* These are equivalent: */
 width: calc(100% - calc(var(--sidebar) + 2rem));
 width: calc(100% - (var(--sidebar) + 2rem));</code></pre>
   </div>
@@ -251,7 +252,7 @@ width: calc(100% - (var(--sidebar) + 2rem));</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Width is 100% of parent, but never more than 500px */
+    <pre><code class="language-css">/* Width is 100% of parent, but never more than 500px */
 .container { width: min(100%, 500px); }
 
 /* Font size is 5vw, capped at 3rem */
@@ -265,7 +266,7 @@ width: calc(100% - (var(--sidebar) + 2rem));</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- HTML --&gt;
+    <pre><code class="language-css">&lt;!-- HTML --&gt;
 &lt;div class="min-demo-box"&gt;I'll fill my parent up to 500px, then stop growing.&lt;/div&gt;
 
 /* CSS */
@@ -287,7 +288,7 @@ width: calc(100% - (var(--sidebar) + 2rem));</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Padding is 5% of container, but never less than 1rem */
+    <pre><code class="language-css">/* Padding is 5% of container, but never less than 1rem */
 .card { padding: max(5%, 1rem); }
 
 /* Width shrinks with viewport, but never below 300px */
@@ -304,7 +305,7 @@ width: calc(100% - (var(--sidebar) + 2rem));</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Font scales with viewport, clamped between 1rem and 2.5rem */
+    <pre><code class="language-css">/* Font scales with viewport, clamped between 1rem and 2.5rem */
 font-size: clamp(1rem, 2.5vw + 0.5rem, 2.5rem);
 
 /* Width is 80% of parent, but between 300px and 800px */
@@ -323,7 +324,7 @@ padding: clamp(1rem, 3vw, 3rem);</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- HTML --&gt;
+    <pre><code class="language-css">&lt;!-- HTML --&gt;
 &lt;div class="clamp-text"&gt;This text scales fluidly...&lt;/div&gt;
 
 /* CSS */
@@ -345,7 +346,7 @@ padding: clamp(1rem, 3vw, 3rem);</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>clamp( floor , preferred , ceiling )
+    <pre><code class="language-css">clamp( floor , preferred , ceiling )
        ↑            ↑           ↑
   never smaller   ideal     never bigger</code></pre>
   </div>
@@ -360,7 +361,7 @@ padding: clamp(1rem, 3vw, 3rem);</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Mix accent with white to lighten */
+    <pre><code class="language-css">/* Mix accent with white to lighten */
 background: color-mix(in oklch, var(--accent), white 50%);
 
 /* Mix accent with black to darken */
@@ -397,7 +398,7 @@ border-color: color-mix(in oklch, red, blue 40%);</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Same mix, different paths */
+    <pre><code class="language-css">/* Same mix, different paths */
 --srgb:  color-mix(in srgb, red, blue 50%);   /* dark muddy purple */
 --hsl:   color-mix(in hsl, red, blue 50%);    /* vivid magenta (hue rotation) */
 --oklab: color-mix(in oklab, red, blue 50%);  /* balanced purple */
@@ -416,7 +417,7 @@ border-color: color-mix(in oklch, red, blue 40%);</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Lighten a brand colour - all valid, different results */
+    <pre><code class="language-css">/* Lighten a brand colour - all valid, different results */
 --light-srgb:  color-mix(in srgb, var(--brand), white 40%);
 --light-hsl:   color-mix(in hsl, var(--brand), white 40%);
 --light-oklab: color-mix(in oklab, var(--brand), white 40%);
@@ -455,7 +456,7 @@ border-color: color-mix(in oklch, red, blue 40%);</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Generate a full tint scale from one token */
+    <pre><code class="language-css">/* Generate a full tint scale from one token */
 :root { --accent: #3a86ff; }
 
 --tint-100: color-mix(in oklch, var(--accent), white 80%);
@@ -475,7 +476,7 @@ border-color: color-mix(in oklch, red, blue 40%);</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>:root {
+    <pre><code class="language-css">:root {
   --min-font: 1rem;
   --max-font: 2.5rem;
   --fluid-rate: 2vw;
@@ -609,5 +610,6 @@ h1 {
 
   <script src="/scripts.js"></script>
   <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
 </body>
 </html>

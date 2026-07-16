@@ -18,6 +18,7 @@
   <meta name="twitter:description" content="SVG's six basic shape elements and the path d attribute. Line commands, cubic and quadratic Bezier curves, arcs, and markers.">
   <link rel="stylesheet" href="/styles.css">
  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -76,7 +77,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;rect x="20" y="20" width="120" height="80" rx="10" ry="10"
+    <pre><code class="language-markup">&lt;rect x="20" y="20" width="120" height="80" rx="10" ry="10"
       fill="#61afef" stroke="#528bcc" stroke-width="2"/&gt;</code></pre>
   </div>
 
@@ -87,7 +88,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;circle cx="80" cy="80" r="50"
+    <pre><code class="language-markup">&lt;circle cx="80" cy="80" r="50"
       fill="#e06c75" stroke="#b04950" stroke-width="2"/&gt;</code></pre>
   </div>
 
@@ -96,7 +97,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;ellipse cx="100" cy="60" rx="80" ry="40"
+    <pre><code class="language-markup">&lt;ellipse cx="100" cy="60" rx="80" ry="40"
       fill="#e5c07b" stroke="#b8993f" stroke-width="2"/&gt;</code></pre>
   </div>
 
@@ -105,7 +106,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;line x1="10" y1="10" x2="180" y2="100"
+    <pre><code class="language-markup">&lt;line x1="10" y1="10" x2="180" y2="100"
       stroke="#98c379" stroke-width="3" stroke-linecap="round"/&gt;</code></pre>
   </div>
 
@@ -114,7 +115,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;polyline points="20,80 60,20 100,60 140,10 180,50"
+    <pre><code class="language-markup">&lt;polyline points="20,80 60,20 100,60 140,10 180,50"
       fill="none" stroke="#c678dd" stroke-width="3"
       stroke-linejoin="round" stroke-linecap="round"/&gt;</code></pre>
   </div>
@@ -124,7 +125,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;polygon points="100,10 150,80 50,80"
+    <pre><code class="language-markup">&lt;polygon points="100,10 150,80 50,80"
       fill="#56b6c2" stroke="#3d8f99" stroke-width="2"/&gt;</code></pre>
   </div>
 
@@ -191,7 +192,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;path d="M 10 10 L 90 10 L 90 90 L 10 90 Z"
+    <pre><code class="language-markup">&lt;path d="M 10 10 L 90 10 L 90 90 L 10 90 Z"
       fill="#61afef" stroke="#528bcc" stroke-width="2"/&gt;
 &lt;!-- Draws a square: move to (10,10), line to each corner, close --&gt;</code></pre>
   </div>
@@ -231,7 +232,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;path d="M 50 120
+    <pre><code class="language-markup">&lt;path d="M 50 120
          L 50 200
          L 200 200
          L 200 120
@@ -302,7 +303,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;path d="M 30 150 C 30 50, 170 50, 170 150"
+    <pre><code class="language-markup">&lt;path d="M 30 150 C 30 50, 170 50, 170 150"
       fill="none" stroke="#c678dd" stroke-width="3"/&gt;
 &lt;!-- Start at (30,150)
      Control 1: (30, 50)  -  pulls the curve up from start
@@ -351,7 +352,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;path d="M 30 150 Q 100 30, 170 150"
+    <pre><code class="language-markup">&lt;path d="M 30 150 Q 100 30, 170 150"
       fill="none" stroke="#56b6c2" stroke-width="3"/&gt;
 &lt;!-- Start: (30, 150)
      Control: (100, 30)  -  the single shared control point
@@ -417,7 +418,7 @@
     <strong>Can you convert parametric to y = f(x)?</strong>
     <p>Sometimes  -  if x increases monotonically. For example, with P0=(0,0), P1=(50,100), P2=(100,0):</p>
     <div class="code-wrapper" style="margin: 0.5rem 0;">
-      <pre><code>x(t) = 100t          → so t = x/100
+      <pre><code class="language-markup">x(t) = 100t          → so t = x/100
 y(t) = 200t - 200t^2  → substitute t = x/100:
 y = 2x - 0.02x^2      ← a regular parabola!</code></pre>
     </div>
@@ -445,7 +446,7 @@ y = 2x - 0.02x^2      ← a regular parabola!</code></pre>
 
   <h4>Quadratic Bézier (Q)  -  three points: P0 (start), P1 (control), P2 (end)</h4>
   <div class="code-wrapper">
-    <pre><code>B(t) = (1-t)^2 * P0  +  2(1-t)t * P1  +  t^2 * P2     where t is 0 to 1</code></pre>
+    <pre><code class="language-markup">B(t) = (1-t)^2 * P0  +  2(1-t)t * P1  +  t^2 * P2     where t is 0 to 1</code></pre>
   </div>
   <ul>
     <li>At <strong>t = 0</strong>: B(0) = P0 (you're at the start)</li>
@@ -454,7 +455,7 @@ y = 2x - 0.02x^2      ← a regular parabola!</code></pre>
   </ul>
   <p>The derivative (tangent direction) at the endpoints:</p>
   <div class="code-wrapper">
-    <pre><code>B'(0) = 2(P1 - P0)     -  curve leaves P0 heading toward P1
+    <pre><code class="language-markup">B'(0) = 2(P1 - P0)     -  curve leaves P0 heading toward P1
 B'(1) = 2(P2 - P1)     -  curve arrives at P2 coming from direction of P1</code></pre>
   </div>
   <p>This is why the control point defines the tangent at <em>both</em> endpoints  -  the curve is pulled toward it from both sides. It's a weighted average of the three points where the weights shift as t progresses.</p>
@@ -462,7 +463,7 @@ B'(1) = 2(P2 - P1)     -  curve arrives at P2 coming from direction of P1</code>
   <h4>Worked example: computing a point on a quadratic Bézier</h4>
   <p>Given P0 = (20, 100), P1 = (100, 10), P2 = (180, 100)  -  where is the curve at t = 0.5?</p>
   <div class="code-wrapper">
-    <pre><code>Step 1: compute the three weights from t = 0.5
+    <pre><code class="language-markup">Step 1: compute the three weights from t = 0.5
 
   (1-t)^2  = (0.5)^2     = 0.25
   2(1-t)t  = 2(0.5)(0.5) = 0.50
@@ -491,14 +492,14 @@ Result: at t = 0.5, the curve passes through (100, 55)</code></pre>
 
   <h4>Cubic Bézier (C)  -  four points: P0 (start), P1 (control 1), P2 (control 2), P3 (end)</h4>
   <div class="code-wrapper">
-    <pre><code>B(t) = (1-t)^3 * P0  +  3(1-t)^2 * t * P1  +  3(1-t) * t^2 * P2  +  t^3 * P3     where t is 0 to 1</code></pre>
+    <pre><code class="language-markup">B(t) = (1-t)^3 * P0  +  3(1-t)^2 * t * P1  +  3(1-t) * t^2 * P2  +  t^3 * P3     where t is 0 to 1</code></pre>
   </div>
   <ul>
     <li>At <strong>t = 0</strong>: B(0) = P0</li>
     <li>At <strong>t = 1</strong>: B(1) = P3</li>
   </ul>
   <div class="code-wrapper">
-    <pre><code>B'(0) = 3(P1 - P0)     -  curve leaves P0 toward P1
+    <pre><code class="language-markup">B'(0) = 3(P1 - P0)     -  curve leaves P0 toward P1
 B'(1) = 3(P3 - P2)     -  curve arrives at P3 from direction of P2</code></pre>
   </div>
   <p>Each endpoint has its own independent control point, so the departure and arrival directions are decoupled  -  this is what gives cubics their asymmetric flexibility over quadratics.</p>
@@ -509,7 +510,7 @@ B'(1) = 3(P3 - P2)     -  curve arrives at P3 from direction of P2</code></pre>
   <h4>Why S and T commands give smooth joins</h4>
   <p>The smooth commands (S for cubic, T for quadratic) mirror the previous curve's final control point across the junction:</p>
   <div class="code-wrapper">
-    <pre><code>reflected_CP = 2·P_junction - CP_previous_end</code></pre>
+    <pre><code class="language-markup">reflected_CP = 2·P_junction - CP_previous_end</code></pre>
   </div>
   <p>This guarantees <strong>C¹ continuity</strong>  -  the tangent direction <em>and</em> magnitude match at the join, so the transition is perfectly smooth with no visible kink.</p>
 
@@ -522,7 +523,7 @@ B'(1) = 3(P3 - P2)     -  curve arrives at P3 from direction of P2</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- Smooth cubic: S mirrors previous CP2 --&gt;
+    <pre><code class="language-markup">&lt;!-- Smooth cubic: S mirrors previous CP2 --&gt;
 &lt;path d="M 30 100 C 30 30, 100 30, 100 100 S 170 170, 170 100"
       fill="none" stroke="#c678dd" stroke-width="3"/&gt;
 
@@ -540,7 +541,7 @@ B'(1) = 3(P3 - P2)     -  curve arrives at P3 from direction of P2</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>A rx ry x-rotation large-arc-flag sweep-flag x y
+    <pre><code class="language-markup">A rx ry x-rotation large-arc-flag sweep-flag x y
 
 &lt;!-- Example: --&gt;
 &lt;path d="M 50 100 A 50 30 0 0 1 200 100"
@@ -603,7 +604,7 @@ B'(1) = 3(P3 - P2)     -  curve arrives at P3 from direction of P2</code></pre>
 
   <h4>What you specify (endpoint parameterisation)</h4>
   <div class="code-wrapper">
-    <pre><code>A rx ry x-rotation large-arc-flag sweep-flag x₂ y₂
+    <pre><code class="language-markup">A rx ry x-rotation large-arc-flag sweep-flag x₂ y₂
 
 Given: current point (x₁, y₁) and endpoint (x₂, y₂)
        ellipse radii rx, ry
@@ -615,27 +616,27 @@ Given: current point (x₁, y₁) and endpoint (x₂, y₂)
   <ol>
     <li><strong>Rotate into the ellipse's local space:</strong> Apply −φ rotation to move the problem into an axis-aligned frame.
       <div class="code-wrapper">
-        <pre><code>x₁' = cos(φ)·(x₁-x₂)/2 + sin(φ)·(y₁-y₂)/2
+        <pre><code class="language-markup">x₁' = cos(φ)·(x₁-x₂)/2 + sin(φ)·(y₁-y₂)/2
 y₁' = -sin(φ)·(x₁-x₂)/2 + cos(φ)·(y₁-y₂)/2</code></pre>
       </div>
     </li>
     <li><strong>Find the centre</strong> of the ellipse in the rotated frame. This involves solving:
       <div class="code-wrapper">
-        <pre><code>cx' = ±√[ (rx²·ry² - rx²·y₁'² - ry²·x₁'²) / (rx²·y₁'² + ry²·x₁'²) ] · (rx·y₁'/ry)
+        <pre><code class="language-markup">cx' = ±√[ (rx²·ry² - rx²·y₁'² - ry²·x₁'²) / (rx²·y₁'² + ry²·x₁'²) ] · (rx·y₁'/ry)
 cy' = ∓√[...] · (ry·x₁'/rx)</code></pre>
       </div>
       <p>The ± sign is chosen based on the <code>large-arc-flag</code> and <code>sweep-flag</code>: they select which of the 4 possible ellipse centres (and therefore which arc) you want.</p>
     </li>
     <li><strong>Compute start and sweep angles</strong> (θ₁ and Δθ) using atan2:
       <div class="code-wrapper">
-        <pre><code>θ₁ = atan2( (y₁' - cy') / ry, (x₁' - cx') / rx )
+        <pre><code class="language-markup">θ₁ = atan2( (y₁' - cy') / ry, (x₁' - cx') / rx )
 θ₂ = atan2( (-y₁' - cy') / ry, (-x₁' - cx') / rx )
 Δθ = θ₂ - θ₁  (adjusted for sweep direction)</code></pre>
       </div>
     </li>
     <li><strong>Trace the ellipse</strong> parametrically from θ₁ to θ₁ + Δθ:
       <div class="code-wrapper">
-        <pre><code>x(θ) = cx + rx·cos(θ)·cos(φ) - ry·sin(θ)·sin(φ)
+        <pre><code class="language-markup">x(θ) = cx + rx·cos(θ)·cos(φ) - ry·sin(θ)·sin(φ)
 y(θ) = cy + rx·cos(θ)·sin(φ) + ry·sin(θ)·cos(φ)</code></pre>
       </div>
     </li>
@@ -695,7 +696,7 @@ y(θ) = cy + rx·cos(θ)·sin(φ) + ry·sin(θ)·cos(φ)</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg"&gt;
+    <pre><code class="language-markup">&lt;svg viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg"&gt;
   &lt;defs&gt;
     &lt;marker id="arrow" markerWidth="10" markerHeight="10"
             refX="9" refY="3" orient="auto" markerUnits="strokeWidth"&gt;
@@ -821,7 +822,7 @@ y(θ) = cy + rx·cos(θ)·sin(φ) + ry·sin(θ)·cos(φ)</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg width="500" height="200" viewBox="0 0 500 200"&gt;
+    <pre><code class="language-markup">&lt;svg width="500" height="200" viewBox="0 0 500 200"&gt;
   &lt;!-- 1. House with line commands --&gt;
   &lt;path d="M 30 150 L 30 80 L 80 80 L 80 150 Z
             M 30 80 L 55 50 L 80 80"
@@ -866,5 +867,6 @@ y(θ) = cy + rx·cos(θ)·sin(φ) + ry·sin(θ)·cos(φ)</code></pre>
   <script src="/scripts.js"></script>
  <script src="scripts.js"></script>
  <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
 </body>
 </html>

@@ -18,6 +18,7 @@
   <meta name="twitter:description" content="Master every CSS pseudo-class and attribute selector including structural positioning, form states, user interaction, and the :nth-child gotcha.">
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
   <style>
     .sel-list { list-style: none; padding: 0; border: 1px solid #e0e0e0; border-radius: 6px; overflow: hidden; }
     .sel-list li { padding: 0.5rem 1rem; font-size: 0.85rem; border-bottom: 1px solid #e0e0e0; color: #1a1a2e; }
@@ -139,7 +140,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- HTML --&gt;
+    <pre><code class="language-css">&lt;!-- HTML --&gt;
 &lt;div&gt;
   &lt;h3&gt;Heading&lt;/h3&gt;           &lt;!-- child #1 --&gt;
   &lt;p&gt;First paragraph&lt;/p&gt;     &lt;!-- child #2 --&gt;
@@ -177,7 +178,7 @@ p:nth-child(1) { background: red; }</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- Same HTML --&gt;
+    <pre><code class="language-css">&lt;!-- Same HTML --&gt;
 &lt;div&gt;
   &lt;h3&gt;Heading&lt;/h3&gt;
   &lt;p&gt;First paragraph&lt;/p&gt;
@@ -208,7 +209,7 @@ p:nth-of-type(2) { background: #d4f5e9; border-left: 3px solid #2a9d8f; }</code>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- HTML — all children are &lt;li&gt;, so :nth-child works intuitively here --&gt;
+    <pre><code class="language-css">&lt;!-- HTML — all children are &lt;li&gt;, so :nth-child works intuitively here --&gt;
 &lt;ul class="list"&gt;
   &lt;li&gt;Item 1&lt;/li&gt;
   &lt;li&gt;Item 2&lt;/li&gt;
@@ -231,7 +232,7 @@ li:nth-child(even) { background: white; }</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>:nth-child(odd)     /* = :nth-child(2n+1) — 1st, 3rd, 5th... */
+    <pre><code class="language-css">:nth-child(odd)     /* = :nth-child(2n+1) — 1st, 3rd, 5th... */
 :nth-child(even)    /* = :nth-child(2n)   — 2nd, 4th, 6th... */
 :nth-child(3)       /* exactly the 3rd child */
 :nth-child(3n)      /* every 3rd: 3, 6, 9, 12... */
@@ -251,7 +252,7 @@ li:nth-child(even) { background: white; }</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Select every 2nd .highlighted item (ignoring non-highlighted ones) */
+    <pre><code class="language-css">/* Select every 2nd .highlighted item (ignoring non-highlighted ones) */
 :nth-child(2n of .highlighted) { }
 
 /* First visible item (counting only items without .hidden) */
@@ -306,7 +307,7 @@ li:nth-child(even) { background: white; }</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- HTML --&gt;
+    <pre><code class="language-css">&lt;!-- HTML --&gt;
 &lt;input type="email" placeholder="Email (try typing valid/invalid)"&gt;
 &lt;input type="text" required placeholder="Required field (type something)"&gt;
 &lt;input type="text" placeholder="I have dashed border while empty (placeholder-shown)"&gt;
@@ -356,7 +357,7 @@ input:disabled { opacity: 0.5; background: #f0f0f0; }</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>:hover        /* mouse is over it */
+    <pre><code class="language-css">:hover        /* mouse is over it */
 :active       /* being clicked/pressed right now */
 :visited      /* link the user has visited before */
 :link         /* unvisited link */
@@ -381,7 +382,7 @@ input:disabled { opacity: 0.5; background: #f0f0f0; }</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- HTML --&gt;
+    <pre><code class="language-css">&lt;!-- HTML --&gt;
 &lt;a href="#section-a"&gt;Go to A&lt;/a&gt;
 &lt;a href="#section-b"&gt;Go to B&lt;/a&gt;
 
@@ -404,7 +405,7 @@ input:disabled { opacity: 0.5; background: #f0f0f0; }</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Has the attribute at all */
+    <pre><code class="language-css">/* Has the attribute at all */
 [data-tooltip] { cursor: help; }
 
 /* Attribute equals exact value */
@@ -437,7 +438,7 @@ input:disabled { opacity: 0.5; background: #f0f0f0; }</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Style external links differently (href starts with http, not your domain) */
+    <pre><code class="language-css">/* Style external links differently (href starts with http, not your domain) */
 a[href^="http"]:not([href*="yourdomain.com"]) {
   &amp;::after { content: " ↗"; }
 }
@@ -547,5 +548,6 @@ tr:not(:first-child):hover {
 
   <script src="/scripts.js"></script>
   <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
 </body>
 </html>

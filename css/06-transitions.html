@@ -18,6 +18,7 @@
   <meta name="twitter:description" content="Master CSS transitions - the four parts, timing functions, cubic-bezier curves, performance tiers, transition-behavior allow-discrete, and transitioning registered custom properties.">
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
   <style>
     /* Demo: basic transition */
     .basic-box {
@@ -245,7 +246,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>transition: &lt;property&gt; &lt;duration&gt; &lt;timing-function&gt; &lt;delay&gt;;
+    <pre><code class="language-css">transition: &lt;property&gt; &lt;duration&gt; &lt;timing-function&gt; &lt;delay&gt;;
 
 /* Example */
 transition: background 0.3s ease 0s;
@@ -275,7 +276,7 @@ transition:
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>.button {
+    <pre><code class="language-css">.button {
   background: blue;
   transition: background 0.6s ease;  /* governs the LEAVE (slow fade back) */
 }
@@ -297,7 +298,7 @@ transition:
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- HTML --&gt;
+    <pre><code class="language-css">&lt;!-- HTML --&gt;
 &lt;div class="basic-box"&gt;Hover me&lt;/div&gt;
 
 /* CSS */
@@ -333,7 +334,7 @@ transition:
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- HTML --&gt;
+    <pre><code class="language-css">&lt;!-- HTML --&gt;
 &lt;div class="timing-row"&gt;
   &lt;div class="timing-bar"&gt;ease&lt;/div&gt;
   &lt;div class="timing-bar"&gt;linear&lt;/div&gt;
@@ -369,7 +370,7 @@ transition:
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Bouncy overshoot */
+    <pre><code class="language-css">/* Bouncy overshoot */
 transition-timing-function: cubic-bezier(0.68, -0.55, 0.27, 1.55);
 
 /* The keywords as cubic-bezier: */
@@ -401,7 +402,7 @@ ease-in-out: cubic-bezier(0.42, 0, 0.58, 1.0)</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- HTML --&gt;
+    <pre><code class="language-css">&lt;!-- HTML --&gt;
 &lt;div class="delay-row"&gt;
   &lt;div class="delay-box"&gt;&lt;/div&gt;
   &lt;div class="delay-box"&gt;&lt;/div&gt;
@@ -440,7 +441,7 @@ ease-in-out: cubic-bezier(0.42, 0, 0.58, 1.0)</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- HTML --&gt;
+    <pre><code class="language-css">&lt;!-- HTML --&gt;
 &lt;div class="multi-box"&gt;Hover&lt;/div&gt;
 
 /* CSS */
@@ -469,7 +470,7 @@ ease-in-out: cubic-bezier(0.42, 0, 0.58, 1.0)</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Transitions every animatable property */
+    <pre><code class="language-css">/* Transitions every animatable property */
 transition: all 0.3s ease;</code></pre>
   </div>
 
@@ -502,7 +503,7 @@ transition: all 0.3s ease;</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>.box {
+    <pre><code class="language-css">.box {
   transition: opacity 0.4s ease, display 0.4s ease allow-discrete;
 }
 
@@ -525,7 +526,7 @@ transition: all 0.3s ease;</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>@property --gradient-angle {
+    <pre><code class="language-css">@property --gradient-angle {
   syntax: "&lt;angle&gt;";
   inherits: false;
   initial-value: 0deg;
@@ -683,5 +684,6 @@ transition: all 0.3s ease;</code></pre>
 
   <script src="/scripts.js"></script>
   <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
 </body>
 </html>

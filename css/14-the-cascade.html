@@ -18,6 +18,7 @@
   <meta name="twitter:description" content="Understand the complete CSS cascade resolution algorithm including origin, importance, layers, specificity, scope proximity, and source order.">
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
   <style>
     .step { background: var(--bg-surface, #f0f7ff); border: 1px solid var(--border); border-radius: 6px; padding: 1rem; margin-bottom: 0.75rem; }
     .step-number { font-weight: 700; color: var(--accent); margin-right: 0.5rem; }
@@ -146,7 +147,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Normal author styles  -  resolved by later steps (layers, specificity, order) */
+    <pre><code class="language-css">/* Normal author styles  -  resolved by later steps (layers, specificity, order) */
 .card { color: blue; }
 
 /* !important author styles  -  beat ALL normal author styles regardless of specificity */
@@ -173,7 +174,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- HTML --&gt;
+    <pre><code class="language-css">&lt;!-- HTML --&gt;
 &lt;div class="card" style="color: red;"&gt;I'm red&lt;/div&gt;
 
 /* This loses to the inline style: */
@@ -191,7 +192,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>/* Resolution order for normal styles: */
+    <pre><code class="language-css">/* Resolution order for normal styles: */
 Unlayered styles (no @layer)     ← WINS over all layers
 @layer utilities { }             ← wins over components
 @layer components { }            ← wins over base
@@ -212,7 +213,7 @@ Unlayered !important             ← lowest for !important</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>Specificity = ( A,          B,                        C                    )
+    <pre><code class="language-css">Specificity = ( A,          B,                        C                    )
                 ↑            ↑                         ↑
            count of     count of                  count of
            #id          .class                    element
@@ -226,7 +227,7 @@ Unlayered !important             ← lowest for !important</code></pre>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>h1                        → 0 IDs, 0 classes, 1 element     = (0, 0, 1)
+    <pre><code class="language-css">h1                        → 0 IDs, 0 classes, 1 element     = (0, 0, 1)
 .card                     → 0 IDs, 1 class,   0 elements    = (0, 1, 0)
 .card .title              → 0 IDs, 2 classes, 0 elements    = (0, 2, 0)
 #main .card               → 1 ID,  1 class,   0 elements    = (1, 1, 0)
@@ -263,7 +264,7 @@ div.card[data-v]          → 0 IDs, 2 (class+attr), 1 elem   = (0, 2, 1)
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- HTML --&gt;
+    <pre><code class="language-css">&lt;!-- HTML --&gt;
 &lt;div class="box"&gt;What colour am I?&lt;/div&gt;
 
 /* Same specificity (0,1,0)  -  source order decides */
@@ -292,7 +293,7 @@ div.card[data-v]          → 0 IDs, 2 (class+attr), 1 elem   = (0, 2, 1)
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>.child {
+    <pre><code class="language-css">.child {
   color: inherit;    /* force inheritance (even for non-inheriting properties) */
   border: initial;   /* reset to the property's default value */
   padding: unset;    /* = inherit for inheriting properties, initial for non-inheriting */
@@ -312,7 +313,7 @@ div.card[data-v]          → 0 IDs, 2 (class+attr), 1 elem   = (0, 2, 1)
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- HTML --&gt;
+    <pre><code class="language-css">&lt;!-- HTML --&gt;
 &lt;p id="intro" class="text highlight" style="color: pink;"&gt;What colour?&lt;/p&gt;
 
 /* Competing declarations for color on this element: */
@@ -503,5 +504,6 @@ div.card[data-v]          → 0 IDs, 2 (class+attr), 1 elem   = (0, 2, 1)
 
   <script src="/scripts.js"></script>
   <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
 </body>
 </html>

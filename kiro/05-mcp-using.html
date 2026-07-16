@@ -18,6 +18,7 @@
   <meta name="twitter:description" content="Using MCP servers in Kiro: configuration format, tools, prompts, resources, and elicitation.">
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -105,7 +106,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>{
+    <pre><code class="language-json">{
   "mcpServers": {
     "github": {
       "command": "npx",
@@ -139,7 +140,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>{
+    <pre><code class="language-json">{
   "mcpServers": {
     "aws-docs": {
       "command": "uvx",
@@ -160,7 +161,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>{
+    <pre><code class="language-json">{
   "mcpServers": {
     "my-remote-server": {
       "url": "https://mcp.internal.example.com/mcp",
@@ -227,7 +228,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>brew install uv</code></pre>
+    <pre><code class="language-bash">brew install uv</code></pre>
   </div>
 
   <p>Once installed, <code>uvx</code> handles downloading and running MCP server packages automatically.</p>
@@ -309,5 +310,8 @@
 
   <script src="/scripts.js"></script>
   <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
+  <script src="/vendor/prism-yaml.min.js"></script>
+  <script src="/vendor/prism-bash.min.js"></script>
 </body>
 </html>

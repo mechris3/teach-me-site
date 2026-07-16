@@ -18,6 +18,7 @@
   <meta name="twitter:description" content="SVG text positioning, text-anchor, dominant-baseline, tspan, textPath for text on curves, font loading, and foreignObject.">
   <link rel="stylesheet" href="/styles.css">
  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -90,7 +91,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg"&gt;
+    <pre><code class="language-markup">&lt;svg viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg"&gt;
   &lt;text x="10" y="50" font-size="24" fill="coral"&gt;
     Hello, SVG!
   &lt;/text&gt;
@@ -130,7 +131,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg viewBox="0 0 400 140" xmlns="http://www.w3.org/2000/svg"&gt;
+    <pre><code class="language-markup">&lt;svg viewBox="0 0 400 140" xmlns="http://www.w3.org/2000/svg"&gt;
   &lt;!-- Vertical guide at x=200 --&gt;
   &lt;line x1="200" y1="0" x2="200" y2="140"
         stroke="grey" stroke-dasharray="4 2"/&gt;
@@ -178,7 +179,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg"&gt;
+    <pre><code class="language-markup">&lt;svg viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg"&gt;
   &lt;line x1="0" y1="60" x2="400" y2="60"
         stroke="grey" stroke-dasharray="4 2"/&gt;
 
@@ -216,7 +217,7 @@
   <h3>Styling sub-portions</h3>
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg viewBox="0 0 400 80" xmlns="http://www.w3.org/2000/svg"&gt;
+    <pre><code class="language-markup">&lt;svg viewBox="0 0 400 80" xmlns="http://www.w3.org/2000/svg"&gt;
   &lt;text x="10" y="45" font-size="20" fill="var(--text)"&gt;
     This is &lt;tspan fill="#e06c75" font-weight="bold"&gt;bold and red&lt;/tspan&gt;
     and this is normal.
@@ -237,7 +238,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg"&gt;
+    <pre><code class="language-markup">&lt;svg viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg"&gt;
   &lt;text x="30" y="50" font-size="28" fill="coral"&gt;
     &lt;tspan dy="0 -8 -14 -8 0 8 14 8 0"&gt;WAVE TEXT&lt;/tspan&gt;
   &lt;/text&gt;
@@ -262,7 +263,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg"&gt;
+    <pre><code class="language-markup">&lt;svg viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg"&gt;
   &lt;text x="20" font-size="18" fill="coral"&gt;
     &lt;tspan x="20" y="30"&gt;First line of text&lt;/tspan&gt;
     &lt;tspan x="20" dy="1.4em"&gt;Second line of text&lt;/tspan&gt;
@@ -318,7 +319,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;!-- Option 1: Google Fonts via @import --&gt;
+    <pre><code class="language-markup">&lt;!-- Option 1: Google Fonts via @import --&gt;
 &lt;svg viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg"&gt;
   &lt;style&gt;
     @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&amp;display=swap');
@@ -374,7 +375,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg"&gt;
+    <pre><code class="language-markup">&lt;svg viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg"&gt;
   &lt;defs&gt;
     &lt;linearGradient id="text-grad" x1="0%" y1="0%" x2="100%" y2="0%"&gt;
       &lt;stop offset="0%" stop-color="#e06c75"/&gt;
@@ -416,7 +417,7 @@
   <h3>Basic usage</h3>
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"&gt;
+    <pre><code class="language-markup">&lt;svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"&gt;
   &lt;defs&gt;
     &lt;path id="curve" d="M 30,150 Q 200,20 370,150" fill="none"/&gt;
   &lt;/defs&gt;
@@ -467,7 +468,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"&gt;
+    <pre><code class="language-markup">&lt;svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"&gt;
   &lt;defs&gt;
     &lt;path id="oval" d="M 50,100 A 150,60 0 1 1 350,100 A 150,60 0 1 1 50,100"
           fill="none"/&gt;
@@ -502,7 +503,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg"&gt;
+    <pre><code class="language-markup">&lt;svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg"&gt;
   &lt;defs&gt;
     &lt;path id="circle-path"
           d="M 150,50 A 100,100 0 1 1 149.99,50" fill="none"/&gt;
@@ -548,7 +549,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg viewBox="0 0 400 160" xmlns="http://www.w3.org/2000/svg"&gt;
+    <pre><code class="language-markup">&lt;svg viewBox="0 0 400 160" xmlns="http://www.w3.org/2000/svg"&gt;
   &lt;!-- Natural length --&gt;
   &lt;text x="20" y="35" font-size="20" fill="coral"&gt;Stretched&lt;/text&gt;
 
@@ -582,7 +583,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg"&gt;
+    <pre><code class="language-markup">&lt;svg viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg"&gt;
   &lt;!-- Values are degrees (no unit suffix). Positive = clockwise. --&gt;
   &lt;text x="30" y="60" font-size="28" fill="coral"
         rotate="0 5 10 15 20 25 30 25 20 15 10 5 0"&gt;TUMBLING TEXT&lt;/text&gt;
@@ -607,7 +608,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"&gt;
+    <pre><code class="language-markup">&lt;svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"&gt;
   &lt;!-- Vertical text via rotation --&gt;
   &lt;text x="0" y="0" font-size="16" fill="coral"
         transform="translate(30, 180) rotate(-90)"&gt;
@@ -643,7 +644,7 @@
   <h3>Text as a clipping path</h3>
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg"&gt;
+    <pre><code class="language-markup">&lt;svg viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg"&gt;
   &lt;defs&gt;
     &lt;clipPath id="text-clip"&gt;
       &lt;text x="200" y="80" text-anchor="middle"
@@ -692,7 +693,7 @@
   <h3>Centred label inside a shape</h3>
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"&gt;
+    <pre><code class="language-markup">&lt;svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"&gt;
   &lt;circle cx="100" cy="100" r="80" fill="#282c34" stroke="#61afef"/&gt;
   &lt;text x="100" y="100"
         text-anchor="middle" dominant-baseline="middle"
@@ -712,7 +713,7 @@
   <h3>Animated typing effect with textLength</h3>
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg viewBox="0 0 400 80" xmlns="http://www.w3.org/2000/svg"&gt;
+    <pre><code class="language-markup">&lt;svg viewBox="0 0 400 80" xmlns="http://www.w3.org/2000/svg"&gt;
   &lt;text x="20" y="50" font-size="24" fill="coral"
         textLength="0" lengthAdjust="spacing"&gt;
     Hello, World!
@@ -736,7 +737,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"&gt;
+    <pre><code class="language-markup">&lt;svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"&gt;
   &lt;!-- SVG content --&gt;
   &lt;rect width="400" height="200" rx="10" fill="#282c34"/&gt;
 
@@ -786,7 +787,7 @@
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    <pre><code>&lt;svg viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg"&gt;
+    <pre><code class="language-markup">&lt;svg viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg"&gt;
   &lt;a href="https://developer.mozilla.org/en-US/docs/Web/SVG"&gt;
     &lt;rect x="20" y="15" width="160" height="50" rx="8"
           fill="#61afef"/&gt;
@@ -900,5 +901,6 @@
   <script src="/scripts.js"></script>
  <script src="scripts.js"></script>
  <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
 </body>
 </html>
