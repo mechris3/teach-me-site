@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>Async with rxMethod - Lesson 7 | Teach Me</title>
+  <meta name="description" content="Master rxMethod for reactive async side effects in NgRx SignalStore. Learn tapResponse, signal-driven pipelines, lifecycle management, and when to choose rxMethod over async/await.">
+  <link rel="canonical" href="https://teachmeskills.dev/angular-signals/07-async-with-rxmethod.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/angular-signals/07-async-with-rxmethod.html">
+  <meta property="og:title" content="Async with rxMethod - Lesson 7 | Teach Me">
+  <meta property="og:description" content="rxMethod for reactive async in SignalStore - signal-driven pipelines, tapResponse, lifecycle, and classic effects comparison.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Async with rxMethod - Lesson 7 | Teach Me">
+  <meta name="twitter:description" content="rxMethod for reactive async in SignalStore - signal-driven pipelines, tapResponse, lifecycle, and classic effects comparison.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header"><a href="index.html">Angular Signals Course</a></div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="0001-signals-the-reactive-primitive.html">1. Signals: The Reactive Primitive</a></li>
+        <li><a href="0002-effects-lifecycle-and-untracked.html">2. Effects, Lifecycle & Untracked</a></li>
+        <li><a href="0003-linked-signal-and-dependent-state.html">3. linkedSignal & Dependent State</a></li>
+        <li><a href="0004-rxjs-interop-the-bridge.html">4. RxJS Interop: The Bridge</a></li>
+        <li><a href="0005-signalstore-your-first-store.html">5. SignalStore: Your First Store</a></li>
+        <li><a href="0006-entity-management.html">6. Entity Management</a></li>
+        <li class="current"><a href="0007-async-with-rxmethod.html">7. Async with rxMethod</a></li>
+        <li class="coming-soon"><a href="0008-resource-and-httpresource.html">8. resource & httpResource</a></li>
+        <li class="coming-soon"><a href="0009-store-lifecycle-and-devtools.html">9. Store Lifecycle & DevTools</a></li>
+        <li class="coming-soon"><a href="0010-custom-store-features.html">10. Custom Store Features</a></li>
+        <li class="coming-soon"><a href="0011-events-and-reducers.html">11. Events & Reducers</a></li>
+        <li class="coming-soon"><a href="0012-store-architecture-and-testing.html">12. Store Architecture & Testing</a></li>
+        <li class="coming-soon"><a href="0013-signal-forms-the-new-model.html">13. Signal Forms: The New Model</a></li>
+        <li class="coming-soon"><a href="0014-validation-and-field-state.html">14. Validation & Field State</a></li>
+        <li class="coming-soon"><a href="0015-complex-forms-and-custom-controls.html">15. Complex Forms & Custom Controls</a></li>
+        <li class="coming-soon"><a href="0016-migrating-signalformcontrol-bridge.html">16. Migrating: SignalFormControl Bridge</a></li>
+        <li class="coming-soon"><a href="0017-signals-store-forms-together.html">17. Signals + Store + Forms</a></li>
+        <li class="coming-soon"><a href="0018-when-to-keep-rxjs.html">18. When to Keep RxJS</a></li>
+        <li class="coming-soon"><a href="0019-capstone-the-complete-dashboard.html">19. Capstone: The Complete Dashboard</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="signals-glossary.html">Signals Glossary</a></li>
+        <li class="coming-soon"><a href="signal-primitives.html">Signal Primitives</a></li>
+        <li class="coming-soon"><a href="signalstore-api.html">SignalStore API</a></li>
+        <li class="coming-soon"><a href="signal-forms-api.html">Signal Forms API</a></li>
+        <li class="coming-soon"><a href="decision-framework.html">Decision Framework</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 7</p>
+  <h1>Async with rxMethod</h1>
+
+  <h2>The Core Idea</h2>
+
+  <div class="key-concept">
+    <strong>Mental model:</strong> <code>rxMethod</code> is a long-lived RxJS pipeline that lives inside your store. You define it once with operators (debounce, switchMap, retry, etc.) and then <em>call</em> it with a signal, an observable, or a static value. When called with a signal, it automatically re-runs the pipeline whenever the signal changes - like a classic NgRx effect that reacts to state, but without actions or the actions/effects/reducer indirection.
+  </div>
+
+  <h2 id="why-not-async-await">Why Not Just async/await?</h2>
+
+  <p>In <a href="0005-signalstore-your-first-store.html">Lesson 5</a> and <a href="0006-entity-management.html">Lesson 6</a>, store methods used <code>async/await</code> with <code>firstValueFrom</code>. That works for fire-and-forget operations (load data, update state). But it falls short when you need:</p>
+
+  <ul>
+    <li><strong>Reactive re-execution</strong> - re-run the pipeline when a signal changes (e.g. search term, selected filter, route param)</li>
+    <li><strong>Cancellation semantics</strong> - cancel the previous HTTP request when a new value arrives (switchMap)</li>
+    <li><strong>Debouncing / throttling</strong> - wait for the user to stop typing before making a request</li>
+    <li><strong>Retry / error recovery</strong> - retry failed requests without killing the subscription</li>
+    <li><strong>Combining streams</strong> - wait for multiple async sources before proceeding</li>
+  </ul>
+
+  <p>These are all things RxJS excels at. <code>rxMethod</code> lets you use the full RxJS operator toolkit inside a store method, while keeping the signal-based API on the outside.</p>
+
+  <h2 id="installation">Installation</h2>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-bash">npm install @ngrx/signals @ngrx/operators</code></pre>
+  </div>
+
+  <p><code>rxMethod</code> ships in <code>@ngrx/signals/rxjs-interop</code>. The companion <code>tapResponse</code> operator lives in <code>@ngrx/operators</code> - a separate package you'll almost always want alongside it.</p>
+
+  <h2 id="anatomy">Anatomy of rxMethod</h2>
+
+  <p>An <code>rxMethod</code> has two parts: the <strong>definition</strong> (where you build the pipeline) and the <strong>invocation</strong> (where you feed it input).</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">import { rxMethod } from '@ngrx/signals/rxjs-interop';
+import { pipe, switchMap, tap } from 'rxjs';
+import { tapResponse } from '@ngrx/operators';
+
+// Definition: build the pipeline
+const loadPolicies = rxMethod&lt;string&gt;(
+  pipe(
+    tap(() =&gt; patchState(store, { isLoading: true })),
+    switchMap((searchTerm) =&gt;
+      policyService.search(searchTerm).pipe(
+        tapResponse({
+          next: (policies) =&gt; patchState(store, setAllEntities(policies), { isLoading: false }),
+          error: () =&gt; patchState(store, { isLoading: false, error: 'Search failed' }),
+        })
+      )
+    )
+  )
+);</code></pre>
+  </div>
+
+  <p>The generic type parameter (<code>&lt;string&gt;</code>) defines what the pipeline receives as input. The <code>pipe(...)</code> receives an <code>Observable&lt;string&gt;</code> as its source - every value you feed in arrives on that source observable.</p>
+
+  <h2 id="three-ways-to-call">Three Ways to Call rxMethod</h2>
+
+  <p>Once defined, an <code>rxMethod</code> accepts three kinds of input:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">// 1. Static value — emits once, immediately
+loadPolicies('home insurance');
+
+// 2. Signal (or computation function) — re-emits every time the signal changes
+const searchTerm = signal('');
+loadPolicies(searchTerm);
+// later: searchTerm.set('auto') → pipeline re-runs with 'auto'
+
+// 3. Observable — each emission feeds the pipeline
+const search$ = fromEvent(input, 'input').pipe(map(e =&gt; e.target.value));
+loadPolicies(search$);</code></pre>
+  </div>
+
+  <p>This is the key design insight: <strong>the pipeline is defined once, but the input source is pluggable</strong>. The same <code>rxMethod</code> can be driven by a signal (reactive), an observable (imperative/event-driven), or a one-shot value (manual trigger).</p>
+
+  <div class="key-concept">
+    <strong>Signal tracking:</strong> When you pass a signal to <code>rxMethod</code>, it creates an internal <code>effect()</code> that watches the signal. Every time the signal changes, the new value is pushed into the pipeline's source observable. This means your <code>switchMap</code> / <code>debounceTime</code> / etc. all work exactly as you'd expect - including cancelling in-flight requests on re-emission.
+  </div>
+
+  <h2 id="tapresponse">tapResponse: Safe Error Handling</h2>
+
+  <p><code>tapResponse</code> is a purpose-built RxJS operator from <code>@ngrx/operators</code> that does two things:</p>
+
+  <ol>
+    <li>Routes success and error to separate callbacks (like <code>tap</code> + <code>catchError</code>)</li>
+    <li>Catches the error <strong>without killing the outer subscription</strong></li>
+  </ol>
+
+  <p>That second point is critical. In a long-lived pipeline, if an inner observable errors and you don't catch it, the entire <code>rxMethod</code> subscription dies — no more values will ever flow through. <code>tapResponse</code> prevents that by catching inside the inner observable.</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">import { tapResponse } from '@ngrx/operators';
+
+// Full signature
+tapResponse({
+  next: (value) =&gt; { /* handle success */ },
+  error: (error) =&gt; { /* handle error - pipeline stays alive */ },
+  complete?: () =&gt; { /* optional: inner observable completed */ },
+  finalize?: () =&gt; { /* optional: runs after success OR error */ },
+});</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <strong>Why not just <code>catchError</code>?</strong> You <em>can</em> use <code>catchError</code> inside the inner observable, but you must remember to return <code>EMPTY</code> (or another observable) to keep the outer alive. <code>tapResponse</code> encapsulates that pattern so you can't accidentally forget. It also provides a <code>finalize</code> callback that runs in both success and error paths - useful for clearing loading flags.
+  </div>
+
+  <h2 id="in-a-store">rxMethod Inside a SignalStore</h2>
+
+  <p>The typical pattern: define <code>rxMethod</code> inside <code>withMethods</code>, then connect it to a signal in <code>withHooks</code>:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">import { computed, inject } from '@angular/core';
+import { signalStore, withState, withComputed, withMethods, withHooks, patchState } from '@ngrx/signals';
+import { withEntities, setAllEntities } from '@ngrx/signals/entities';
+import { rxMethod } from '@ngrx/signals/rxjs-interop';
+import { tapResponse } from '@ngrx/operators';
+import { debounceTime, distinctUntilChanged, pipe, switchMap, tap } from 'rxjs';
+
+export interface Policy {
+  id: string;
+  holder: string;
+  premium: number;
+  status: 'active' | 'expired' | 'pending';
+}
+
+export const PolicySearchStore = signalStore(
+  { providedIn: 'root' },
+  withState({ query: '', isLoading: false, error: null as string | null }),
+  withEntities&lt;Policy&gt;(),
+  withComputed(({ entities }) =&gt; ({
+    resultCount: computed(() =&gt; entities().length),
+  })),
+  withMethods((store, policyService = inject(PolicyService)) =&gt; ({
+
+    setQuery(query: string): void {
+      patchState(store, { query });
+    },
+
+    // rxMethod: reactive search pipeline
+    searchPolicies: rxMethod&lt;string&gt;(
+      pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        tap(() =&gt; patchState(store, { isLoading: true, error: null })),
+        switchMap((query) =&gt;
+          policyService.search(query).pipe(
+            tapResponse({
+              next: (policies) =&gt; patchState(store, setAllEntities(policies)),
+              error: (e: Error) =&gt; patchState(store, { error: e.message }),
+              finalize: () =&gt; patchState(store, { isLoading: false }),
+            })
+          )
+        )
+      )
+    ),
+  })),
+  withHooks({
+    onInit(store) {
+      // Connect the query signal to the search pipeline
+      // Every time store.query() changes → pipeline re-runs (debounced)
+      store.searchPolicies(store.query);
+    },
+  })
+);</code></pre>
+  </div>
+
+  <p>What's happening here:</p>
+  <ol>
+    <li><code>setQuery</code> updates the <code>query</code> state via <code>patchState</code></li>
+    <li><code>searchPolicies</code> is defined as an <code>rxMethod&lt;string&gt;</code> with debounce + switchMap</li>
+    <li>In <code>onInit</code>, we pass <code>store.query</code> (a signal) to <code>searchPolicies</code> - this creates a reactive binding</li>
+    <li>Every time <code>query</code> changes, the pipeline fires: debounces 300ms, skips duplicates, cancels in-flight requests, makes the API call</li>
+  </ol>
+
+  <div class="key-concept">
+    <strong>Note:</strong> We pass <code>store.query</code> (the signal reference), not <code>store.query()</code> (the current value). Passing the signal creates a live connection. Passing the value would be a one-shot static call.
+  </div>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <h2 id="lifecycle">Lifecycle and Cleanup</h2>
+
+  <p><code>rxMethod</code> ties its subscription lifetime to the injector that created it. When the store is destroyed (component unmounts for component-scoped stores, or app shuts down for root stores), the subscription is automatically unsubscribed. No manual cleanup needed.</p>
+
+  <p>When you pass a signal or observable as input, additional subscriptions are created for that specific invocation. These are also tied to the caller's injection context:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">// In a component - subscription lives as long as the component
+@Component({ ... })
+export class PolicyListComponent {
+  private store = inject(PolicySearchStore);
+  private searchInput = signal('');
+
+  constructor() {
+    // This watcher is tied to the component's DestroyRef
+    // Component destroyed → watcher cleaned up → no more emissions
+    this.store.searchPolicies(this.searchInput);
+  }
+}</code></pre>
+  </div>
+
+  <p>If you need to call an <code>rxMethod</code> with a signal outside an injection context (e.g. in a callback), pass an injector explicitly:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">private injector = inject(Injector);
+
+someCallback(): void {
+  this.store.searchPolicies(this.searchInput, { injector: this.injector });
+}</code></pre>
+  </div>
+
+  <h2 id="manual-destroy">Manual Cleanup with destroy()</h2>
+
+  <p>Every <code>rxMethod</code> invocation returns a <code>RxMethodRef</code> with a <code>destroy()</code> method. Use it when you need fine-grained control over when to stop listening:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">const ref = store.searchPolicies(searchTerm$);
+
+// Later: stop this particular subscription
+ref.destroy();
+
+// The rxMethod itself is still alive — you can call it again
+store.searchPolicies(anotherSignal);</code></pre>
+  </div>
+
+  <p>You can also call <code>destroy()</code> on the <code>rxMethod</code> function itself to kill the entire pipeline (all invocations):</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">store.searchPolicies.destroy(); // Kills the pipeline entirely</code></pre>
+  </div>
+
+  <h2 id="void-rxmethod">rxMethod&lt;void&gt; for Trigger-Only Pipelines</h2>
+
+  <p>Not every pipeline needs input data. Use <code>rxMethod&lt;void&gt;</code> for effects that just need to be triggered:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">withMethods((store, policyService = inject(PolicyService)) =&gt; ({
+  loadAll: rxMethod&lt;void&gt;(
+    pipe(
+      tap(() =&gt; patchState(store, { isLoading: true })),
+      exhaustMap(() =&gt;
+        policyService.getAll().pipe(
+          tapResponse({
+            next: (policies) =&gt; patchState(store, setAllEntities(policies)),
+            error: (e: Error) =&gt; patchState(store, { error: e.message }),
+            finalize: () =&gt; patchState(store, { isLoading: false }),
+          })
+        )
+      )
+    )
+  ),
+})),
+withHooks({
+  onInit(store) {
+    store.loadAll(); // Fire once - no input needed
+  },
+})</code></pre>
+  </div>
+
+  <p>Note the use of <code>exhaustMap</code> here instead of <code>switchMap</code>: if the user triggers a reload while one is in flight, <code>exhaustMap</code> ignores the new trigger until the current request completes. Choose your flattening operator based on the use case:</p>
+
+  <ul>
+    <li><strong><code>switchMap</code></strong> - cancel previous, use latest (search, autocomplete)</li>
+    <li><strong><code>exhaustMap</code></strong> - ignore new until current finishes (form submit, initial load)</li>
+    <li><strong><code>concatMap</code></strong> - queue and execute in order (ordered writes)</li>
+    <li><strong><code>mergeMap</code></strong> - run all in parallel (independent fire-and-forget)</li>
+  </ul>
+
+  <h2 id="multiple-inputs">Reacting to Multiple Signals</h2>
+
+  <p>What if your pipeline depends on multiple signals? You have two approaches:</p>
+
+  <h3>Option 1: Computed signal as input</h3>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">withState({ status: 'all' as string, page: 1 }),
+withMethods((store, policyService = inject(PolicyService)) =&gt; ({
+  loadFiltered: rxMethod&lt;{ status: string; page: number }&gt;(
+    pipe(
+      distinctUntilChanged((a, b) =&gt; a.status === b.status &amp;&amp; a.page === b.page),
+      switchMap(({ status, page }) =&gt;
+        policyService.getFiltered(status, page).pipe(
+          tapResponse({
+            next: (policies) =&gt; patchState(store, setAllEntities(policies)),
+            error: (e: Error) =&gt; patchState(store, { error: e.message }),
+          })
+        )
+      )
+    )
+  ),
+})),
+withHooks({
+  onInit(store) {
+    // Pass a computation function - re-evaluates when either signal changes
+    store.loadFiltered(() =&gt; ({ status: store.status(), page: store.page() }));
+  },
+})</code></pre>
+  </div>
+
+  <p>The computation function (<code>() =&gt; ({ ... })</code>) is tracked by an internal <code>effect()</code>. Whenever <code>store.status()</code> or <code>store.page()</code> changes, the function re-evaluates and the new object is pushed into the pipeline.</p>
+
+  <h3>Option 2: Separate rxMethods per concern</h3>
+
+  <p>Sometimes it's cleaner to have independent pipelines that each watch one signal, rather than combining everything into one mega-pipeline. This is a design judgment - there's no single right answer.</p>
+
+  <h2 id="rxmethod-outside-store">rxMethod Outside a Store</h2>
+
+  <p><code>rxMethod</code> isn't exclusive to SignalStore. You can use it directly in components or services - anywhere you have an injection context:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">import { Component, inject, signal } from '@angular/core';
+import { rxMethod } from '@ngrx/signals/rxjs-interop';
+import { tapResponse } from '@ngrx/operators';
+import { debounceTime, distinctUntilChanged, pipe, switchMap } from 'rxjs';
+
+@Component({
+  selector: 'app-search',
+  template: `&lt;input (input)="query.set($event.target.value)"&gt;`,
+})
+export class SearchComponent {
+  private searchService = inject(SearchService);
+  query = signal('');
+  results = signal&lt;Result[]&gt;([]);
+
+  private search = rxMethod&lt;string&gt;(
+    pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap((q) =&gt;
+        this.searchService.search(q).pipe(
+          tapResponse({
+            next: (r) =&gt; this.results.set(r),
+            error: console.error,
+          })
+        )
+      )
+    )
+  );
+
+  constructor() {
+    this.search(this.query); // reactive binding
+  }
+}</code></pre>
+  </div>
+
+  <p>This is essentially a lightweight alternative to a full store when all you need is one reactive pipeline in a component.</p>
+
+  <h2 id="classic-comparison">Classic NgRx Comparison</h2>
+
+  <p class="comparison-label">Classic NgRx (Effects)</p>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">// actions.ts
+export const searchPolicies = createAction('[Policy] Search', props&lt;{ query: string }&gt;());
+export const searchPoliciesSuccess = createAction('[Policy] Search Success', props&lt;{ policies: Policy[] }&gt;());
+export const searchPoliciesFailure = createAction('[Policy] Search Failure', props&lt;{ error: string }&gt;());
+
+// effects.ts
+searchPolicies$ = createEffect(() =&gt;
+  this.actions$.pipe(
+    ofType(searchPolicies),
+    debounceTime(300),
+    distinctUntilChanged((a, b) =&gt; a.query === b.query),
+    switchMap(({ query }) =&gt;
+      this.policyService.search(query).pipe(
+        map((policies) =&gt; searchPoliciesSuccess({ policies })),
+        catchError((error) =&gt; of(searchPoliciesFailure({ error: error.message })))
+      )
+    )
+  )
+);
+
+// reducer.ts
+on(searchPolicies, (state) =&gt; ({ ...state, isLoading: true })),
+on(searchPoliciesSuccess, (state, { policies }) =&gt; ({ ...state, policies, isLoading: false })),
+on(searchPoliciesFailure, (state, { error }) =&gt; ({ ...state, error, isLoading: false })),</code></pre>
+  </div>
+
+  <p class="comparison-label">SignalStore (rxMethod)</p>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">// Everything in one file - no actions, no reducer cases, no effects class
+searchPolicies: rxMethod&lt;string&gt;(
+  pipe(
+    debounceTime(300),
+    distinctUntilChanged(),
+    tap(() =&gt; patchState(store, { isLoading: true, error: null })),
+    switchMap((query) =&gt;
+      policyService.search(query).pipe(
+        tapResponse({
+          next: (policies) =&gt; patchState(store, setAllEntities(policies)),
+          error: (e: Error) =&gt; patchState(store, { error: e.message }),
+          finalize: () =&gt; patchState(store, { isLoading: false }),
+        })
+      )
+    )
+  )
+)</code></pre>
+  </div>
+
+  <p>Same operators, same RxJS pipeline logic. The difference: no action dispatch indirection. The pipeline is co-located with the state it updates. Input comes directly from a signal rather than being serialised through the action stream.</p>
+
+  <h2 id="when-rxmethod">When to Use rxMethod vs async/await</h2>
+
+  <table>
+    <thead>
+      <tr><th>Scenario</th><th>Use</th><th>Why</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>One-shot load on init</td><td><code>async/await</code></td><td>No reactive input, no cancellation needed</td></tr>
+      <tr><td>Search with debounce</td><td><code>rxMethod</code></td><td>Needs debounceTime + switchMap</td></tr>
+      <tr><td>Re-fetch when filter signal changes</td><td><code>rxMethod</code></td><td>Reactive re-execution on signal change</td></tr>
+      <tr><td>Form submit (fire once)</td><td><code>async/await</code></td><td>Imperative, no stream semantics needed</td></tr>
+      <tr><td>Polling / WebSocket</td><td><code>rxMethod</code></td><td>Long-lived subscription with cleanup</td></tr>
+      <tr><td>Optimistic update + rollback</td><td><code>rxMethod</code></td><td>Needs error recovery without killing the pipeline</td></tr>
+      <tr><td>Sequential API calls (await result of first)</td><td><code>async/await</code></td><td>Clearer with imperative flow</td></tr>
+    </tbody>
+  </table>
+
+  <p>The rule of thumb: if the method is called once and you just need the result, <code>async/await</code> is simpler. If the method reacts to changing input, needs cancellation semantics, or is a long-lived subscription, reach for <code>rxMethod</code>.</p>
+
+  <h2 id="full-example">Full Example: Policy Dashboard with Reactive Search</h2>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">import { computed, inject } from '@angular/core';
+import { signalStore, withState, withComputed, withMethods, withHooks, patchState } from '@ngrx/signals';
+import { withEntities, setAllEntities, removeEntity } from '@ngrx/signals/entities';
+import { rxMethod } from '@ngrx/signals/rxjs-interop';
+import { tapResponse } from '@ngrx/operators';
+import { debounceTime, distinctUntilChanged, exhaustMap, pipe, switchMap, tap } from 'rxjs';
+
+export const PolicyDashboardStore = signalStore(
+  { providedIn: 'root' },
+  withEntities&lt;Policy&gt;(),
+  withState({
+    query: '',
+    statusFilter: 'all' as 'all' | 'active' | 'expired',
+    isLoading: false,
+    error: null as string | null,
+  }),
+  withComputed(({ entities, statusFilter }) =&gt; ({
+    filteredPolicies: computed(() =&gt; {
+      const status = statusFilter();
+      return status === 'all' ? entities() : entities().filter(p =&gt; p.status === status);
+    }),
+  })),
+  withMethods((store, policyService = inject(PolicyService)) =&gt; ({
+    setQuery(query: string): void {
+      patchState(store, { query });
+    },
+    setStatusFilter(status: 'all' | 'active' | 'expired'): void {
+      patchState(store, { statusFilter: status });
+    },
+
+    // Reactive search: re-runs when query or statusFilter changes
+    loadPolicies: rxMethod&lt;{ query: string; status: string }&gt;(
+      pipe(
+        debounceTime(300),
+        distinctUntilChanged((a, b) =&gt; a.query === b.query &amp;&amp; a.status === b.status),
+        tap(() =&gt; patchState(store, { isLoading: true, error: null })),
+        switchMap(({ query, status }) =&gt;
+          policyService.search(query, status).pipe(
+            tapResponse({
+              next: (policies) =&gt; patchState(store, setAllEntities(policies)),
+              error: (e: Error) =&gt; patchState(store, { error: e.message }),
+              finalize: () =&gt; patchState(store, { isLoading: false }),
+            })
+          )
+        )
+      )
+    ),
+
+    // Fire-and-forget delete (no reactive input)
+    deletePolicy: rxMethod&lt;string&gt;(
+      pipe(
+        exhaustMap((id) =&gt;
+          policyService.delete(id).pipe(
+            tapResponse({
+              next: () =&gt; patchState(store, removeEntity(id)),
+              error: (e: Error) =&gt; patchState(store, { error: e.message }),
+            })
+          )
+        )
+      )
+    ),
+  })),
+  withHooks({
+    onInit(store) {
+      // Reactive binding: re-search whenever query or status changes
+      store.loadPolicies(() =&gt; ({
+        query: store.query(),
+        status: store.statusFilter(),
+      }));
+    },
+  })
+);</code></pre>
+  </div>
+
+  <p>This store combines both patterns: <code>loadPolicies</code> is a reactive pipeline driven by signals, while <code>deletePolicy</code> is called imperatively with a static ID. Both use <code>tapResponse</code> for safe error handling.</p>
+
+  <h2>Quiz</h2>
+
+  <div class="quiz" role="group">
+    <h3>What does <code>rxMethod</code> accept as its definition argument?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">An async function that returns a Promise</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">A function that receives an Observable and returns an Observable (i.e. an RxJS pipe)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">A callback that runs on every signal change</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="quiz" role="group">
+    <h3>What happens when you pass a signal to an <code>rxMethod</code> invocation?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The signal's current value is read once and the pipeline runs once</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The signal is converted to an observable using toObservable()</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">An internal effect() watches the signal and pushes each new value into the pipeline's source observable</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="quiz" role="group">
+    <h3>Why use <code>tapResponse</code> instead of plain <code>catchError</code> in an rxMethod pipeline?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">tapResponse is faster because it skips error serialisation</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">tapResponse catches the error without killing the outer subscription, keeping the long-lived pipeline alive</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">catchError doesn't work inside switchMap</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <h2>Try It Yourself</h2>
+
+  <div class="exercise">
+    <h3>Exercise 1: Polling Store</h3>
+    <p>Build a store that polls an API every 10 seconds for updated policy data. Use <code>rxMethod&lt;void&gt;</code> with <code>interval</code> or <code>timer</code>. Include a way to stop polling:</p>
+    <div class="code-wrapper">
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre><code class="language-typescript">// TODO: PollingStore with rxMethod that polls every 10s
+// Hint: timer(0, 10_000) gives you an immediate emit + 10s interval</code></pre>
+    </div>
+    <!-- reveal -->
+      <button class="reveal-toggle" aria-expanded="false">Reveal solution</button>
+      <div class="reveal-content"><div class="reveal-inner">
+      <div class="code-wrapper">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre><code class="language-typescript">import { inject } from '@angular/core';
+import { signalStore, withMethods, withHooks, patchState, withState } from '@ngrx/signals';
+import { withEntities, setAllEntities } from '@ngrx/signals/entities';
+import { rxMethod } from '@ngrx/signals/rxjs-interop';
+import { tapResponse } from '@ngrx/operators';
+import { pipe, switchMap, timer } from 'rxjs';
+
+export const PollingStore = signalStore(
+  withEntities&lt;Policy&gt;(),
+  withState({ lastUpdated: null as string | null }),
+  withMethods((store, policyService = inject(PolicyService)) =&gt; ({
+    startPolling: rxMethod&lt;void&gt;(
+      pipe(
+        switchMap(() =&gt;
+          timer(0, 10_000).pipe(
+            switchMap(() =&gt;
+              policyService.getAll().pipe(
+                tapResponse({
+                  next: (policies) =&gt; patchState(store,
+                    setAllEntities(policies),
+                    { lastUpdated: new Date().toISOString() }
+                  ),
+                  error: console.error,
+                })
+              )
+            )
+          )
+        )
+      )
+    ),
+  })),
+  withHooks({
+    onInit(store) {
+      store.startPolling();
+    },
+    // Cleanup is automatic — when the store's injector is destroyed,
+    // the rxMethod subscription (including the timer) is unsubscribed.
+  })
+);</code></pre>
+      </div>
+      <p><code>timer(0, 10_000)</code> emits immediately then every 10 seconds. The outer <code>switchMap</code> means calling <code>startPolling()</code> again would restart the timer. Unsubscription is automatic via DestroyRef.</p>
+      </div></div>
+    <!-- /reveal -->
+  </div>
+
+  <div class="exercise">
+    <h3>Exercise 2: Autocomplete with Minimum Length</h3>
+    <p>Create an <code>rxMethod&lt;string&gt;</code> that only fires the API call when the input is at least 3 characters. Debounce 400ms, cancel previous on new input:</p>
+    <div class="code-wrapper">
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre><code class="language-typescript">// TODO: autocomplete rxMethod - minimum 3 chars, debounce 400ms, switchMap</code></pre>
+    </div>
+    <!-- reveal -->
+      <button class="reveal-toggle" aria-expanded="false">Reveal solution</button>
+      <div class="reveal-content"><div class="reveal-inner">
+      <div class="code-wrapper">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre><code class="language-typescript">autocomplete: rxMethod&lt;string&gt;(
+  pipe(
+    debounceTime(400),
+    distinctUntilChanged(),
+    filter((query) =&gt; query.length &gt;= 3),
+    tap(() =&gt; patchState(store, { isSearching: true })),
+    switchMap((query) =&gt;
+      suggestService.getSuggestions(query).pipe(
+        tapResponse({
+          next: (suggestions) =&gt; patchState(store, { suggestions }),
+          error: () =&gt; patchState(store, { suggestions: [] }),
+          finalize: () =&gt; patchState(store, { isSearching: false }),
+        })
+      )
+    )
+  )
+)</code></pre>
+      </div>
+      <p>The <code>filter</code> operator gates the pipeline - values shorter than 3 characters never reach <code>switchMap</code>. Note: if the user clears the input to 2 chars, no request fires. You might also want to clear suggestions in that case via a separate <code>tap</code> before the <code>filter</code>.</p>
+      </div></div>
+    <!-- /reveal -->
+  </div>
+
+  <div class="exercise">
+    <h3>Exercise 3: Optimistic Delete with Rollback</h3>
+    <p>Implement a delete that immediately removes the entity from the store (optimistic), makes the API call, and rolls back if the API fails:</p>
+    <div class="code-wrapper">
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre><code class="language-typescript">// TODO: optimisticDelete rxMethod&lt;Policy&gt; - remove immediately, rollback on error</code></pre>
+    </div>
+    <!-- reveal -->
+      <button class="reveal-toggle" aria-expanded="false">Reveal solution</button>
+      <div class="reveal-content"><div class="reveal-inner">
+      <div class="code-wrapper">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre><code class="language-typescript">optimisticDelete: rxMethod&lt;Policy&gt;(
+  pipe(
+    concatMap((policy) =&gt; {
+      // Optimistic: remove immediately
+      patchState(store, removeEntity(policy.id));
+
+      return policyService.delete(policy.id).pipe(
+        tapResponse({
+          next: () =&gt; { /* already removed - nothing to do */ },
+          error: () =&gt; {
+            // Rollback: re-add the entity
+            patchState(store, addEntity(policy));
+            patchState(store, { error: 'Delete failed — restored policy' });
+          },
+        })
+      );
+    })
+  )
+)</code></pre>
+      </div>
+      <p><code>concatMap</code> ensures deletes are processed one at a time (no race conditions on rollback). The entity is saved in the closure so we can re-add it on failure.</p>
+      </div></div>
+    <!-- /reveal -->
+  </div>
+
+  <h2>Your Tangible Win</h2>
+
+  <p>You now have two async patterns in your toolkit: <code>async/await</code> for simple fire-and-forget operations, and <code>rxMethod</code> for reactive pipelines that need the full power of RxJS operators. Combined with <code>tapResponse</code> for safe error handling, this replaces classic NgRx Effects with far less ceremony - same operators, no action/effect/reducer indirection.</p>
+
+  <div class="recommended">
+    <strong>Primary sources:</strong>
+    <a href="https://ngrx.io/guide/signals/rxjs-integration">NgRx RxJS Integration Guide</a> - canonical documentation for rxMethod.
+    <a href="https://ngrx.io/guide/operators">NgRx Operators</a> - tapResponse and mapResponse documentation.
+  </div>
+
+  <div class="ask-kiro">
+    Something unclear? Ask me follow-up questions - I'm your teacher and can clarify anything, adjust examples, or go deeper on any concept.
+  </div>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <div class="footer-nav">
+    <a href="0006-entity-management.html">&larr; Prev: Entity Management</a>
+    <a href="0008-resource-and-httpresource.html">Next: resource &amp; httpResource &rarr;</a>
+  </div>
+
+    </main>
+  </div>
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
+  <script src="/vendor/prism-typescript.min.js"></script>
+  <script src="/vendor/prism-bash.min.js"></script>
+</body>
+</html>

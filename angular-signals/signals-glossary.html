@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>Signals Glossary | Teach Me</title>
+  <meta name="description" content="Canonical terminology for Angular Signals, NgRx SignalStore, and Signal Forms. Definitions of signal, computed, effect, store, and more.">
+  <link rel="canonical" href="https://teachmeskills.dev/angular-signals/reference/signals-glossary.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/angular-signals/reference/signals-glossary.html">
+  <meta property="og:title" content="Signals Glossary | Teach Me">
+  <meta property="og:description" content="Canonical terminology for Angular Signals, NgRx SignalStore, and Signal Forms.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="../lessons/styles.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header"><a href="../lessons/index.html">Angular Signals Course</a></div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li class="current"><a href="signals-glossary.html">Signals Glossary</a></li>
+        <li class="coming-soon"><a href="signal-primitives.html">Signal Primitives</a></li>
+        <li class="coming-soon"><a href="signalstore-api.html">SignalStore API</a></li>
+        <li class="coming-soon"><a href="signal-forms-api.html">Signal Forms API</a></li>
+        <li class="coming-soon"><a href="decision-framework.html">Decision Framework</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="../lessons/index.html" class="back-link">&larr; Back to Index</a>
+
+  <h1>Signals Glossary</h1>
+
+  <p>Canonical terminology for this course. All lessons and reference documents use these definitions. Updated as new concepts are introduced.</p>
+
+  <h2>Angular Signals (Core)</h2>
+
+  <p><strong>Signal</strong>:<br>
+  A reactive value wrapper that notifies consumers when it changes. Read by calling it as a function. Always has a current value. Always synchronous.<br>
+  <em>Avoid</em>: observable, stream, subject</p>
+
+  <p><strong>Writable signal</strong>:<br>
+  A signal created with <code>signal()</code> that can be mutated via <code>.set()</code> or <code>.update()</code>. Type: <code>WritableSignal&lt;T&gt;</code>.<br>
+  <em>Avoid</em>: mutable signal</p>
+
+  <p><strong>Computed signal</strong>:<br>
+  A read-only signal whose value is derived from other signals via a computation function. Created with <code>computed()</code>. Lazily evaluated and memoized.<br>
+  <em>Avoid</em>: derived signal (technically accurate but less specific)</p>
+
+  <p><strong>Reactive context</strong>:<br>
+  A runtime state where Angular tracks signal reads to establish dependencies. Exists inside <code>computed()</code>, <code>effect()</code>, <code>linkedSignal()</code>, <code>resource()</code> params/loader, and template rendering.<br>
+  <em>Avoid</em>: subscription context, tracking scope</p>
+
+  <p><strong>Consumer</strong>:<br>
+  Code that reads a signal within a reactive context. The consumer is re-evaluated when its dependencies change.<br>
+  <em>Avoid</em>: subscriber, listener</p>
+
+  <p><strong>Producer</strong>:<br>
+  A signal being read by a consumer. The thing that produces the value.<br>
+  <em>Avoid</em>: source (too generic)</p>
+
+  <p><strong>Effect</strong>:<br>
+  A side-effect function that runs whenever its signal dependencies change. Created with <code>effect()</code>. Not for derivation - for non-reactive API interactions (logging, localStorage, DOM manipulation).<br>
+  <em>Avoid</em>: watcher, subscription</p>
+
+  <p><strong>linkedSignal</strong>:<br>
+  A writable signal whose value is initialised and reset by a reactive computation, but can also be manually overridden with <code>.set()</code>/<code>.update()</code>. A writable computed, essentially.<br>
+  <em>Avoid</em>: writable computed (not an official name)</p>
+
+  <p><strong>Resource</strong>:<br>
+  A reactive wrapper for async data. Exposes the loading state and resolved value as signals. Created with <code>resource()</code> or <code>httpResource()</code>.<br>
+  <em>Avoid</em>: async signal</p>
+
+  <p><strong>Equality function</strong>:<br>
+  A function passed to <code>signal()</code> or <code>computed()</code> via <code>{ equal: fn }</code> that determines whether a new value is considered different from the old. Default: <code>Object.is()</code>.<br>
+  <em>Avoid</em>: comparator</p>
+
+  <p><strong>untracked</strong>:<br>
+  A utility that reads a signal without registering a dependency. Used inside reactive contexts when you want to access a value without creating a reactive link.<br>
+  <em>Avoid</em>: peek (used in some other frameworks but not Angular)</p>
+
+  <h2>NgRx SignalStore</h2>
+
+  <p><strong>SignalStore</strong>:<br>
+  A composable, signal-based state management container created with <code>signalStore()</code>. Replaces the classic NgRx Store for new code. Injectable as a service.<br>
+  <em>Avoid</em>: store (too generic - qualify as SignalStore or classic store)</p>
+
+  <p><strong>signalState</strong>:<br>
+  A lightweight alternative to SignalStore for simple state slices. Created with <code>signalState()</code>. No store composition - just state + signals.<br>
+  <em>Avoid</em>: mini-store</p>
+
+  <p><strong>patchState</strong>:<br>
+  The primary function for updating SignalStore state. Accepts partial state objects or updater functions. Immutable update semantics.<br>
+  <em>Avoid</em>: setState (that's a different concept in other frameworks)</p>
+
+  <p><strong>Store feature</strong>:<br>
+  A composable unit of store functionality added via <code>with*</code> functions (withState, withComputed, withMethods, withEntities, etc.). Features compose left-to-right in <code>signalStore()</code>.<br>
+  <em>Avoid</em>: plugin, middleware</p>
+
+  <p><strong>rxMethod</strong>:<br>
+  A reactive method that accepts a signal, observable, or static value and processes it through RxJS operators. The bridge between SignalStore and async/stream-based logic.<br>
+  <em>Avoid</em>: effect (that's Angular's effect()), side-effect handler</p>
+
+  <p><strong>Entity collection</strong>:<br>
+  A normalised collection of entities managed by <code>withEntities()</code>. Provides ids, entities, and entityMap signals plus updater functions.<br>
+  <em>Avoid</em>: entity state (the old @ngrx/entity term - still valid but context-specific)</p>
+
+  <h2>Signal Forms</h2>
+
+  <p><strong>Signal Form</strong>:<br>
+  A form created with <code>form()</code> that manages state via Angular signals. The model is a plain signal; the form provides a FieldTree for binding and validation.<br>
+  <em>Avoid</em>: reactive form (that's the old FormGroup/FormControl system)</p>
+
+  <p><strong>FieldTree</strong>:<br>
+  The object returned by <code>form()</code>. Mirrors the shape of the model. Each node is callable to get state signals (value, valid, touched, dirty, errors, etc.).<br>
+  <em>Avoid</em>: form group (that's the reactive forms concept)</p>
+
+  <p><strong>formField</strong>:<br>
+  The directive (<code>[formField]</code>) that binds an HTML input to a FieldTree node. Creates two-way binding between the DOM and the signal model.<br>
+  <em>Avoid</em>: formControlName, formControl (reactive forms directives)</p>
+
+  <p><strong>Schema function</strong>:<br>
+  The second argument to <code>form()</code> that configures validation rules for fields. Receives a schema path object for addressing fields.<br>
+  <em>Avoid</em>: validator config</p>
+
+  <div class="footer-nav">
+    <a href="../lessons/index.html">Index</a>
+    <a href="signal-primitives.html">Next: Signal Primitives Reference &rarr;</a>
+  </div>
+
+    </main>
+  </div>
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

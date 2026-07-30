@@ -10,9 +10,24 @@
 
 ## Courses
 
+- [Angular Signals, NgRx SignalStore & Signal Forms](https://teachmeskills.dev/angular-signals/): A 19-lesson course (7 available, more releasing regularly) on Angular Signals, NgRx SignalStore, and Signal Forms for experienced Angular developers.
 - [Kiro Mastery](https://teachmeskills.dev/kiro/): A 16-lesson course covering Kiro configuration, extension, and advanced features from steering to team setup.
 - [CSS Mastery](https://teachmeskills.dev/css/): A 24-lesson advanced course covering modern CSS from custom properties to scroll-driven animations.
 - [SVG - From Coordinates to Animation](https://teachmeskills.dev/svg/): A 13-lesson course covering SVG from first principles through to complex animation.
+
+## Angular Signals Lessons (7 of 19 available)
+
+- [Signals: The Reactive Primitive](https://teachmeskills.dev/angular-signals/0001-signals-the-reactive-primitive.html): signal(), computed(), set, update, asReadonly, pull-based reactivity
+- [Effects, Lifecycle & Untracked](https://teachmeskills.dev/angular-signals/0002-effects-lifecycle-and-untracked.html): effect(), onCleanup, untracked(), afterRenderEffect, injection context
+- [linkedSignal & Dependent State](https://teachmeskills.dev/angular-signals/0003-linked-signal-and-dependent-state.html): writable computed, source/computation, reset patterns
+- [RxJS Interop: The Bridge](https://teachmeskills.dev/angular-signals/0004-rxjs-interop-the-bridge.html): toSignal, toObservable, takeUntilDestroyed, bridging patterns
+- [SignalStore: Your First Store](https://teachmeskills.dev/angular-signals/0005-signalstore-your-first-store.html): withState, withComputed, withMethods, patchState
+- [Entity Management](https://teachmeskills.dev/angular-signals/0006-entity-management.html): withEntities, entity adapter patterns, collection state
+- [Async with rxMethod](https://teachmeskills.dev/angular-signals/0007-async-with-rxmethod.html): rxMethod, async pipelines, loading/error state
+
+## Angular Signals Reference
+
+- [Signals Glossary](https://teachmeskills.dev/angular-signals/signals-glossary.html): terminology and concepts reference
 
 ## Kiro Mastery Lessons
 

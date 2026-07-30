@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>SignalStore: Your First Store - Lesson 5 | Teach Me</title>
+  <meta name="description" content="Learn NgRx SignalStore - a functional, signal-native state management library. Master signalStore, withState, withComputed, withMethods, patchState, and store provisioning.">
+  <link rel="canonical" href="https://teachmeskills.dev/angular-signals/05-signalstore-your-first-store.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/angular-signals/05-signalstore-your-first-store.html">
+  <meta property="og:title" content="SignalStore: Your First Store - Lesson 5 | Teach Me">
+  <meta property="og:description" content="NgRx SignalStore - functional, composable, signal-native state management for Angular.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="SignalStore: Your First Store - Lesson 5 | Teach Me">
+  <meta name="twitter:description" content="NgRx SignalStore - functional, composable, signal-native state management for Angular.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header"><a href="index.html">Angular Signals Course</a></div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="0001-signals-the-reactive-primitive.html">1. Signals: The Reactive Primitive</a></li>
+        <li><a href="0002-effects-lifecycle-and-untracked.html">2. Effects, Lifecycle & Untracked</a></li>
+        <li><a href="0003-linked-signal-and-dependent-state.html">3. linkedSignal & Dependent State</a></li>
+        <li><a href="0004-rxjs-interop-the-bridge.html">4. RxJS Interop: The Bridge</a></li>
+        <li class="current"><a href="0005-signalstore-your-first-store.html">5. SignalStore: Your First Store</a></li>
+        <li><a href="0006-entity-management.html">6. Entity Management</a></li>
+        <li><a href="0007-async-with-rxmethod.html">7. Async with rxMethod</a></li>
+        <li class="coming-soon"><a href="0008-resource-and-httpresource.html">8. resource & httpResource</a></li>
+        <li class="coming-soon"><a href="0009-store-lifecycle-and-devtools.html">9. Store Lifecycle & DevTools</a></li>
+        <li class="coming-soon"><a href="0010-custom-store-features.html">10. Custom Store Features</a></li>
+        <li class="coming-soon"><a href="0011-events-and-reducers.html">11. Events & Reducers</a></li>
+        <li class="coming-soon"><a href="0012-store-architecture-and-testing.html">12. Store Architecture & Testing</a></li>
+        <li class="coming-soon"><a href="0013-signal-forms-the-new-model.html">13. Signal Forms: The New Model</a></li>
+        <li class="coming-soon"><a href="0014-validation-and-field-state.html">14. Validation & Field State</a></li>
+        <li class="coming-soon"><a href="0015-complex-forms-and-custom-controls.html">15. Complex Forms & Custom Controls</a></li>
+        <li class="coming-soon"><a href="0016-migrating-signalformcontrol-bridge.html">16. Migrating: SignalFormControl Bridge</a></li>
+        <li class="coming-soon"><a href="0017-signals-store-forms-together.html">17. Signals + Store + Forms</a></li>
+        <li class="coming-soon"><a href="0018-when-to-keep-rxjs.html">18. When to Keep RxJS</a></li>
+        <li class="coming-soon"><a href="0019-capstone-the-complete-dashboard.html">19. Capstone: The Complete Dashboard</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="signals-glossary.html">Signals Glossary</a></li>
+        <li class="coming-soon"><a href="signal-primitives.html">Signal Primitives</a></li>
+        <li class="coming-soon"><a href="signalstore-api.html">SignalStore API</a></li>
+        <li class="coming-soon"><a href="signal-forms-api.html">Signal Forms API</a></li>
+        <li class="coming-soon"><a href="decision-framework.html">Decision Framework</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 5</p>
+  <h1>SignalStore: Your First Store</h1>
+
+  <h2>The Core Idea</h2>
+
+  <div class="key-concept">
+    <strong>Mental model:</strong> NgRx SignalStore is a functional, composable state container built on Angular signals. You construct a store by composing features - <code>withState</code>, <code>withComputed</code>, <code>withMethods</code> - like building blocks. Each feature can see everything that came before it. The result is an injectable class with signals for state and methods for updates. No actions, no reducers, no selectors - just functions composing functions.
+  </div>
+
+  <p>If you've used classic NgRx, you know the ceremony: define actions, write reducers, create selectors, wire effects, register in a module. SignalStore replaces all of that with a single <code>signalStore()</code> function call. It's not a different version of the same thing - it's a fundamentally different architecture that happens to solve the same problem.</p>
+
+  <h2 id="installation">Installation</h2>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-bash">npm install @ngrx/signals</code></pre>
+  </div>
+
+  <p>That's it. No <code>StoreModule.forRoot()</code>, no <code>EffectsModule</code>, no app-level wiring. SignalStore is standalone - each store is an independent injectable.</p>
+
+  <h2 id="first-store">Your First Store</h2>
+
+  <p>Let's build a store for the Policy Dashboard's filter state - tracking which filters the user has applied to the policy list:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">import { computed } from '@angular/core';
+import {
+  signalStore,
+  withState,
+  withComputed,
+  withMethods,
+  patchState,
+} from '@ngrx/signals';
+
+export type PolicyStatus = 'all' | 'active' | 'expired' | 'pending';
+export type SortBy = 'premium' | 'holder' | 'expiry';
+export type SortOrder = 'asc' | 'desc';
+
+export interface PolicyFilterState {
+  query: string;
+  status: PolicyStatus;
+  sortBy: SortBy;
+  sortOrder: SortOrder;
+}
+
+const initialState: PolicyFilterState = {
+  query: '',
+  status: 'all',
+  sortBy: 'holder',
+  sortOrder: 'asc',
+};
+
+export const PolicyFilterStore = signalStore(
+  withState(initialState),
+  withComputed(({ query, status }) => ({
+    hasActiveFilters: computed(() => query() !== '' || status() !== 'all'),
+  })),
+  withMethods((store) => ({
+    updateQuery(query: string): void {
+      patchState(store, { query });
+    },
+    updateStatus(status: PolicyStatus): void {
+      patchState(store, { status });
+    },
+    updateSort(sortBy: SortBy): void {
+      patchState(store, (state) => ({
+        sortBy,
+        sortOrder: (state.sortBy === sortBy && state.sortOrder === 'asc' ? 'desc' : 'asc') as SortOrder,
+      }));
+    },
+    resetFilters(): void {
+      patchState(store, initialState);
+    },
+  }))
+);</code></pre>
+  </div>
+
+  <p>That's a complete store. This is a plain TypeScript file - no decorator, no module, no component. <code>signalStore()</code> returns an injectable class that Angular's DI system can provide and inject like any service. You'd save this as:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-bash"># File: src/app/policies/policy-filter.store.ts
+# Convention: feature-name.store.ts, alongside the components that use it</code></pre>
+  </div>
+
+  <p>And consume it in a component by injecting it:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">import { PolicyFilterStore } from './policy-filter.store';
+
+@Component({
+  providers: [PolicyFilterStore],  // provide here, or use providedIn: 'root' in the store
+  template: `...`
+})
+export class PolicySearchPage {
+  readonly store = inject(PolicyFilterStore);  // inject like any service
+}</code></pre>
+  </div>
+
+  <p>There's no registration step beyond this. No <code>StoreModule.forRoot()</code>, no <code>forFeature()</code>. The store is just an injectable - Angular's standard DI handles the rest. We'll cover provisioning strategies (root vs component-level) in detail <a href="#provisioning">below</a>.</p>
+
+  <h3 id="sharing-state">Sharing State Between Components</h3>
+
+  <p>An immediate question: if multiple components inject this store, do they all see the same state? Yes - they share the same instance. When one component updates the store, the others react automatically because they're reading the same signal references. No event bus, no manual subscription, no shared service pattern.</p>
+
+  <p>How they share depends on how the store is provisioned:</p>
+  <ul>
+    <li><strong><code>providedIn: 'root'</code></strong> (passed as the first argument to <code>signalStore()</code>) - global singleton. Every component in the app that injects it gets the same instance. No <code>providers</code> array needed anywhere.</li>
+    <li><strong>Component <code>providers</code> array</strong> - the providing component and all its children share one instance. Other parts of the app get nothing (unless they also provide it, which creates a separate instance).</li>
+  </ul>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">// Global singleton - first argument to signalStore()
+export const AuthStore = signalStore(
+  { providedIn: 'root' },  // <-- this is how, no decorator needed
+  withState({ user: null as User | null })
+);
+
+// Any component, anywhere - just inject:
+readonly auth = inject(AuthStore);
+
+// vs. component-scoped - no providedIn, must be in providers:
+export const FilterStore = signalStore(
+  withState({ query: '' })
+);</code></pre>
+  </div>
+
+  <p>Here's the component-level approach - a parent provides the store, its two children share it:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">// A parent provides the store - its children share the instance
+@Component({
+  selector: 'app-policy-page',
+  providers: [PolicyFilterStore],
+  template: `
+    &lt;app-filter-bar /&gt;
+    &lt;app-policy-results /&gt;
+  `
+})
+export class PolicyPage {}
+
+// Child 1: updates the store
+@Component({
+  selector: 'app-filter-bar',
+  template: `
+    &lt;input
+      [value]="store.query()"
+      (input)="store.updateQuery($event.target.value)"
+    /&gt;
+  `
+})
+export class FilterBarComponent {
+  readonly store = inject(PolicyFilterStore);  // same instance as sibling
+}
+
+// Child 2: reads from the same store - updates automatically
+@Component({
+  selector: 'app-policy-results',
+  template: `
+    &lt;p&gt;Showing results for: "{{ store.query() }}"&lt;/p&gt;
+    @if (store.hasActiveFilters()) {
+      &lt;p&gt;Filters active&lt;/p&gt;
+    }
+  `
+})
+export class PolicyResultsComponent {
+  readonly store = inject(PolicyFilterStore);  // same instance as sibling
+}</code></pre>
+  </div>
+
+  <p><code>FilterBarComponent</code> calls <code>store.updateQuery()</code>. <code>PolicyResultsComponent</code>'s template reads <code>store.query()</code> - it re-renders instantly because it's the same signal. No wiring needed. This is Angular DI doing what it already does - the store is just an injectable service whose properties happen to be signals.</p>
+
+  <p>All examples in this lesson are standalone components (the default since Angular 19 - no <code>standalone: true</code> needed). The DI mechanics are identical to module-based components: <code>providers</code> on a standalone component creates an injector at that level, and children inherit it. SignalStore doesn't care whether your components use modules or standalone.</p>
+
+  <h3 id="shared-vs-separate">Shared Instance vs Separate Instances</h3>
+
+  <p>Contrast these two scenarios:</p>
+
+  <p class="comparison-label">Shared: siblings share the parent's store</p>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">// Parent provides once - children share ONE instance
+@Component({
+  providers: [PolicyFilterStore],
+  template: `
+    &lt;app-filter-bar /&gt;
+    &lt;app-policy-results /&gt;
+  `
+})
+export class PolicyPage {}
+
+// Both children inject the SAME store instance
+// FilterBar updates query -> PolicyResults sees the change instantly</code></pre>
+  </div>
+
+  <p class="comparison-label">Separate: each component provides its own instance</p>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">// Each component provides its OWN instance - they don't share state
+@Component({
+  providers: [PolicyFilterStore],
+  template: `&lt;input (input)="store.updateQuery($event.target.value)" /&gt;`
+})
+export class SearchWidgetA {
+  readonly store = inject(PolicyFilterStore);  // instance A
+}
+
+@Component({
+  providers: [PolicyFilterStore],
+  template: `&lt;input (input)="store.updateQuery($event.target.value)" /&gt;`
+})
+export class SearchWidgetB {
+  readonly store = inject(PolicyFilterStore);  // instance B - completely independent
+}
+
+// Updating store in SearchWidgetA has NO effect on SearchWidgetB.
+// They're separate instances with separate state.</code></pre>
+  </div>
+
+  <p>The rule: whoever lists the store in their <code>providers</code> array creates a new instance. Components that <em>don't</em> provide it themselves walk up the injector tree until they find an ancestor that did. That's how siblings share - neither provides it, so both find the parent's instance.</p>
+
+  <p>"Child" here means the component tree (the rendering hierarchy in templates), not the file system. <code>FilterBarComponent</code> is a child of <code>PolicyPage</code> because it's rendered via <code>&lt;app-filter-bar /&gt;</code> in the parent's template. It could live in a completely different file, folder, or feature area - what matters is where it appears in the rendered component tree. That tree determines DI resolution.</p>
+
+  <p>Now let's break down each piece.</p>
+
+  <h2 id="with-state">withState: Defining State</h2>
+
+  <p><code>withState</code> defines the store's state shape and initial values. It creates a deeply nested signal for each property - you read state by calling the property as a function:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">const store = inject(PolicyFilterStore);
+
+store.query();     // '' (Signal&lt;string&gt;)
+store.status();    // 'all' (Signal&lt;'all' | 'active' | 'expired' | 'pending'&gt;)
+store.sortBy();    // 'holder'
+store.sortOrder(); // 'asc'</code></pre>
+  </div>
+
+  <p>Each state property becomes a signal on the store instance. You read them with <code>()</code> in templates and component logic - exactly like any other signal.</p>
+
+  <p>For nested objects, SignalStore creates <strong>deep signals</strong> - each nested property gets its own signal:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">// Nested state
+const store = signalStore(
+  withState({
+    filter: { query: '', order: 'asc' as const },
+    pagination: { page: 1, pageSize: 25 },
+  })
+);
+
+// The parent is a signal (returns the whole object)
+store.filter();        // { query: '', order: 'asc' }
+
+// Its properties are also signals (return individual values)
+store.filter.query();  // ''
+store.filter.order();  // 'asc'
+store.pagination.page(); // 1</code></pre>
+  </div>
+
+  <p><code>store.filter</code> is both a signal you can invoke (to get the whole object) and a container with signal properties on it. This means Angular tracks dependencies at the leaf level - if you only read <code>store.filter.query()</code> in a template and <code>order</code> changes, your template doesn't re-render. Only the specific signals you read matter for change detection.</p>
+
+  <div class="warning">
+    <strong>This is not a general Angular signals feature.</strong> A plain <code>signal({ query: '', order: 'asc' })</code> does not create nested signals on its properties - you'd get the whole object back and any change re-notifies. Deep signals are specific to SignalStore's <code>withState</code> and <code>signalState</code>, which create this nested structure for you automatically.
+  </div>
+
+  <div class="key-concept">
+    <strong>State must be serialisable:</strong> The state type must be a plain object (record/object literal). No classes, no functions, no observables. Think: if <code>JSON.parse(JSON.stringify(state))</code> would lose information, don't put it in state. This is the same constraint as classic NgRx - state is data, not behaviour.
+  </div>
+
+  <div class="warning">
+    <strong>Watch out for error objects:</strong> This isn't enforced at runtime - <code>patchState</code> will happily accept whatever TypeScript allows. The classic footgun: storing a raw <code>HttpErrorResponse</code> (which has methods, circular references, and non-serialisable properties) when your state type says <code>error: unknown</code>. It goes in without complaint, then breaks DevTools or <code>getState()</code> later. Always extract the serialisable parts (message, status code) before storing errors.
+  </div>
+
+  <h3 id="state-factory">State Factory</h3>
+
+  <p>If your initial state depends on injected values, pass a factory function instead of an object:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">import { InjectionToken } from '@angular/core';
+
+const DEFAULT_PAGE_SIZE = new InjectionToken&lt;number&gt;('DefaultPageSize', {
+  factory: () => 25,
+});
+
+export const PaginationStore = signalStore(
+  withState(() => ({
+    page: 1,
+    pageSize: inject(DEFAULT_PAGE_SIZE),
+  }))
+);</code></pre>
+  </div>
+
+  <p>This is a relatively uncommon pattern - most stores just hardcode their initial values. You'd reach for it when configuration needs to vary between environments, be overridden in tests, or differ between components (e.g., different parts of the app need different page sizes via the DI hierarchy). For a constant that never changes, a plain <code>const</code> is simpler and better - no token needed.</p>
+
+  <div class="key-concept">
+    <strong>What's an InjectionToken?</strong> Angular's DI needs a key to look things up. For classes, the class itself is the key - <code>inject(PolicyService)</code> works because <code>PolicyService</code> is a unique class reference. But when you want to inject a plain value (a number, string, or config object), there's no class to use as a key. <code>InjectionToken</code> creates that key.
+
+    <p style="margin-top: 0.75rem;">Breaking down <code>new InjectionToken&lt;number&gt;('DefaultPageSize', { factory: () => 25 })</code>:</p>
+    <ul>
+      <li><strong><code>&lt;number&gt;</code></strong> - the type of value this token represents. When you <code>inject(DEFAULT_PAGE_SIZE)</code>, TypeScript knows the result is a <code>number</code>.</li>
+      <li><strong><code>'DefaultPageSize'</code></strong> - a description string for debugging (shows up in error messages). Not used for lookup - two tokens with the same string are still different tokens.</li>
+      <li><strong><code>{ factory: () => 25 }</code></strong> - optional second argument. If provided, Angular uses this factory to create the value when no explicit provider is configured. It also implicitly registers the token at root level (like <code>providedIn: 'root'</code> for services). Without this, you'd need to add <code>{ provide: DEFAULT_PAGE_SIZE, useValue: 25 }</code> to a <code>providers</code> array somewhere.</li>
+    </ul>
+    <p style="margin-top: 0.75rem;">If you've never needed one: that's normal. You only need <code>InjectionToken</code> when injecting something that isn't a class - configuration values, feature flags, or abstract interfaces you want to swap in tests.</p>
+  </div>
+
+  <h2 id="patch-state">patchState: Updating State</h2>
+
+  <p>State is updated exclusively through <code>patchState</code>. It works like spreading a partial object over the current state - you only specify what changed:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">import { patchState } from '@ngrx/signals';
+
+// Partial object - merge these properties into current state
+patchState(store, { query: 'flood' });
+
+// Updater function - receives current state, returns partial update
+patchState(store, (state) => ({
+  sortOrder: state.sortOrder === 'asc' ? 'desc' : 'asc',
+}));
+
+// Multiple updates in one call
+patchState(store, { query: '' }, { status: 'all' });</code></pre>
+  </div>
+
+  <p>Key characteristics:</p>
+  <ul>
+    <li><strong>Immutable:</strong> patchState creates a new state reference internally. The signals update and downstream computeds re-evaluate. You never mutate state directly.</li>
+    <li><strong>Type-safe:</strong> You can only patch properties that exist in the state type. TypeScript catches invalid keys at compile time.</li>
+    <li><strong>Batched:</strong> Multiple <code>patchState</code> calls within a single synchronous execution batch signal updates - no intermediate renders.</li>
+  </ul>
+
+  <div class="warning">
+    <strong>Never mutate state directly:</strong> <code>store.query.set('flood')</code> won't work - state signals are read-only from outside the store. All writes go through <code>patchState</code> inside <code>withMethods</code>. This is intentional: it keeps state changes traceable and centralised.
+  </div>
+
+  <h3 id="fixed-shape">Fixed State Shape</h3>
+
+  <p>The state shape is locked in at definition time by <code>withState(initialState)</code>. You cannot add new properties later - <code>patchState</code> only accepts keys that already exist in the state type:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">// State shape defined once
+withState({
+  filter: { query: '', order: 'asc' as const },
+  policies: [] as Policy[],
+})
+
+// Later:
+patchState(store, { policies: newPolicies });  // works - existing key
+patchState(store, { newProp: 'foo' });         // TypeScript error - key doesn't exist
+
+// Nested properties are fixed too:
+patchState(store, {
+  filter: { query: 'flood', order: 'desc' }    // works
+});
+patchState(store, {
+  filter: { query: 'flood', order: 'desc', limit: 10 }  // TypeScript error - limit doesn't exist
+});</code></pre>
+  </div>
+
+  <p>This applies at every depth - the entire tree is typed from the initial state. If you need a property, define it upfront (even if it starts as <code>null</code>, <code>[]</code>, or another empty value). Same constraint as classic NgRx reducers.</p>
+
+  <h3 id="custom-updaters">Reusable State Updaters</h3>
+
+  <p>For updates you use in multiple places, extract them as named functions:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">import { PartialStateUpdater } from '@ngrx/signals';
+
+// Reusable updater - can be used in any store with these properties
+function setLoading(): PartialStateUpdater&lt;{ isLoading: boolean }&gt; {
+  return () => ({ isLoading: true });
+}
+
+function setLoaded(): PartialStateUpdater&lt;{ isLoading: boolean }&gt; {
+  return () => ({ isLoading: false });
+}
+
+// Usage inside withMethods
+withMethods((store) => ({
+  async loadPolicies(): Promise&lt;void&gt; {
+    patchState(store, setLoading());
+    const policies = await this.policyService.getAll();
+    patchState(store, { policies }, setLoaded());
+  },
+}))</code></pre>
+  </div>
+
+  <h2 id="with-computed">withComputed: Derived State</h2>
+
+  <p><code>withComputed</code> adds derived signals to your store - the equivalent of NgRx selectors, but using Angular's <code>computed()</code>. The factory function receives the store (everything defined before it), and you return an object of computed signals:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">import { computed } from '@angular/core';
+
+export const PolicyListStore = signalStore(
+  withState({
+    policies: [] as Policy[],
+    filter: { query: '', status: 'all' as PolicyStatus },
+  }),
+  withComputed(({ policies, filter }) => ({
+    filteredPolicies: computed(() => {
+      const q = filter.query().toLowerCase();
+      const status = filter.status();
+
+      return policies().filter(p =>
+        (status === 'all' || p.status === status) &&
+        (q === '' || p.holder.toLowerCase().includes(q))
+      );
+    }),
+    totalCount: computed(() => policies().length),
+    activeCount: computed(() =>
+      policies().filter(p => p.status === 'active').length
+    ),
+  }))
+);</code></pre>
+  </div>
+
+  <p>Computed signals are lazy and cached - they only re-evaluate when their dependencies change. If <code>filter.query()</code> changes but <code>policies()</code> doesn't, only <code>filteredPolicies</code> re-evaluates (since it reads both). <code>totalCount</code> and <code>activeCount</code> stay cached.</p>
+
+  <div class="key-concept">
+    <strong>Classic NgRx comparison:</strong> In classic NgRx, you'd write selectors with <code>createSelector()</code> and memoisation. SignalStore's <code>withComputed</code> achieves the same thing - derived, memoised, composable state slices - but using Angular's native <code>computed()</code> instead of a custom memoisation library.
+  </div>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <h2 id="with-methods">withMethods: Actions and Logic</h2>
+
+  <p><code>withMethods</code> defines the public API of your store - the functions that components call to trigger state changes. The factory receives the store instance (state signals + computed signals + any previously defined methods) and can also inject services:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">export const PolicyListStore = signalStore(
+  withState({ policies: [] as Policy[], isLoading: false }),
+  withComputed(/* ... */),
+  withMethods((store, policyService = inject(PolicyService)) => ({
+    async loadPolicies(): Promise&lt;void&gt; {
+      patchState(store, { isLoading: true });
+      const policies = await policyService.getAll();
+      patchState(store, { policies, isLoading: false });
+    },
+    removePolicy(id: string): void {
+      patchState(store, (state) => ({
+        policies: state.policies.filter(p => p.id !== id),
+      }));
+    },
+    updatePolicy(updated: Policy): void {
+      patchState(store, (state) => ({
+        policies: state.policies.map(p =>
+          p.id === updated.id ? updated : p
+        ),
+      }));
+    },
+  }))
+);</code></pre>
+  </div>
+
+  <p>Key points:</p>
+  <ul>
+    <li><strong>Dependency injection:</strong> Services are injected as default parameters in the factory function. No constructor, no <code>@Inject</code> - just <code>inject()</code> in the parameter list.</li>
+    <li><strong>Async methods:</strong> Methods can be async. Call <code>patchState</code> before and after the async operation to manage loading state.</li>
+    <li><strong>Composition order matters:</strong> <code>withMethods</code> can access everything defined above it. If you need a method to call another method, define them in separate <code>withMethods</code> blocks (the second can see the first).</li>
+  </ul>
+
+  <h3 id="di-in-methods">Dependency Injection in Detail</h3>
+
+  <p>The DI pattern can be easy to miss - it looks like a regular default parameter, but it's Angular's <code>inject()</code> running inside the factory:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">withMethods((
+  store,
+  policyService = inject(PolicyService),
+  notificationService = inject(NotificationService),
+  router = inject(Router)
+) => ({
+  async loadPolicies(): Promise&lt;void&gt; {
+    patchState(store, { isLoading: true });
+    const policies = await policyService.getAll();
+    patchState(store, { policies, isLoading: false });
+  },
+  async deletePolicy(id: string): Promise&lt;void&gt; {
+    await policyService.delete(id);
+    patchState(store, (state) => ({
+      policies: state.policies.filter(p => p.id !== id),
+    }));
+    notificationService.show('Policy deleted');
+  },
+  navigateToPolicy(id: string): void {
+    router.navigate(['/policies', id]);
+  },
+}))</code></pre>
+  </div>
+
+  <p>This works because <code>signalStore()</code> creates the store inside an injection context (same as a constructor). The factory function's default parameters are evaluated at that moment, so <code>inject()</code> has access to the DI system. You can inject as many services as you need - they're just additional parameters after <code>store</code>.</p>
+
+  <h3 id="async-methods">Async Methods</h3>
+
+  <p>Methods can be <code>async</code>. The pattern: set loading state before the <code>await</code>, update state after it resolves. The store's signals update reactively at each <code>patchState</code> call, so the template shows a spinner during the gap:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">// In the store:
+withMethods((store, policyService = inject(PolicyService)) => ({
+  async loadPolicies(): Promise&lt;void&gt; {
+    patchState(store, { isLoading: true });          // template shows spinner
+    const policies = await policyService.getAll();   // HTTP call
+    patchState(store, { policies, isLoading: false });// template shows data
+  },
+}))
+
+// In the component - just call it:
+@Component({
+  providers: [PolicyListStore],
+  template: `
+    @if (store.isLoading()) {
+      &lt;app-spinner /&gt;
+    } @else {
+      @for (policy of store.policies(); track policy.id) {
+        &lt;app-policy-card [policy]="policy" /&gt;
+      }
+    }
+  `
+})
+export class PolicyListPage {
+  readonly store = inject(PolicyListStore);
+
+  constructor() {
+    this.store.loadPolicies();  // fire and forget - no subscribe needed
+  }
+}</code></pre>
+  </div>
+
+  <p>No observable, no <code>subscribe()</code>, no <code>async</code> pipe. The method is fire-and-forget from the component's perspective - the store manages its own loading state internally.</p>
+
+  <h3 id="async-with-observables">Working with Observable-Returning Services</h3>
+
+  <p>Most Angular services return observables (because <code>HttpClient</code> does). To use them inside an async method, convert with <code>firstValueFrom</code>:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">import { firstValueFrom } from 'rxjs';
+import { retry, timeout } from 'rxjs';
+
+withMethods((store, policyService = inject(PolicyService)) => ({
+  async loadPolicies(): Promise&lt;void&gt; {
+    patchState(store, { isLoading: true });
+
+    // policyService.getAll() returns Observable&lt;Policy[]&gt;
+    // firstValueFrom converts it to a Promise for await
+    const policies = await firstValueFrom(
+      policyService.getAll().pipe(
+        retry({ count: 2, delay: 1000 }),
+        timeout(5000)
+      )
+    );
+
+    patchState(store, { policies, isLoading: false });
+  },
+}))</code></pre>
+  </div>
+
+  <p><code>firstValueFrom</code> takes the first emission from the observable and returns it as a Promise. For single-emission observables like HTTP calls, this is a lossless conversion. You can still pipe RxJS operators before it - <code>retry</code>, <code>timeout</code>, <code>map</code>, <code>catchError</code> all work as normal.</p>
+
+  <p>The limitation: operators that depend on <strong>multiple emissions over time</strong> (<code>debounceTime</code>, <code>switchMap</code>, <code>distinctUntilChanged</code>) need a long-lived subscription. <code>firstValueFrom</code> takes one value and unsubscribes. For those patterns, you'd use <code>rxMethod</code> instead (covered in <a href="0007-async-with-rxmethod.html">Lesson 7</a>).</p>
+
+  <h3 id="multiple-with-methods">Layering withMethods</h3>
+
+  <p>You can use <code>withMethods</code> multiple times. Each layer can see the methods defined in previous layers:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">export const PolicyStore = signalStore(
+  withState({ policies: [] as Policy[], isLoading: false }),
+  // First layer: low-level state operations
+  withMethods((store) => ({
+    setPolicies(policies: Policy[]): void {
+      patchState(store, { policies, isLoading: false });
+    },
+    setLoading(): void {
+      patchState(store, { isLoading: true });
+    },
+  })),
+  // Second layer: higher-level operations that use the first layer
+  withMethods((store, policyService = inject(PolicyService)) => ({
+    async loadPolicies(): Promise&lt;void&gt; {
+      store.setLoading();
+      const policies = await policyService.getAll();
+      store.setPolicies(policies);
+    },
+  }))
+);</code></pre>
+  </div>
+
+  <h2 id="provisioning">Provisioning: Where Does the Store Live?</h2>
+
+  <p>SignalStore supports two provisioning strategies - same as any Angular service:</p>
+
+  <h3 id="provided-in-root">Global (providedIn: 'root')</h3>
+
+  <p><code>providedIn: 'root'</code> tells Angular: "create one instance of this and make it available app-wide without needing to list it in any <code>providers</code> array." You just <code>inject()</code> it wherever you need it, and Angular gives you the same singleton instance every time.</p>
+
+  <p>If you've used classic NgRx, you may not have used <code>providedIn: 'root'</code> much - because the global store itself is already registered through <code>StoreModule.forRoot()</code>. With SignalStore there's no module registration step. Each store is an independent injectable, so <code>providedIn: 'root'</code> is how you say "this is a global singleton."</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">export const AuthStore = signalStore(
+  { providedIn: 'root' },
+  withState({ user: null as User | null, isAuthenticated: false }),
+  withComputed(/* ... */),
+  withMethods(/* ... */)
+);
+
+// Any component, anywhere - no providers array needed:
+export class HeaderComponent {
+  readonly auth = inject(AuthStore);  // same instance every time
+}</code></pre>
+  </div>
+
+  <h3 id="component-level">Component-Level</h3>
+
+  <p>If you omit <code>providedIn: 'root'</code>, the store must be listed in a component's <code>providers</code> array to be injectable. Each component that provides it gets its own fresh instance, destroyed when the component is destroyed. Child components of that provider share the same instance via normal DI resolution.</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">// Store definition - no providedIn
+export const PolicySearchStore = signalStore(
+  withState(initialState),
+  withComputed(/* ... */),
+  withMethods(/* ... */)
+);
+
+// Component provides it
+@Component({
+  providers: [PolicySearchStore],
+  template: `
+    &lt;input (input)="store.updateQuery($event.target.value)" /&gt;
+    @for (policy of store.filteredPolicies(); track policy.id) {
+      &lt;app-policy-card [policy]="policy" /&gt;
+    }
+  `
+})
+export class PolicySearchPage {
+  readonly store = inject(PolicySearchStore);
+}</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <strong>Which to choose:</strong>
+    <ul>
+      <li><strong>providedIn: 'root'</strong> - auth state, user preferences, app-wide caches. Lives for the app's lifetime. Every component that injects it shares the same instance and the same state.</li>
+      <li><strong>Component providers</strong> - page-specific data, search results, form state. Created fresh on navigation, destroyed on leave. No stale state between visits. Child components of the provider share the parent's instance (standard Angular DI resolution).</li>
+    </ul>
+  </div>
+
+  <p>In classic NgRx, everything lives in a single global store - which nudges you toward treating all state as global. SignalStore gives you granular control: global state is a singleton, page-scoped state gets a fresh instance per visit. Both are common patterns in a real app.</p>
+
+  <h2 id="with-hooks">withHooks: Lifecycle</h2>
+
+  <p>Stores can hook into their own lifecycle with <code>withHooks</code>:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">import { withHooks } from '@ngrx/signals';
+
+export const PolicyListStore = signalStore(
+  { providedIn: 'root' },
+  withState({ policies: [] as Policy[], isLoading: false }),
+  withMethods((store, policyService = inject(PolicyService)) => ({
+    async loadPolicies(): Promise&lt;void&gt; {
+      patchState(store, { isLoading: true });
+      const policies = await policyService.getAll();
+      patchState(store, { policies, isLoading: false });
+    },
+  })),
+  withHooks({
+    onInit(store) {
+      // Auto-load policies when the store is created
+      store.loadPolicies();
+    },
+    onDestroy(store) {
+      console.log('PolicyListStore destroyed', store.policies().length, 'policies');
+    },
+  })
+);</code></pre>
+  </div>
+
+  <p><code>onInit</code> fires when the store is first injected. <code>onDestroy</code> fires when its injector is destroyed (component unmount for component-level stores, app shutdown for root stores). You can use <code>inject()</code> inside the hooks since they run in an injection context.</p>
+
+  <h3>Factory Form with Dependencies</h3>
+
+  <p>If your hooks need injected dependencies, use the factory form:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">withHooks((store) => {
+  const logger = inject(Logger);
+
+  return {
+    onInit() {
+      logger.info('Store initialised');
+      store.loadPolicies();
+    },
+    onDestroy() {
+      logger.info('Store destroyed');
+    },
+  };
+})</code></pre>
+  </div>
+
+  <h2 id="signal-state">signalState: The Lightweight Alternative</h2>
+
+  <p>Not every piece of state needs a full store. For simple, local state in a component or service, <code>signalState</code> gives you the same deep-signal behaviour and <code>patchState</code> without the store scaffolding:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">import { signalState, patchState } from '@ngrx/signals';
+
+@Component({
+  template: `
+    @if (state.isExpanded()) {
+      &lt;div class="panel-content"&gt;{{ state.content() }}&lt;/div&gt;
+    }
+    &lt;button (click)="toggle()"&gt;
+      {{ state.isExpanded() ? 'Collapse' : 'Expand' }}
+    &lt;/button&gt;
+  `
+})
+export class CollapsiblePanel {
+  readonly state = signalState({
+    isExpanded: false,
+    content: '',
+  });
+
+  toggle(): void {
+    patchState(this.state, (s) => ({ isExpanded: !s.isExpanded }));
+  }
+}</code></pre>
+  </div>
+
+  <p><code>signalState</code> gives you:</p>
+  <ul>
+    <li>Deep signals on nested properties (same as <code>withState</code>)</li>
+    <li><code>patchState</code> for immutable updates</li>
+    <li>A fixed, typed state shape</li>
+  </ul>
+
+  <p>It does <strong>not</strong> give you:</p>
+  <ul>
+    <li>No <code>withComputed</code> - use Angular's <code>computed()</code> directly alongside it</li>
+    <li>No <code>withMethods</code> - write methods on the component or service class</li>
+    <li>No DI (it's not injectable - it's just a local value)</li>
+    <li>No lifecycle hooks</li>
+    <li>No feature composition</li>
+  </ul>
+
+  <h3>signalState in a Service</h3>
+
+  <p>You can also use <code>signalState</code> inside an injectable service for state that multiple components share but doesn't need full store composition:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">@Injectable({ providedIn: 'root' })
+export class ToastService {
+  readonly state = signalState({
+    messages: [] as ToastMessage[],
+    position: 'top-right' as 'top-right' | 'bottom-right',
+  });
+
+  // You write methods on the class - not inside the state
+  show(message: string, type: 'success' | 'error' = 'success'): void {
+    patchState(this.state, (s) => ({
+      messages: [...s.messages, { id: crypto.randomUUID(), message, type }],
+    }));
+  }
+
+  dismiss(id: string): void {
+    patchState(this.state, (s) => ({
+      messages: s.messages.filter(m => m.id !== id),
+    }));
+  }
+}</code></pre>
+  </div>
+
+  <h3>Why Not Just Use signal()?</h3>
+
+  <p>For a single primitive value (<code>signal(false)</code>, <code>signal(0)</code>), plain <code>signal()</code> is fine. <code>signalState</code> earns its keep when you have an <strong>object with multiple properties</strong> that you want to update partially and read granularly:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">// Plain signal - have to spread manually, no deep signals
+const state = signal({ query: '', page: 1, isLoading: false });
+state.update(s => ({ ...s, query: 'flood' }));  // manual spread
+state().query;  // not a signal - just a value read
+
+// signalState - patchState handles immutability, deep signals for free
+const state = signalState({ query: '', page: 1, isLoading: false });
+patchState(state, { query: 'flood' });  // partial update, no spreading
+state.query();  // a signal - granular reactivity</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <strong>When to reach for which:</strong>
+    <ul>
+      <li><strong>Plain <code>signal()</code></strong> - single values (a boolean toggle, a counter, a selected ID).</li>
+      <li><strong><code>signalState</code></strong> - local object state with multiple properties you want to patch partially and read granularly. No shared API needed.</li>
+      <li><strong><code>signalStore</code></strong> - shared state with business logic, computed derivations, service injection, lifecycle hooks, and a public API for consumers.</li>
+    </ul>
+  </div>
+
+  <h2 id="consuming">Consuming a Store in Components</h2>
+
+  <p>A complete example - the Policy Search page with its store:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">@Component({
+  selector: 'app-policy-search',
+  providers: [PolicyFilterStore],
+  template: `
+    &lt;div class="search-bar"&gt;
+      &lt;input
+        [value]="store.query()"
+        (input)="store.updateQuery($event.target.value)"
+        placeholder="Search policies..."
+      /&gt;
+
+      &lt;select
+        [value]="store.status()"
+        (change)="store.updateStatus($event.target.value)"&gt;
+        &lt;option value="all"&gt;All Statuses&lt;/option&gt;
+        &lt;option value="active"&gt;Active&lt;/option&gt;
+        &lt;option value="expired"&gt;Expired&lt;/option&gt;
+        &lt;option value="pending"&gt;Pending&lt;/option&gt;
+      &lt;/select&gt;
+
+      @if (store.hasActiveFilters()) {
+        &lt;button (click)="store.resetFilters()"&gt;Clear Filters&lt;/button&gt;
+      }
+    &lt;/div&gt;
+  `
+})
+export class PolicySearchComponent {
+  readonly store = inject(PolicyFilterStore);
+}</code></pre>
+  </div>
+
+  <p>Notice:</p>
+  <ul>
+    <li>State signals read directly in the template: <code>store.query()</code>, <code>store.status()</code></li>
+    <li>Computed signals used the same way: <code>store.hasActiveFilters()</code></li>
+    <li>Methods called directly from event handlers: <code>store.updateQuery(...)</code></li>
+    <li>No <code>async</code> pipe, no subscription management, no <code>ngOnDestroy</code></li>
+  </ul>
+
+  <h2 id="classic-comparison">Classic NgRx Comparison</h2>
+
+  <p>The same feature in classic NgRx vs SignalStore:</p>
+
+  <p class="comparison-label">Classic NgRx</p>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">// actions.ts
+export const updateQuery = createAction('[Filters] Update Query', props&lt;{ query: string }&gt;());
+export const updateStatus = createAction('[Filters] Update Status', props&lt;{ status: string }&gt;());
+export const resetFilters = createAction('[Filters] Reset');
+
+// reducer.ts
+export const filterReducer = createReducer(
+  initialState,
+  on(updateQuery, (state, { query }) => ({ ...state, query })),
+  on(updateStatus, (state, { status }) => ({ ...state, status })),
+  on(resetFilters, () => initialState)
+);
+
+// selectors.ts
+export const selectQuery = createSelector(selectFilterState, s => s.query);
+export const selectStatus = createSelector(selectFilterState, s => s.status);
+export const selectHasActiveFilters = createSelector(
+  selectQuery, selectStatus,
+  (query, status) => query !== '' || status !== 'all'
+);
+
+// component.ts
+this.store.dispatch(updateQuery({ query: 'flood' }));
+this.query$ = this.store.select(selectQuery);</code></pre>
+  </div>
+
+  <p class="comparison-label">SignalStore</p>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">// policy-filter.store.ts - everything in one file
+export const PolicyFilterStore = signalStore(
+  withState(initialState),
+  withComputed(({ query, status }) => ({
+    hasActiveFilters: computed(() => query() !== '' || status() !== 'all'),
+  })),
+  withMethods((store) => ({
+    updateQuery(query: string): void { patchState(store, { query }); },
+    updateStatus(status: string): void { patchState(store, { status }); },
+    resetFilters(): void { patchState(store, initialState); },
+  }))
+);
+
+// component.ts
+this.store.updateQuery('flood');
+this.store.query(); // direct signal read</code></pre>
+  </div>
+
+  <p>Same behaviour. A fraction of the code. No indirection through actions and selectors. The trade-off: you lose the action log (Redux DevTools won't show named events). We'll address that in <a href="0009-store-lifecycle-and-devtools.html">Lesson 9</a> and <a href="0011-events-and-reducers.html">Lesson 11</a>.</p>
+
+  <h2 id="private-members">Private Store Members</h2>
+
+  <p>Prefix any state property, computed signal, or method with <code>_</code> to make it private - inaccessible from outside the store but available to later features in the composition chain. This isn't just naming convention - SignalStore strips underscore-prefixed members from the store's public type. TypeScript will error if you try to access them from a component:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">export const PolicyStore = signalStore(
+  withState({
+    _rawPolicies: [] as Policy[],  // private - internal only
+    isLoading: false,              // public
+  }),
+  withComputed(({ _rawPolicies }) => ({
+    // Private state used internally, public computed exposed
+    policies: computed(() => _rawPolicies().filter(p => !p.deleted)),
+    totalCount: computed(() => _rawPolicies().length),
+  })),
+  withMethods((store) => ({
+    // This method uses _rawPolicies internally
+    _setRawPolicies(policies: Policy[]): void {
+      patchState(store, { _rawPolicies: policies });
+    },
+    // Public method delegates to private
+    async loadPolicies(): Promise&lt;void&gt; {
+      patchState(store, { isLoading: true });
+      const policies = await inject(PolicyService).getAll();
+      store._setRawPolicies(policies);
+      patchState(store, { isLoading: false });
+    },
+  }))
+);
+
+// In a component:
+const store = inject(PolicyStore);
+store.policies();       // works - public computed
+store.isLoading();      // works - public state
+store.loadPolicies();   // works - public method
+store._rawPolicies();   // TypeScript error - private
+store._setRawPolicies(); // TypeScript error - private</code></pre>
+  </div>
+
+  <h2 id="get-state">Reading the Full State Snapshot</h2>
+
+  <p>Sometimes you need the entire state as a plain object (logging, debugging, serialisation). Use <code>getState()</code>:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">import { getState } from '@ngrx/signals';
+
+const store = inject(PolicyFilterStore);
+const snapshot = getState(store);
+// { query: 'flood', status: 'active', sortBy: 'holder', sortOrder: 'asc' }
+
+console.log(JSON.stringify(snapshot));</code></pre>
+  </div>
+
+  <h2 id="composition">The Composition Model</h2>
+
+  <p>The power of SignalStore is in its composition. Features are applied in order, and each feature can access everything that came before it:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">signalStore(
+  withState(...)     // 1. State signals created
+  withComputed(...)  // 2. Can read state signals
+  withMethods(...)   // 3. Can read state + computed, can call patchState
+  withHooks(...)     // 4. Can read state + computed + methods
+)</code></pre>
+  </div>
+
+  <p>This ordering is not arbitrary - it's a dependency graph. State is the foundation, computeds derive from state, methods act on state and read computeds, hooks orchestrate methods. Later lessons will show how to extract reusable features (<a href="0010-custom-store-features.html">Lesson 10</a>) that compose into any store.</p>
+
+  <div class="key-concept">
+    <strong>NgRx comparison:</strong> In classic NgRx, composition happens through feature modules, meta-reducers, and selector composition. In SignalStore, composition is functional - you compose features into a single <code>signalStore()</code> call. Custom features (covered in Lesson 10) let you extract and reuse patterns like "loading state", "pagination", or "entity management" across stores.
+  </div>
+
+  <h2 id="devtools">Redux DevTools Integration</h2>
+
+  <p>Redux DevTools don't work with SignalStore out of the box - there are no actions dispatched, so there's nothing for the extension to log. NgRx provides an official plugin to bridge SignalStore to the DevTools:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">import { withDevtools } from '@ngrx/signals/devtools';
+
+export const PolicyFilterStore = signalStore(
+  withState(initialState),
+  withComputed(/* ... */),
+  withMethods(/* ... */),
+  withDevtools('PolicyFilter')  // name shown in DevTools panel
+);</code></pre>
+  </div>
+
+  <p>This gives you state inspection in the Redux DevTools browser extension - you can see state snapshots whenever they change. You won't get full action replay/time-travel (since there are no named actions), but you can see state history with auto-generated labels. If you add the events/reducers pattern (<a href="0011-events-and-reducers.html">Lesson 11</a>), you get named events in DevTools too.</p>
+
+  <h3 id="devtools-production">Excluding DevTools from Production</h3>
+
+  <p><code>withDevtools()</code> is code in your store definition. It shouldn't ship to production - use <code>isDevMode()</code> with a spread to conditionally include it:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">import { isDevMode } from '@angular/core';
+import { withDevtools } from '@ngrx/signals/devtools';
+
+export const PolicyFilterStore = signalStore(
+  withState(initialState),
+  withComputed(/* ... */),
+  withMethods(/* ... */),
+  ...(isDevMode() ? [withDevtools('PolicyFilter')] : [])
+);</code></pre>
+  </div>
+
+  <p><code>isDevMode()</code> returns <code>false</code> in production builds (<code>ng build</code>), so the spread produces an empty array and <code>withDevtools</code> is never called. The build optimizer can then tree-shake the import entirely.</p>
+
+  <p>If the spread syntax feels noisy across many stores, wrap it in a utility:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">// shared/dev-tools.ts
+import { isDevMode } from '@angular/core';
+import { withDevtools } from '@ngrx/signals/devtools';
+
+export function withDevtoolsIfDev(name: string) {
+  return isDevMode() ? [withDevtools(name)] : [];
+}
+
+// usage in any store
+export const PolicyFilterStore = signalStore(
+  withState(initialState),
+  withMethods(/* ... */),
+  ...withDevtoolsIfDev('PolicyFilter')
+);</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <strong>Why it has to be in the code:</strong> Unlike classic NgRx (which has a single global store the browser extension can hook into), SignalStore instances are independent injectables. The extension has no way to discover them without being told. This is the same pattern as classic NgRx's <code>StoreDevtoolsModule.instrument()</code> or Redux's <code>composeWithDevTools()</code> - you always have to opt in from the code.
+  </div>
+
+  <h2>Quiz</h2>
+
+  <div class="quiz" role="group">
+    <h3>How do you update state in a SignalStore?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">store.state.query = 'flood' (direct mutation)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">patchState(store, { query: 'flood' }) inside withMethods</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">store.dispatch(updateQuery({ query: 'flood' }))</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="quiz" role="group">
+    <h3>What does <code>withComputed</code> replace from classic NgRx?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Reducers</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Selectors (createSelector)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Effects</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="quiz" role="group">
+    <h3>You have filter state that should reset when the user navigates away from the search page. How should you provision the store?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">providedIn: 'root' with manual reset in ngOnDestroy</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Component-level providers array - the store is destroyed with the component</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">providedIn: 'any' for lazy-loaded isolation</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <h2>Try It Yourself</h2>
+
+  <div class="exercise">
+    <h3>Exercise 1: Build a Counter Store</h3>
+    <p>Create a SignalStore with <code>count</code> state, a <code>doubleCount</code> computed, and <code>increment()</code> / <code>decrement()</code> / <code>reset()</code> methods:</p>
+    <div class="code-wrapper">
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre><code class="language-typescript">// TODO: Create CounterStore with:
+// - state: { count: 0 }
+// - computed: doubleCount
+// - methods: increment, decrement, reset</code></pre>
+    </div>
+    <!-- reveal -->
+      <button class="reveal-toggle" aria-expanded="false">Reveal solution</button>
+      <div class="reveal-content"><div class="reveal-inner">
+      <div class="code-wrapper">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre><code class="language-typescript">import { computed } from '@angular/core';
+import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
+
+export const CounterStore = signalStore(
+  withState({ count: 0 }),
+  withComputed(({ count }) => ({
+    doubleCount: computed(() => count() * 2),
+  })),
+  withMethods((store) => ({
+    increment(): void {
+      patchState(store, ({ count }) => ({ count: count + 1 }));
+    },
+    decrement(): void {
+      patchState(store, ({ count }) => ({ count: count - 1 }));
+    },
+    reset(): void {
+      patchState(store, { count: 0 });
+    },
+  }))
+);</code></pre>
+      </div>
+      <p>The composition order: state first, then computed (which reads state), then methods (which modify state). Each layer builds on the previous.</p>
+      </div></div>
+    <!-- /reveal -->
+  </div>
+
+  <div class="exercise">
+    <h3>Exercise 2: Policy Dashboard Store</h3>
+    <p>Build a store for the Policy Dashboard that holds a list of policies, tracks loading state, provides a computed <code>totalPremium</code>, and has a <code>loadPolicies()</code> method that injects a service:</p>
+    <div class="code-wrapper">
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre><code class="language-typescript">// Given this service:
+@Injectable({ providedIn: 'root' })
+export class PolicyService {
+  async getAll(): Promise&lt;Policy[]&gt; { /* ... */ }
+}
+
+// TODO: Build PolicyDashboardStore with:
+// - state: { policies: Policy[], isLoading: boolean }
+// - computed: totalPremium (sum of all policy premiums)
+// - methods: loadPolicies() that injects PolicyService</code></pre>
+    </div>
+    <!-- reveal -->
+      <button class="reveal-toggle" aria-expanded="false">Reveal solution</button>
+      <div class="reveal-content"><div class="reveal-inner">
+      <div class="code-wrapper">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre><code class="language-typescript">import { computed, inject } from '@angular/core';
+import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
+
+type DashboardState = {
+  policies: Policy[];
+  isLoading: boolean;
+};
+
+export const PolicyDashboardStore = signalStore(
+  withState&lt;DashboardState&gt;({ policies: [], isLoading: false }),
+  withComputed(({ policies }) => ({
+    totalPremium: computed(() =>
+      policies().reduce((sum, p) => sum + p.premium, 0)
+    ),
+  })),
+  withMethods((store, policyService = inject(PolicyService)) => ({
+    async loadPolicies(): Promise&lt;void&gt; {
+      patchState(store, { isLoading: true });
+      const policies = await policyService.getAll();
+      patchState(store, { policies, isLoading: false });
+    },
+  }))
+);</code></pre>
+      </div>
+      <p>Services are injected as default parameters in the <code>withMethods</code> factory. The <code>inject()</code> call works because the factory runs in an injection context when the store is created.</p>
+      </div></div>
+    <!-- /reveal -->
+  </div>
+
+  <div class="exercise">
+    <h3>Exercise 3: signalState for Local Component State</h3>
+    <p>You have a modal component that tracks its own open/closed state and a title. Use <code>signalState</code> (not a full store) to manage this:</p>
+    <div class="code-wrapper">
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre><code class="language-typescript">// TODO: Use signalState to manage:
+// - isOpen: boolean
+// - title: string
+// Write open(title: string) and close() methods</code></pre>
+    </div>
+    <!-- reveal -->
+      <button class="reveal-toggle" aria-expanded="false">Reveal solution</button>
+      <div class="reveal-content"><div class="reveal-inner">
+      <div class="code-wrapper">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre><code class="language-typescript">import { signalState, patchState } from '@ngrx/signals';
+
+@Component({
+  template: `
+    @if (state.isOpen()) {
+      &lt;div class="modal-overlay" (click)="close()"&gt;
+        &lt;div class="modal" (click)="$event.stopPropagation()"&gt;
+          &lt;h2&gt;{{ state.title() }}&lt;/h2&gt;
+          &lt;ng-content /&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    }
+  `
+})
+export class ModalComponent {
+  readonly state = signalState({ isOpen: false, title: '' });
+
+  open(title: string): void {
+    patchState(this.state, { isOpen: true, title });
+  }
+
+  close(): void {
+    patchState(this.state, { isOpen: false, title: '' });
+  }
+}</code></pre>
+      </div>
+      <p><code>signalState</code> is perfect here - simple local state, no need for computed, methods composition, or DI. The component owns and manages it directly.</p>
+      </div></div>
+    <!-- /reveal -->
+  </div>
+
+  <h2>Your Tangible Win</h2>
+
+  <p>You can now build a complete SignalStore: define state, derive computed values, expose methods, inject services, and provision the store at the right level. You've replaced the classic NgRx ceremony (actions, reducers, selectors, effects, module registration) with a single composable function. Next lesson, we'll add entity management - the patterns for working with collections of items (add, remove, update, select).</p>
+
+  <div class="recommended">
+    <strong>Primary source:</strong>
+    <a href="https://ngrx.io/guide/signals/signal-store">NgRx SignalStore Guide</a> - the canonical documentation for signalStore, withState, withComputed, withMethods, and patchState.
+  </div>
+
+  <div class="ask-kiro">
+    Something unclear? Ask me follow-up questions - I'm your teacher and can clarify anything, adjust examples, or go deeper on any concept.
+  </div>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <div class="footer-nav">
+    <a href="0004-rxjs-interop-the-bridge.html">&larr; Prev: RxJS Interop: The Bridge</a>
+    <a href="0006-entity-management.html">Next: Entity Management &rarr;</a>
+  </div>
+
+    </main>
+  </div>
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
+  <script src="/vendor/prism-typescript.min.js"></script>
+  <script src="/vendor/prism-bash.min.js"></script>
+</body>
+</html>

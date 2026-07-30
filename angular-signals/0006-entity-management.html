@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>Entity Management - Lesson 6 | Teach Me</title>
+  <meta name="description" content="Master NgRx SignalStore entity management with withEntities. Learn addEntity, removeEntity, updateEntity, setAllEntities, named collections, and custom ID selection.">
+  <link rel="canonical" href="https://teachmeskills.dev/angular-signals/06-entity-management.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/angular-signals/06-entity-management.html">
+  <meta property="og:title" content="Entity Management - Lesson 6 | Teach Me">
+  <meta property="og:description" content="NgRx SignalStore entity management - withEntities, CRUD updaters, named collections, and custom ID selection.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Entity Management - Lesson 6 | Teach Me">
+  <meta name="twitter:description" content="NgRx SignalStore entity management - withEntities, CRUD updaters, named collections, and custom ID selection.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header"><a href="index.html">Angular Signals Course</a></div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="0001-signals-the-reactive-primitive.html">1. Signals: The Reactive Primitive</a></li>
+        <li><a href="0002-effects-lifecycle-and-untracked.html">2. Effects, Lifecycle & Untracked</a></li>
+        <li><a href="0003-linked-signal-and-dependent-state.html">3. linkedSignal & Dependent State</a></li>
+        <li><a href="0004-rxjs-interop-the-bridge.html">4. RxJS Interop: The Bridge</a></li>
+        <li><a href="0005-signalstore-your-first-store.html">5. SignalStore: Your First Store</a></li>
+        <li class="current"><a href="0006-entity-management.html">6. Entity Management</a></li>
+        <li><a href="0007-async-with-rxmethod.html">7. Async with rxMethod</a></li>
+        <li class="coming-soon"><a href="0008-resource-and-httpresource.html">8. resource & httpResource</a></li>
+        <li class="coming-soon"><a href="0009-store-lifecycle-and-devtools.html">9. Store Lifecycle & DevTools</a></li>
+        <li class="coming-soon"><a href="0010-custom-store-features.html">10. Custom Store Features</a></li>
+        <li class="coming-soon"><a href="0011-events-and-reducers.html">11. Events & Reducers</a></li>
+        <li class="coming-soon"><a href="0012-store-architecture-and-testing.html">12. Store Architecture & Testing</a></li>
+        <li class="coming-soon"><a href="0013-signal-forms-the-new-model.html">13. Signal Forms: The New Model</a></li>
+        <li class="coming-soon"><a href="0014-validation-and-field-state.html">14. Validation & Field State</a></li>
+        <li class="coming-soon"><a href="0015-complex-forms-and-custom-controls.html">15. Complex Forms & Custom Controls</a></li>
+        <li class="coming-soon"><a href="0016-migrating-signalformcontrol-bridge.html">16. Migrating: SignalFormControl Bridge</a></li>
+        <li class="coming-soon"><a href="0017-signals-store-forms-together.html">17. Signals + Store + Forms</a></li>
+        <li class="coming-soon"><a href="0018-when-to-keep-rxjs.html">18. When to Keep RxJS</a></li>
+        <li class="coming-soon"><a href="0019-capstone-the-complete-dashboard.html">19. Capstone: The Complete Dashboard</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="signals-glossary.html">Signals Glossary</a></li>
+        <li class="coming-soon"><a href="signal-primitives.html">Signal Primitives</a></li>
+        <li class="coming-soon"><a href="signalstore-api.html">SignalStore API</a></li>
+        <li class="coming-soon"><a href="signal-forms-api.html">Signal Forms API</a></li>
+        <li class="coming-soon"><a href="decision-framework.html">Decision Framework</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 6</p>
+  <h1>Entity Management</h1>
+
+  <h2>The Core Idea</h2>
+
+  <div class="key-concept">
+    <strong>Mental model:</strong> <code>withEntities</code> gives you a normalised entity collection - like classic NgRx EntityAdapter - with signals for the entity array, ID array, and entity map. Instead of writing repetitive array manipulation code (find-by-id, filter-and-replace, spread-into-new-array), you get type-safe CRUD updaters out of the box. The entities are stored internally as a map for O(1) lookups, but exposed as an array signal for easy template iteration.
+  </div>
+
+  <p>In <a href="0005-signalstore-your-first-store.html">Lesson 5</a>, the Policy Dashboard store managed a <code>policies: Policy[]</code> array in plain state. Every method had to manually filter, map, or spread the array. That's fine for a handful of items, but it gets repetitive and error-prone as operations grow. <code>withEntities</code> eliminates that boilerplate by giving you pre-built updaters for every common collection operation.</p>
+
+  <h2 id="installation">Installation</h2>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-bash">npm install @ngrx/signals</code></pre>
+  </div>
+
+  <p><code>withEntities</code> ships in a sub-entry point: <code>@ngrx/signals/entities</code>. No additional package needed - it's part of the same <code>@ngrx/signals</code> install from Lesson 5.</p>
+
+  <h2 id="what-withentities-provides">What withEntities Provides</h2>
+
+  <p>When you add <code>withEntities&lt;Policy&gt;()</code> to a store, three signals are created automatically:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">import { signalStore } from '@ngrx/signals';
+import { withEntities } from '@ngrx/signals/entities';
+
+type Policy = {
+  id: string;
+  holder: string;
+  premium: number;
+  status: 'active' | 'expired';
+};
+
+export const PolicyStore = signalStore(
+  withEntities&lt;Policy&gt;()
+  //           ^^^^^^^^ — this single line gives you:
+  //  store.entities()  → Signal&lt;Policy[]&gt;
+  //  store.ids()       → Signal&lt;string[]&gt;
+  //  store.entityMap() → Signal&lt;EntityMap&lt;Policy&gt;&gt;
+);</code></pre>
+  </div>
+
+  <ul>
+    <li><strong><code>entities</code></strong> - <code>Signal&lt;Policy[]&gt;</code> - the full array, in insertion order</li>
+    <li><strong><code>ids</code></strong> - <code>Signal&lt;string[] | number[]&gt;</code> - just the IDs, same order</li>
+    <li><strong><code>entityMap</code></strong> - <code>Signal&lt;EntityMap&lt;Policy&gt;&gt;</code> - a record keyed by ID for O(1) lookups</li>
+  </ul>
+
+  <p>How do entities get into the store? You <em>must</em> use entity updaters inside <code>patchState</code>. This isn't a convenience layer over something you could do manually - the internal <code>entityMap</code> and <code>ids</code> state is owned by the entity system, and <code>patchState(store, { entityMap: ... })</code> won't work. Entity updaters are the only API for writing to entity state.</p>
+
+  <p>Here's the simplest path - adding two policies one at a time:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">import { patchState } from '@ngrx/signals';
+import { addEntity, setAllEntities } from '@ngrx/signals/entities';
+
+// Option A: add individually
+patchState(store, addEntity({ id: 'pol-001', holder: 'Alice', premium: 1200, status: 'active' }));
+patchState(store, addEntity({ id: 'pol-002', holder: 'Bob',   premium: 800,  status: 'expired' }));
+
+// Option B: set the whole collection at once (e.g. from an API response)
+patchState(store, setAllEntities([
+  { id: 'pol-001', holder: 'Alice', premium: 1200, status: 'active' },
+  { id: 'pol-002', holder: 'Bob',   premium: 800,  status: 'expired' },
+]));</code></pre>
+  </div>
+
+  <p>Either way, the resulting internal shape is the same:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">// Internal state (what withEntities actually stores)
+{
+  entityMap: {
+    'pol-001': { id: 'pol-001', holder: 'Alice', premium: 1200, status: 'active' },
+    'pol-002': { id: 'pol-002', holder: 'Bob',   premium: 800,  status: 'expired' }
+  },
+  ids: ['pol-001', 'pol-002']
+}
+
+// What the three signals expose:
+store.ids()        // ['pol-001', 'pol-002']           ← direct read of stored state
+store.entityMap()  // { 'pol-001': { ... }, ... }      ← direct read of stored state
+store.entities()   // [{ id: 'pol-001', ... }, ...]    ← computed view (not stored)</code></pre>
+  </div>
+
+  <p><code>ids</code> and <code>entityMap</code> are direct signals over the actual stored state - they reflect exactly what's in memory. <code>entities</code> is a computed signal that derives the array by mapping <code>ids</code> through <code>entityMap</code>. It doesn't store its own copy of the data; it recalculates (and caches) only when <code>ids</code> or <code>entityMap</code> change.</p>
+
+  <p>The collection starts empty - you populate it with entity updaters.</p>
+
+  <div class="key-concept">
+    <strong>The <code>id</code> property:</strong> By default, <code>withEntities</code> expects each entity to have an <code>id</code> property of type <code>string</code> or <code>number</code>. This is the key used for lookups, updates, and removals. If your entity uses a different key (like <code>policyRef</code> or <code>claimId</code>), you need custom ID selection - covered <a href="#custom-id">below</a>.
+  </div>
+
+  <h2 id="complete-api">Complete <code>@ngrx/signals/entities</code> API</h2>
+
+  <p>Here's everything exported from <code>@ngrx/signals/entities</code>. The lesson demonstrates the most common updaters in detail below, but this table serves as your complete reference.</p>
+
+  <h3>Entity Updaters (passed to <code>patchState</code>)</h3>
+
+  <table class="api-table">
+    <thead>
+      <tr><th>Updater</th><th>What it does</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>addEntity(entity)</code></td><td>Append one entity. Ignored if ID already exists.</td></tr>
+      <tr><td><code>addEntities(entity[])</code></td><td>Append multiple (takes an array). Skips duplicates.</td></tr>
+      <tr><td><code>prependEntity(entity)</code></td><td>Insert one entity at the <em>beginning</em>. Ignored if ID exists.</td></tr>
+      <tr><td><code>prependEntities(entity[])</code></td><td>Insert multiple at the beginning (takes an array). Skips duplicates.</td></tr>
+      <tr><td><code>setEntity(entity)</code></td><td>Add if new, <strong>replace entirely</strong> if ID exists (upsert-replace).</td></tr>
+      <tr><td><code>setEntities(entity[])</code></td><td>Set multiple (takes an array) - adds new, replaces existing.</td></tr>
+      <tr><td><code>setAllEntities(entity[])</code></td><td>Replace the <em>entire</em> collection (clear + set). Takes an array.</td></tr>
+      <tr><td><code>upsertEntity(entity)</code></td><td>Add if new, <strong>merge partially</strong> if ID exists (upsert-merge).</td></tr>
+      <tr><td><code>upsertEntities(entity[])</code></td><td>Upsert-merge multiple (takes an array).</td></tr>
+      <tr><td><code>updateEntity({ id, changes })</code></td><td>Partial update one entity by ID. <code>changes</code> can be an object or function.</td></tr>
+      <tr><td><code>updateEntities({ predicate, changes })</code></td><td>Partial update all entities matching a predicate.</td></tr>
+      <tr><td><code>updateAllEntities(changes)</code></td><td>Partial update every entity in the collection.</td></tr>
+      <tr><td><code>removeEntity(id)</code></td><td>Remove one entity by ID.</td></tr>
+      <tr><td><code>removeEntities(predicate | id[])</code></td><td>Remove by predicate function or array of IDs.</td></tr>
+      <tr><td><code>removeAllEntities()</code></td><td>Clear the entire collection.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="key-concept">
+    <strong><code>setEntity</code> vs <code>upsertEntity</code>:</strong> Both handle "add or update" but differ in how they update. <code>setEntity</code> replaces the whole entity object. <code>upsertEntity</code> merges the provided fields into the existing entity, preserving properties you didn't pass.
+  </div>
+
+  <h3>Configuration</h3>
+
+  <table class="api-table">
+    <thead>
+      <tr><th>Export</th><th>Purpose</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>withEntities&lt;T&gt;()</code></td><td>Add an entity collection to the store. Accepts optional <code>entityConfig</code>.</td></tr>
+      <tr><td><code>entityConfig({ entity, selectId?, collection? })</code></td><td>Configure custom ID selection and/or named collections.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Type Exports</h3>
+
+  <table class="api-table">
+    <thead>
+      <tr><th>Type</th><th>What it represents</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>EntityId</code></td><td><code>string | number</code> - the allowed ID types.</td></tr>
+      <tr><td><code>EntityMap&lt;T&gt;</code></td><td><code>Record&lt;EntityId, T&gt;</code> - the internal map shape.</td></tr>
+      <tr><td><code>EntityState&lt;T&gt;</code></td><td>The full entity state shape: <code>{ entityMap, ids }</code>.</td></tr>
+      <tr><td><code>EntityChanges&lt;T&gt;</code></td><td>Partial&lt;T&gt; or updater function - what <code>updateEntity</code> accepts as <code>changes</code>.</td></tr>
+      <tr><td><code>SelectEntityId&lt;T&gt;</code></td><td>Signature for a custom ID selector function.</td></tr>
+      <tr><td><code>EntityProps&lt;T&gt;</code></td><td>The signal properties added to the store (<code>entities</code>, <code>ids</code>, <code>entityMap</code>).</td></tr>
+      <tr><td><code>NamedEntityState&lt;T&gt;</code></td><td>Entity state shape for named collections (prefixed properties).</td></tr>
+      <tr><td><code>NamedEntityProps&lt;T&gt;</code></td><td>Signal properties for named collections (prefixed signals).</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="entity-updaters">Entity Updaters</h2>
+
+  <p>Entity updaters are functions you pass to <code>patchState</code>. They handle the internal normalisation - you never manually spread arrays or build maps:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">import { patchState, signalStore, withMethods } from '@ngrx/signals';
+import {
+  addEntity,
+  addEntities,
+  setAllEntities,
+  setEntity,
+  updateEntity,
+  updateAllEntities,
+  removeEntity,
+  removeEntities,
+  withEntities,
+} from '@ngrx/signals/entities';
+import { inject } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
+
+export const PolicyStore = signalStore(
+  withEntities&lt;Policy&gt;(),
+  withMethods((store, policyService = inject(PolicyService)) =&gt; ({
+
+    // Replace the entire collection (initial load)
+    async loadAll(): Promise&lt;void&gt; {
+      const policies = await firstValueFrom(policyService.getAll());
+      patchState(store, setAllEntities(policies));
+    },
+
+    // Add a single entity
+    addPolicy(policy: Policy): void {
+      patchState(store, addEntity(policy));
+    },
+
+    // Upsert - add if new, replace if existing
+    upsertPolicy(policy: Policy): void {
+      patchState(store, setEntity(policy));
+    },
+
+    // Partial update by ID
+    updatePremium(id: string, premium: number): void {
+      patchState(store, updateEntity({ id, changes: { premium } }));
+    },
+
+    // Update with a function (access current entity values)
+    applyDiscount(id: string, pct: number): void {
+      patchState(store, updateEntity({
+        id,
+        changes: (policy) =&gt; ({ premium: policy.premium * (1 - pct) }),
+      }));
+    },
+
+    // Update all entities
+    markAllExpired(): void {
+      patchState(store, updateAllEntities({ status: 'expired' as const }));
+    },
+
+    // Remove by ID
+    removePolicy(id: string): void {
+      patchState(store, removeEntity(id));
+    },
+
+    // Remove by predicate
+    removeExpired(): void {
+      patchState(store, removeEntities(({ status }) =&gt; status === 'expired'));
+    },
+  }))
+);</code></pre>
+  </div>
+
+  <p>Key points:</p>
+  <ul>
+    <li><strong>All updaters are immutable</strong> - they return new state internally. You never mutate.</li>
+    <li><strong>Duplicate IDs are ignored</strong> - <code>addEntity</code> won't add an entity if its ID already exists. Use <code>setEntity</code> (upsert) if you want to replace.</li>
+    <li><strong><code>updateEntity</code> accepts a function</strong> - when <code>changes</code> is a function, it receives the current entity so you can compute the next value from it.</li>
+    <li><strong>Composable</strong> - pass multiple updaters to a single <code>patchState</code> call.</li>
+  </ul>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <h2 id="custom-id">Custom ID Selection</h2>
+
+  <p>By default, entities must have an <code>id</code> property. If your domain model uses a different key, configure it with <code>entityConfig</code>:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">import { signalStore, type } from '@ngrx/signals';
+import { entityConfig, withEntities } from '@ngrx/signals/entities';
+
+type Claim = {
+  claimRef: string;
+  amount: number;
+  status: 'open' | 'settled' | 'denied';
+  policyId: string;
+};
+
+const claimConfig = entityConfig({
+  entity: type&lt;Claim&gt;(),
+  selectId: (claim) =&gt; claim.claimRef,
+});
+
+export const ClaimsStore = signalStore(
+  withEntities(claimConfig),
+  withMethods((store) =&gt; ({
+    removeClaim(claimRef: string): void {
+      patchState(store, removeEntity(claimRef));
+    },
+  }))
+);</code></pre>
+  </div>
+
+  <p><code>selectId</code> tells the entity system which property to use as the unique key. All updaters then use that key for lookups.</p>
+
+  <h2 id="named-collections">Named Collections</h2>
+
+  <p>Named collections are <strong>mandatory</strong> when a single store has more than one <code>withEntities</code> call. Without names, both would create <code>entities</code>, <code>ids</code>, and <code>entityMap</code> signals - a collision. The alternative is separate stores (one per entity type), in which case neither needs a named collection.</p>
+
+  <p>Use named collections when you want a single store to own multiple entity types together:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">import { signalStore, type } from '@ngrx/signals';
+import { withEntities, addEntity, removeEntity } from '@ngrx/signals/entities';
+
+export const DashboardStore = signalStore(
+  withEntities({ entity: type&lt;Policy&gt;(), collection: 'policy' }),
+  withEntities({ entity: type&lt;Claim&gt;(), collection: 'claim' }),
+  withMethods((store) =&gt; ({
+    addPolicy(policy: Policy): void {
+      patchState(store, addEntity(policy, { collection: 'policy' }));
+    },
+    addClaim(claim: Claim): void {
+      patchState(store, addEntity(claim, { collection: 'claim' }));
+    },
+    removeClaim(id: string): void {
+      patchState(store, removeEntity(id, { collection: 'claim' }));
+    },
+  }))
+);</code></pre>
+  </div>
+
+  <p>Named collections create prefixed signals:</p>
+  <ul>
+    <li><code>store.policyEntities()</code>, <code>store.policyIds()</code>, <code>store.policyEntityMap()</code></li>
+    <li><code>store.claimEntities()</code>, <code>store.claimIds()</code>, <code>store.claimEntityMap()</code></li>
+  </ul>
+
+  <p>Every updater needs the <code>{ collection: 'name' }</code> option so it knows which collection to operate on.</p>
+
+  <h2 id="with-computed-entities">Combining with withComputed</h2>
+
+  <p>Derived views over your entities work exactly like Lesson 5 - <code>withComputed</code> reads the entity signals:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">import { computed } from '@angular/core';
+
+export const PolicyStore = signalStore(
+  withEntities&lt;Policy&gt;(),
+  withComputed(({ entities }) =&gt; ({
+    activePolicies: computed(() =&gt;
+      entities().filter(p =&gt; p.status === 'active')
+    ),
+    totalPremium: computed(() =&gt;
+      entities().reduce((sum, p) =&gt; sum + p.premium, 0)
+    ),
+    policyCount: computed(() =&gt; entities().length),
+  }))
+);</code></pre>
+  </div>
+
+  <p>Computed signals derived from <code>entities()</code> automatically re-evaluate when any entity is added, removed, or updated. They're lazy and cached.</p>
+
+  <h2 id="full-example">Full Example: Policy Dashboard Store</h2>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">import { computed, inject } from '@angular/core';
+import { signalStore, withState, withComputed, withMethods, withHooks, patchState } from '@ngrx/signals';
+import { withEntities, setAllEntities, addEntity, removeEntity, updateEntity } from '@ngrx/signals/entities';
+import { firstValueFrom } from 'rxjs';
+
+export interface Policy {
+  id: string;
+  holder: string;
+  premium: number;
+  status: 'active' | 'expired' | 'pending';
+  expiryDate: string;
+}
+
+export const PolicyDashboardStore = signalStore(
+  { providedIn: 'root' },
+  withEntities&lt;Policy&gt;(),
+  withState({ isLoading: false, error: null as string | null }),
+  withComputed(({ entities }) =&gt; ({
+    activePolicies: computed(() =&gt; entities().filter(p =&gt; p.status === 'active')),
+    totalPremium: computed(() =&gt; entities().reduce((sum, p) =&gt; sum + p.premium, 0)),
+    policyCount: computed(() =&gt; entities().length),
+  })),
+  withMethods((store, policyService = inject(PolicyService)) =&gt; ({
+    async loadPolicies(): Promise&lt;void&gt; {
+      patchState(store, { isLoading: true, error: null });
+      try {
+        const policies = await firstValueFrom(policyService.getAll());
+        patchState(store, setAllEntities(policies), { isLoading: false });
+      } catch (e) {
+        patchState(store, { isLoading: false, error: 'Failed to load policies' });
+      }
+    },
+    addPolicy(policy: Policy): void {
+      patchState(store, addEntity(policy));
+    },
+    removePolicy(id: string): void {
+      patchState(store, removeEntity(id));
+    },
+    updateStatus(id: string, status: Policy['status']): void {
+      patchState(store, updateEntity({ id, changes: { status } }));
+    },
+  })),
+  withHooks({
+    onInit(store) {
+      store.loadPolicies();
+    },
+  })
+);</code></pre>
+  </div>
+
+  <p>Note how <code>withEntities</code> and <code>withState</code> coexist - entities handle the collection, <code>withState</code> handles the metadata (loading, error). They compose naturally.</p>
+
+  <h2 id="classic-comparison">Classic NgRx Comparison</h2>
+
+  <p class="comparison-label">Classic NgRx (@ngrx/entity)</p>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">// adapter, state interface, initial state, reducer, selectors - 5 files
+const adapter = createEntityAdapter&lt;Policy&gt;();
+interface PolicyState extends EntityState&lt;Policy&gt; { isLoading: boolean; }
+const initialState = adapter.getInitialState({ isLoading: false });
+
+const reducer = createReducer(initialState,
+  on(loadSuccess, (state, { policies }) =&gt; adapter.setAll(policies, { ...state, isLoading: false })),
+  on(addPolicy, (state, { policy }) =&gt; adapter.addOne(policy, state)),
+  on(removePolicy, (state, { id }) =&gt; adapter.removeOne(id, state)),
+);
+
+const { selectAll, selectEntities } = adapter.getSelectors(selectPolicyState);</code></pre>
+  </div>
+
+  <p class="comparison-label">SignalStore (withEntities)</p>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">// Everything in one file - no adapter, no selectors, no reducer
+export const PolicyStore = signalStore(
+  withEntities&lt;Policy&gt;(),
+  withState({ isLoading: false }),
+  withMethods((store) =&gt; ({
+    setAll(policies: Policy[]) { patchState(store, setAllEntities(policies), { isLoading: false }); },
+    add(policy: Policy) { patchState(store, addEntity(policy)); },
+    remove(id: string) { patchState(store, removeEntity(id)); },
+  }))
+);
+// store.entities(), store.ids(), store.entityMap() - no selectors file</code></pre>
+  </div>
+
+  <p>Same normalised collection, same operations. No adapter creation, no EntityState interface, no selectors file, no reducer.</p>
+
+  <h2>Quiz</h2>
+
+  <div class="quiz" role="group">
+    <h3>What signals does <code>withEntities&lt;Policy&gt;()</code> automatically provide?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">policies(), policyIds(), policyMap()</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">entities(), ids(), entityMap()</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">items(), keys(), lookup()</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="quiz" role="group">
+    <h3>How do you remove all expired policies from an entity store?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">patchState(store, { entities: store.entities().filter(...) })</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">patchState(store, removeEntities(({ status }) =&gt; status === 'expired'))</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">store.entities.update(list =&gt; list.filter(...))</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="quiz" role="group">
+    <h3>Your entity has <code>policyRef</code> instead of <code>id</code>. How do you configure this?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">withEntities&lt;Policy&gt;({ idKey: 'policyRef' })</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">withEntities(entityConfig({ entity: type&lt;Policy&gt;(), selectId: (p) =&gt; p.policyRef }))</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">withEntities&lt;Policy&gt;({ selectId: (p) =&gt; p.policyRef })</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <h2>Try It Yourself</h2>
+
+  <div class="exercise">
+    <h3>Exercise 1: Claims Store</h3>
+    <p>Build a <code>ClaimsStore</code> using <code>withEntities</code>. The <code>Claim</code> type uses <code>claimRef</code> as its unique key. Include a computed <code>totalAmount</code> and a <code>loadAll()</code> method:</p>
+    <div class="code-wrapper">
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre><code class="language-typescript">type Claim = {
+  claimRef: string;
+  policyId: string;
+  amount: number;
+  status: 'open' | 'settled' | 'denied';
+};
+// TODO: Build ClaimsStore with entityConfig, computed totalAmount, loadAll()</code></pre>
+    </div>
+    <!-- reveal -->
+      <button class="reveal-toggle" aria-expanded="false">Reveal solution</button>
+      <div class="reveal-content"><div class="reveal-inner">
+      <div class="code-wrapper">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre><code class="language-typescript">import { computed, inject } from '@angular/core';
+import { signalStore, withComputed, withMethods, patchState } from '@ngrx/signals';
+import { entityConfig, type, withEntities, setAllEntities, updateEntity } from '@ngrx/signals/entities';
+import { firstValueFrom } from 'rxjs';
+
+const claimConfig = entityConfig({
+  entity: type&lt;Claim&gt;(),
+  selectId: (claim) =&gt; claim.claimRef,
+});
+
+export const ClaimsStore = signalStore(
+  withEntities(claimConfig),
+  withComputed(({ entities }) =&gt; ({
+    totalAmount: computed(() =&gt;
+      entities().reduce((sum, c) =&gt; sum + c.amount, 0)
+    ),
+  })),
+  withMethods((store, claimsService = inject(ClaimsService)) =&gt; ({
+    async loadAll(): Promise&lt;void&gt; {
+      const claims = await firstValueFrom(claimsService.getAll());
+      patchState(store, setAllEntities(claims, claimConfig));
+    },
+    settleClaim(claimRef: string): void {
+      patchState(store, updateEntity(
+        { id: claimRef, changes: { status: 'settled' as const } },
+        claimConfig
+      ));
+    },
+  }))
+);</code></pre>
+      </div>
+      <p>When using <code>entityConfig</code>, pass it to updaters so they know which ID selector to use.</p>
+      </div></div>
+    <!-- /reveal -->
+  </div>
+
+  <div class="exercise">
+    <h3>Exercise 2: Bulk Update</h3>
+    <p>Add a method that sets status to <code>'pending'</code> for all policies where premium exceeds a threshold:</p>
+    <div class="code-wrapper">
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre><code class="language-typescript">// TODO: flagHighPremium(threshold: number) - updates matching policies</code></pre>
+    </div>
+    <!-- reveal -->
+      <button class="reveal-toggle" aria-expanded="false">Reveal solution</button>
+      <div class="reveal-content"><div class="reveal-inner">
+      <div class="code-wrapper">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre><code class="language-typescript">flagHighPremium(threshold: number): void {
+  const toFlag = store.entities().filter(p =&gt; p.premium &gt; threshold);
+  patchState(
+    store,
+    ...toFlag.map(p =&gt; updateEntity({ id: p.id, changes: { status: 'pending' as const } }))
+  );
+}</code></pre>
+      </div>
+      <p>No built-in "update where predicate" updater - filter the entities, map to <code>updateEntity</code> calls, spread into <code>patchState</code>.</p>
+      </div></div>
+    <!-- /reveal -->
+  </div>
+
+  <div class="exercise">
+    <h3>Exercise 3: Multiple Collections</h3>
+    <p>Create a store with named <code>'policy'</code> and <code>'claim'</code> collections. Add a computed <code>totalExposure</code> (sum of claim amounts for active policies):</p>
+    <div class="code-wrapper">
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre><code class="language-typescript">// TODO: DashboardStore with two named collections and totalExposure computed</code></pre>
+    </div>
+    <!-- reveal -->
+      <button class="reveal-toggle" aria-expanded="false">Reveal solution</button>
+      <div class="reveal-content"><div class="reveal-inner">
+      <div class="code-wrapper">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre><code class="language-typescript">import { computed } from '@angular/core';
+import { signalStore, type, withComputed } from '@ngrx/signals';
+import { withEntities } from '@ngrx/signals/entities';
+
+export const DashboardStore = signalStore(
+  withEntities({ entity: type&lt;Policy&gt;(), collection: 'policy' }),
+  withEntities({ entity: type&lt;Claim&gt;(), collection: 'claim' }),
+  withComputed(({ policyEntities, claimEntities }) =&gt; {
+    const activePolicyIds = computed(() =&gt;
+      new Set(policyEntities().filter(p =&gt; p.status === 'active').map(p =&gt; p.id))
+    );
+    return {
+      totalExposure: computed(() =&gt;
+        claimEntities()
+          .filter(c =&gt; activePolicyIds().has(c.policyId))
+          .reduce((sum, c) =&gt; sum + c.amount, 0)
+      ),
+    };
+  })
+);</code></pre>
+      </div>
+      <p>Named collections prefix signal names: <code>policyEntities()</code>, <code>claimEntities()</code>. The intermediate <code>activePolicyIds</code> computed avoids rebuilding the Set on every claim filter iteration.</p>
+      </div></div>
+    <!-- /reveal -->
+  </div>
+
+  <h2>Your Tangible Win</h2>
+
+  <p>You can now manage normalised entity collections in SignalStore without writing manual array manipulation. <code>withEntities</code> gives you the signals (entities, ids, entityMap) and the updaters (add, remove, update, set) that replace classic NgRx's EntityAdapter. Next lesson, we'll add <code>rxMethod</code> - the bridge for when your store methods need long-lived RxJS pipelines rather than simple async/await.</p>
+
+  <div class="recommended">
+    <strong>Primary source:</strong>
+    <a href="https://ngrx.io/guide/signals/signal-store/entity-management">NgRx Entity Management Guide</a> - canonical documentation for withEntities and all entity updaters.
+  </div>
+
+  <div class="ask-kiro">
+    Something unclear? Ask me follow-up questions - I'm your teacher and can clarify anything, adjust examples, or go deeper on any concept.
+  </div>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <div class="footer-nav">
+    <a href="0005-signalstore-your-first-store.html">&larr; Prev: SignalStore: Your First Store</a>
+    <a href="0007-async-with-rxmethod.html">Next: Async with rxMethod &rarr;</a>
+  </div>
+
+    </main>
+  </div>
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
+  <script src="/vendor/prism-typescript.min.js"></script>
+  <script src="/vendor/prism-bash.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,190 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 380" width="760" height="380" aria-label="Wireframe of the Policy Dashboard showing filters sidebar, policy list, and detail panel with tabs">
+  <style>
+    svg {
+      --border: #e2e0dc;
+      --border-strong: #c8c4be;
+      --bg: #ffffff;
+      --bg-subtle: #f8f7f5;
+      --bg-panel: #fafaf9;
+      --text: #1a1a1a;
+      --text-secondary: #4a4a4a;
+      --muted: #8b8b8b;
+      --accent: #2563eb;
+      --accent-soft: rgba(37, 99, 235, 0.08);
+      --accent-border: rgba(37, 99, 235, 0.3);
+      --shadow: rgba(0,0,0,0.04);
+      --header-bg: #f1f0ee;
+    }
+    @media (prefers-color-scheme: dark) {
+      svg {
+        --border: #3a3f4b;
+        --border-strong: #4b5263;
+        --bg: #1a1b26;
+        --bg-subtle: #1f2133;
+        --bg-panel: #22243a;
+        --text: #e0e0e0;
+        --text-secondary: #b0b0b0;
+        --muted: #6b7280;
+        --accent: #60a5fa;
+        --accent-soft: rgba(96, 165, 250, 0.1);
+        --accent-border: rgba(96, 165, 250, 0.35);
+        --shadow: rgba(0,0,0,0.2);
+        --header-bg: #252736;
+      }
+    }
+    svg.dark {
+      --border: #3a3f4b;
+      --border-strong: #4b5263;
+      --bg: #1a1b26;
+      --bg-subtle: #1f2133;
+      --bg-panel: #22243a;
+      --text: #e0e0e0;
+      --text-secondary: #b0b0b0;
+      --muted: #6b7280;
+      --accent: #60a5fa;
+      --accent-soft: rgba(96, 165, 250, 0.1);
+      --accent-border: rgba(96, 165, 250, 0.35);
+      --shadow: rgba(0,0,0,0.2);
+      --header-bg: #252736;
+    }
+  </style>
+  <script>
+    (function() {
+      try {
+        var parentTheme = window.parent.document.documentElement.getAttribute('data-theme');
+        if (parentTheme === 'dark') {
+          document.querySelector('svg').classList.add('dark');
+        }
+        var observer = new MutationObserver(function() {
+          var theme = window.parent.document.documentElement.getAttribute('data-theme');
+          var svg = document.querySelector('svg');
+          if (theme === 'dark') { svg.classList.add('dark'); }
+          else { svg.classList.remove('dark'); }
+        });
+        observer.observe(window.parent.document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+      } catch(e) {}
+    })();
+  </script>
+
+  <!-- Drop shadow for outer frame -->
+  <defs>
+    <filter id="panel-shadow" x="-2%" y="-2%" width="104%" height="104%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="var(--shadow)" flood-opacity="1"/>
+    </filter>
+  </defs>
+
+  <!-- Outer frame -->
+  <rect x="16" y="16" width="728" height="348" rx="8" fill="var(--bg)" stroke="var(--border)" stroke-width="1" filter="url(#panel-shadow)"/>
+
+  <!-- Title bar with window controls -->
+  <rect x="16" y="16" width="728" height="36" rx="8" fill="var(--header-bg)"/>
+  <rect x="16" y="44" width="728" height="8" fill="var(--header-bg)"/>
+  <!-- Window dots -->
+  <circle cx="36" cy="34" r="5" fill="#ff5f57"/>
+  <circle cx="54" cy="34" r="5" fill="#ffbd2e"/>
+  <circle cx="72" cy="34" r="5" fill="#28c840"/>
+  <!-- Title -->
+  <text x="380" y="38" text-anchor="middle" font-size="11" font-weight="500" fill="var(--text-secondary)" font-family="-apple-system, BlinkMacSystemFont, sans-serif">Policy Dashboard</text>
+
+  <!-- Sidebar: Filters -->
+  <rect x="16" y="52" width="156" height="312" fill="var(--bg-subtle)"/>
+  <line x1="172" y1="52" x2="172" y2="364" stroke="var(--border)" stroke-width="1"/>
+  <text x="32" y="76" font-size="9" font-weight="700" letter-spacing="0.5" fill="var(--muted)" font-family="-apple-system, BlinkMacSystemFont, sans-serif">FILTERS</text>
+
+  <!-- Filter labels + dropdowns -->
+  <text x="32" y="98" font-size="8.5" fill="var(--text-secondary)" font-family="-apple-system, BlinkMacSystemFont, sans-serif">Class of Business</text>
+  <rect x="28" y="102" width="134" height="24" rx="4" fill="var(--bg)" stroke="var(--border)" stroke-width="1"/>
+  <text x="36" y="118" font-size="9" fill="var(--text)" font-family="-apple-system, BlinkMacSystemFont, sans-serif">All Classes</text>
+  <text x="150" y="118" text-anchor="end" font-size="9" fill="var(--muted)" font-family="-apple-system, BlinkMacSystemFont, sans-serif">&#x25BE;</text>
+
+  <text x="32" y="144" font-size="8.5" fill="var(--text-secondary)" font-family="-apple-system, BlinkMacSystemFont, sans-serif">Status</text>
+  <rect x="28" y="148" width="134" height="24" rx="4" fill="var(--bg)" stroke="var(--border)" stroke-width="1"/>
+  <text x="36" y="164" font-size="9" fill="var(--text)" font-family="-apple-system, BlinkMacSystemFont, sans-serif">Active</text>
+  <text x="150" y="164" text-anchor="end" font-size="9" fill="var(--muted)" font-family="-apple-system, BlinkMacSystemFont, sans-serif">&#x25BE;</text>
+
+  <text x="32" y="190" font-size="8.5" fill="var(--text-secondary)" font-family="-apple-system, BlinkMacSystemFont, sans-serif">Cover Type</text>
+  <rect x="28" y="194" width="134" height="24" rx="4" fill="var(--bg)" stroke="var(--border)" stroke-width="1"/>
+  <text x="36" y="210" font-size="9" fill="var(--text)" font-family="-apple-system, BlinkMacSystemFont, sans-serif">Buildings</text>
+  <text x="150" y="210" text-anchor="end" font-size="9" fill="var(--muted)" font-family="-apple-system, BlinkMacSystemFont, sans-serif">&#x25BE;</text>
+
+  <!-- Annotation: filters -->
+  <rect x="30" y="238" width="128" height="42" rx="4" fill="var(--accent-soft)" stroke="var(--accent-border)" stroke-width="0.75" stroke-dasharray="3,2"/>
+  <text x="94" y="255" text-anchor="middle" font-size="8" fill="var(--accent)" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-style="italic">signal() inputs drive</text>
+  <text x="94" y="268" text-anchor="middle" font-size="8" fill="var(--accent)" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-style="italic">computed() filtered list</text>
+
+  <!-- Policy list panel -->
+  <rect x="172" y="52" width="228" height="312" fill="var(--bg-panel)"/>
+  <line x1="400" y1="52" x2="400" y2="364" stroke="var(--border)" stroke-width="1"/>
+  <text x="188" y="76" font-size="9" font-weight="700" letter-spacing="0.5" fill="var(--muted)" font-family="-apple-system, BlinkMacSystemFont, sans-serif">POLICIES</text>
+  <text x="380" y="76" text-anchor="end" font-size="8" fill="var(--muted)" font-family="-apple-system, BlinkMacSystemFont, sans-serif">3 results</text>
+
+  <!-- Selected policy row -->
+  <rect x="180" y="86" width="212" height="44" rx="5" fill="var(--accent-soft)" stroke="var(--accent-border)" stroke-width="1"/>
+  <circle cx="196" cy="100" r="4" fill="var(--accent)" opacity="0.6"/>
+  <text x="206" y="101" font-size="9" font-weight="600" fill="var(--text)" font-family="-apple-system, BlinkMacSystemFont, sans-serif">POL-001 &#xB7; Acme Corp</text>
+  <text x="206" y="115" font-size="8" fill="var(--muted)" font-family="-apple-system, BlinkMacSystemFont, sans-serif">Buildings &#xB7; Active &#xB7; &#xA3;120,000</text>
+  <text x="380" y="101" text-anchor="end" font-size="8" fill="var(--accent)" font-family="-apple-system, BlinkMacSystemFont, sans-serif">&#x2713;</text>
+
+  <!-- Policy row 2 -->
+  <rect x="180" y="136" width="212" height="44" rx="5" fill="var(--bg)" stroke="var(--border)" stroke-width="0.75"/>
+  <circle cx="196" cy="150" r="4" fill="var(--border-strong)" opacity="0.4"/>
+  <text x="206" y="151" font-size="9" fill="var(--text)" font-family="-apple-system, BlinkMacSystemFont, sans-serif">POL-002 &#xB7; Beta Ltd</text>
+  <text x="206" y="165" font-size="8" fill="var(--muted)" font-family="-apple-system, BlinkMacSystemFont, sans-serif">Contents &#xB7; Active &#xB7; &#xA3;85,000</text>
+
+  <!-- Policy row 3 -->
+  <rect x="180" y="186" width="212" height="44" rx="5" fill="var(--bg)" stroke="var(--border)" stroke-width="0.75"/>
+  <circle cx="196" cy="200" r="4" fill="var(--border-strong)" opacity="0.4"/>
+  <text x="206" y="201" font-size="9" fill="var(--text)" font-family="-apple-system, BlinkMacSystemFont, sans-serif">POL-003 &#xB7; Gamma Inc</text>
+  <text x="206" y="215" font-size="8" fill="var(--muted)" font-family="-apple-system, BlinkMacSystemFont, sans-serif">Motor Fleet &#xB7; Pending &#xB7; &#xA3;200,000</text>
+
+  <!-- Annotation: selected policy -->
+  <rect x="180" y="250" width="212" height="32" rx="4" fill="var(--accent-soft)" stroke="var(--accent-border)" stroke-width="0.75" stroke-dasharray="3,2"/>
+  <text x="286" y="263" text-anchor="middle" font-size="8" fill="var(--accent)" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-style="italic">linkedSignal() resets selection</text>
+  <text x="286" y="276" text-anchor="middle" font-size="8" fill="var(--accent)" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-style="italic">when filters change</text>
+
+  <!-- Pagination -->
+  <rect x="180" y="330" width="212" height="24" rx="4" fill="var(--bg)" stroke="var(--border)" stroke-width="0.75"/>
+  <text x="286" y="346" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="-apple-system, BlinkMacSystemFont, sans-serif">&#x2039; 1 / 12 &#x203A;</text>
+
+  <!-- Detail panel -->
+  <rect x="400" y="52" width="344" height="312" fill="var(--bg)"/>
+  <text x="416" y="76" font-size="9" font-weight="700" letter-spacing="0.5" fill="var(--muted)" font-family="-apple-system, BlinkMacSystemFont, sans-serif">POLICY DETAIL</text>
+
+  <!-- Tabs -->
+  <rect x="412" y="86" width="56" height="22" rx="4" fill="var(--accent-soft)" stroke="var(--accent-border)" stroke-width="1"/>
+  <text x="440" y="100" text-anchor="middle" font-size="8.5" font-weight="600" fill="var(--accent)" font-family="-apple-system, BlinkMacSystemFont, sans-serif">Summary</text>
+  <rect x="474" y="86" width="36" height="22" rx="4" fill="var(--bg)" stroke="var(--border)" stroke-width="0.75"/>
+  <text x="492" y="100" text-anchor="middle" font-size="8.5" fill="var(--muted)" font-family="-apple-system, BlinkMacSystemFont, sans-serif">Risk</text>
+  <rect x="516" y="86" width="48" height="22" rx="4" fill="var(--bg)" stroke="var(--border)" stroke-width="0.75"/>
+  <text x="540" y="100" text-anchor="middle" font-size="8.5" fill="var(--muted)" font-family="-apple-system, BlinkMacSystemFont, sans-serif">Claims</text>
+  <rect x="570" y="86" width="40" height="22" rx="4" fill="var(--bg)" stroke="var(--border)" stroke-width="0.75"/>
+  <text x="590" y="100" text-anchor="middle" font-size="8.5" fill="var(--muted)" font-family="-apple-system, BlinkMacSystemFont, sans-serif">Docs</text>
+
+  <!-- Divider under tabs -->
+  <line x1="412" y1="116" x2="728" y2="116" stroke="var(--border)" stroke-width="0.75"/>
+
+  <!-- Detail content skeleton -->
+  <rect x="412" y="126" width="200" height="10" rx="3" fill="var(--border)" opacity="0.4"/>
+  <rect x="412" y="144" width="280" height="8" rx="3" fill="var(--border)" opacity="0.25"/>
+  <rect x="412" y="158" width="240" height="8" rx="3" fill="var(--border)" opacity="0.25"/>
+  <rect x="412" y="172" width="160" height="8" rx="3" fill="var(--border)" opacity="0.25"/>
+
+  <!-- Form fields -->
+  <text x="412" y="202" font-size="8.5" fill="var(--text-secondary)" font-family="-apple-system, BlinkMacSystemFont, sans-serif">Inception Date</text>
+  <rect x="412" y="206" width="140" height="24" rx="4" fill="var(--bg)" stroke="var(--border)" stroke-width="1"/>
+  <text x="420" y="222" font-size="9" fill="var(--text)" font-family="-apple-system, BlinkMacSystemFont, sans-serif">01/01/2026</text>
+
+  <text x="568" y="202" font-size="8.5" fill="var(--text-secondary)" font-family="-apple-system, BlinkMacSystemFont, sans-serif">Excess Amount</text>
+  <rect x="568" y="206" width="120" height="24" rx="4" fill="var(--bg)" stroke="var(--border)" stroke-width="1"/>
+  <text x="576" y="222" font-size="9" fill="var(--text)" font-family="-apple-system, BlinkMacSystemFont, sans-serif">&#xA3;25,000</text>
+
+  <text x="412" y="252" font-size="8.5" fill="var(--text-secondary)" font-family="-apple-system, BlinkMacSystemFont, sans-serif">Total Premium</text>
+  <rect x="412" y="256" width="140" height="24" rx="4" fill="var(--bg-subtle)" stroke="var(--border)" stroke-width="1"/>
+  <text x="420" y="272" font-size="9" font-weight="600" fill="var(--text)" font-family="-apple-system, BlinkMacSystemFont, sans-serif">&#xA3;120,000</text>
+  <text x="500" y="272" font-size="7" fill="var(--muted)" font-family="-apple-system, BlinkMacSystemFont, sans-serif">(derived)</text>
+
+  <!-- Annotation: detail panel -->
+  <rect x="412" y="296" width="316" height="44" rx="4" fill="var(--accent-soft)" stroke="var(--accent-border)" stroke-width="0.75" stroke-dasharray="3,2"/>
+  <text x="570" y="312" text-anchor="middle" font-size="8" fill="var(--accent)" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-style="italic">Tabs: linkedSignal() &#xB7; Form fields: signal()</text>
+  <text x="570" y="326" text-anchor="middle" font-size="8" fill="var(--accent)" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-style="italic">Totals: computed() &#xB7; Pagination: linkedSignal()</text>
+</svg>

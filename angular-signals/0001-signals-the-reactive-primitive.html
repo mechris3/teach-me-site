@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>Signals: The Reactive Primitive - Lesson 1 | Teach Me</title>
+  <meta name="description" content="Angular Signals are a pull-based reactive primitive. Learn signal(), computed(), set, update, and asReadonly - and how they compare to BehaviorSubject.">
+  <link rel="canonical" href="https://teachmeskills.dev/angular-signals/01-signals-the-reactive-primitive.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/angular-signals/01-signals-the-reactive-primitive.html">
+  <meta property="og:title" content="Signals: The Reactive Primitive - Lesson 1 | Teach Me">
+  <meta property="og:description" content="Angular Signals are a pull-based reactive primitive. Learn signal(), computed(), set, update, and asReadonly - and how they compare to BehaviorSubject.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Signals: The Reactive Primitive - Lesson 1 | Teach Me">
+  <meta name="twitter:description" content="Angular Signals are a pull-based reactive primitive. Learn signal(), computed(), set, update, and asReadonly - and how they compare to BehaviorSubject.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header"><a href="index.html">Angular Signals Course</a></div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li class="current"><a href="0001-signals-the-reactive-primitive.html">1. Signals: The Reactive Primitive</a></li>
+        <li><a href="0002-effects-lifecycle-and-untracked.html">2. Effects, Lifecycle & Untracked</a></li>
+        <li><a href="0003-linked-signal-and-dependent-state.html">3. linkedSignal & Dependent State</a></li>
+        <li><a href="0004-rxjs-interop-the-bridge.html">4. RxJS Interop: The Bridge</a></li>
+        <li><a href="0005-signalstore-your-first-store.html">5. SignalStore: Your First Store</a></li>
+        <li><a href="0006-entity-management.html">6. Entity Management</a></li>
+        <li><a href="0007-async-with-rxmethod.html">7. Async with rxMethod</a></li>
+        <li class="coming-soon"><a href="0008-resource-and-httpresource.html">8. resource & httpResource</a></li>
+        <li class="coming-soon"><a href="0009-store-lifecycle-and-devtools.html">9. Store Lifecycle & DevTools</a></li>
+        <li class="coming-soon"><a href="0010-custom-store-features.html">10. Custom Store Features</a></li>
+        <li class="coming-soon"><a href="0011-events-and-reducers.html">11. Events & Reducers</a></li>
+        <li class="coming-soon"><a href="0012-store-architecture-and-testing.html">12. Store Architecture & Testing</a></li>
+        <li class="coming-soon"><a href="0013-signal-forms-the-new-model.html">13. Signal Forms: The New Model</a></li>
+        <li class="coming-soon"><a href="0014-validation-and-field-state.html">14. Validation & Field State</a></li>
+        <li class="coming-soon"><a href="0015-complex-forms-and-custom-controls.html">15. Complex Forms & Custom Controls</a></li>
+        <li class="coming-soon"><a href="0016-migrating-signalformcontrol-bridge.html">16. Migrating: SignalFormControl Bridge</a></li>
+        <li class="coming-soon"><a href="0017-signals-store-forms-together.html">17. Signals + Store + Forms</a></li>
+        <li class="coming-soon"><a href="0018-when-to-keep-rxjs.html">18. When to Keep RxJS</a></li>
+        <li class="coming-soon"><a href="0019-capstone-the-complete-dashboard.html">19. Capstone: The Complete Dashboard</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="signals-glossary.html">Signals Glossary</a></li>
+        <li class="coming-soon"><a href="signal-primitives.html">Signal Primitives</a></li>
+        <li class="coming-soon"><a href="signalstore-api.html">SignalStore API</a></li>
+        <li class="coming-soon"><a href="signal-forms-api.html">Signal Forms API</a></li>
+        <li class="coming-soon"><a href="decision-framework.html">Decision Framework</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 1</p>
+  <h1>Signals: The Reactive Primitive</h1>
+
+  <h2>The Core Idea</h2>
+
+  <div class="key-concept">
+    <strong>Mental model:</strong> A signal is a <em>value with a notification mechanism</em>. You read it by calling it like a function. Angular tracks where you read it and re-renders only what depends on it. There's no subscription. No teardown. No async pipe.
+  </div>
+
+  <p>If you've spent a decade with RxJS, your instinct is to think in <strong>streams</strong> - sequences of values pushed over time, transformed through operators, eventually subscribed to. Signals flip that model on its head.</p>
+
+  <p>A signal is not a stream. It's a <strong>synchronous, reactive value</strong>. It always has a current value. You read it when you need it. The framework knows <em>where</em> you read it, and when the value changes, it re-evaluates only those consumers.</p>
+
+  <div class="key-concept">
+    <strong>Pull reads, push invalidation:</strong> The word "pull-based" can be confusing. Here's what it means in practice: <em>reading</em> is pull - you call <code>count()</code> to get the value. But <em>change notification</em> is push - when you call <code>count.set(5)</code>, Angular immediately marks all dependents as stale via the reactive graph. The actual re-evaluation then happens when something pulls: for computed signals, that's the next read. For templates, Angular's change detection scheduler listens directly to signal notifications and triggers a targeted re-render of only the dirty components. No zone.js needed - Angular 21+ is zoneless by default, so this just works without any configuration. Values <strong>do</strong> auto-update in the UI - the mechanism is "invalidate, schedule, then re-pull" rather than "push new value directly into the subscriber."
+  </div>
+
+  <table>
+    <tr><th></th><th>Observable (RxJS)</th><th>Signal (Angular)</th></tr>
+    <tr><td>Model</td><td>Push-based stream</td><td>Pull reads, push invalidation</td></tr>
+    <tr><td>Has current value?</td><td>Only BehaviorSubject/ReplaySubject</td><td>Always</td></tr>
+    <tr><td>Reading</td><td><code>.subscribe()</code> or <code>async</code> pipe</td><td>Invoke it as a function: <code>mySignal()</code></td></tr>
+    <tr><td>Cleanup</td><td>Unsubscribe / takeUntilDestroyed</td><td>Automatic (framework-managed)</td></tr>
+    <tr><td>Async?</td><td>Yes - values arrive over time</td><td>No - always synchronous</td></tr>
+    <tr><td>Glitch-free?</td><td>No (diamond problem - see below)</td><td>Yes (lazy evaluation prevents glitches)</td></tr>
+  </table>
+
+  <p>The closest RxJS analogue to a signal is a <code>BehaviorSubject</code> - it always holds a current value, and you can read it synchronously with <code>.getValue()</code>. But signals shed all the subscription machinery and give the framework fine-grained tracking that observables never could.</p>
+
+  <h3>The Diamond Problem and Glitch-Free Evaluation</h3>
+
+  <p>A <strong>glitch</strong> in reactive programming is when a consumer momentarily sees an inconsistent, half-updated state. The classic cause is the <strong>diamond problem</strong>:</p>
+
+  <div class="demo" style="padding-left: 0.5rem; padding-right: 0.5rem;">
+    <div style="display: flex; gap: 0; justify-content: stretch; align-items: stretch;">
+      <!-- Observable (Push) Column -->
+      <div style="flex: 1; display: flex; flex-direction: column; align-items: stretch; padding: 0 1rem 1rem 1rem;">
+        <p style="font-size: 0.85rem; font-weight: 600; color: var(--text-h2); margin-bottom: 0.5rem; text-align: center;">Observable (Push) - Glitch</p>
+        <svg id="diamond-push" viewBox="0 0 240 280" width="220" height="260" style="display: block; margin: 0 auto;" aria-label="Observable diamond: push-based with glitch">
+          <!-- Edges -->
+          <line x1="120" y1="50" x2="50" y2="130" stroke="var(--border)" stroke-width="2"/>
+          <line x1="120" y1="50" x2="190" y2="130" stroke="var(--border)" stroke-width="2"/>
+          <line x1="50" y1="130" x2="120" y2="210" stroke="var(--border)" stroke-width="2"/>
+          <line x1="190" y1="130" x2="120" y2="210" stroke="var(--border)" stroke-width="2"/>
+          <!-- Pulse dots (animated - 9s total cycle, motion synced with opacity) -->
+          <!-- A to B: visible 0-1.6s -->
+          <circle class="pulse-ab" r="6" fill="var(--accent)" opacity="0">
+            <animateMotion dur="9s" repeatCount="indefinite" keyPoints="0;0;1;1" keyTimes="0;0.001;0.178;1" calcMode="linear">
+              <mpath href="#path-ab-push"/>
+            </animateMotion>
+            <animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.01;0.15;0.178;1" dur="9s" repeatCount="indefinite"/>
+          </circle>
+          <!-- B to D (glitch): visible 1.6-3.2s -->
+          <circle class="pulse-bd" r="6" fill="var(--signal-stale)" opacity="0">
+            <animateMotion dur="9s" repeatCount="indefinite" keyPoints="0;0;0;1;1" keyTimes="0;0.177;0.178;0.356;1" calcMode="linear">
+              <mpath href="#path-bd-push"/>
+            </animateMotion>
+            <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.177;0.178;0.33;0.356;1" dur="9s" repeatCount="indefinite"/>
+          </circle>
+          <!-- A to C: visible 3.5-5.1s -->
+          <circle class="pulse-ac" r="6" fill="var(--accent)" opacity="0">
+            <animateMotion dur="9s" repeatCount="indefinite" keyPoints="0;0;0;1;1" keyTimes="0;0.388;0.389;0.567;1" calcMode="linear">
+              <mpath href="#path-ac-push"/>
+            </animateMotion>
+            <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.388;0.389;0.54;0.567;1" dur="9s" repeatCount="indefinite"/>
+          </circle>
+          <!-- C to D: visible 5.1-6.7s -->
+          <circle class="pulse-cd" r="6" fill="var(--accent)" opacity="0">
+            <animateMotion dur="9s" repeatCount="indefinite" keyPoints="0;0;0;1;1" keyTimes="0;0.566;0.567;0.744;1" calcMode="linear">
+              <mpath href="#path-cd-push"/>
+            </animateMotion>
+            <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.566;0.567;0.72;0.744;1" dur="9s" repeatCount="indefinite"/>
+          </circle>
+          <!-- Hidden paths for motion -->
+          <path id="path-ab-push" d="M120,50 L50,130" fill="none" stroke="none"/>
+          <path id="path-ac-push" d="M120,50 L190,130" fill="none" stroke="none"/>
+          <path id="path-bd-push" d="M50,130 L120,210" fill="none" stroke="none"/>
+          <path id="path-cd-push" d="M190,130 L120,210" fill="none" stroke="none"/>
+          <!-- Nodes -->
+          <circle cx="120" cy="50" r="24" fill="var(--bg)" stroke="var(--accent)" stroke-width="2"/>
+          <text x="120" y="56" text-anchor="middle" fill="var(--text-heading)" font-size="14" font-weight="bold" font-family="-apple-system, sans-serif">A</text>
+          <circle cx="50" cy="130" r="24" fill="var(--bg)" stroke="var(--border)" stroke-width="2"/>
+          <text x="50" y="136" text-anchor="middle" fill="var(--text)" font-size="14" font-weight="bold" font-family="-apple-system, sans-serif">B</text>
+          <circle cx="190" cy="130" r="24" fill="var(--bg)" stroke="var(--border)" stroke-width="2"/>
+          <text x="190" y="136" text-anchor="middle" fill="var(--text)" font-size="14" font-weight="bold" font-family="-apple-system, sans-serif">C</text>
+          <circle id="node-d-push" cx="120" cy="210" r="24" fill="var(--bg)" stroke="var(--border)" stroke-width="2"/>
+          <text x="120" y="216" text-anchor="middle" fill="var(--text)" font-size="14" font-weight="bold" font-family="-apple-system, sans-serif">D</text>
+          <!-- Glitch flash on D - stays red from B->D arrival (0.356) until C->D arrival (0.744) -->
+          <circle cx="120" cy="210" r="24" fill="var(--signal-stale)" opacity="0">
+            <animate attributeName="opacity" values="0;0;0.35;0.35;0;0" keyTimes="0;0.355;0.356;0.743;0.744;1" dur="9s" repeatCount="indefinite"/>
+          </circle>
+          <!-- Annotation - visible during glitch period -->
+          <text x="120" y="250" text-anchor="middle" fill="var(--signal-stale)" font-size="10" font-family="-apple-system, sans-serif" opacity="0">
+            <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.355;0.356;0.743;0.744;1" dur="9s" repeatCount="indefinite"/>
+            GLITCH! D sees new B + old C
+          </text>
+        </svg>
+        <p style="font-size: 0.8rem; color: var(--muted); margin-top: 0.75rem; line-height: 1.5; text-align: left; width: 100%;">B pushes to D before C has updated - D momentarily sees an inconsistent state.</p>
+        <p style="font-size: 0.75rem; color: var(--muted); margin-top: 0.5rem; text-align: left; width: 100%;">
+          <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); vertical-align: middle;"></span> normal propagation<br>
+          <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--signal-stale); vertical-align: middle;"></span> premature push (glitch)
+        </p>
+      </div>
+
+      <!-- Vertical divider -->
+      <div style="width: 1px; background: var(--border); align-self: stretch;"></div>
+
+      <!-- Signal (Pull) Column -->
+      <div style="flex: 1; display: flex; flex-direction: column; align-items: stretch; padding: 0 1rem 1rem 1rem;">
+        <p style="font-size: 0.85rem; font-weight: 600; color: var(--text-h2); margin-bottom: 0.5rem; text-align: center;">Signal (Pull) - Glitch-Free</p>
+        <svg id="diamond-pull" viewBox="0 0 240 280" width="220" height="260" style="display: block; margin: 0 auto;" aria-label="Signal diamond: pull-based, glitch-free">
+          <!-- Edges -->
+          <line x1="120" y1="50" x2="50" y2="130" stroke="var(--border)" stroke-width="2"/>
+          <line x1="120" y1="50" x2="190" y2="130" stroke="var(--border)" stroke-width="2"/>
+          <line x1="50" y1="130" x2="120" y2="210" stroke="var(--border)" stroke-width="2"/>
+          <line x1="190" y1="130" x2="120" y2="210" stroke="var(--border)" stroke-width="2"/>
+          <!-- Phase 1: A changes - invalidation wave (orange going DOWN) - 9s cycle -->
+          <!-- A to B invalidation: 0-1.4s -->
+          <circle r="5" fill="var(--signal-invalidation)" opacity="0">
+            <animateMotion dur="9s" repeatCount="indefinite" keyPoints="0;0;1;1" keyTimes="0;0.001;0.156;1" calcMode="linear">
+              <mpath href="#path-ab-pull"/>
+            </animateMotion>
+            <animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.01;0.13;0.156;1" dur="9s" repeatCount="indefinite"/>
+          </circle>
+          <!-- A to C invalidation: 0-1.4s -->
+          <circle r="5" fill="var(--signal-invalidation)" opacity="0">
+            <animateMotion dur="9s" repeatCount="indefinite" keyPoints="0;0;1;1" keyTimes="0;0.001;0.156;1" calcMode="linear">
+              <mpath href="#path-ac-pull"/>
+            </animateMotion>
+            <animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.01;0.13;0.156;1" dur="9s" repeatCount="indefinite"/>
+          </circle>
+          <!-- B to D invalidation: 1.2-2.6s -->
+          <circle r="5" fill="var(--signal-invalidation)" opacity="0">
+            <animateMotion dur="9s" repeatCount="indefinite" keyPoints="0;0;0;1;1" keyTimes="0;0.133;0.134;0.289;1" calcMode="linear">
+              <mpath href="#path-bd-pull"/>
+            </animateMotion>
+            <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.133;0.134;0.26;0.289;1" dur="9s" repeatCount="indefinite"/>
+          </circle>
+          <!-- C to D invalidation: 1.2-2.6s -->
+          <circle r="5" fill="var(--signal-invalidation)" opacity="0">
+            <animateMotion dur="9s" repeatCount="indefinite" keyPoints="0;0;0;1;1" keyTimes="0;0.133;0.134;0.289;1" calcMode="linear">
+              <mpath href="#path-cd-pull"/>
+            </animateMotion>
+            <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.133;0.134;0.26;0.289;1" dur="9s" repeatCount="indefinite"/>
+          </circle>
+          <!-- Phase 2: D pulls - cyan dots going UP: 5-6.4s -->
+          <circle r="5" fill="var(--signal-value)" opacity="0">
+            <animateMotion dur="9s" repeatCount="indefinite" keyPoints="0;0;0;1;1" keyTimes="0;0.555;0.556;0.711;1" calcMode="linear">
+              <mpath href="#path-db-pull"/>
+            </animateMotion>
+            <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.555;0.556;0.69;0.711;1" dur="9s" repeatCount="indefinite"/>
+          </circle>
+          <circle r="5" fill="var(--signal-value)" opacity="0">
+            <animateMotion dur="9s" repeatCount="indefinite" keyPoints="0;0;0;1;1" keyTimes="0;0.555;0.556;0.711;1" calcMode="linear">
+              <mpath href="#path-dc-pull"/>
+            </animateMotion>
+            <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.555;0.556;0.69;0.711;1" dur="9s" repeatCount="indefinite"/>
+          </circle>
+          <!-- Hidden paths -->
+          <path id="path-ab-pull" d="M120,50 L50,130" fill="none" stroke="none"/>
+          <path id="path-ac-pull" d="M120,50 L190,130" fill="none" stroke="none"/>
+          <path id="path-bd-pull" d="M50,130 L120,210" fill="none" stroke="none"/>
+          <path id="path-cd-pull" d="M190,130 L120,210" fill="none" stroke="none"/>
+          <path id="path-db-pull" d="M120,210 L50,130" fill="none" stroke="none"/>
+          <path id="path-dc-pull" d="M120,210 L190,130" fill="none" stroke="none"/>
+          <!-- Nodes -->
+          <circle cx="120" cy="50" r="24" fill="var(--bg)" stroke="var(--accent)" stroke-width="2"/>
+          <text x="120" y="56" text-anchor="middle" fill="var(--text-heading)" font-size="14" font-weight="bold" font-family="-apple-system, sans-serif">A</text>
+          <circle cx="50" cy="130" r="24" fill="var(--bg)" stroke="var(--border)" stroke-width="2"/>
+          <text x="50" y="136" text-anchor="middle" fill="var(--text)" font-size="14" font-weight="bold" font-family="-apple-system, sans-serif">B</text>
+          <circle cx="190" cy="130" r="24" fill="var(--bg)" stroke="var(--border)" stroke-width="2"/>
+          <text x="190" y="136" text-anchor="middle" fill="var(--text)" font-size="14" font-weight="bold" font-family="-apple-system, sans-serif">C</text>
+          <circle cx="120" cy="210" r="24" fill="var(--bg)" stroke="var(--border)" stroke-width="2"/>
+          <text x="120" y="216" text-anchor="middle" fill="var(--text)" font-size="14" font-weight="bold" font-family="-apple-system, sans-serif">D</text>
+          <!-- Success flash on D -->
+          <circle cx="120" cy="210" r="24" fill="var(--signal-value)" opacity="0">
+            <animate attributeName="opacity" values="0;0;0.3;0.3;0;0" keyTimes="0;0.7;0.71;0.8;0.81;1" dur="9s" repeatCount="indefinite" begin="0s"/>
+          </circle>
+          <!-- Annotation -->
+          <text x="120" y="252" text-anchor="middle" fill="var(--signal-value)" font-size="10" font-family="-apple-system, sans-serif" opacity="0">
+            <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.7;0.71;0.85;0.86;1" dur="9s" repeatCount="indefinite" begin="0s"/>
+            D pulls B + C together - consistent!
+          </text>
+          <!-- Stale labels during invalidation -->
+          <text x="50" y="165" text-anchor="middle" fill="var(--signal-invalidation)" font-size="9" font-family="-apple-system, sans-serif" opacity="0">
+            <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.2;0.21;0.5;0.51;1" dur="9s" repeatCount="indefinite" begin="0s"/>
+            stale
+          </text>
+          <text x="190" y="165" text-anchor="middle" fill="var(--signal-invalidation)" font-size="9" font-family="-apple-system, sans-serif" opacity="0">
+            <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.2;0.21;0.5;0.51;1" dur="9s" repeatCount="indefinite" begin="0s"/>
+            stale
+          </text>
+        </svg>
+        <p style="font-size: 0.8rem; color: var(--muted); margin-top: 0.75rem; line-height: 1.5; text-align: left; width: 100%;">All nodes are marked stale first, then D pulls B and C together - always consistent.</p>
+        <p style="font-size: 0.75rem; color: var(--muted); margin-top: 0.5rem; text-align: left; width: 100%;">
+          <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--signal-invalidation); vertical-align: middle;"></span> invalidation (mark stale)<br>
+          <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--signal-value); vertical-align: middle;"></span> pull (consistent read)
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <p><strong>With observables (push-based):</strong> When <code>A</code> emits, <code>B</code> recalculates and immediately pushes to <code>D</code>. At that instant, <code>D</code> sees the <em>new</em> <code>B</code> but the <em>old</em> <code>C</code> - an inconsistent snapshot. Then <code>C</code> updates and pushes to <code>D</code> again. That first intermediate emission is the glitch. In RxJS, <code>combineLatest([b$, c$])</code> exhibits this: it fires once with stale <code>C</code>, then again with both correct.</p>
+
+  <p><strong>With signals (lazy evaluation):</strong> When <code>A</code> changes, <code>B</code> and <code>C</code> are merely <em>marked stale</em>. <code>D</code> doesn't recalculate until something reads it. By that point, both dependencies are known to be stale, so when <code>D</code> pulls from <code>B</code> and <code>C</code>, they both recalculate against the already-updated <code>A</code>. You only ever see the final consistent state. No glitch.</p>
+
+  <h2>Zoneless by Default</h2>
+
+  <p>If you're wondering what actually triggers re-evaluation when a signal is marked stale - the answer used to be zone.js. Not anymore.</p>
+
+  <p>Zone.js was Angular's original mechanism for knowing when to run change detection. It monkey-patched every async API in the browser (<code>setTimeout</code>, <code>Promise</code>, <code>addEventListener</code>, etc.) and triggered a full change detection cycle after each one. It worked, but it was a shotgun: it checked the entire component tree after <em>any</em> async event, whether state actually changed or not.</p>
+
+  <p>Since Angular 21, <strong>zoneless is the default</strong>. You don't configure anything - new apps simply don't include zone.js. Angular's scheduler instead listens directly to signal notifications via the reactive graph, and triggers targeted re-renders of only the components whose bindings actually depend on the changed signal.</p>
+
+  <h3>Why this matters</h3>
+
+  <table>
+    <tr><th>Benefit</th><th>What it means in practice</th></tr>
+    <tr><td>Smaller bundle</td><td>zone.js was ~13KB gzipped. Gone.</td></tr>
+    <tr><td>Fewer CD cycles</td><td>No more change detection after every <code>setTimeout</code> or HTTP response. Only runs when a signal actually changes.</td></tr>
+    <tr><td>Targeted updates</td><td>Zone.js couldn't know <em>which</em> component was dirty. Signals tell Angular exactly which bindings changed.</td></tr>
+    <tr><td>No phantom cycles</td><td>A random <code>setTimeout</code> in a third-party library no longer triggers change detection across your entire app.</td></tr>
+    <tr><td>No <code>ExpressionChangedAfterItHasBeenCheckedError</code></td><td>This error was a symptom of zone-triggered CD running at unexpected times. With signals, state changes are explicit.</td></tr>
+    <tr><td>Better interop</td><td>No more monkey-patching global APIs. Third-party libraries and micro-frontends no longer fight over zone.js.</td></tr>
+    <tr><td>Clearer mental model</td><td>"State changes when I call <code>.set()</code> or <code>.update()</code>" is far easier to reason about than "state might be checked after any async event anywhere."</td></tr>
+  </table>
+
+  <div class="key-concept">
+    <strong>The timeline:</strong> Zoneless was experimental in Angular 19 (opt-in via <code>provideExperimentalZonelessChangeDetection()</code>), graduated to stable in Angular 20 (<code>provideZonelessChangeDetection()</code>, still opt-in), and became the default in Angular 21+. Angular 22 additionally makes <code>OnPush</code> the default change detection strategy. If you're on Angular 21 or later, you get all of this for free.
+  </div>
+
+  <h3>What exactly triggers change detection without zone.js?</h3>
+
+  <p>In zoneless Angular, change detection runs when <em>any</em> of the following happens:</p>
+
+  <ol>
+    <li><strong>A signal read in a template changes</strong> - the scheduler is notified directly by the reactive graph.</li>
+    <li><strong>A template event listener fires</strong> - any <code>(click)</code>, <code>(keyup)</code>, <code>(submit)</code> etc. bound in a template automatically schedules CD after the handler runs.</li>
+    <li><strong><code>ChangeDetectorRef.markForCheck()</code> is called</strong> - this still works exactly as before. The <code>async</code> pipe calls this internally, so <code>observable$ | async</code> still triggers updates.</li>
+    <li><strong><code>ComponentRef.setInput()</code> is called</strong> - this is what Angular calls internally when a parent passes a new value to a child's <code>@Input()</code>. So traditional inputs still work.</li>
+    <li><strong>A view is attached that was already marked dirty</strong> - e.g. lazy-loaded components or <code>*ngIf</code> revealing a dirty view.</li>
+  </ol>
+
+  <h3>Do I need signals for zoneless to work?</h3>
+
+  <p><strong>No.</strong> Traditional patterns still trigger change detection through the mechanisms above. Specifically:</p>
+
+  <table>
+    <tr><th>Pattern</th><th>Why it still works without zone.js</th></tr>
+    <tr><td><code>@Input()</code> bindings</td><td>Angular calls <code>setInput()</code> internally when the parent re-renders and passes a new value.</td></tr>
+    <tr><td><code>observable$ | async</code></td><td>The <code>async</code> pipe calls <code>markForCheck()</code> when the observable emits.</td></tr>
+    <tr><td>Event bindings <code>(click)="doThing()"</code></td><td>Template listeners schedule CD automatically after the handler completes.</td></tr>
+    <tr><td>Classic NgRx with <code>store.select() | async</code></td><td>Same as above - the <code>async</code> pipe handles it.</td></tr>
+  </table>
+
+  <h3>What <em>breaks</em> without zone.js?</h3>
+
+  <p>The one thing that won't work: mutating a plain class property inside a raw <code>setTimeout</code>, <code>setInterval</code>, or <code>Promise.then()</code> without calling <code>markForCheck()</code> or triggering one of the mechanisms above.</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">// This WORKED with zone.js (zone intercepted the setTimeout)
+// This BREAKS in zoneless (nothing tells Angular to check)
+@Component({ template: `{{ name }}` })
+export class BrokenComponent {
+  name = 'initial';
+
+  ngOnInit() {
+    setTimeout(() => {
+      this.name = 'updated'; // UI won't update!
+    }, 1000);
+  }
+}
+
+// Fix: use a signal instead
+@Component({ template: `{{ name() }}` })
+export class FixedComponent {
+  name = signal('initial');
+
+  ngOnInit() {
+    setTimeout(() => {
+      this.name.set('updated'); // signal notifies the scheduler
+    }, 1000);
+  }
+}</code></pre>
+  </div>
+
+  <p>This is the only real "gotcha" when moving to zoneless. If you're already using OnPush + observables + async pipe (which you are with classic NgRx), you were never relying on zone.js to catch plain property mutations anyway - so the transition is seamless. Signals just make it explicit and remove the last edge cases.</p>
+
+  <h2>Our Running Example: The Policy Dashboard</h2>
+
+  <p>Throughout this course, our code examples live in a <strong>Policy Dashboard</strong> - an insurance platform that manages policies, claims, endorsements, and pricing. If you see types like <code>Policy</code>, <code>Claim</code>, or <code>CoverType</code>, that's the domain. It gives us realistic data structures (nested objects, arrays, statuses) without needing to explain the business logic each time.</p>
+
+  <!-- Policy Dashboard Wireframe (external SVG) -->
+  <div style="margin: 1.5rem 0; padding: 1rem; border: 1px solid var(--border); border-radius: 8px; background: var(--bg);">
+    <object data="policy-dashboard-wireframe.svg" type="image/svg+xml" style="display: block; width: 100%; max-width: 780px; margin: 0 auto;" aria-label="Wireframe of the Policy Dashboard showing filters sidebar, policy list, and detail panel with tabs"></object>
+    <p style="font-size: 0.8rem; color: var(--muted); margin-top: 0.75rem; line-height: 1.5; text-align: center;">The Policy Dashboard wireframe. Blue annotations show which signal primitives power each UI region - we'll build these patterns throughout the course.</p>
+  </div>
+
+  <h2>Creating a Writable Signal</h2>
+
+  <p>The <code>signal()</code> function creates a writable signal. You pass it an initial value:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">import { signal } from '@angular/core';
+
+const count = signal(0);          // WritableSignal&lt;number&gt;
+const name = signal('');           // WritableSignal&lt;string&gt;
+const policies = signal&lt;Policy[]&gt;([]);  // WritableSignal&lt;Policy[]&gt;</code></pre>
+  </div>
+
+  <p>The type is inferred from the initial value. For arrays or complex types, you'll sometimes need an explicit generic to avoid a TypeScript gotcha: an empty array literal <code>[]</code> is inferred as <code>never[]</code> in strict mode, meaning you can't assign anything to it later:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">// Without explicit type - inferred as WritableSignal&lt;never[]&gt;
+const policies = signal([]);
+policies.set([{ id: '1' }]); // Error: '{ id: string }' is not assignable to 'never'
+
+// With explicit type - works as expected
+const policies = signal&lt;Policy[]&gt;([]);
+policies.set([{ id: '1', holder: 'Acme Corp', premium: 50000 }]); // Fine</code></pre>
+  </div>
+
+  <p>This isn't specific to signals - it's how TypeScript infers empty arrays anywhere. But it trips people up here because <code>signal([])</code> looks like it should be flexible. The fix is always to provide the generic: <code>signal&lt;YourType[]&gt;([])</code>.</p>
+
+  <div class="key-concept">
+    <strong>What is <code>never</code>?</strong> Think of types as sets of possible values. <code>string</code> is the set of all strings. <code>unknown</code> is the set of everything. <code>never</code> is the <em>empty set</em> - no value belongs to it. Nothing is assignable to <code>never</code> because there's no value that fits in an empty set. So <code>never[]</code> means "an array that can only contain values from the empty set" - i.e. an array where you can't put anything in. TypeScript infers <code>[]</code> as <code>never[]</code> because it has no evidence of what goes in there and picks the most restrictive type possible.
+  </div>
+
+  <h3>Reading a Signal</h3>
+
+  <p>A signal <em>is</em> a function. You read its current value by invoking it with parentheses - whatever you named the variable, just add <code>()</code>:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">const count = signal(0);
+const name = signal('');
+const policies = signal&lt;Policy[]&gt;([]);
+
+// Read by calling the signal as a function
+console.log(count());    // 0
+console.log(name());     // ''
+console.log(policies()); // []</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <strong>Why a function call?</strong> The act of calling <code>count()</code> is what lets Angular <em>track</em> the read. If you read a signal inside a template, a <code>computed()</code>, or an <code>effect()</code>, Angular records the dependency. This is what makes signals reactive - not a subscription, but a tracked read.
+  </div>
+
+  <p><strong>The RxJS equivalent:</strong> Where you'd previously write <code>{{ count$ | async }}</code> in a template or <code>this.count$.getValue()</code> in class code, you now write <code>{{ count() }}</code> in templates and <code>this.count()</code> in class code. Same signal, same call - templates just don't need <code>this</code>. No pipe. No subscription. No memory leak risk.</p>
+
+  <h2>Updating a Signal</h2>
+
+  <p>Writable signals provide two mutation methods:</p>
+
+  <h3>.set() - Replace the value</h3>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">count.set(5);       // value is now 5
+name.set('Acme Insurance'); // value is now 'Acme Insurance'</code></pre>
+  </div>
+
+  <h3>.update() - Derive from the previous value</h3>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">count.update(prev => prev + 1);  // 5 → 6
+
+policies.update(prev => [
+  ...prev,
+  { id: '1', holder: 'Acme Corp', premium: 50000 }
+]);</code></pre>
+  </div>
+
+  <p><code>.update()</code> takes a pure function: previous value in, new value out. This is your bread and butter for immutable state updates - the signal equivalent of the reducer pattern you know from NgRx.</p>
+
+  <div class="warning">
+    <strong>No immutability enforcement:</strong> The <code>prev</code> value in <code>.update()</code> is not frozen or typed as <code>Readonly</code>. Nothing stops you from mutating it directly (e.g. <code>prev.push(item); return prev;</code>). But if you do, you return the same reference - <code>Object.is()</code> sees no change, consumers aren't notified, and the UI silently goes stale. Same discipline as NgRx reducers: always return a new reference.
+  </div>
+
+  <h3>.set() vs .update() - When to use which</h3>
+
+  <table>
+    <tr><th>Use <code>.set()</code></th><th>Use <code>.update()</code></th></tr>
+    <tr><td>You have the complete new value</td><td>You need to derive from the current value</td></tr>
+    <tr><td>Resetting state</td><td>Incrementing, appending, toggling</td></tr>
+    <tr><td>Assigning from an API response</td><td>Transforming existing state</td></tr>
+  </table>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <h2>Computed Signals</h2>
+
+  <p>A <code>computed()</code> signal derives its value from other signals. It's read-only - the type system enforces this at compile time. A <code>computed()</code> returns <code>Signal&lt;T&gt;</code>, not <code>WritableSignal&lt;T&gt;</code>, so <code>.set()</code> and <code>.update()</code> simply don't exist on it. Try it and TypeScript stops you before the code ever runs:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">import { signal, computed } from '@angular/core';
+
+const count = signal(0);
+const doubleCount = computed(() => count() * 2);
+
+doubleCount.set(10);        // TS Error: Property 'set' does not exist on type 'Signal&lt;number&gt;'
+doubleCount.update(v => v); // TS Error: Property 'update' does not exist on type 'Signal&lt;number&gt;'
+
+// To change doubleCount, change its source:
+count.set(3);
+console.log(doubleCount()); // 6</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <strong>Lazy and memoized:</strong> The derivation function only runs when you <em>read</em> the computed signal, and only if a dependency has changed since the last read. If nothing changed, it returns the cached value. This means expensive computations (filtering, sorting) are safe inside computed - they won't re-run unless their inputs actually change.
+  </div>
+
+  <h3>The RxJS Comparison</h3>
+
+  <p>In RxJS, you'd derive state with operators:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">// RxJS way
+count$ = new BehaviorSubject(0);
+doubleCount$ = this.count$.pipe(
+  map(c => c * 2),
+  distinctUntilChanged(),
+  shareReplay(1)
+);
+
+// Signals way
+count = signal(0);
+doubleCount = computed(() => this.count() * 2);</code></pre>
+  </div>
+
+  <p>Notice what vanished: <code>pipe()</code>, <code>map()</code>, <code>distinctUntilChanged()</code> (signals already skip if the value hasn't changed), <code>shareReplay(1)</code> (computed is already memoized and shared). The computed signal collapses all of that into a single declaration.</p>
+
+  <h3>Dynamic Dependencies</h3>
+
+  <p>Computed signals track dependencies <em>dynamically</em> - only what was actually read during the last evaluation counts. This is different from RxJS <code>combineLatest</code>, which always subscribes to all sources.</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">const showCount = signal(false);
+const count = signal(0);
+
+const message = computed(() => {
+  if (showCount()) {
+    return `Count is ${count()}`;
+  }
+  return 'Nothing to see here';
+});
+
+// When showCount is false, changes to count don't
+// invalidate the computed - count isn't a dependency.
+count.set(99);
+console.log(message()); // 'Nothing to see here' - not recomputed</code></pre>
+  </div>
+
+  <p>This is genuinely different from how <code>combineLatest([showCount$, count$])</code> works - that would emit on <em>every</em> change to either source, regardless of branching logic. Signals are smarter here.</p>
+
+  <h2>Equality and Change Detection</h2>
+
+  <p>By default, signals use <code>Object.is()</code> to determine if a value has changed. Setting the same value again does not trigger consumers:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">const count = signal(5);
+count.set(5); // No change detected - consumers not notified</code></pre>
+  </div>
+
+  <p>For objects and arrays, this means reference equality. Setting a new array with the same contents <em>will</em> trigger consumers (different reference).</p>
+
+  <h3 id="custom-equality">Custom Equality Functions</h3>
+
+  <p>You can override the default <code>Object.is()</code> check by passing an <code>equal</code> option. This works on <code>signal()</code>, <code>computed()</code>, and (as we'll see in <a href="0003-linked-signal-and-dependent-state.html#custom-equality">Lesson 3</a>) <code>linkedSignal()</code>:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">import isEqual from 'lodash/isEqual';
+
+// signal with custom equality - deep comparison
+const data = signal(['active', 'pending'], { equal: isEqual });
+data.set(['active', 'pending']); // Same contents - no notification
+
+// computed with custom equality - only notify if ID changes
+const activePolicy = computed(
+  () => this.policies().find(p => p.status === 'active'),
+  { equal: (a, b) => a?.id === b?.id }
+);</code></pre>
+  </div>
+
+  <p>This is the signal equivalent of <code>distinctUntilChanged()</code> in RxJS - but built into the primitive itself rather than being an operator you chain on.</p>
+
+  <div class="warning">
+    <strong>Watch out:</strong> Custom equality only prevents <em>notification</em>. It does not prevent deep mutation of the existing value from causing bugs. Signals have no built-in immutability enforcement. Treat signal values as immutable - always <code>.set()</code> or <code>.update()</code> with a new reference.
+  </div>
+
+  <h2>Read-Only Signals with .asReadonly()</h2>
+
+  <p>Encapsulation matters. Expose a signal publicly for reading, keep writing private:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">import { Injectable, signal } from '@angular/core';
+
+@Injectable({ providedIn: 'root' })
+export class CounterService {
+  // Private - only this service can write
+  private readonly _count = signal(0);
+
+  // Public - consumers can read but not write
+  readonly count = this._count.asReadonly();
+
+  increment(): void {
+    this._count.update(c => c + 1);
+  }
+}</code></pre>
+  </div>
+
+  <p>This is the signal equivalent of the pattern where you'd expose a <code>BehaviorSubject</code> as an <code>Observable</code>:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">// The old way
+private _count$ = new BehaviorSubject(0);
+readonly count$ = this._count$.asObservable();
+
+// The signal way
+private _count = signal(0);
+readonly count = this._count.asReadonly();</code></pre>
+  </div>
+
+  <p>Same encapsulation principle. Less machinery.</p>
+
+  <h2>Signals in Templates</h2>
+
+  <p>In a component template, you simply call the signal:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">@Component({
+  template: `
+    &lt;h2&gt;Count: {{ count() }}&lt;/h2&gt;
+    &lt;p&gt;Double: {{ doubleCount() }}&lt;/p&gt;
+    &lt;button (click)="increment()"&gt;+1&lt;/button&gt;
+  `
+})
+export class CounterComponent {
+  count = signal(0);
+  doubleCount = computed(() => this.count() * 2);
+
+  increment(): void {
+    this.count.update(c => c + 1);
+  }
+}</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <strong>OnPush is now the default:</strong> In Angular 22, <code>OnPush</code> is the default change detection strategy - you don't need to declare it. Combined with zoneless (default since Angular 21), Angular knows exactly which component bindings depend on which signals. When a signal changes, only that component is marked dirty - no <code>markForCheck()</code>, no <code>async</code> pipe, no zone.js monkey-patching. The example above omits the <code>changeDetection</code> property entirely and still gets optimal behaviour.
+  </div>
+
+  <p><strong>The old way:</strong></p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">// Before signals - OnPush + BehaviorSubject + async pipe
+@Component({
+  template: `
+    &lt;h2&gt;Count: {{ count$ | async }}&lt;/h2&gt;
+    &lt;p&gt;Double: {{ doubleCount$ | async }}&lt;/p&gt;
+    &lt;button (click)="increment()"&gt;+1&lt;/button&gt;
+  `,
+  changeDetection: ChangeDetectionStrategy.OnPush
+})
+export class CounterComponent {
+  private count$ = new BehaviorSubject(0);
+  doubleCount$ = this.count$.pipe(map(c => c * 2));
+
+  increment(): void {
+    this.count$.next(this.count$.getValue() + 1);
+  }
+}</code></pre>
+  </div>
+
+  <p>The signal version has less noise, no pipe imports, no subscription lifecycle to worry about, and the same (actually better) change detection performance.</p>
+
+  <h2>When Signals Are Not Enough</h2>
+
+  <p>Signals solve synchronous, state-centric reactivity beautifully. But they have clear boundaries:</p>
+
+  <table>
+    <tr><th>Signals handle well</th><th>Still reach for RxJS</th></tr>
+    <tr><td>Component state</td><td>Complex async orchestration (retry, debounce, switchMap)</td></tr>
+    <tr><td>Derived/computed state</td><td>Event streams (WebSockets, DOM events with operators)</td></tr>
+    <tr><td>Simple async (resource/httpResource)</td><td>Race condition management</td></tr>
+    <tr><td>Template bindings</td><td>Backpressure / buffering</td></tr>
+    <tr><td>Cross-component state</td><td>Complex time-based logic (debounceTime, throttle, delay)</td></tr>
+  </table>
+
+  <p>We'll explore this boundary in detail in <a href="0018-when-to-keep-rxjs.html">Lesson 18 (When to Keep RxJS)</a>. For now, the rule of thumb: <strong>if your problem is about state, reach for signals. If it's about events over time, reach for observables.</strong></p>
+
+  <h2>A Note on Multicasting</h2>
+
+  <p>One thing signals eliminate entirely is the multicasting question. With observables, reading from the same source in two places means two subscriptions (unicast by default) - hence the need for <code>share()</code>, <code>shareReplay()</code>, or subjects. Signals are inherently multicast: every consumer reads the same value from the same source. There is no concept of "subscribing twice" to a signal. This eliminates an entire class of bugs.</p>
+
+  <h3>Refresher: Unicast vs. Multicast</h3>
+
+  <p>If this distinction is fuzzy, here's the concrete version using a random number generator:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">// Observable (unicast) - each subscriber triggers its own execution
+const random$ = new Observable(subscriber =&gt; {
+  subscriber.next(Math.random()); // runs independently per subscriber
+});
+
+random$.subscribe(v =&gt; console.log('A:', v)); // A: 0.4281...
+random$.subscribe(v =&gt; console.log('B:', v)); // B: 0.7193... (different!)
+
+// Subject (multicast) - one value shared to all subscribers
+const random$$ = new Subject&lt;number&gt;();
+
+random$$.subscribe(v =&gt; console.log('A:', v));
+random$$.subscribe(v =&gt; console.log('B:', v));
+
+random$$.next(Math.random()); // A: 0.5612..., B: 0.5612... (same!)
+
+// Signal - no subscription, no question
+const random = signal(Math.random()); // computed once, everyone reads the same value
+console.log(random()); // same value every time, for every consumer</code></pre>
+  </div>
+
+  <p>The observable's producer function runs <em>per subscriber</em>. The subject's value is emitted once and fanned out to all subscribers. Operators like <code>shareReplay()</code> exist to convert unicast observables into multicast ones (internally using a Subject). Signals sidestep the entire concept - there's no subscription, so there's no "per-subscriber execution" to worry about.</p>
+
+  <div class="key-concept">
+    <strong>No hot/cold distinction:</strong> Observables can be cold (each subscriber gets their own execution) or hot (shared execution). Signals are always "hot" in that sense - there's one value, and everyone sees it. But they're also "cold" in that computed signals are lazy (they don't compute until read). The hot/cold mental model simply doesn't apply. You can let it go.
+  </div>
+
+  <h2>Quiz</h2>
+
+  <div class="quiz" role="group">
+    <h3>What does calling a signal (e.g. <code>count()</code>) do besides returning the value?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">It triggers change detection across the application</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">It registers a dependency if called within a reactive context</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">It creates a new subscription to the signal's value stream</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="quiz" role="group">
+    <h3>You set a signal to the same value it already holds. What happens?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Nothing - consumers are not notified (Object.is equality check)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">All dependent computed signals are recalculated immediately</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The value is set and change detection runs for the component</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="quiz" role="group">
+    <h3>A computed signal's derivation reads signal A only when signal B is true. Signal B is currently false. You update signal A. What happens to the computed?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Nothing - A is not currently a dependency, so no invalidation occurs</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The computed recalculates and returns the new derived value</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The computed throws an error because A was read conditionally</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="quiz" role="group">
+    <h3>What is the signal equivalent of <code>distinctUntilChanged()</code> in RxJS?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">You must wrap computed signals with a distinct() utility function</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">It's built in - signals skip notification when the new value equals the old (via the equal option)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">There is no equivalent; signals always notify on every .set() call</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <h2>Try It Yourself</h2>
+
+  <div class="exercise">
+    <h3>Exercise 1: Policy Premium Tracker</h3>
+    <p>Build a small service that tracks a policy's base premium and an adjustment percentage. The final premium should be derived automatically.</p>
+    <ol>
+      <li>Create a writable signal <code>basePremium</code> with an initial value of <code>100000</code></li>
+      <li>Create a writable signal <code>adjustmentPct</code> with an initial value of <code>0.1</code> (10%)</li>
+      <li>Create a computed signal <code>finalPremium</code> that calculates <code>basePremium * (1 + adjustmentPct)</code></li>
+      <li>Expose <code>finalPremium</code> as read-only to consumers</li>
+    </ol>
+    <p>What should <code>finalPremium()</code> return initially? What happens after <code>basePremium.set(200000)</code>?</p>
+    <!-- reveal -->
+      <button class="reveal-toggle" aria-expanded="false">Reveal solution</button>
+ <div class="reveal-content"><div class="reveal-inner">
+      <div class="code-wrapper">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre><code class="language-typescript">import { Injectable, signal, computed } from '@angular/core';
+
+@Injectable({ providedIn: 'root' })
+export class PremiumService {
+  private readonly _basePremium = signal(100000);
+  private readonly _adjustmentPct = signal(0.1);
+
+  readonly basePremium = this._basePremium.asReadonly();
+  readonly adjustmentPct = this._adjustmentPct.asReadonly();
+  readonly finalPremium = computed(() =>
+    this._basePremium() * (1 + this._adjustmentPct())
+  );
+
+  setBasePremium(value: number): void {
+    this._basePremium.set(value);
+  }
+
+  setAdjustment(pct: number): void {
+    this._adjustmentPct.set(pct);
+  }
+}
+
+// finalPremium() initially returns 110000
+// After basePremium.set(200000), finalPremium() returns 220000
+// No subscription, no pipe - just read the computed when you need it</code></pre>
+      </div>
+    </div></div>
+ <!-- /reveal -->
+  </div>
+
+  <div class="exercise">
+    <h3>Exercise 2: Conditional Dependency Tracking</h3>
+    <p>Predict the output. Don't run it - reason through the dependency graph:</p>
+    <div class="code-wrapper">
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre><code class="language-typescript">const showDetails = signal(false);
+const policyCount = signal(3);
+const label = computed(() => {
+  if (showDetails()) {
+    return `${policyCount()} policies on risk`;
+  }
+  return 'Details hidden';
+});
+
+console.log(label());         // (1) What logs here?
+policyCount.set(7);
+console.log(label());         // (2) What logs here?
+showDetails.set(true);
+console.log(label());         // (3) What logs here?</code></pre>
+    </div>
+    <!-- reveal -->
+      <button class="reveal-toggle" aria-expanded="false">Reveal solution</button>
+ <div class="reveal-content"><div class="reveal-inner">
+      <p><strong>(1)</strong> <code>'Details hidden'</code> - showDetails is false, so the else branch runs. <code>policyCount</code> is never read, so it's not a dependency.</p>
+      <p><strong>(2)</strong> <code>'Details hidden'</code> - policyCount changed, but it's not tracked as a dependency (the if-branch was never entered). The computed is not invalidated and returns its cached value.</p>
+      <p><strong>(3)</strong> <code>'7 policies on risk'</code> - showDetails changed (it IS a dependency), so the computed re-evaluates. Now it enters the if-branch, reads policyCount (which is 7), and returns the new string. From this point forward, BOTH showDetails and policyCount are dependencies.</p>
+    </div></div>
+ <!-- /reveal -->
+  </div>
+
+  <div class="exercise">
+    <h3>Exercise 3: Immutable Update Pattern</h3>
+    <p>You have a signal holding a list of claims. Write the <code>.update()</code> call to add a new claim without mutating the existing array:</p>
+    <div class="code-wrapper">
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre><code class="language-typescript">interface Claim {
+  id: string;
+  amount: number;
+  status: 'open' | 'reserved' | 'settled';
+}
+
+const claims = signal&lt;Claim[]&gt;([
+  { id: 'CLM-001', amount: 25000, status: 'open' },
+  { id: 'CLM-002', amount: 150000, status: 'reserved' },
+]);
+
+const newClaim: Claim = { id: 'CLM-003', amount: 75000, status: 'open' };
+
+// Write the .update() call to append newClaim
+// Then write another .update() to mark CLM-001 as 'settled'</code></pre>
+    </div>
+    <!-- reveal -->
+      <button class="reveal-toggle" aria-expanded="false">Reveal solution</button>
+ <div class="reveal-content"><div class="reveal-inner">
+      <div class="code-wrapper">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre><code class="language-typescript">// Append a new claim - spread creates a new array reference
+claims.update(prev => [...prev, newClaim]);
+
+// Update a claim's status - map creates a new array, spread creates a new object
+claims.update(prev =>
+  prev.map(c => c.id === 'CLM-001' ? { ...c, status: 'settled' } : c)
+);</code></pre>
+      </div>
+      <p>Both operations return new references. The signal detects the change (new array reference !== old) and notifies consumers. If you'd done <code>prev.push(newClaim); return prev;</code>, the reference wouldn't change and consumers would never know.</p>
+    </div></div>
+ <!-- /reveal -->
+  </div>
+
+  <h2>Your Tangible Win</h2>
+
+  <p>You now understand the core reactive primitive that everything else in this course builds on. You can create writable signals, derive computed values, control visibility with <code>.asReadonly()</code>, and - critically - you understand <em>why</em> this model is different from observables, not just <em>how</em>.</p>
+
+  <p>Next lesson, we'll look at <code>effect()</code> - the signal equivalent of <code>tap()</code>/<code>subscribe()</code> for side effects - and understand the rules of reactive contexts.</p>
+
+  <div class="recommended">
+    <strong>Primary source:</strong>
+    <a href="https://angular.dev/guide/signals">Angular Signals Overview - angular.dev</a> - the canonical documentation for everything covered here.
+  </div>
+
+  <div class="ask-kiro">
+    Something unclear? Ask me follow-up questions - I'm your teacher and can clarify anything, adjust examples, or go deeper on any concept.
+  </div>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <div class="footer-nav">
+    <a href="index.html">Index</a>
+    <a href="0002-effects-lifecycle-and-untracked.html">Next: Effects, Lifecycle & Untracked &rarr;</a>
+  </div>
+
+    </main>
+  </div>
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
+  <script src="/vendor/prism-typescript.min.js"></script>
+  <script src="/vendor/prism-bash.min.js"></script>
+</body>
+</html>

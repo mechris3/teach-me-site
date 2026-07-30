@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>RxJS Interop: The Bridge - Lesson 4 | Teach Me</title>
+  <meta name="description" content="Bridge signals and RxJS with toSignal(), toObservable(), and takeUntilDestroyed(). Adopt signals incrementally without rewriting existing observable-based code.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header"><a href="index.html">Angular Signals Course</a></div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="0001-signals-the-reactive-primitive.html">1. Signals: The Reactive Primitive</a></li>
+        <li><a href="0002-effects-lifecycle-and-untracked.html">2. Effects, Lifecycle & Untracked</a></li>
+        <li><a href="0003-linked-signal-and-dependent-state.html">3. linkedSignal & Dependent State</a></li>
+        <li class="current"><a href="0004-rxjs-interop-the-bridge.html">4. RxJS Interop: The Bridge</a></li>
+        <li><a href="0005-signalstore-your-first-store.html">5. SignalStore: Your First Store</a></li>
+        <li><a href="0006-entity-management.html">6. Entity Management</a></li>
+        <li><a href="0007-async-with-rxmethod.html">7. Async with rxMethod</a></li>
+        <li class="coming-soon"><a href="0008-resource-and-httpresource.html">8. resource & httpResource</a></li>
+        <li class="coming-soon"><a href="0009-store-lifecycle-and-devtools.html">9. Store Lifecycle & DevTools</a></li>
+        <li class="coming-soon"><a href="0010-custom-store-features.html">10. Custom Store Features</a></li>
+        <li class="coming-soon"><a href="0011-events-and-reducers.html">11. Events & Reducers</a></li>
+        <li class="coming-soon"><a href="0012-store-architecture-and-testing.html">12. Store Architecture & Testing</a></li>
+        <li class="coming-soon"><a href="0013-signal-forms-the-new-model.html">13. Signal Forms: The New Model</a></li>
+        <li class="coming-soon"><a href="0014-validation-and-field-state.html">14. Validation & Field State</a></li>
+        <li class="coming-soon"><a href="0015-complex-forms-and-custom-controls.html">15. Complex Forms & Custom Controls</a></li>
+        <li class="coming-soon"><a href="0016-migrating-signalformcontrol-bridge.html">16. Migrating: SignalFormControl Bridge</a></li>
+        <li class="coming-soon"><a href="0017-signals-store-forms-together.html">17. Signals + Store + Forms</a></li>
+        <li class="coming-soon"><a href="0018-when-to-keep-rxjs.html">18. When to Keep RxJS</a></li>
+        <li class="coming-soon"><a href="0019-capstone-the-complete-dashboard.html">19. Capstone: The Complete Dashboard</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="signals-glossary.html">Signals Glossary</a></li>
+        <li class="coming-soon"><a href="signal-primitives.html">Signal Primitives</a></li>
+        <li class="coming-soon"><a href="signalstore-api.html">SignalStore API</a></li>
+        <li class="coming-soon"><a href="signal-forms-api.html">Signal Forms API</a></li>
+        <li class="coming-soon"><a href="decision-framework.html">Decision Framework</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 4</p>
+  <h1>RxJS Interop: The Bridge</h1>
+
+  <h2>The Core Idea</h2>
+
+  <div class="key-concept">
+    <strong>Mental model:</strong> Signals and observables are not enemies - they solve different problems.
+    The <code>@angular/core/rxjs-interop</code> package gives you two bridge functions: <code>toSignal()</code> converts an Observable into a Signal, and <code>toObservable()</code> converts a Signal into an Observable. You use these at the boundaries - not to replace one system with the other, but to let them communicate.
+  </div>
+
+  <p>You already have services that return observables, stores that expose selectors as observables, and HTTP calls that return observables. You don't need to rewrite any of that. The interop layer lets you consume those observables as signals in your templates, and feed signal-based state back into observable pipelines when needed.</p>
+
+  <h2 id="greenfield-or-migration">Greenfield or Migration?</h2>
+
+  <p>A fair question: is this interop layer just a way to avoid throwing away legacy code? No. Even in a brand-new application, you'd use both systems - and you'd still need the bridge between them.</p>
+
+  <p>The reason is that signals and observables solve fundamentally different problems:</p>
+
+  <ul>
+    <li><strong>Signals own synchronous, UI-bound state.</strong> Component state, form state, derived/computed values, store slices - anything the template reads.</li>
+    <li><strong>Observables own async coordination.</strong> HTTP calls, WebSocket streams, complex event orchestration (debounce, retry, race, combineLatest across time), route param streams - anything where <em>time</em> and <em>event sequencing</em> matter.</li>
+  </ul>
+
+  <p>In a greenfield app, your <code>HttpClient</code> still returns observables. Your WebSocket service still returns observables. A route guard that chains multiple async checks is still cleaner as an observable pipeline. You use <code>toSignal()</code> at the boundary where async data enters your component/store state, and <code>toObservable()</code> where a signal value needs to feed into a pipeline (e.g., a search term signal driving a debounced HTTP lookup).</p>
+
+  <div class="key-concept">
+    <strong>Architecture:</strong> Signals are your state layer. Observables are your event/async layer. The interop functions are the adapters at the seams between those two layers. That architecture holds whether you're migrating a five-year-old app or starting fresh today.
+  </div>
+
+  <p>What <em>wouldn't</em> happen in a greenfield app is wrapping everything in <code>toSignal()</code> just because you can. You wouldn't create a <code>BehaviorSubject</code> for local component state when a <code>signal()</code> does the job directly. The interop layer isn't legacy glue - it's the designed interface between two complementary systems.</p>
+
+  <h3 id="greenfield-example">Example: A Greenfield Search Feature</h3>
+
+  <p>Here's a complete policy search component you might write from scratch today. Each piece uses the right primitive for its job:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">import { rxResource } from '@angular/core/rxjs-interop';
+import { signal, computed, inject } from '@angular/core';
+import { retry } from 'rxjs';
+
+@Component({
+  template: `
+    &lt;input
+      [value]="query()"
+      (input)="query.set($event.target.value)"
+      placeholder="Search policies..."
+    /&gt;
+
+    @if (results.isLoading()) {
+      &lt;app-spinner /&gt;
+    }
+
+    @for (policy of results.value(); track policy.id) {
+      &lt;app-policy-card
+        [policy]="policy"
+        [selected]="policy.id === selectedId()"
+        (click)="selectedId.set(policy.id)"
+      /&gt;
+    }
+  `
+})
+export class PolicySearchPage {
+  private readonly policyService = inject(PolicyService);
+
+  // --- SIGNALS: synchronous UI state ---
+  readonly query = signal('');           // user input - local, writable
+  readonly selectedId = signal&lt;string | null&gt;(null);  // selection state
+
+  // --- OBSERVABLE PIPELINE: async orchestration ---
+  // rxResource bridges an Observable-returning loader into signal-land,
+  // giving you .value(), .isLoading(), and .error() as signals.
+  // Covered in depth in Lesson 8 - for now, note the shape.
+  readonly results = rxResource({
+    request: () => this.query(),  // reactive signal dependency
+    loader: ({ request: query }) => this.policyService.search(query).pipe(
+      retry({ count: 2, delay: 1000 })
+    )
+  });
+
+  // --- DERIVED SIGNAL: synchronous computation ---
+  readonly selectedPolicy = computed(() => {
+    const id = this.selectedId();
+    return this.results.value()?.find(p => p.id === id) ?? null;
+  });
+}</code></pre>
+  </div>
+
+  <p><code>rxResource</code> is a higher-level abstraction over the manual <code>toObservable()</code> -> pipe -> <code>toSignal()</code> sandwich - you declare a reactive dependency and an Observable-returning loader, and Angular gives you a complete async state machine as signals. We'll cover it properly in <a href="#rx-resource">the rxResource section below</a> and in full depth in <a href="0008-resource-and-httpresource.html">Lesson 8</a>.</p>
+
+  <p>Notice the separation:</p>
+  <ul>
+    <li><strong>Signals</strong> (<code>query</code>, <code>selectedId</code>, <code>selectedPolicy</code>) - synchronous state the template reads and the user writes. No async involved.</li>
+    <li><strong>Observable/Resource</strong> (<code>rxResource</code> wrapping <code>policyService.search()</code>) - async coordination with retry logic. The service returns an observable; the resource bridges it into signal-land with loading/error state included.</li>
+  </ul>
+
+  <div style="margin: 2rem 0; padding: 1.5rem; border: 1px solid var(--border); border-radius: 8px; background: var(--bg);">
+    <p style="font-size: 0.85rem; font-weight: 600; color: var(--text-h2); margin-bottom: 1rem; text-align: center;">The Signal-Observable Bridge</p>
+    <svg viewBox="0 0 700 280" width="100%" style="display: block; max-width: 700px; margin: 0 auto;" aria-label="Animated swim-lane diagram showing data flowing from signal land down into observable land via rxResource, then back up into signal land for the template.">
+      <!--
+        Geometry reference:
+        Signal lane:    y center = 60, nodes at y=45 h=30
+        Observable lane: y center = 175, nodes at y=160 h=30
+        Bridge down:    x=175, from y=75 to y=160
+        Bridge up:      x=530, from y=160 to y=75
+      -->
+      <defs>
+        <path id="path-down" d="M175,75 L175,175"/>
+        <path id="path-across" d="M175,175 L530,175"/>
+        <path id="path-up" d="M530,160 L530,75"/>
+      </defs>
+
+      <!-- Swim lane backgrounds -->
+      <rect x="30" y="20" width="640" height="80" rx="8" fill="var(--accent, #3b82f6)" opacity="0.07"/>
+      <rect x="30" y="140" width="640" height="80" rx="8" fill="var(--signal-invalidation, #f59e0b)" opacity="0.07"/>
+
+      <!-- Lane labels -->
+      <text x="50" y="60" fill="var(--accent, #3b82f6)" font-size="11" font-weight="700" font-family="-apple-system, sans-serif" opacity="0.8">SIGNAL LAND</text>
+      <text x="50" y="180" fill="var(--signal-invalidation, #f59e0b)" font-size="11" font-weight="700" font-family="-apple-system, sans-serif" opacity="0.8">OBSERVABLE LAND</text>
+
+      <!-- Signal lane nodes -->
+      <rect x="130" y="45" width="90" height="30" rx="6" fill="var(--accent, #3b82f6)" opacity="0.15" stroke="var(--accent, #3b82f6)" stroke-width="1.5"/>
+      <text x="175" y="65" text-anchor="middle" fill="var(--accent, #3b82f6)" font-size="11" font-weight="600" font-family="'SF Mono', monospace">query()</text>
+
+      <rect x="420" y="45" width="120" height="30" rx="6" fill="var(--accent, #3b82f6)" opacity="0.15" stroke="var(--accent, #3b82f6)" stroke-width="1.5"/>
+      <text x="480" y="65" text-anchor="middle" fill="var(--accent, #3b82f6)" font-size="11" font-weight="600" font-family="'SF Mono', monospace">results.value()</text>
+
+      <rect x="560" y="45" width="90" height="30" rx="6" fill="var(--accent, #3b82f6)" opacity="0.15" stroke="var(--accent, #3b82f6)" stroke-width="1.5"/>
+      <text x="605" y="65" text-anchor="middle" fill="var(--accent, #3b82f6)" font-size="11" font-weight="600" font-family="'SF Mono', monospace">template</text>
+
+      <!-- Observable lane nodes -->
+      <rect x="250" y="160" width="90" height="30" rx="6" fill="var(--signal-invalidation, #f59e0b)" opacity="0.15" stroke="var(--signal-invalidation, #f59e0b)" stroke-width="1.5"/>
+      <text x="295" y="180" text-anchor="middle" fill="var(--signal-invalidation, #f59e0b)" font-size="10" font-weight="600" font-family="'SF Mono', monospace">switchMap</text>
+
+      <rect x="360" y="160" width="80" height="30" rx="6" fill="var(--signal-invalidation, #f59e0b)" opacity="0.15" stroke="var(--signal-invalidation, #f59e0b)" stroke-width="1.5"/>
+      <text x="400" y="180" text-anchor="middle" fill="var(--signal-invalidation, #f59e0b)" font-size="10" font-weight="600" font-family="'SF Mono', monospace">retry</text>
+
+      <rect x="460" y="160" width="70" height="30" rx="6" fill="var(--signal-invalidation, #f59e0b)" opacity="0.15" stroke="var(--signal-invalidation, #f59e0b)" stroke-width="1.5"/>
+      <text x="495" y="180" text-anchor="middle" fill="var(--signal-invalidation, #f59e0b)" font-size="10" font-weight="600" font-family="'SF Mono', monospace">HTTP</text>
+
+      <!-- Bridge arrow DOWN: query() bottom -> observable lane connector -->
+      <line x1="175" y1="75" x2="175" y2="175" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <polygon points="170,171 175,179 180,171" fill="var(--muted)"/>
+      <text x="183" y="115" fill="var(--signal-stale, #ef4444)" font-size="9" font-weight="600" font-family="-apple-system, sans-serif">rxResource</text>
+      <text x="183" y="127" fill="var(--signal-stale, #ef4444)" font-size="9" font-family="-apple-system, sans-serif">request:</text>
+
+      <!-- Bridge arrow UP: observable lane top -> results.value() bottom -->
+      <line x1="530" y1="160" x2="530" y2="75" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <polygon points="525,79 530,71 535,79" fill="var(--muted)"/>
+      <text x="538" y="115" fill="var(--signal-stale, #ef4444)" font-size="9" font-weight="600" font-family="-apple-system, sans-serif">rxResource</text>
+      <text x="538" y="127" fill="var(--signal-stale, #ef4444)" font-size="9" font-family="-apple-system, sans-serif">.value()</text>
+
+      <!-- Horizontal connectors in signal lane (node edge to node edge) -->
+      <line x1="540" y1="60" x2="560" y2="60" stroke="var(--accent, #3b82f6)" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.4"/>
+
+      <!-- Horizontal connectors in observable lane (bridge landing to first node, between nodes) -->
+      <line x1="175" y1="175" x2="250" y2="175" stroke="var(--signal-invalidation, #f59e0b)" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.4"/>
+      <line x1="340" y1="175" x2="360" y2="175" stroke="var(--signal-invalidation, #f59e0b)" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.4"/>
+      <line x1="440" y1="175" x2="460" y2="175" stroke="var(--signal-invalidation, #f59e0b)" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.4"/>
+      <line x1="530" y1="175" x2="530" y2="160" stroke="var(--signal-invalidation, #f59e0b)" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.4"/>
+
+      <!-- Animated dot: keystroke flowing down the bridge -->
+      <circle r="5" fill="var(--accent, #3b82f6)" opacity="0">
+        <animateMotion dur="5s" repeatCount="indefinite" keyPoints="0;0;1;1;1;1;1" keyTimes="0;0.05;0.2;0.21;0.5;0.9;1" calcMode="linear">
+          <mpath href="#path-down"/>
+        </animateMotion>
+        <animate attributeName="opacity" values="0;1;1;0;0;0;0" keyTimes="0;0.05;0.19;0.21;0.5;0.9;1" dur="5s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- Animated dot: traveling across observable lane -->
+      <circle r="5" fill="var(--signal-invalidation, #f59e0b)" opacity="0">
+        <animateMotion dur="5s" repeatCount="indefinite" keyPoints="0;0;0;1;1;1;1" keyTimes="0;0.2;0.22;0.55;0.56;0.9;1" calcMode="linear">
+          <mpath href="#path-across"/>
+        </animateMotion>
+        <animate attributeName="opacity" values="0;0;1;1;0;0;0" keyTimes="0;0.21;0.22;0.54;0.56;0.9;1" dur="5s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- Animated dot: response rising back up -->
+      <circle r="5" fill="var(--accent, #3b82f6)" opacity="0">
+        <animateMotion dur="5s" repeatCount="indefinite" keyPoints="0;0;0;0;1;1;1" keyTimes="0;0.5;0.55;0.57;0.72;0.73;1" calcMode="linear">
+          <mpath href="#path-up"/>
+        </animateMotion>
+        <animate attributeName="opacity" values="0;0;0;1;1;0;0" keyTimes="0;0.55;0.56;0.57;0.71;0.73;1" dur="5s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- User keystroke label (appears at start of animation) -->
+      <text x="175" y="40" text-anchor="middle" fill="var(--muted)" font-size="9" font-family="-apple-system, sans-serif" opacity="0">
+        keystroke
+        <animate attributeName="opacity" values="0;1;1;0;0;0" keyTimes="0;0.02;0.12;0.18;0.9;1" dur="5s" repeatCount="indefinite"/>
+      </text>
+
+      <!-- Response label (appears at end of animation) -->
+      <text x="480" y="40" text-anchor="middle" fill="var(--muted)" font-size="9" font-family="-apple-system, sans-serif" opacity="0">
+        Policy[]
+        <animate attributeName="opacity" values="0;0;0;0;1;1;0" keyTimes="0;0.6;0.7;0.71;0.72;0.85;0.9" dur="5s" repeatCount="indefinite"/>
+      </text>
+
+      <!-- Legend -->
+      <circle cx="80" cy="250" r="5" fill="var(--accent, #3b82f6)"/>
+      <text x="92" y="254" fill="var(--muted)" font-size="10" font-family="-apple-system, sans-serif">Synchronous state (signals)</text>
+      <circle cx="320" cy="250" r="5" fill="var(--signal-invalidation, #f59e0b)"/>
+      <text x="332" y="254" fill="var(--muted)" font-size="10" font-family="-apple-system, sans-serif">Async coordination (observables)</text>
+      <circle cx="570" cy="250" r="5" fill="var(--signal-stale, #ef4444)"/>
+      <text x="582" y="254" fill="var(--muted)" font-size="10" font-family="-apple-system, sans-serif">Bridge</text>
+    </svg>
+  </div>
+
+  <p>No legacy code in sight. This is what the architecture looks like when both systems are used for what they're good at.</p>
+
+  <h2 id="to-signal">toSignal: Observable to Signal</h2>
+
+  <p><code>toSignal()</code> subscribes to an observable and exposes its latest emission as a signal. It's the replacement for the <code>async</code> pipe - but usable anywhere, not just templates:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">import { toSignal } from '@angular/core/rxjs-interop';
+import { inject } from '@angular/core';
+
+@Component({
+  template: `
+    @if (policies(); as policies) {
+      &lt;app-policy-list [policies]="policies" /&gt;
+    } @else {
+      &lt;app-loading /&gt;
+    }
+  `
+})
+export class PolicyPage {
+  private readonly http = inject(HttpClient);
+
+  // Observable from HTTP - unchanged from your existing code
+  private readonly policies$ = this.http.get&lt;Policy[]&gt;('/api/policies');
+
+  // Expose as a signal for the template - no async pipe needed
+  readonly policies = toSignal(this.policies$);
+}</code></pre>
+  </div>
+
+  <p>Key behaviours:</p>
+  <ul>
+    <li><strong>Subscribes immediately</strong> - not lazily like templates with <code>async</code>. The subscription starts the moment <code>toSignal()</code> is called.</li>
+    <li><strong>Auto-unsubscribes</strong> - when the component/service that created it is destroyed, the subscription is cleaned up. No <code>takeUntilDestroyed()</code> needed.</li>
+    <li><strong>Injection context required</strong> - must be called in a constructor, field initialiser, or with an explicit <code>injector</code> option (same rule as <a href="0002-effects-lifecycle-and-untracked.html#when-to-use-effects">effect()</a>).</li>
+  </ul>
+
+  <h3 id="initial-values">The Initial Value Problem</h3>
+
+  <p>Observables can be async - they might not emit immediately. But signals always have a current value. This creates a type mismatch that <code>toSignal()</code> resolves in three ways:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">// 1. No initial value - signal type includes undefined
+const policies = toSignal(this.policies$);
+// Type: Signal&lt;Policy[] | undefined&gt;
+
+// 2. Explicit initial value - no undefined in the type
+const policies = toSignal(this.policies$, { initialValue: [] });
+// Type: Signal&lt;Policy[]&gt;
+
+// 3. requireSync - for observables that emit synchronously (BehaviorSubject)
+const count = toSignal(this.count$, { requireSync: true });
+// Type: Signal&lt;number&gt; (no undefined, no initial value needed)</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <strong>When to use which:</strong>
+    <ul>
+      <li><code>initialValue: []</code> - HTTP calls, cold observables. You know what "empty" looks like.</li>
+      <li><code>requireSync: true</code> - BehaviorSubjects, NgRx selectors, ReplaySubject(1). The observable always emits on subscribe.</li>
+      <li>No option - when you genuinely need to represent "not yet loaded" as <code>undefined</code> and handle it in the template.</li>
+    </ul>
+  </div>
+
+  <h3 id="require-sync">requireSync in Depth</h3>
+
+  <p>The problem <code>requireSync</code> solves is a type-level one. When you call <code>toSignal(obs$)</code>, TypeScript has no way to know whether the observable will emit immediately or later. So Angular defaults to the safe assumption: the signal might not have a value yet, giving you <code>Signal&lt;T | undefined&gt;</code>.</p>
+
+  <p>But some observables <em>always</em> emit synchronously on subscribe - they have a current value ready before the subscription function returns. The classic examples:</p>
+
+  <ul>
+    <li><strong>BehaviorSubject</strong> - holds a current value, emits it immediately to every new subscriber</li>
+    <li><strong>NgRx selectors</strong> - backed by BehaviorSubject internally, <code>store.select(...)</code> always emits the current slice on subscribe</li>
+    <li><strong>ReplaySubject(1)</strong> - replays the last value synchronously if one exists</li>
+    <li><strong>Observables piped through <code>startWith()</code></strong> - the <code>startWith</code> value emits synchronously</li>
+  </ul>
+
+  <p>For these, <code>requireSync: true</code> tells Angular: "I guarantee this observable will have emitted a value by the time <code>toSignal()</code> returns." Angular trusts you - it gives back <code>Signal&lt;T&gt;</code> (no undefined). But it also verifies at runtime: if the observable hasn't emitted by the time the constructor completes, Angular throws <code>NG0601</code>.</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">// This works - BehaviorSubject emits 'initial' immediately
+const source$ = new BehaviorSubject('initial');
+const value = toSignal(source$, { requireSync: true });
+// Type: Signal&lt;string&gt;
+// value() === 'initial' immediately, no undefined possible
+
+// This CRASHES at runtime - HTTP is async, nothing emits on subscribe
+const data = toSignal(this.http.get('/api/data'), { requireSync: true });
+// Runtime error: NG0601</code></pre>
+  </div>
+
+  <p>Why not just use <code>initialValue</code> instead? You could - <code>toSignal(store.select(selectPolicies), { initialValue: [] })</code> compiles fine. But it's semantically wrong: the signal will <em>never</em> be that initial value because the store emits immediately. <code>requireSync</code> communicates intent more clearly and avoids inventing a phantom state that never occurs.</p>
+
+  <div class="warning">
+    <strong>requireSync is a contract:</strong> If you use <code>requireSync: true</code> on an observable that doesn't actually emit synchronously (like a cold HTTP call), Angular throws a runtime error: <code>NG0601: requireSync set but observable did not emit synchronously</code>. It's not a hint - it's an assertion you're making, and Angular enforces it.
+  </div>
+
+  <h3>Error Handling</h3>
+
+  <p>If the source observable errors, the error is thrown when the signal is read. This means it'll trigger Angular's error handling (ErrorHandler) or crash the component. Handle errors in the observable pipeline before converting:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">// BAD - error crashes the component when signal is read
+const policies = toSignal(this.http.get&lt;Policy[]&gt;('/api/policies'));
+
+// GOOD - handle errors in the observable pipeline
+const policies = toSignal(
+  this.http.get&lt;Policy[]&gt;('/api/policies').pipe(
+    catchError(() => of([]))  // fallback to empty array
+  ),
+  { initialValue: [] }
+);</code></pre>
+  </div>
+
+  <h3>Custom Equality</h3>
+
+  <p>Like all signal primitives (see <a href="0001-signals-the-reactive-primitive.html#custom-equality">Custom Equality Functions</a> in Lesson 1), <code>toSignal()</code> accepts an <code>equal</code> option to prevent unnecessary downstream updates:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">// Only update signal (and re-render) when the policy ID changes
+const activePolicy = toSignal(this.activePolicy$, {
+  initialValue: null,
+  equal: (a, b) => a?.id === b?.id,
+});</code></pre>
+  </div>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <h2 id="to-observable">toObservable: Signal to Observable</h2>
+
+  <p><code>toObservable()</code> goes the other direction - it creates an observable that emits whenever the signal's value changes. Use it when you need to feed signal state into an existing RxJS pipeline:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">import { toObservable } from '@angular/core/rxjs-interop';
+import { switchMap, debounceTime } from 'rxjs';
+
+@Component({
+  template: `
+    &lt;input [value]="searchQuery()" (input)="searchQuery.set($event.target.value)" /&gt;
+    &lt;app-results [results]="results()" /&gt;
+  `
+})
+export class PolicySearch {
+  readonly searchQuery = signal('');
+
+  // Convert signal to observable so we can use RxJS operators
+  private readonly results$ = toObservable(this.searchQuery).pipe(
+    debounceTime(300),
+    switchMap(query => this.policyService.search(query))
+  );
+
+  // Convert back to signal for the template
+  readonly results = toSignal(this.results$, { initialValue: [] });
+}</code></pre>
+  </div>
+
+  <p>This is the classic pattern: signal for user input (synchronous state), observable for async orchestration (debounce + switchMap), signal for template consumption. Each tool used where it's strongest.</p>
+
+  <h3>Timing and Batching</h3>
+
+  <p><code>toObservable()</code> uses an <code>effect()</code> internally to track the signal. This means:</p>
+  <ul>
+    <li><strong>Emissions are asynchronous</strong> - even if you call <code>.set()</code> multiple times synchronously, only the final value is emitted.</li>
+    <li><strong>No initial synchronous emission on subscribe</strong> - unlike BehaviorSubject, the first value may arrive async. The first value is emitted via a ReplaySubject(1) though, so late subscribers do get it.</li>
+  </ul>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">const count = signal(0);
+const count$ = toObservable(count);
+
+count$.subscribe(v => console.log(v));
+
+count.set(1);
+count.set(2);
+count.set(3);
+// Only logs: 3 (the stabilised value after the microtask)</code></pre>
+  </div>
+
+  <div class="key-concept">
+    <strong>This is like distinctUntilChanged + auditTime(0):</strong> Multiple synchronous writes are batched into a single emission. This prevents the "glitchy intermediate states" problem we discussed in <a href="0001-signals-the-reactive-primitive.html">Lesson 1</a>. The observable only sees the final, consistent value.
+  </div>
+
+  <h2 id="take-until-destroyed">takeUntilDestroyed: The Cleanup Operator</h2>
+
+  <p><code>takeUntilDestroyed()</code> isn't a signal primitive - it's a lifecycle utility for observable subscriptions. It lives in the same <code>@angular/core/rxjs-interop</code> package because it solves a problem you'll hit constantly when working with observables alongside signals: cleaning up subscriptions that <code>toSignal()</code> doesn't manage for you (manual <code>.subscribe()</code> calls for side effects, WebSocket listeners, etc.).</p>
+
+  <p>It completes an observable when the enclosing context (component, directive, service) is destroyed, replacing the manual <code>ngOnDestroy</code> + Subject pattern:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+
+@Component({ /* ... */ })
+export class PolicyUpdates {
+  private readonly destroyRef = inject(DestroyRef);
+
+  constructor() {
+    // Option 1: in constructor (injection context available)
+    this.policyService.liveUpdates$.pipe(
+      takeUntilDestroyed()
+    ).subscribe(update => this.handleUpdate(update));
+  }
+
+  // Option 2: outside constructor (pass DestroyRef explicitly)
+  startListening(): void {
+    this.policyService.liveUpdates$.pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(update => this.handleUpdate(update));
+  }
+}</code></pre>
+  </div>
+
+  <h3>The Old Way vs The New Way</h3>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">// OLD: manual destroy$ subject
+export class OldComponent implements OnDestroy {
+  private destroy$ = new Subject&lt;void&gt;();
+
+  ngOnInit() {
+    this.data$.pipe(takeUntil(this.destroy$)).subscribe(/*...*/);
+    this.other$.pipe(takeUntil(this.destroy$)).subscribe(/*...*/);
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+}
+
+// NEW: takeUntilDestroyed - no boilerplate
+export class NewComponent {
+  constructor() {
+    this.data$.pipe(takeUntilDestroyed()).subscribe(/*...*/);
+    this.other$.pipe(takeUntilDestroyed()).subscribe(/*...*/);
+  }
+  // No ngOnDestroy needed
+}</code></pre>
+  </div>
+
+  <div class="warning">
+    <strong>Don't mix with toSignal:</strong> If you're converting an observable to a signal with <code>toSignal()</code>, you don't also need <code>takeUntilDestroyed()</code> on it. <code>toSignal()</code> already handles unsubscription. Adding both is redundant (harmless but noisy).
+  </div>
+
+  <h2 id="patterns">Real-World Patterns</h2>
+
+  <h3>Pattern 1: Existing NgRx Store + Signal Components</h3>
+
+  <p>You have a classic NgRx store with selectors. You want to use signals in your new components without rewriting the store:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">@Component({
+  template: `
+    &lt;h2&gt;{{ selectedPolicy()?.holder }}&lt;/h2&gt;
+    &lt;p&gt;Premium: {{ selectedPolicy()?.premium | currency }}&lt;/p&gt;
+    @if (isLoading()) {
+      &lt;app-spinner /&gt;
+    }
+  `
+})
+export class PolicyDetail {
+  private readonly store = inject(Store);
+
+  // NgRx selectors return Observables - convert to signals
+  readonly selectedPolicy = toSignal(
+    this.store.select(selectSelectedPolicy),
+    { requireSync: true }  // NgRx selectors always emit synchronously
+  );
+
+  readonly isLoading = toSignal(
+    this.store.select(selectPoliciesLoading),
+    { requireSync: true }
+  );
+}</code></pre>
+  </div>
+
+  <p>No <code>async</code> pipe, no subscription management, full type safety. The store is unchanged - you just consume it differently at the component level.</p>
+
+  <h3>Pattern 2: Signal Input + Async Pipeline</h3>
+
+  <p>A component receives an ID as an input signal. You need to fetch data whenever it changes - that's an async operation that benefits from RxJS operators:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">@Component({
+  template: `
+    @if (policyDetail(); as detail) {
+      &lt;app-policy-summary [policy]="detail" /&gt;
+    } @else {
+      &lt;app-skeleton-loader /&gt;
+    }
+  `
+})
+export class PolicyDetailContainer {
+  readonly policyId = input.required&lt;string&gt;();
+
+  private readonly policyDetail$ = toObservable(this.policyId).pipe(
+    switchMap(id => this.policyService.getById(id)),
+    catchError(() => of(null))
+  );
+
+  readonly policyDetail = toSignal(this.policyDetail$);
+}</code></pre>
+  </div>
+
+  <p>The flow: signal input -> observable (for switchMap/retry/catchError) -> signal (for template). This is the <strong>signal-observable-signal sandwich</strong> pattern you'll use anywhere async orchestration meets signal-based templates.</p>
+
+  <div class="key-concept">
+    <strong>Why not just use effect() + signal?</strong> You <em>could</em> write an effect that watches policyId and calls a service. But you'd lose switchMap's automatic cancellation of in-flight requests, catchError's declarative error recovery, and retry's built-in resilience. RxJS operators are still the right tool for async orchestration. Signals are for state and templates.
+  </div>
+
+  <h3>Pattern 3: WebSocket Stream to Signal</h3>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">@Component({
+  template: `
+    &lt;span class="premium-badge" [class.stale]="!livePremium()"&gt;
+      {{ livePremium()?.amount | currency }}
+    &lt;/span&gt;
+  `
+})
+export class LivePremiumBadge {
+  readonly policyId = input.required&lt;string&gt;();
+
+  private readonly livePremium$ = toObservable(this.policyId).pipe(
+    switchMap(id => this.wsService.subscribeToPremiumUpdates(id)),
+    map(msg => ({ amount: msg.premium, timestamp: msg.ts }))
+  );
+
+  readonly livePremium = toSignal(this.livePremium$);
+}</code></pre>
+  </div>
+
+  <p>WebSocket streams are inherently observable territory - continuous async events. <code>toSignal()</code> gives the template a synchronous snapshot of the latest value. When the component is destroyed, <code>toSignal</code> unsubscribes, which triggers <code>switchMap</code>'s teardown, which closes the WebSocket subscription. Clean.</p>
+
+  <h2 id="when-to-bridge">When to Bridge vs When to Stay Pure</h2>
+
+  <table>
+    <tr><th>Scenario</th><th>Approach</th><th>Why</th></tr>
+    <tr><td>Template binding to a store selector</td><td><code>toSignal(store.select(...))</code></td><td>No async pipe needed, type-safe</td></tr>
+    <tr><td>Debounced search input</td><td>Signal -> <code>toObservable</code> -> RxJS pipeline -> <code>toSignal</code></td><td>debounceTime/switchMap need observables</td></tr>
+    <tr><td>Simple derived state</td><td><code>computed()</code></td><td>No bridge needed - stay in signal land</td></tr>
+    <tr><td>User interaction (click, toggle)</td><td><code>signal()</code> + <code>.set()</code></td><td>Synchronous state - no observable needed</td></tr>
+    <tr><td>Existing service returns Observable</td><td><code>toSignal()</code> in the component</td><td>Don't rewrite the service - bridge at consumption</td></tr>
+    <tr><td>You need retry, timeout, polling</td><td>Stay in RxJS, <code>toSignal()</code> at the end</td><td>These operators have no signal equivalent</td></tr>
+  </table>
+
+  <div class="key-concept">
+    <strong>The migration heuristic:</strong> Convert at the leaf, not at the root. Don't rewrite your services to return signals. Instead, keep services returning observables and convert to signals at the component level where you need template bindings. This gives you incremental adoption with zero risk to existing logic.
+  </div>
+
+  <h2 id="rx-resource">resource and rxResource: Declarative Async Data</h2>
+
+  <p>The <code>toObservable()</code> -> pipe -> <code>toSignal()</code> sandwich works, but it only gives you the resolved value. In real applications you also need loading state, error state, cancellation, and reload. Angular's <code>resource()</code> and <code>rxResource()</code> provide all of this as a single declarative primitive.</p>
+
+  <p>They're the same concept - the only difference is the loader's return type:</p>
+  <ul>
+    <li><strong><code>resource()</code></strong> - loader returns a <code>Promise</code> and receives an <code>AbortSignal</code> for cancellation. Lives in <code>@angular/core</code>.</li>
+    <li><strong><code>rxResource()</code></strong> - loader returns an <code>Observable</code>. No <code>AbortSignal</code> needed - cancellation is handled by unsubscribing (which RxJS does natively). Lives in <code>@angular/core/rxjs-interop</code>. Use this when your services already return observables (which, with <code>HttpClient</code>, they always do).</li>
+  </ul>
+
+  <h3 id="resource-shape">The Shape</h3>
+
+  <p class="comparison-label">resource (Promise-based)</p>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">import { resource } from '@angular/core';
+
+readonly policy = resource({
+  request: () => this.policyId(),
+  loader: async ({ request: id, abortSignal }) => {
+    const res = await fetch(`/api/policies/${id}`, {
+      signal: abortSignal
+    });
+    return res.json();
+  },
+});</code></pre>
+  </div>
+
+  <p class="comparison-label">rxResource (Observable-based)</p>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">import { rxResource } from '@angular/core/rxjs-interop';
+
+readonly policy = rxResource({
+  request: () => this.policyId(),
+  loader: ({ request: id }) =>
+    this.policyService.getById(id),
+});
+
+// Usage - policy is a ResourceRef, not a signal itself.
+// Access its signal properties:
+policy.value()      // Policy | undefined
+policy.isLoading()  // boolean
+policy.error()      // unknown | undefined
+policy.reload()     // force re-fetch</code></pre>
+  </div>
+
+  <p>Both take the same two properties:</p>
+  <ul>
+    <li><strong><code>request</code></strong> - a reactive computation (like <code>computed</code>). Whenever signals read inside it change, the resource re-fetches. If it returns <code>undefined</code>, the resource becomes idle and the loader doesn't run.</li>
+    <li><strong><code>loader</code></strong> - receives the request value. Returns a Promise (<code>resource</code>) or Observable (<code>rxResource</code>). If the request changes while a previous load is in flight, the previous operation is cancelled.</li>
+  </ul>
+
+  <h3 id="resource-options">Complete Options</h3>
+
+  <p>The full configuration object:</p>
+
+  <table>
+    <tr><th>Option</th><th>Required</th><th>Description</th></tr>
+    <tr><td><code>request</code></td><td>No</td><td>Reactive computation that produces the request value. When it changes, the loader re-runs. If omitted, the loader runs once. If it returns <code>undefined</code>, the resource goes idle.</td></tr>
+    <tr><td><code>loader</code></td><td>Yes</td><td>Function that receives <code>{ request, abortSignal }</code> (resource) or <code>{ request }</code> (rxResource) and returns a Promise or Observable.</td></tr>
+    <tr><td><code>defaultValue</code></td><td>No</td><td>Value returned from <code>.value()</code> before the loader resolves. Removes <code>undefined</code> from the signal type (like <code>initialValue</code> on <code>toSignal</code>).</td></tr>
+    <tr><td><code>equal</code></td><td>No</td><td>Equality function for the loader's return value. Prevents downstream updates when the value hasn't meaningfully changed.</td></tr>
+    <tr><td><code>injector</code></td><td>No</td><td>Overrides the injector used by the resource (same escape hatch as <code>effect()</code> and <code>toSignal()</code>).</td></tr>
+  </table>
+
+  <h3 id="resource-signals">What You Get Back</h3>
+
+  <p>Both return a <code>ResourceRef</code> - an object with signal properties and methods representing a complete async state machine:</p>
+
+  <p><strong>Signals (read the current state):</strong></p>
+  <table>
+    <tr><th>Property</th><th>Type</th><th>Description</th></tr>
+    <tr><td><code>.value()</code></td><td><code>T | undefined</code></td><td>The resolved value, or undefined if not yet loaded. Throws if the resource is in error state (use <code>.hasValue()</code> to guard).</td></tr>
+    <tr><td><code>.hasValue()</code></td><td><code>boolean</code></td><td>Type guard - true when a value is available and safe to read.</td></tr>
+    <tr><td><code>.error()</code></td><td><code>unknown</code></td><td>The most recent error from the loader, or undefined if no error.</td></tr>
+    <tr><td><code>.isLoading()</code></td><td><code>boolean</code></td><td>Whether the loader is currently running (true during both initial load and reload).</td></tr>
+    <tr><td><code>.status()</code></td><td><code>ResourceStatus</code></td><td>The specific state: <code>'idle'</code> | <code>'loading'</code> | <code>'reloading'</code> | <code>'resolved'</code> | <code>'error'</code> | <code>'local'</code></td></tr>
+  </table>
+
+  <p><strong>Methods (control the resource):</strong></p>
+  <table>
+    <tr><th>Method</th><th>Description</th></tr>
+    <tr><td><code>.reload()</code></td><td>Re-runs the loader with the current request. Status becomes <code>'reloading'</code> and the previous value remains accessible.</td></tr>
+    <tr><td><code>.set(value)</code></td><td>Optimistically sets the value locally without re-fetching. Status becomes <code>'local'</code>.</td></tr>
+    <tr><td><code>.update(fn)</code></td><td>Optimistically updates the value using a function. Status becomes <code>'local'</code>.</td></tr>
+    <tr><td><code>.destroy()</code></td><td>Manually destroys the resource, cancelling any in-flight loader. Typically not needed - lifecycle is tied to the injection context.</td></tr>
+  </table>
+
+  <p>This replaces the pattern where you'd previously manage separate <code>data$</code>, <code>loading$</code>, and <code>error$</code> observables (or an NgRx <code>CallState</code> discriminated union).</p>
+
+  <h3 id="resource-full-example">Full Example</h3>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">import { rxResource } from '@angular/core/rxjs-interop';
+
+@Component({
+  template: `
+    @switch (policyResource.status()) {
+      @case ('loading') {
+        &lt;app-spinner /&gt;
+      }
+      @case ('error') {
+        &lt;app-error
+          [error]="policyResource.error()"
+          (retry)="policyResource.reload()"
+        /&gt;
+      }
+      @case ('resolved') {
+        &lt;app-policy-detail [policy]="policyResource.value()" /&gt;
+      }
+    }
+  `
+})
+export class PolicyContainer {
+  private readonly policyService = inject(PolicyService);
+  readonly policyId = input.required&lt;string&gt;();
+
+  readonly policyResource = rxResource({
+    request: () => this.policyId(),
+    loader: ({ request: id }) => this.policyService.getById(id),
+  });
+}</code></pre>
+  </div>
+
+  <h3 id="resource-vs-sandwich">resource vs the Manual Sandwich</h3>
+
+  <p class="comparison-label">Manual: toObservable + pipe + toSignal</p>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">readonly policyId = input.required&lt;string&gt;();
+
+private readonly policy$ = toObservable(this.policyId).pipe(
+  switchMap(id => this.svc.getById(id)),
+  catchError(() => of(null))
+);
+
+readonly policy = toSignal(this.policy$);
+// No loading state, no error state - just the value</code></pre>
+  </div>
+
+  <p class="comparison-label">rxResource</p>
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">readonly policyId = input.required&lt;string&gt;();
+
+readonly policy = rxResource({
+  request: () => this.policyId(),
+  loader: ({ request: id }) => this.svc.getById(id),
+});
+// .value(), .isLoading(), .error(), .status() included</code></pre>
+  </div>
+
+  <p>The manual sandwich gives you raw value only - you'd need additional signals or observables to track loading/error state. <code>rxResource</code> gives you the full state machine for free.</p>
+
+  <h3 id="resource-features">Key Behaviours</h3>
+
+  <ul>
+    <li><strong>Auto-cancellation:</strong> If <code>request</code> changes while a previous load is in flight, the previous operation is cancelled. For <code>resource()</code>, this uses <code>AbortSignal</code> (passed to your loader). For <code>rxResource()</code>, the previous Observable subscription is unsubscribed. Same semantics as <code>switchMap</code> - no stale responses arriving after a newer request.</li>
+    <li><strong>Idle when undefined:</strong> If the <code>request</code> computation returns <code>undefined</code>, the loader doesn't run and status becomes <code>'idle'</code>. Useful for conditional fetching:</li>
+  </ul>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">// Only fetch when we have a valid ID
+readonly policy = rxResource({
+  request: () => this.policyId() || undefined,  // undefined = don't fetch
+  loader: ({ request: id }) => this.svc.getById(id),
+});</code></pre>
+  </div>
+
+  <ul>
+    <li><strong>Manual reload:</strong> Call <code>.reload()</code> to re-run the loader with the same request. Status becomes <code>'reloading'</code> and the previous value remains accessible while loading.</li>
+    <li><strong>Local updates:</strong> Call <code>.set(value)</code> or <code>.update(fn)</code> to optimistically update the value without re-fetching. Status becomes <code>'local'</code>.</li>
+    <li><strong>Default value:</strong> Pass <code>defaultValue</code> to avoid <code>undefined</code> in the type, similar to <code>initialValue</code> on <code>toSignal()</code>:</li>
+  </ul>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">readonly policies = rxResource({
+  request: () => this.filters(),
+  loader: ({ request: filters }) => this.svc.search(filters),
+  defaultValue: [],  // Type: ResourceRef&lt;Policy[]&gt; (no undefined)
+});</code></pre>
+  </div>
+
+  <h3 id="resource-which">resource or rxResource?</h3>
+
+  <p>Simple rule: if your service returns an Observable (which is almost always the case with <code>HttpClient</code>), use <code>rxResource</code>. If you're working with <code>fetch()</code> or any other Promise-based API, use <code>resource</code>. They're interchangeable otherwise - same state machine, same signals, same behaviours.</p>
+
+  <div class="key-concept">
+    <strong>When to use resource/rxResource vs the manual sandwich:</strong>
+    <ul>
+      <li><strong>resource/rxResource</strong> - when you need loading/error state, auto-cancellation, and the data source is a "request in, response out" pattern. Most HTTP calls.</li>
+      <li><strong>Manual toObservable/toSignal</strong> - when you need complex pipeline logic between the request and the result (debounce, combining multiple streams, retry with exponential backoff). You can still use operators inside the loader, but if the pipeline is complex, the manual approach can be clearer.</li>
+    </ul>
+  </div>
+
+  <div class="key-concept">
+    <strong>RxJS comparison:</strong> <code>rxResource</code> is conceptually similar to what you'd build with <code>switchMap</code> + a state reducer tracking loading/error/data. But it's declarative, signal-native, and handles cancellation and lifecycle automatically. Think of it as a reactive <code>switchMap</code> with built-in state management.
+  </div>
+
+  <p><a href="0008-resource-and-httpresource.html">Lesson 8</a> covers <code>httpResource</code> (a higher-level wrapper around <code>HttpClient</code> that removes even more boilerplate), resource chaining, streaming resources, and advanced error recovery patterns.</p>
+
+  <h2>Quiz</h2>
+
+  <div class="quiz" role="group">
+    <h3>You have a classic NgRx selector <code>store.select(selectPolicies)</code>. What's the best way to use it in a zoneless signal-based template?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Keep using the async pipe - it still works</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">toSignal(store.select(selectPolicies), { requireSync: true })</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Rewrite the selector to return a signal instead</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="quiz" role="group">
+    <h3>You call <code>signal.set(1)</code>, <code>signal.set(2)</code>, <code>signal.set(3)</code> synchronously. What does <code>toObservable(signal)</code> emit?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">1, 2, 3 (all three values)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Only 3 (the stabilised value after batching)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Nothing - toObservable only emits on the next change detection cycle</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="quiz" role="group">
+    <h3>You're already using <code>toSignal(obs$)</code> in a component. Should you also add <code>takeUntilDestroyed()</code> to the observable?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Yes - always use takeUntilDestroyed for safety</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">No - toSignal already handles unsubscription on destroy</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Only if the observable is hot (WebSocket, interval)</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <h2>Try It Yourself</h2>
+
+  <div class="exercise">
+    <h3>Exercise 1: Convert an Existing Service</h3>
+    <p>You have a <code>ClaimsService</code> that exposes claims as an observable. Write a component that displays them using signals without modifying the service:</p>
+    <div class="code-wrapper">
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre><code class="language-typescript">// Existing service - do NOT modify
+@Injectable({ providedIn: 'root' })
+export class ClaimsService {
+  readonly claims$ = this.http.get&lt;Claim[]&gt;('/api/claims').pipe(
+    shareReplay(1)
+  );
+  constructor(private http: HttpClient) {}
+}
+
+// TODO: Write the component that displays claims using toSignal()</code></pre>
+    </div>
+    <!-- reveal -->
+      <button class="reveal-toggle" aria-expanded="false">Reveal solution</button>
+      <div class="reveal-content"><div class="reveal-inner">
+      <div class="code-wrapper">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre><code class="language-typescript">@Component({
+  template: `
+    @for (claim of claims(); track claim.id) {
+      &lt;div class="claim-row"&gt;
+        {{ claim.id }} - {{ claim.amount | currency }} - {{ claim.status }}
+      &lt;/div&gt;
+    } @empty {
+      &lt;p&gt;No claims found.&lt;/p&gt;
+    }
+  `
+})
+export class ClaimsListComponent {
+  private readonly claimsService = inject(ClaimsService);
+
+  readonly claims = toSignal(this.claimsService.claims$, { initialValue: [] });
+}</code></pre>
+      </div>
+      <p>The service is completely untouched. <code>toSignal()</code> bridges the gap at the component level. <code>initialValue: []</code> gives us a clean type (<code>Signal&lt;Claim[]&gt;</code> not <code>Signal&lt;Claim[] | undefined&gt;</code>) and means the <code>@for</code> loop works immediately with an empty array before data arrives.</p>
+      </div></div>
+    <!-- /reveal -->
+  </div>
+
+  <div class="exercise">
+    <h3>Exercise 2: Signal-Observable-Signal Sandwich</h3>
+    <p>Build a type-ahead search: the user types into an input (signal), you need to debounce and search (RxJS), then display results (signal). Fill in the gaps:</p>
+    <div class="code-wrapper">
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre><code class="language-typescript">@Component({
+  template: `
+    &lt;input (input)="query.set($event.target.value)" /&gt;
+    &lt;ul&gt;
+      @for (result of results(); track result.id) {
+        &lt;li&gt;{{ result.name }}&lt;/li&gt;
+      }
+    &lt;/ul&gt;
+  `
+})
+export class TypeAheadComponent {
+  readonly query = signal('');
+
+  // TODO: convert query to observable, debounce 300ms,
+  // switchMap to search service, convert back to signal
+}</code></pre>
+    </div>
+    <!-- reveal -->
+      <button class="reveal-toggle" aria-expanded="false">Reveal solution</button>
+      <div class="reveal-content"><div class="reveal-inner">
+      <div class="code-wrapper">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre><code class="language-typescript">@Component({
+  template: `
+    &lt;input (input)="query.set($event.target.value)" /&gt;
+    &lt;ul&gt;
+      @for (result of results(); track result.id) {
+        &lt;li&gt;{{ result.name }}&lt;/li&gt;
+      }
+    &lt;/ul&gt;
+  `
+})
+export class TypeAheadComponent {
+  private readonly searchService = inject(SearchService);
+
+  readonly query = signal('');
+
+  private readonly results$ = toObservable(this.query).pipe(
+    debounceTime(300),
+    filter(q => q.length >= 2),
+    switchMap(q => this.searchService.search(q)),
+    catchError(() => of([]))
+  );
+
+  readonly results = toSignal(this.results$, { initialValue: [] });
+}</code></pre>
+      </div>
+      <p>Signal -> Observable (for debounce/switchMap) -> Signal (for template). Each tool used where it's strongest. Note the <code>filter</code> to avoid searching on very short strings, and <code>catchError</code> to prevent the stream from dying on a failed request.</p>
+      </div></div>
+    <!-- /reveal -->
+  </div>
+
+  <div class="exercise">
+    <h3>Exercise 3: Choose Your Approach</h3>
+    <p>For each scenario, decide: stay pure signals, stay pure RxJS, or bridge?</p>
+    <ol>
+      <li>A boolean toggle for showing/hiding a panel</li>
+      <li>Polling an API every 10 seconds for live claim updates</li>
+      <li>Deriving a "total claims amount" from a list of claims</li>
+      <li>A form field that should validate after the user stops typing for 500ms</li>
+      <li>Consuming a NgRx selector in a template</li>
+    </ol>
+    <!-- reveal -->
+      <button class="reveal-toggle" aria-expanded="false">Reveal solution</button>
+      <div class="reveal-content"><div class="reveal-inner">
+      <ol>
+        <li><strong>Pure signal</strong> - <code>signal(false)</code> + <code>.set(true)</code>. No async, no stream, just state.</li>
+        <li><strong>RxJS + toSignal</strong> - <code>interval(10000).pipe(switchMap(() => http.get(...)))</code> then <code>toSignal()</code>. Polling is inherently stream-based.</li>
+        <li><strong>Pure signal</strong> - <code>computed(() => claims().reduce((sum, c) => sum + c.amount, 0))</code>. Synchronous derivation.</li>
+        <li><strong>Bridge</strong> - signal input -> <code>toObservable</code> -> <code>debounceTime(500)</code> -> validation logic -> <code>toSignal</code>. Time-based operators need RxJS.</li>
+        <li><strong>toSignal + requireSync</strong> - <code>toSignal(store.select(...), { requireSync: true })</code>. Bridge at consumption, don't rewrite the store.</li>
+      </ol>
+      </div></div>
+    <!-- /reveal -->
+  </div>
+
+  <h2>Your Tangible Win</h2>
+
+  <p>You now know how to bridge signals and observables in both directions. The key insight: you don't have to choose one world or the other. Use signals for synchronous state and templates, observables for async orchestration and time-based logic, and <code>toSignal()</code>/<code>toObservable()</code> at the boundaries. Your existing services and stores work unchanged - you just consume them differently at the component level.</p>
+
+  <p>Next lesson, we'll start building with NgRx SignalStore - purpose-built state management that speaks signals natively, so you won't need these bridges for new state patterns.</p>
+
+  <div class="recommended">
+    <strong>Primary source:</strong>
+    <a href="https://angular.dev/ecosystem/rxjs-interop">RxJS Interop - angular.dev</a> - the canonical documentation for toSignal, toObservable, and rxResource.
+  </div>
+
+  <div class="ask-kiro">
+    Something unclear? Ask me follow-up questions - I'm your teacher and can clarify anything, adjust examples, or go deeper on any concept.
+  </div>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <div class="footer-nav">
+    <a href="0003-linked-signal-and-dependent-state.html">&larr; Prev: linkedSignal & Dependent State</a>
+    <a href="0005-signalstore-your-first-store.html">Next: SignalStore: Your First Store &rarr;</a>
+  </div>
+
+    </main>
+  </div>
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
+  <script src="/vendor/prism-typescript.min.js"></script>
+  <script src="/vendor/prism-bash.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>linkedSignal & Dependent State - Lesson 3 | Teach Me</title>
+  <meta name="description" content="Learn Angular's linkedSignal() for writable derived state - the missing piece between computed() and signal(). Master shorthand and expanded forms, previous value access, and smart reset patterns.">
+  <link rel="canonical" href="https://teachmeskills.dev/angular-signals/03-linked-signal-and-dependent-state.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/angular-signals/03-linked-signal-and-dependent-state.html">
+  <meta property="og:title" content="linkedSignal & Dependent State - Lesson 3 | Teach Me">
+  <meta property="og:description" content="Learn Angular's linkedSignal() for writable derived state, previous value access, and smart reset patterns.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="linkedSignal & Dependent State - Lesson 3 | Teach Me">
+  <meta name="twitter:description" content="Learn Angular's linkedSignal() for writable derived state, previous value access, and smart reset patterns.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header"><a href="index.html">Angular Signals Course</a></div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="0001-signals-the-reactive-primitive.html">1. Signals: The Reactive Primitive</a></li>
+        <li><a href="0002-effects-lifecycle-and-untracked.html">2. Effects, Lifecycle & Untracked</a></li>
+        <li class="current"><a href="0003-linked-signal-and-dependent-state.html">3. linkedSignal & Dependent State</a></li>
+        <li><a href="0004-rxjs-interop-the-bridge.html">4. RxJS Interop: The Bridge</a></li>
+        <li><a href="0005-signalstore-your-first-store.html">5. SignalStore: Your First Store</a></li>
+        <li><a href="0006-entity-management.html">6. Entity Management</a></li>
+        <li><a href="0007-async-with-rxmethod.html">7. Async with rxMethod</a></li>
+        <li class="coming-soon"><a href="0008-resource-and-httpresource.html">8. resource & httpResource</a></li>
+        <li class="coming-soon"><a href="0009-store-lifecycle-and-devtools.html">9. Store Lifecycle & DevTools</a></li>
+        <li class="coming-soon"><a href="0010-custom-store-features.html">10. Custom Store Features</a></li>
+        <li class="coming-soon"><a href="0011-events-and-reducers.html">11. Events & Reducers</a></li>
+        <li class="coming-soon"><a href="0012-store-architecture-and-testing.html">12. Store Architecture & Testing</a></li>
+        <li class="coming-soon"><a href="0013-signal-forms-the-new-model.html">13. Signal Forms: The New Model</a></li>
+        <li class="coming-soon"><a href="0014-validation-and-field-state.html">14. Validation & Field State</a></li>
+        <li class="coming-soon"><a href="0015-complex-forms-and-custom-controls.html">15. Complex Forms & Custom Controls</a></li>
+        <li class="coming-soon"><a href="0016-migrating-signalformcontrol-bridge.html">16. Migrating: SignalFormControl Bridge</a></li>
+        <li class="coming-soon"><a href="0017-signals-store-forms-together.html">17. Signals + Store + Forms</a></li>
+        <li class="coming-soon"><a href="0018-when-to-keep-rxjs.html">18. When to Keep RxJS</a></li>
+        <li class="coming-soon"><a href="0019-capstone-the-complete-dashboard.html">19. Capstone: The Complete Dashboard</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="signals-glossary.html">Signals Glossary</a></li>
+        <li class="coming-soon"><a href="signal-primitives.html">Signal Primitives</a></li>
+        <li class="coming-soon"><a href="signalstore-api.html">SignalStore API</a></li>
+        <li class="coming-soon"><a href="signal-forms-api.html">Signal Forms API</a></li>
+        <li class="coming-soon"><a href="decision-framework.html">Decision Framework</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 3</p>
+  <h1>linkedSignal & Dependent State</h1>
+
+  <h2>The Core Idea</h2>
+
+  <div class="key-concept">
+    <strong>Mental model:</strong> A <code>linkedSignal</code> is a writable signal that automatically resets its value based on a reactive source. Think of it as a <code>computed()</code> that you can also <code>.set()</code> manually. When the source changes, the linked signal snaps back to its computed default. When the user (or your code) overrides it, the override holds until the source changes again.
+  </div>
+
+  <h2>The Problem linkedSignal Solves</h2>
+
+  <p>Before <code>linkedSignal</code>, you had two options for derived state:</p>
+
+  <table>
+    <tr><th>Primitive</th><th>Reactive?</th><th>Writable?</th><th>Limitation</th></tr>
+    <tr><td><code>computed()</code></td><td>Yes</td><td>No</td><td>Can't be overridden by user interaction</td></tr>
+    <tr><td><code>signal()</code></td><td>No</td><td>Yes</td><td>Doesn't react to source changes</td></tr>
+  </table>
+
+  <p>The gap: what about state that <em>usually</em> derives from a source, but <em>sometimes</em> gets overridden by the user? Classic example: a dropdown defaults to the first option, but the user can select a different one. When the options list changes, the selection should reset to a valid default.</p>
+
+  <p>Without <code>linkedSignal</code>, people reached for <code>effect()</code> to propagate state - which we learned in <a href="0002-effects-lifecycle-and-untracked.html#when-to-use-effects"></a>Lesson 2</a> is an antipattern. <code>linkedSignal</code> is the correct tool for this.</p>
+
+  <h2>The Function Form (Shorthand)</h2>
+
+  <p>The simplest form of <code>linkedSignal</code> takes a computation function - identical syntax to <code>computed()</code>, but returns a <code>WritableSignal</code>:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">import { signal, linkedSignal } from '@angular/core';
+
+const coverTypes = signal(['Buildings', 'Contents', 'Business Interruption']);
+
+// Defaults to the first cover type, resets when coverTypes changes
+const selectedCover = linkedSignal(() => coverTypes()[0]);
+
+console.log(selectedCover()); // 'Buildings'
+
+// User selects a different option
+selectedCover.set('Contents');
+console.log(selectedCover()); // 'Contents'
+
+// Source changes - linkedSignal resets to new computation result
+coverTypes.set(['Motor Fleet', 'Cargo', 'Marine Hull']);
+console.log(selectedCover()); // 'Motor Fleet'</code></pre>
+  </div>
+
+  <p>In a real component, that <code>.set()</code> call lives in the event handler wired to a template control:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">@Component({
+  selector: 'app-cover-picker',
+  template: `
+    &lt;label for="cover-select"&gt;Cover type&lt;/label&gt;
+    &lt;select id="cover-select" [value]="selectedCover()" (change)="onCoverChange($event)"&gt;
+      @for (cover of coverTypes(); track cover) {
+        &lt;option [value]="cover"&gt;{{ cover }}&lt;/option&gt;
+      }
+    &lt;/select&gt;
+    &lt;p&gt;Selected: {{ selectedCover() }}&lt;/p&gt;
+  `,
+})
+export class CoverPickerComponent {
+  // Could come from a service, a store, or an input()
+  readonly coverTypes = signal(['Buildings', 'Contents', 'Business Interruption']);
+
+  // Defaults to first, resets when the list changes
+  readonly selectedCover = linkedSignal(() => this.coverTypes()[0]);
+
+  onCoverChange(event: Event): void {
+    const value = (event.target as HTMLSelectElement).value;
+    this.selectedCover.set(value); // user override - holds until coverTypes changes
+  }
+}</code></pre>
+  </div>
+
+  <p>When <code>coverTypes</code> changes later - maybe a parent pushes new options via an <code>input()</code>, or a service emits a new list - the <code>linkedSignal</code> resets to <code>coverTypes()[0]</code> automatically. No cleanup logic, no subscription management.</p>
+
+  <p>Key behaviours:</p>
+  <ul>
+    <li><strong>Writable</strong> - you can call <code>.set()</code> and <code>.update()</code> on it, just like a regular signal.</li>
+    <li><strong>Reactive</strong> - when any signal read inside the computation changes, the linked signal resets to the computation result.</li>
+    <li><strong>Overridable</strong> - manual writes are preserved until the next source change triggers a reset.</li>
+  </ul>
+
+  <h3>The RxJS Comparison</h3>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">// RxJS way - BehaviorSubject that resets on source emission
+private coverTypes$ = new BehaviorSubject(['Buildings', 'Contents', 'BI']);
+private userSelection$ = new BehaviorSubject&lt;string | null&gt;(null);
+
+selectedCover$ = this.coverTypes$.pipe(
+  switchMap(types => this.userSelection$.pipe(
+    startWith(null),
+    map(selection => selection ?? types[0])
+  ))
+);
+// Plus: manual reset logic when coverTypes$ emits, unsubscription, etc.
+
+// Signal way - one line
+const selectedCover = linkedSignal(() => this.coverTypes()[0]);</code></pre>
+  </div>
+
+  <p>The RxJS version requires orchestrating two subjects, a <code>switchMap</code>, and careful thought about when to reset the user selection. The <code>linkedSignal</code> captures the entire pattern in a single declaration.</p>
+
+  <h2>The Expanded Form (Object): Previous Value Access</h2>
+
+  <p>The function form above always resets to whatever the computation returns - it has no memory of the previous value. But what if you want smarter behaviour - like preserving the user's selection if it's still valid in the new list?</p>
+
+  <p>The <strong>expanded form</strong> passes an object with <code>source</code> and <code>computation</code> instead of a bare function. The computation receives the previous value as its second argument, letting you make intelligent decisions about what to keep:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">interface CoverType {
+  id: string;
+  name: string;
+}
+
+const availableCovers = signal&lt;CoverType[]&gt;([
+  { id: 'buildings', name: 'Buildings' },
+  { id: 'contents', name: 'Contents' },
+  { id: 'bi', name: 'Business Interruption' },
+]);
+
+const selectedCover = linkedSignal&lt;CoverType[], CoverType&gt;({
+  source: availableCovers,
+  computation: (newCovers, previous) => {
+    // If the previously selected cover still exists, keep it
+    const preserved = newCovers.find(c => c.id === previous?.value.id);
+    return preserved ?? newCovers[0];
+  },
+});</code></pre>
+  </div>
+
+  <p>The <code>computation</code> function receives:</p>
+  <ul>
+    <li><strong>First argument</strong> - the new value of <code>source</code>.</li>
+    <li><strong>Second argument</strong> - a <code>previous</code> object with <code>.value</code> (previous linkedSignal value) and <code>.source</code> (previous source value). This is <code>undefined</code> on the first computation.</li>
+  </ul>
+
+  <div class="key-concept">
+    <strong>Type parameters:</strong> When using the expanded form with <code>previous</code>, you must provide explicit generic types: <code>linkedSignal&lt;SourceType, OutputType&gt;({...})</code>. The first type is the source signal's value type, the second is the linkedSignal's output type.
+  </div>
+
+  <h2>How It Works: The Reset Cycle</h2>
+
+  <p>The lifecycle of a <code>linkedSignal</code> follows a predictable cycle:</p>
+
+  <!-- linkedSignal Reset Cycle Animation -->
+  <div style="margin: 2rem 0; padding: 1.5rem; border: 1px solid var(--border); border-radius: 8px; background: var(--bg);">
+    <p style="font-size: 0.85rem; font-weight: 600; color: var(--text-h2); margin-bottom: 1rem; text-align: center;">linkedSignal Reset Cycle</p>
+    <svg viewBox="0 0 600 260" width="100%" style="display: block; max-width: 600px; margin: 0 auto;" aria-label="Animated diagram showing linkedSignal reset cycle: source changes, computation runs, value resets. User override persists until next source change.">
+      <!-- Central timeline -->
+      <line x1="50" y1="130" x2="550" y2="130" stroke="var(--border)" stroke-width="2"/>
+
+      <!-- Phase labels -->
+      <text x="130" y="30" text-anchor="middle" fill="var(--muted)" font-size="10" font-family="-apple-system, sans-serif">Source changes</text>
+      <text x="300" y="30" text-anchor="middle" fill="var(--muted)" font-size="10" font-family="-apple-system, sans-serif">Computation resets value</text>
+      <text x="470" y="30" text-anchor="middle" fill="var(--muted)" font-size="10" font-family="-apple-system, sans-serif">User overrides (.set)</text>
+
+      <!-- Timeline markers -->
+      <line x1="130" y1="115" x2="130" y2="145" stroke="var(--border)" stroke-width="1.5"/>
+      <line x1="300" y1="115" x2="300" y2="145" stroke="var(--border)" stroke-width="1.5"/>
+      <line x1="470" y1="115" x2="470" y2="145" stroke="var(--border)" stroke-width="1.5"/>
+
+      <!-- Phase 1: Source change (orange) -->
+      <circle cx="130" cy="130" r="12" fill="none" stroke="var(--signal-invalidation, #f59e0b)" stroke-width="2.5" opacity="0">
+        <animate attributeName="opacity" values="0;0;1;1;0;0;0;0;0" keyTimes="0;0.04;0.05;0.2;0.25;0.5;0.7;0.9;1" dur="8s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="130" cy="130" r="6" fill="var(--signal-invalidation, #f59e0b)" opacity="0">
+        <animate attributeName="opacity" values="0;0;1;1;0;0;0;0;0" keyTimes="0;0.04;0.05;0.2;0.25;0.5;0.7;0.9;1" dur="8s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- Arrow 1 to 2 -->
+      <circle r="5" fill="var(--signal-invalidation, #f59e0b)" opacity="0">
+        <animateMotion dur="8s" repeatCount="indefinite" keyPoints="0;0;0;1;1;1" keyTimes="0;0.2;0.21;0.38;0.39;1" calcMode="linear">
+          <mpath href="#path-source-to-reset"/>
+        </animateMotion>
+        <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.2;0.21;0.37;0.39;1" dur="8s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- Phase 2: Computation resets (blue) -->
+      <circle cx="300" cy="130" r="12" fill="none" stroke="var(--accent, #3b82f6)" stroke-width="2.5" opacity="0">
+        <animate attributeName="opacity" values="0;0;0;0;1;1;0;0;0" keyTimes="0;0.3;0.35;0.38;0.39;0.53;0.56;0.8;1" dur="8s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="300" cy="130" r="6" fill="var(--accent, #3b82f6)" opacity="0">
+        <animate attributeName="opacity" values="0;0;0;0;1;1;0;0;0" keyTimes="0;0.3;0.35;0.38;0.39;0.53;0.56;0.8;1" dur="8s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- Arrow 2 to 3 (dashed - represents time passing / user action) -->
+      <path d="M315,130 L450,130" fill="none" stroke="var(--signal-value, #00e5ff)" stroke-width="2" stroke-dasharray="6,4" opacity="0">
+        <animate attributeName="opacity" values="0;0;0;0;0;1;1;0;0" keyTimes="0;0.5;0.55;0.58;0.6;0.61;0.75;0.78;1" dur="8s" repeatCount="indefinite"/>
+      </path>
+      <circle r="5" fill="var(--signal-value, #00e5ff)" opacity="0">
+        <animateMotion dur="8s" repeatCount="indefinite" keyPoints="0;0;0;1;1;1" keyTimes="0;0.6;0.61;0.75;0.76;1" calcMode="linear">
+          <mpath href="#path-reset-to-override"/>
+        </animateMotion>
+        <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.6;0.61;0.74;0.76;1" dur="8s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- Phase 3: User override (cyan/teal) -->
+      <circle cx="470" cy="130" r="12" fill="none" stroke="var(--signal-value, #00e5ff)" stroke-width="2.5" opacity="0">
+        <animate attributeName="opacity" values="0;0;0;0;0;0;0;1;1;0" keyTimes="0;0.5;0.55;0.6;0.65;0.7;0.75;0.76;0.9;0.95" dur="8s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="470" cy="130" r="6" fill="var(--signal-value, #00e5ff)" opacity="0">
+        <animate attributeName="opacity" values="0;0;0;0;0;0;0;1;1;0" keyTimes="0;0.5;0.55;0.6;0.65;0.7;0.75;0.76;0.9;0.95" dur="8s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- Sequence numbers -->
+      <circle cx="130" cy="65" r="10" fill="var(--signal-invalidation, #f59e0b)" opacity="0.9"/>
+      <text x="130" y="69" text-anchor="middle" fill="white" font-size="11" font-weight="bold" font-family="-apple-system, sans-serif">1</text>
+
+      <circle cx="300" cy="65" r="10" fill="var(--accent, #3b82f6)" opacity="0.9"/>
+      <text x="300" y="69" text-anchor="middle" fill="white" font-size="11" font-weight="bold" font-family="-apple-system, sans-serif">2</text>
+
+      <circle cx="470" cy="65" r="10" fill="var(--signal-value, #00e5ff)" opacity="0.9"/>
+      <text x="470" y="69" text-anchor="middle" fill="white" font-size="11" font-weight="bold" font-family="-apple-system, sans-serif">3</text>
+
+      <!-- Description row -->
+      <text x="130" y="175" text-anchor="middle" fill="var(--text)" font-size="10" font-family="-apple-system, sans-serif">availableCovers</text>
+      <text x="130" y="188" text-anchor="middle" fill="var(--text)" font-size="10" font-family="-apple-system, sans-serif">list updates</text>
+      <text x="300" y="175" text-anchor="middle" fill="var(--text)" font-size="10" font-family="-apple-system, sans-serif">selectedCover resets</text>
+      <text x="300" y="188" text-anchor="middle" fill="var(--text)" font-size="10" font-family="-apple-system, sans-serif">to computed default</text>
+      <text x="470" y="175" text-anchor="middle" fill="var(--text)" font-size="10" font-family="-apple-system, sans-serif">User picks 'Contents'</text>
+      <text x="470" y="188" text-anchor="middle" fill="var(--text)" font-size="10" font-family="-apple-system, sans-serif">override holds</text>
+
+      <!-- Cycle arrow (wraps back) -->
+      <path d="M470,205 C470,235 130,235 130,205" fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.6"/>
+      <text x="300" y="248" text-anchor="middle" fill="var(--muted)" font-size="9" font-family="-apple-system, sans-serif">Next source change resets again</text>
+
+      <!-- Hidden paths for animateMotion -->
+      <path id="path-source-to-reset" d="M145,130 L285,130" fill="none" stroke="none"/>
+      <path id="path-reset-to-override" d="M315,130 L455,130" fill="none" stroke="none"/>
+    </svg>
+    <p style="font-size: 0.8rem; color: var(--muted); margin-top: 0.75rem; line-height: 1.5; text-align: center;">The cycle repeats: source change triggers reset, user override holds until the next source change.</p>
+  </div>
+
+  <h2>Real-World Pattern: Policy Dashboard Selection</h2>
+
+  <p>In our Policy Dashboard, the user selects a policy from a filtered list. When filters change, the selection should reset to the first result - unless the currently selected policy is still in the new results:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">@Component({ /* ... */ })
+export class PolicyListComponent {
+  private readonly policyService = inject(PolicyService);
+
+  // Inputs that affect filtering
+  readonly classOfBusiness = input&lt;string&gt;('all');
+  readonly status = input&lt;PolicyStatus&gt;('active');
+
+  // Filtered policies - derived from inputs
+  readonly filteredPolicies = computed(() =>
+    this.policyService.policies()
+      .filter(p => this.classOfBusiness() === 'all' || p.class === this.classOfBusiness())
+      .filter(p => p.status === this.status())
+  );
+
+  // Selected policy - resets smartly when filtered list changes
+  readonly selectedPolicy = linkedSignal&lt;Policy[], Policy | null&gt;({
+    source: this.filteredPolicies,
+    computation: (policies, previous) => {
+      if (!policies.length) return null;
+      // Preserve selection if it's still in the filtered results
+      const preserved = policies.find(p => p.id === previous?.value?.id);
+      return preserved ?? policies[0];
+    },
+  });
+
+  selectPolicy(policy: Policy): void {
+    this.selectedPolicy.set(policy); // user override
+  }
+}</code></pre>
+  </div>
+
+  <p>Without <code>linkedSignal</code>, this pattern would require either:</p>
+  <ul>
+    <li>An <code>effect()</code> that sets a separate signal (antipattern - state propagation via effect)</li>
+    <li>Manual reset logic scattered across filter change handlers</li>
+    <li>A <code>BehaviorSubject</code> + <code>switchMap</code> + <code>startWith</code> orchestration</li>
+  </ul>
+
+  <p><code>linkedSignal</code> captures the entire "default + smart reset + user override" pattern in a single, declarative expression.</p>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <h2>linkedSignal with Component Inputs</h2>
+
+  <p>One of the most common use cases: a component receives an input that provides a default, but the user can modify it locally. When the parent sends a new input, the local state should reset:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">@Component({
+  selector: 'app-premium-calculator',
+  template: `
+    &lt;label&gt;
+      Excess amount
+      &lt;input type="number" [value]="excessAmount()" (input)="updateExcess($event)" /&gt;
+    &lt;/label&gt;
+    &lt;p&gt;Current excess: {{ excessAmount() | currency }}&lt;/p&gt;
+  `
+})
+export class PremiumCalculator {
+  // Parent provides a default excess based on the policy class
+  readonly defaultExcess = input.required&lt;number&gt;();
+
+  // Local state: follows the input, but user can override
+  readonly excessAmount = linkedSignal(() => this.defaultExcess());
+
+  updateExcess(event: Event): void {
+    const value = +(event.target as HTMLInputElement).value;
+    this.excessAmount.set(value);
+  }
+}</code></pre>
+  </div>
+
+  <p>When the parent changes the <code>defaultExcess</code> input (e.g. the user switches to a different policy class), the <code>excessAmount</code> resets to the new default. If the user has typed a custom value, it's preserved until the next input change.</p>
+
+  <div class="key-concept">
+    <strong>This is the model() alternative:</strong> Angular's <code>model()</code> primitive (stable since Angular 18) creates a <code>WritableSignal</code> that syncs both directions - when the child writes to it, the parent sees the change automatically via <code>[(value)]</code> two-way binding. <code>linkedSignal</code> + <code>input()</code> creates one-way-in with local override - the parent pushes a default in, the child can override it locally, but the parent never sees the user's changes unless you add an explicit <code>output()</code>. Choose based on whether the parent needs to know about local modifications. We'll cover <code>model()</code> in detail in <a href="0015-complex-forms-and-custom-controls.html">Lesson 15</a> when building custom form controls.
+  </div>
+
+  <h2 id="custom-equality">Custom Equality</h2>
+
+  <p>Like <code>signal()</code> and <code>computed()</code> (see <a href="0001-signals-the-reactive-primitive.html#custom-equality">Custom Equality Functions</a> in Lesson 1), you can provide an <code>equal</code> option to <code>linkedSignal</code>. This controls when downstream consumers consider the value "changed":</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">const activePolicy = signal&lt;Policy&gt;(initialPolicy);
+
+// Only consider it "changed" if the policy ID is different
+const editableCopy = linkedSignal(() => activePolicy(), {
+  equal: (a, b) => a.id === b.id,
+});
+
+// Or with the expanded form:
+const editableCopy = linkedSignal({
+  source: activePolicy,
+  computation: (policy) => ({ ...policy }),
+  equal: (a, b) => a.id === b.id,
+});</code></pre>
+  </div>
+
+  <p>This prevents unnecessary re-renders when the source emits a new object with the same logical identity.</p>
+
+  <h2>When to Use Which</h2>
+
+  <p>The signal primitives form a spectrum from "fully derived" to "fully independent":</p>
+
+  <table>
+    <tr><th>Primitive</th><th>Reactive source?</th><th>Writable?</th><th>Use when</th></tr>
+    <tr><td><code>computed()</code></td><td>Yes</td><td>No</td><td>Value is <em>always</em> derived - no user override needed</td></tr>
+    <tr><td><code>linkedSignal()</code></td><td>Yes</td><td>Yes</td><td>Value has a reactive default but can be overridden locally</td></tr>
+    <tr><td><code>signal()</code></td><td>No</td><td>Yes</td><td>Value is independent - no reactive source</td></tr>
+  </table>
+
+  <div class="warning">
+    <strong>Don't reach for linkedSignal when computed will do.</strong> If the value should <em>always</em> be derived and never overridden, use <code>computed()</code>. <code>linkedSignal</code> is for the specific pattern of "reactive default + local override." Using it where <code>computed</code> suffices adds unnecessary writability and makes the code harder to reason about.
+  </div>
+
+  <h3>Decision tree</h3>
+  <ol>
+    <li>Does the value depend on other signals? <strong>No</strong> - use <code>signal()</code></li>
+    <li>Should it always reflect the computation? <strong>Yes</strong> - use <code>computed()</code></li>
+    <li>Should it reflect the computation <em>unless</em> overridden? <strong>Yes</strong> - use <code>linkedSignal()</code></li>
+  </ol>
+
+  <h2>The RxJS Comparison</h2>
+
+  <p>There's no single RxJS operator that does what <code>linkedSignal</code> does. The closest pattern combines multiple concepts:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">// RxJS way - resettable selection state
+private source$ = this.store.select(selectFilteredPolicies);
+private userOverride$ = new Subject&lt;Policy&gt;();
+private reset$ = this.source$.pipe(map(policies => policies[0]));
+
+selectedPolicy$ = merge(this.reset$, this.userOverride$).pipe(
+  distinctUntilChanged((a, b) => a?.id === b?.id),
+  shareReplay(1)
+);
+
+selectPolicy(policy: Policy) {
+  this.userOverride$.next(policy);
+}
+// Plus: unsubscription, timing issues if override races with reset
+
+// Signal way
+selectedPolicy = linkedSignal&lt;Policy[], Policy | null&gt;({
+  source: this.filteredPolicies,
+  computation: (policies, prev) =>
+    policies.find(p => p.id === prev?.value?.id) ?? policies[0],
+});</code></pre>
+  </div>
+
+  <p>The RxJS pattern requires merging two streams, managing race conditions between the reset and override, and careful subscription management. The <code>linkedSignal</code> is synchronous, glitch-free, and declarative.</p>
+
+  <h2>Common Patterns</h2>
+
+  <h3>Form field with resettable default</h3>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">// Inception date defaults to today, resets when policy type changes
+readonly policyType = input.required&lt;string&gt;();
+readonly inceptionDate = linkedSignal(() => {
+  // Different policy types have different default inception rules
+  const type = this.policyType();
+  return type === 'renewal' ? this.currentPolicy().expiryDate : new Date();
+});</code></pre>
+  </div>
+
+  <h3>Tab selection that preserves across safe transitions</h3>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">readonly availableTabs = computed(() =>
+  this.userRole() === 'underwriter'
+    ? ['summary', 'risk', 'pricing', 'claims']
+    : ['summary', 'claims']
+);
+
+readonly activeTab = linkedSignal&lt;string[], string&gt;({
+  source: this.availableTabs,
+  computation: (tabs, previous) =>
+    // Keep current tab if it's still available after role change
+    tabs.includes(previous?.value ?? '') ? previous!.value : tabs[0],
+});</code></pre>
+  </div>
+
+  <h3>Pagination that resets on filter change</h3>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">readonly searchQuery = signal('');
+readonly currentPage = linkedSignal(() => {
+  this.searchQuery(); // track the dependency
+  return 1; // always reset to page 1 when search changes
+});</code></pre>
+  </div>
+
+  <h2>When Classic NgRx Would Have Done This</h2>
+
+  <p>In a classic NgRx setup, this "dependent selection" pattern typically involved:</p>
+  <ul>
+    <li>An action dispatched when filters change</li>
+    <li>A reducer that resets the selected item</li>
+    <li>A selector that derives the "effective selection" from store state</li>
+    <li>A separate action + reducer for user selection</li>
+  </ul>
+
+  <p>That's four moving parts (two actions, a reducer case, a selector) for what <code>linkedSignal</code> captures in one declaration. This is why <a href="0005-signalstore-your-first-store.html"></a>NgRx SignalStore</a> (Lesson 5+) uses signals directly rather than the action/reducer cycle for most local state patterns.</p>
+
+  <h2>Quiz</h2>
+
+  <div class="quiz" role="group">
+    <h3>What makes <code>linkedSignal</code> different from <code>computed</code>?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">linkedSignal is lazy and memoized, computed is not</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">linkedSignal is writable - you can call .set() on it</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">linkedSignal runs asynchronously, computed runs synchronously</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="quiz" role="group">
+    <h3>When the source signal changes, what happens to a linkedSignal's value?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Nothing - it keeps the last value that was .set()</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">It resets to the result of the computation function</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">It throws an error because the source is invalid</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="quiz" role="group">
+    <h3>You have a value that should always be derived from other signals and never overridden. Which primitive?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">computed() - read-only derived state</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">linkedSignal() - writable derived state</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">signal() - independent writable state</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="quiz" role="group">
+    <h3>In the expanded form, what does the <code>previous</code> parameter give you access to?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The previous value of the source signal only</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Both the previous linkedSignal value (.value) and previous source value (.source)</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">A history array of all previous values</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <h2>Try It Yourself</h2>
+
+  <div class="exercise">
+    <h3>Exercise 1: Pagination Reset</h3>
+    <p>You're building a claims list with search and pagination. When the user types a new search query, the page should reset to 1. But the user can also manually navigate to any page. Write the signals:</p>
+    <ol>
+      <li>A writable signal <code>searchQuery</code> (initially empty string)</li>
+      <li>A <code>linkedSignal</code> for <code>currentPage</code> that resets to 1 whenever <code>searchQuery</code> changes, but allows manual override via <code>.set()</code></li>
+    </ol>
+    <p>What form of <code>linkedSignal</code> do you need - shorthand or expanded? Why?</p>
+    <!-- reveal -->
+      <button class="reveal-toggle" aria-expanded="false">Reveal solution</button>
+ <div class="reveal-content"><div class="reveal-inner">
+      <div class="code-wrapper">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre><code class="language-typescript">import { signal, linkedSignal } from '@angular/core';
+
+const searchQuery = signal('');
+
+const currentPage = linkedSignal(() => {
+  searchQuery(); // track the dependency
+  return 1;      // always reset to page 1
+});
+
+// User navigates to page 3
+currentPage.set(3);
+console.log(currentPage()); // 3
+
+// User types a new search - resets to 1
+searchQuery.set('flood damage');
+console.log(currentPage()); // 1</code></pre>
+      </div>
+      <p>The shorthand form is sufficient here because you always want to reset to the same value (1) regardless of what was there before. You don't need the previous value.</p>
+    </div></div>
+ <!-- /reveal -->
+  </div>
+
+  <div class="exercise">
+    <h3>Exercise 2: Smart Tab Preservation</h3>
+    <p>A component shows tabs based on user role. When the role changes, the active tab should stay the same if it's still available, otherwise fall back to the first tab. Write this using the expanded form:</p>
+    <div class="code-wrapper">
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre><code class="language-typescript">const userRole = signal&lt;'broker' | 'underwriter' | 'claims'&gt;('broker');
+
+const availableTabs = computed(() => {
+  switch (userRole()) {
+    case 'broker':      return ['summary', 'documents', 'endorsements'];
+    case 'underwriter': return ['summary', 'risk', 'pricing', 'documents'];
+    case 'claims':      return ['summary', 'reserves', 'payments'];
+  }
+});
+
+// TODO: Write the linkedSignal for activeTab
+// - Should preserve the current tab if it exists in the new tab list
+// - Should fall back to the first available tab otherwise</code></pre>
+    </div>
+    <!-- reveal -->
+      <button class="reveal-toggle" aria-expanded="false">Reveal solution</button>
+ <div class="reveal-content"><div class="reveal-inner">
+      <div class="code-wrapper">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre><code class="language-typescript">const activeTab = linkedSignal&lt;string[], string&gt;({
+  source: availableTabs,
+  computation: (tabs, previous) => {
+    // If the previous tab is still available, keep it
+    if (previous && tabs.includes(previous.value)) {
+      return previous.value;
+    }
+    // Otherwise fall back to first tab
+    return tabs[0];
+  },
+});
+
+// Initially: 'summary' (first tab for broker)
+activeTab.set('documents');
+console.log(activeTab()); // 'documents'
+
+// Role changes to underwriter - 'documents' still available
+userRole.set('underwriter');
+console.log(activeTab()); // 'documents' (preserved!)
+
+// Role changes to claims - 'documents' not available, falls back
+userRole.set('claims');
+console.log(activeTab()); // 'summary' (fallback to first)</code></pre>
+      </div>
+      <p>The expanded form is needed because we access <code>previous.value</code> to check if the old tab is still valid. The type parameters <code>&lt;string[], string&gt;</code> tell TypeScript that the source is a string array and the output is a single string.</p>
+    </div></div>
+ <!-- /reveal -->
+  </div>
+
+  <div class="exercise">
+    <h3>Exercise 3: Choose the Right Primitive</h3>
+    <p>For each scenario, decide: <code>signal()</code>, <code>computed()</code>, or <code>linkedSignal()</code>? Explain why.</p>
+    <ol>
+      <li>A total premium that's always the sum of all line items</li>
+      <li>A currency dropdown that defaults to the insured's country currency, but the user can override it</li>
+      <li>A loading flag that gets set to <code>true</code> when a request starts and <code>false</code> when it ends</li>
+      <li>A "dirty" indicator that turns true when a form field's current value differs from its original value</li>
+      <li>The selected sort column in a table, which resets to "inception date" when the policy class filter changes</li>
+    </ol>
+    <!-- reveal -->
+      <button class="reveal-toggle" aria-expanded="false">Reveal solution</button>
+ <div class="reveal-content"><div class="reveal-inner">
+      <ol>
+        <li><strong><code>computed()</code></strong> - purely derived, never overridden. <code>computed(() =&gt; lineItems().reduce((sum, li) =&gt; sum + li.premium, 0))</code></li>
+        <li><strong><code>linkedSignal()</code></strong> - has a reactive default (country currency) but allows user override. Classic linkedSignal pattern.</li>
+        <li><strong><code>signal()</code></strong> - independent state with no reactive source. Nothing to derive from - it's set imperatively based on external events (request start/end).</li>
+        <li><strong><code>computed()</code></strong> - always derived: <code>computed(() =&gt; currentValue() !== originalValue())</code>. No user override needed.</li>
+        <li><strong><code>linkedSignal()</code></strong> - resets to a default when a source changes, but allows manual override. <code>linkedSignal(() =&gt; { classFilter(); return 'inceptionDate'; })</code></li>
+      </ol>
+    </div></div>
+ <!-- /reveal -->
+  </div>
+
+  <h2>Your Tangible Win</h2>
+
+  <p>You now have the complete signal primitives toolkit: <code>signal()</code> for independent state, <code>computed()</code> for read-only derived state, and <code>linkedSignal()</code> for the "reactive default with local override" pattern. Together with <code>effect()</code> for side effects, these four primitives cover every reactive state scenario that previously required complex RxJS orchestration or NgRx action/reducer ceremonies.</p>
+
+  <p>Next lesson, we'll bridge the gap between these signal primitives and your existing RxJS code with <code>toSignal()</code> and <code>toObservable()</code> - the interop layer that lets you adopt signals incrementally without rewriting everything at once.</p>
+
+  <div class="recommended">
+    <strong>Primary source:</strong>
+    <a href="https://angular.dev/guide/signals/linked-signal">Dependent state with linkedSignal - angular.dev</a> - the canonical documentation for linkedSignal.
+  </div>
+
+  <div class="ask-kiro">
+    Something unclear? Ask me follow-up questions - I'm your teacher and can clarify anything, adjust examples, or go deeper on any concept.
+  </div>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <div class="footer-nav">
+    <a href="0002-effects-lifecycle-and-untracked.html">&larr; Prev: Effects, Lifecycle & Untracked</a>
+    <a href="0004-rxjs-interop-the-bridge.html">Next: RxJS Interop: The Bridge &rarr;</a>
+  </div>
+
+    </main>
+  </div>
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
+  <script src="/vendor/prism-typescript.min.js"></script>
+  <script src="/vendor/prism-bash.min.js"></script>
+</body>
+</html>

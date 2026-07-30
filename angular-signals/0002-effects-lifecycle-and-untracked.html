@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>Effects, Lifecycle & Untracked - Lesson 2 | Teach Me</title>
+  <meta name="description" content="Learn Angular's effect() API for side effects, onCleanup for resource management, untracked() to read signals without creating dependencies, and when NOT to use effects.">
+  <link rel="canonical" href="https://teachmeskills.dev/angular-signals/02-effects-lifecycle-and-untracked.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/angular-signals/02-effects-lifecycle-and-untracked.html">
+  <meta property="og:title" content="Effects, Lifecycle & Untracked - Lesson 2 | Teach Me">
+  <meta property="og:description" content="Learn Angular's effect() API for side effects, onCleanup, untracked(), and when NOT to use effects.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Effects, Lifecycle & Untracked - Lesson 2 | Teach Me">
+  <meta name="twitter:description" content="Learn Angular's effect() API for side effects, onCleanup, untracked(), and when NOT to use effects.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header"><a href="index.html">Angular Signals Course</a></div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="0001-signals-the-reactive-primitive.html">1. Signals: The Reactive Primitive</a></li>
+        <li class="current"><a href="0002-effects-lifecycle-and-untracked.html">2. Effects, Lifecycle & Untracked</a></li>
+        <li><a href="0003-linked-signal-and-dependent-state.html">3. linkedSignal & Dependent State</a></li>
+        <li><a href="0004-rxjs-interop-the-bridge.html">4. RxJS Interop: The Bridge</a></li>
+        <li><a href="0005-signalstore-your-first-store.html">5. SignalStore: Your First Store</a></li>
+        <li><a href="0006-entity-management.html">6. Entity Management</a></li>
+        <li><a href="0007-async-with-rxmethod.html">7. Async with rxMethod</a></li>
+        <li class="coming-soon"><a href="0008-resource-and-httpresource.html">8. resource & httpResource</a></li>
+        <li class="coming-soon"><a href="0009-store-lifecycle-and-devtools.html">9. Store Lifecycle & DevTools</a></li>
+        <li class="coming-soon"><a href="0010-custom-store-features.html">10. Custom Store Features</a></li>
+        <li class="coming-soon"><a href="0011-events-and-reducers.html">11. Events & Reducers</a></li>
+        <li class="coming-soon"><a href="0012-store-architecture-and-testing.html">12. Store Architecture & Testing</a></li>
+        <li class="coming-soon"><a href="0013-signal-forms-the-new-model.html">13. Signal Forms: The New Model</a></li>
+        <li class="coming-soon"><a href="0014-validation-and-field-state.html">14. Validation & Field State</a></li>
+        <li class="coming-soon"><a href="0015-complex-forms-and-custom-controls.html">15. Complex Forms & Custom Controls</a></li>
+        <li class="coming-soon"><a href="0016-migrating-signalformcontrol-bridge.html">16. Migrating: SignalFormControl Bridge</a></li>
+        <li class="coming-soon"><a href="0017-signals-store-forms-together.html">17. Signals + Store + Forms</a></li>
+        <li class="coming-soon"><a href="0018-when-to-keep-rxjs.html">18. When to Keep RxJS</a></li>
+        <li class="coming-soon"><a href="0019-capstone-the-complete-dashboard.html">19. Capstone: The Complete Dashboard</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="signals-glossary.html">Signals Glossary</a></li>
+        <li class="coming-soon"><a href="signal-primitives.html">Signal Primitives</a></li>
+        <li class="coming-soon"><a href="signalstore-api.html">SignalStore API</a></li>
+        <li class="coming-soon"><a href="signal-forms-api.html">Signal Forms API</a></li>
+        <li class="coming-soon"><a href="decision-framework.html">Decision Framework</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 2</p>
+  <h1>Effects, Lifecycle & Untracked</h1>
+
+  <h2>The Core Idea</h2>
+
+  <div class="key-concept">
+    <strong>Mental model:</strong> An effect is a side-effect function that Angular re-runs whenever its signal dependencies change. It's the signal world's equivalent of <code>tap()</code> inside a subscription - the place where you interact with non-reactive APIs (logging, localStorage, DOM, third-party libraries). It is <em>not</em> for deriving state.
+  </div>
+
+  <div class="warning">
+    <strong>Not to be confused with NgRx Effects.</strong> Angular's <code>effect()</code> and NgRx's <code>createEffect()</code> share the name "effect" and the concept of "do something in response to a change," but they operate at different layers. Angular's <code>effect()</code> is a <em>framework primitive</em> - it reacts to signal value changes and runs locally within a component or service lifecycle. NgRx Effects react to <em>dispatched actions</em>, orchestrate async workflows (API calls, navigation), and typically dispatch further actions back into the store. Think of Angular's <code>effect()</code> as the low-level "sync to the outside world" tool, and NgRx Effects as a higher-level architectural pattern for managing complex async flows. We'll revisit this distinction in the SignalStore lessons, where <a href="0007-async-with-rxmethod.html"><code>rxMethod</code></a> bridges the two models.
+  </div>
+
+  <p>In the RxJS world, you'd subscribe to an observable and do something with the value - log it, save it to localStorage, update a chart. In the signals world, <code>effect()</code> fills that role. But with a critical difference: effects are <strong>the last tool you should reach for</strong>, not the first.</p>
+
+  <h2>Creating an Effect</h2>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">import { signal, effect } from '@angular/core';
+
+const count = signal(0);
+
+effect(() => {
+  console.log(`The count is: ${count()}`);
+});
+// Logs immediately: "The count is: 0"
+
+count.set(5);
+// Logs again: "The count is: 5"</code></pre>
+  </div>
+
+  <p>Key behaviours:</p>
+  <ul>
+    <li><strong>Runs at least once</strong> - the effect executes immediately to establish its dependencies.</li>
+    <li><strong>Tracks dynamically</strong> - just like <code>computed()</code>, only signals read during the most recent execution are dependencies. Conditional branches work the same way.</li>
+    <li><strong>Runs asynchronously</strong> - effects don't run synchronously when you call <code>.set()</code>. They're scheduled to run during Angular's change detection process.</li>
+  </ul>
+
+  <h3>How Does Angular Know Which Signals to Watch?</h3>
+
+  <p>There's no explicit registration - no "subscribe to this signal" call. The link between a signal and an effect is created purely by <em>reading</em> the signal inside the effect's function body.</p>
+
+  <p>The mechanism:</p>
+  <ol>
+    <li>Angular starts executing the effect function and activates a <strong>reactive context</strong> (a tracking scope).</li>
+    <li>Every signal that gets <em>read</em> (you call <code>mySignal()</code>) during that synchronous execution registers itself as a dependency.</li>
+    <li>When any registered signal changes value, the effect is scheduled to re-run.</li>
+    <li>On re-run, the dependency set is rebuilt from scratch (dynamic tracking).</li>
+  </ol>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">const name = signal('Alice');
+const age = signal(30);
+const theme = signal('dark');
+
+effect(() => {
+  console.log(`${name()} is ${age()}`);
+  // name and age are dependencies (they were called)
+  // theme is NOT a dependency (never called in here)
+});</code></pre>
+  </div>
+
+  <p>Changing <code>theme</code> will never trigger this effect. Changing <code>name</code> or <code>age</code> will. And because tracking is dynamic, conditional branches change the dependency set:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">effect(() => {
+  if (showDetails()) {
+    console.log(name(), age()); // showDetails + name + age tracked
+  } else {
+    console.log(name());        // only showDetails + name tracked
+  }
+});</code></pre>
+  </div>
+
+  <p>If <code>showDetails()</code> returns <code>false</code>, changes to <code>age</code> won't trigger the effect until <code>showDetails</code> flips back to <code>true</code>. This is the same tracking mechanism that powers <code>computed()</code>, and it's the reason <code>untracked()</code> works (covered later in this lesson) - it reads a signal's value <em>without</em> triggering the registration step.</p>
+
+  <div class="key-concept">
+    <strong>Key insight:</strong> calling a signal = subscribing to it. Not calling it = not subscribed. The effect's dependency graph is rebuilt on every execution, not declared up front.
+  </div>
+
+  <h3>The RxJS Comparison</h3>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">// RxJS way - subscribe + tap for side effects
+this.count$.pipe(
+  tap(count => console.log(`The count is: ${count}`))
+).subscribe();
+// Don't forget to unsubscribe!
+
+// Signal way - effect handles it all
+effect(() => {
+  console.log(`The count is: ${this.count()}`);
+});
+// No subscription. No teardown. Cleaned up automatically.</code></pre>
+  </div>
+
+  <p>The effect is destroyed automatically when the component/directive that created it is destroyed. No <code>takeUntilDestroyed()</code>, no <code>ngOnDestroy</code>, no subscription management.</p>
+
+  <h2 id="when-to-use-effects">When to Use Effects (and When Not To)</h2>
+
+  <p>This is the most important section of this lesson. The Angular team is explicit: <strong>effects should be your last resort</strong>. The official docs say "there are no situations where effect is good, only situations where it is appropriate."</p>
+
+  <h3>Appropriate uses</h3>
+
+  <table>
+    <tr><th>Use case</th><th>Example</th></tr>
+    <tr><td>Logging / analytics</td><td>Send signal values to a logging service or analytics platform</td></tr>
+    <tr><td>Syncing to external storage</td><td>Write to <code>localStorage</code>, <code>sessionStorage</code>, cookies</td></tr>
+    <tr><td>Custom DOM behaviour</td><td>Update a canvas, integrate a charting library, manipulate elements that templates can't express</td></tr>
+    <tr><td>Third-party library integration</td><td>Push data to a non-Angular library that has its own imperative API</td></tr>
+  </table>
+
+  <h3>What NOT to use effects for</h3>
+
+  <div class="warning">
+    <strong>Never use effects to propagate state changes.</strong> If you find yourself writing <code>effect(() => { someOtherSignal.set(derivedValue()) })</code>, stop. You're creating a chain reaction that Angular can't optimise, risks circular updates, and may trigger <code>ExpressionChangedAfterItHasBeenCheckedError</code>. Use <code>computed()</code> or <a href="0003-linked-signal-and-dependent-state.html"><code>linkedSignal()</code></a> (covered in Lesson 3) instead. <code>linkedSignal()</code> is a writable signal that automatically resets its value based on a reactive source - like a <code>computed()</code> that you can also <code>.set()</code> manually when the user overrides it.
+  </div>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">// WRONG - using effect to propagate state
+const firstName = signal('John');
+const lastName = signal('Doe');
+const fullName = signal('');
+
+effect(() => {
+  fullName.set(`${firstName()} ${lastName()}`); // Don't do this!
+});
+
+// RIGHT - use computed for derived state
+const firstName = signal('John');
+const lastName = signal('Doe');
+const fullName = computed(() => `${firstName()} ${lastName()}`);</code></pre>
+  </div>
+
+  <p><strong>The heuristic:</strong> If the output of your effect is "set another signal" or "change some state", you almost certainly want <code>computed()</code> or <code>linkedSignal()</code> instead. Effects are for crossing the boundary <em>out</em> of the reactive system - into the DOM, into localStorage, into a third-party API, into a log.</p>
+
+  <h2>Injection Context</h2>
+
+  <p>Effects must be created within an injection context - meaning inside a constructor, a field initialiser, or somewhere you have access to <code>inject()</code>. This is because effects need Angular's DI to manage their lifecycle (knowing when to destroy them). Using our Policy Dashboard as the example:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">@Component({ /* ... */ })
+export class PolicyDashboard {
+  private readonly selectedPolicy = signal&lt;Policy | null&gt;(null);
+
+  // Option 1: field initialiser (works because it runs in injection context)
+  private readonly logEffect = effect(() => {
+    console.log('Selected policy:', this.selectedPolicy()?.id);
+  });
+
+  // Option 2: constructor
+  constructor() {
+    effect(() => {
+      console.log('Selected policy:', this.selectedPolicy()?.id);
+    });
+  }
+}</code></pre>
+  </div>
+
+  <p>If you need to create an effect later (outside the constructor), pass an <code>Injector</code>:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">@Component({ /* ... */ })
+export class PolicyDashboard {
+  private readonly injector = inject(Injector);
+  private readonly selectedPolicy = signal&lt;Policy | null&gt;(null);
+
+  startLogging(): void {
+    effect(() => {
+      console.log('Selected policy:', this.selectedPolicy()?.id);
+    }, { injector: this.injector });
+  }
+}</code></pre>
+  </div>
+
+  <p><strong>The RxJS equivalent:</strong> This is like how <code>takeUntilDestroyed()</code> needs a <code>DestroyRef</code> when used outside the constructor. Same idea - Angular needs to know the lifecycle scope.</p>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <h2>Effect Cleanup</h2>
+
+  <p>Effects often start operations that need cancelling - timers, network requests, event listeners. The <code>onCleanup</code> callback handles this:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">effect((onCleanup) => {
+  const user = currentUser();
+
+  const timer = setTimeout(() => {
+    console.log(`1 second ago, the user became ${user}`);
+  }, 1000);
+
+  // Called before the next run, or when the effect is destroyed
+  onCleanup(() => {
+    clearTimeout(timer);
+  });
+});</code></pre>
+  </div>
+
+  <p><code>onCleanup</code> is called in two situations:</p>
+  <ol>
+    <li><strong>Before the effect re-runs</strong> - a dependency changed, so the previous operation needs cancelling before the new one starts.</li>
+    <li><strong>When the effect is destroyed</strong> - the component is being torn down.</li>
+  </ol>
+
+  <!-- Effect Cleanup Lifecycle Animation -->
+  <div style="margin: 2rem 0; padding: 1.5rem; border: 1px solid var(--border); border-radius: 8px; background: var(--bg);">
+    <p style="font-size: 0.85rem; font-weight: 600; color: var(--text-h2); margin-bottom: 1rem; text-align: center;">Effect Cleanup Lifecycle</p>
+    <svg viewBox="0 0 600 220" width="100%" style="display: block; max-width: 600px; margin: 0 auto;" aria-label="Animated diagram showing the effect cleanup lifecycle: signal changes, cleanup fires, then effect re-runs">
+      <!-- Timeline base -->
+      <line x1="40" y1="110" x2="560" y2="110" stroke="var(--border)" stroke-width="2"/>
+
+      <!-- Phase labels (always visible) -->
+      <text x="120" y="30" text-anchor="middle" fill="var(--muted)" font-size="10" font-family="-apple-system, sans-serif">Signal changes</text>
+      <text x="280" y="30" text-anchor="middle" fill="var(--muted)" font-size="10" font-family="-apple-system, sans-serif">onCleanup fires</text>
+      <text x="440" y="30" text-anchor="middle" fill="var(--muted)" font-size="10" font-family="-apple-system, sans-serif">Effect re-runs</text>
+
+      <!-- Timeline markers -->
+      <line x1="120" y1="95" x2="120" y2="125" stroke="var(--border)" stroke-width="1.5"/>
+      <line x1="280" y1="95" x2="280" y2="125" stroke="var(--border)" stroke-width="1.5"/>
+      <line x1="440" y1="95" x2="440" y2="125" stroke="var(--border)" stroke-width="1.5"/>
+
+      <!-- Phase 1: Signal change indicator (orange pulse) -->
+      <circle cx="120" cy="110" r="12" fill="none" stroke="var(--signal-invalidation, #f59e0b)" stroke-width="2.5" opacity="0">
+        <animate attributeName="opacity" values="0;0;1;1;0;0;0;0;0" keyTimes="0;0.05;0.06;0.2;0.25;0.5;0.75;0.95;1" dur="6s" repeatCount="indefinite"/>
+        <animate attributeName="r" values="8;8;12;14;14" keyTimes="0;0.05;0.06;0.2;1" dur="6s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="120" cy="110" r="6" fill="var(--signal-invalidation, #f59e0b)" opacity="0">
+        <animate attributeName="opacity" values="0;0;1;1;0;0;0;0;0" keyTimes="0;0.05;0.06;0.2;0.25;0.5;0.75;0.95;1" dur="6s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- Arrow from signal change to cleanup -->
+      <path d="M135,110 L260,110" fill="none" stroke="var(--signal-invalidation, #f59e0b)" stroke-width="2" stroke-dasharray="6,4" opacity="0">
+        <animate attributeName="opacity" values="0;0;0;1;1;0;0;0;0" keyTimes="0;0.15;0.2;0.21;0.38;0.4;0.6;0.8;1" dur="6s" repeatCount="indefinite"/>
+      </path>
+      <!-- Animated dot traveling from signal to cleanup -->
+      <circle r="5" fill="var(--signal-invalidation, #f59e0b)" opacity="0">
+        <animateMotion dur="6s" repeatCount="indefinite" keyPoints="0;0;0;1;1;1;1" keyTimes="0;0.2;0.21;0.38;0.39;0.95;1" calcMode="linear">
+          <mpath href="#path-signal-to-cleanup"/>
+        </animateMotion>
+        <animate attributeName="opacity" values="0;0;1;1;0;0;0" keyTimes="0;0.2;0.21;0.37;0.39;0.95;1" dur="6s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- Phase 2: Cleanup fires (red flash) -->
+      <circle cx="280" cy="110" r="12" fill="none" stroke="var(--signal-stale, #ef4444)" stroke-width="2.5" opacity="0">
+        <animate attributeName="opacity" values="0;0;0;1;1;0;0;0;0" keyTimes="0;0.35;0.38;0.39;0.53;0.56;0.7;0.9;1" dur="6s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="280" cy="110" r="6" fill="var(--signal-stale, #ef4444)" opacity="0">
+        <animate attributeName="opacity" values="0;0;0;1;1;0;0;0;0" keyTimes="0;0.35;0.38;0.39;0.53;0.56;0.7;0.9;1" dur="6s" repeatCount="indefinite"/>
+      </circle>
+      <!-- Cleanup label highlight -->
+      <text x="280" y="145" text-anchor="middle" fill="var(--signal-stale, #ef4444)" font-size="11" font-weight="bold" font-family="-apple-system, sans-serif" opacity="0">
+        clearTimeout()
+        <animate attributeName="opacity" values="0;0;0;1;1;0;0;0" keyTimes="0;0.38;0.39;0.4;0.55;0.57;0.9;1" dur="6s" repeatCount="indefinite"/>
+      </text>
+
+      <!-- Arrow from cleanup to re-run -->
+      <path d="M295,110 L420,110" fill="none" stroke="var(--accent, #3b82f6)" stroke-width="2" stroke-dasharray="6,4" opacity="0">
+        <animate attributeName="opacity" values="0;0;0;0;1;1;0;0;0" keyTimes="0;0.4;0.5;0.55;0.56;0.72;0.75;0.9;1" dur="6s" repeatCount="indefinite"/>
+      </path>
+      <!-- Animated dot traveling from cleanup to re-run -->
+      <circle r="5" fill="var(--accent, #3b82f6)" opacity="0">
+        <animateMotion dur="6s" repeatCount="indefinite" keyPoints="0;0;0;0;1;1;1" keyTimes="0;0.55;0.56;0.56;0.72;0.73;1" calcMode="linear">
+          <mpath href="#path-cleanup-to-rerun"/>
+        </animateMotion>
+        <animate attributeName="opacity" values="0;0;0;1;1;0;0" keyTimes="0;0.55;0.56;0.71;0.73;0.9;1" dur="6s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- Phase 3: Effect re-runs (blue/accent pulse) -->
+      <circle cx="440" cy="110" r="12" fill="none" stroke="var(--accent, #3b82f6)" stroke-width="2.5" opacity="0">
+        <animate attributeName="opacity" values="0;0;0;0;0;1;1;0;0" keyTimes="0;0.5;0.6;0.7;0.72;0.73;0.87;0.9;1" dur="6s" repeatCount="indefinite"/>
+        <animate attributeName="r" values="8;8;8;8;12;14;14;14;14" keyTimes="0;0.5;0.6;0.7;0.72;0.73;0.87;0.9;1" dur="6s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="440" cy="110" r="6" fill="var(--accent, #3b82f6)" opacity="0">
+        <animate attributeName="opacity" values="0;0;0;0;0;1;1;0;0" keyTimes="0;0.5;0.6;0.7;0.72;0.73;0.87;0.9;1" dur="6s" repeatCount="indefinite"/>
+      </circle>
+      <!-- Re-run label -->
+      <text x="440" y="145" text-anchor="middle" fill="var(--accent, #3b82f6)" font-size="11" font-weight="bold" font-family="-apple-system, sans-serif" opacity="0">
+        new setTimeout()
+        <animate attributeName="opacity" values="0;0;0;0;0;1;1;0;0" keyTimes="0;0.5;0.6;0.7;0.72;0.73;0.87;0.9;1" dur="6s" repeatCount="indefinite"/>
+      </text>
+
+      <!-- Sequence numbers -->
+      <circle cx="120" cy="65" r="10" fill="var(--signal-invalidation, #f59e0b)" opacity="0.9"/>
+      <text x="120" y="69" text-anchor="middle" fill="white" font-size="11" font-weight="bold" font-family="-apple-system, sans-serif">1</text>
+
+      <circle cx="280" cy="65" r="10" fill="var(--signal-stale, #ef4444)" opacity="0.9"/>
+      <text x="280" y="69" text-anchor="middle" fill="white" font-size="11" font-weight="bold" font-family="-apple-system, sans-serif">2</text>
+
+      <circle cx="440" cy="65" r="10" fill="var(--accent, #3b82f6)" opacity="0.9"/>
+      <text x="440" y="69" text-anchor="middle" fill="white" font-size="11" font-weight="bold" font-family="-apple-system, sans-serif">3</text>
+
+      <!-- Description row -->
+      <text x="120" y="185" text-anchor="middle" fill="var(--text)" font-size="10" font-family="-apple-system, sans-serif">currentUser</text>
+      <text x="120" y="198" text-anchor="middle" fill="var(--text)" font-size="10" font-family="-apple-system, sans-serif">changes value</text>
+      <text x="280" y="185" text-anchor="middle" fill="var(--text)" font-size="10" font-family="-apple-system, sans-serif">Previous timer</text>
+      <text x="280" y="198" text-anchor="middle" fill="var(--text)" font-size="10" font-family="-apple-system, sans-serif">cancelled</text>
+      <text x="440" y="185" text-anchor="middle" fill="var(--text)" font-size="10" font-family="-apple-system, sans-serif">New timer</text>
+      <text x="440" y="198" text-anchor="middle" fill="var(--text)" font-size="10" font-family="-apple-system, sans-serif">started</text>
+
+      <!-- Hidden paths for animateMotion -->
+      <path id="path-signal-to-cleanup" d="M135,110 L265,110" fill="none" stroke="none"/>
+      <path id="path-cleanup-to-rerun" d="M295,110 L425,110" fill="none" stroke="none"/>
+    </svg>
+    <p style="font-size: 0.8rem; color: var(--muted); margin-top: 0.75rem; line-height: 1.5; text-align: center;">The cleanup from the <em>previous</em> run always fires before the effect executes again. This prevents resource leaks (dangling timers, stale listeners, orphaned requests).</p>
+  </div>
+
+  <h3>The RxJS Comparison</h3>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">// RxJS way - switchMap cancels the previous inner observable
+this.currentUser$.pipe(
+  switchMap(user => timer(1000).pipe(
+    tap(() => console.log(`1 second ago, the user became ${user}`))
+  )),
+  takeUntilDestroyed()
+).subscribe();
+
+// Signal way - onCleanup cancels the previous timeout
+effect((onCleanup) => {
+  const user = currentUser();
+  const timer = setTimeout(() => {
+    console.log(`1 second ago, the user became ${user}`);
+  }, 1000);
+  onCleanup(() => clearTimeout(timer));
+});</code></pre>
+  </div>
+
+  <p>The <code>switchMap</code> pattern and the <code>onCleanup</code> pattern are solving the same problem: cancel the previous operation when a new one starts. The signal version is more explicit about what's being cleaned up.</p>
+
+  <h2>Untracked: Reading Without Dependency</h2>
+
+  <p>Sometimes you need to read a signal inside an effect (or computed) without creating a dependency on it. <code>untracked()</code> does this:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">import { signal, effect, untracked } from '@angular/core';
+
+const currentUser = signal('Alice');
+const counter = signal(0);
+
+effect(() => {
+  // This effect should only re-run when currentUser changes.
+  // counter is read but should NOT trigger a re-run.
+  console.log(`User set to ${currentUser()} and the counter is ${untracked(counter)}`);
+});</code></pre>
+  </div>
+
+  <p>Without <code>untracked</code>, this effect would re-run every time <em>either</em> signal changes. With it, only changes to <code>currentUser</code> trigger the effect - <code>counter</code> is read but not tracked.</p>
+
+  <div class="key-concept">
+    <strong>When to use untracked:</strong> When you need a signal's <em>current value</em> for context but don't want changes to that signal to re-trigger the effect. Common examples: reading a configuration value, accessing an ID for a log message, or calling a service method that happens to read signals internally.
+  </div>
+
+  <p>You can also wrap an entire block:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">effect(() => {
+  const user = currentUser(); // tracked - triggers re-run
+
+  untracked(() => {
+    // Nothing read in here creates a dependency
+    this.loggingService.log(`User set to ${user}`);
+    // Even if loggingService internally reads signals, they won't be tracked
+  });
+});</code></pre>
+  </div>
+
+  <h3>The RxJS Comparison</h3>
+
+  <p>There's no direct RxJS equivalent because RxJS subscriptions don't have "tracked reads." The closest analogy is using <code>withLatestFrom()</code> vs <code>combineLatest()</code>:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">// combineLatest - re-emits when EITHER changes (like two tracked reads)
+combineLatest([currentUser$, counter$]).pipe(
+  tap(([user, count]) => console.log(`${user}, ${count}`))
+);
+
+// withLatestFrom - only re-emits when currentUser$ emits,
+// grabs counter's latest value passively (like untracked)
+currentUser$.pipe(
+  withLatestFrom(counter$),
+  tap(([user, count]) => console.log(`${user}, ${count}`))
+);</code></pre>
+  </div>
+
+  <p>So <code>untracked(counter)</code> is the signal equivalent of <code>withLatestFrom(counter$)</code> - "give me the value, but don't make me react to it."</p>
+
+  <h2>Async and Reactive Context</h2>
+
+  <p>A critical rule: <strong>the reactive context is only active for synchronous code.</strong> Signal reads after an <code>await</code> or inside a callback are not tracked:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">// BROKEN - theme() is read after await, so it won't be tracked
+effect(async () => {
+  const data = await fetchUserData();
+  console.log(`User: ${data.name}, Theme: ${theme()}`); // theme not tracked!
+});
+
+// FIXED - read all signals before the await
+effect(async () => {
+  const currentTheme = theme(); // tracked - read before await
+  const data = await fetchUserData();
+  console.log(`User: ${data.name}, Theme: ${currentTheme}`);
+});</code></pre>
+  </div>
+
+  <p>This applies to all reactive contexts - <code>effect()</code>, <code>computed()</code>, templates. The tracking only works synchronously during the initial execution. Anything after an async boundary is invisible to the dependency graph.</p>
+
+  <div class="key-concept">
+    <strong>Why?</strong> Angular's dependency tracking works by intercepting signal reads during execution. After an <code>await</code>, the execution has already "returned" from Angular's perspective - the reactive context is closed. The callback after the await runs in a different microtask with no tracking active. This is a fundamental constraint of the push-invalidation model, not a bug.
+  </div>
+
+  <h2>View Effects vs Root Effects</h2>
+
+  <p>Angular distinguishes between two kinds of effect based on where they're created:</p>
+
+  <table>
+    <tr><th></th><th>View Effect</th><th>Root Effect</th></tr>
+    <tr><td>Created in</td><td>Component, directive, or their services</td><td>Root-provided service (outside the component tree)</td></tr>
+    <tr><td>Runs</td><td>Before its component is checked by CD</td><td>Before all components are checked</td></tr>
+    <tr><td>Destroyed</td><td>When the component is destroyed</td><td>When the application is destroyed</td></tr>
+  </table>
+
+  <p>In practice, most effects you write will be view effects. Root effects are for application-wide concerns like syncing to localStorage in a global service.</p>
+
+  <div class="key-concept">
+    <strong>The real rule:</strong> An effect is destroyed when its <em>injector</em> is destroyed. A component-level injector dies with the component. A root-level injector dies with the application. If you provide a service at the component level (in the component's <code>providers</code> array), effects created inside that service share the component's lifecycle - they're destroyed when the component is destroyed. This matters because in well-structured Angular apps, most business logic lives in services injected into components, not in the components themselves.
+  </div>
+
+  <h2>afterRenderEffect: DOM Side Effects</h2>
+
+  <p><code>afterRenderEffect()</code> is not a lifecycle hook - it's a <strong>reactive primitive</strong>, introduced in Angular 19 alongside the signals system. The distinction matters:</p>
+
+  <ul>
+    <li><strong>Lifecycle hooks</strong> (<code>ngOnInit</code>, <code>ngAfterViewInit</code>, etc.) fire at fixed points in a component's life - once, unconditionally, because the component reached that stage.</li>
+    <li><strong><code>afterRenderEffect()</code></strong> fires <em>reactively</em> whenever its signal dependencies change, but defers execution until after Angular has updated the DOM. It can fire zero times, once, or hundreds of times depending on how its signals change.</li>
+  </ul>
+
+  <p>It exists because <code>effect()</code> has a timing problem: it runs <em>before</em> Angular updates the DOM. If your side effect needs to read or manipulate the actual rendered DOM - measure an element, update a canvas, interact with a third-party library that needs a real DOM node - <code>effect()</code> is too early. <code>afterRenderEffect()</code> gives you the reactivity of <code>effect()</code> with the timing guarantee that the DOM is current.</p>
+
+  <h3>The RxJS Comparison</h3>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">// Old way: lifecycle hook + manual subscription
+ngAfterViewInit() {
+  this.chartData$.pipe(
+    takeUntilDestroyed(this.destroyRef)
+  ).subscribe(data => {
+    this.chart.update(data); // DOM manipulation
+  });
+}
+
+// New way: reactive + DOM-safe, no subscription management
+constructor() {
+  afterRenderEffect(() => {
+    this.chart.update(this.chartData()); // runs after DOM is updated
+  });
+}</code></pre>
+  </div>
+
+  <h3>Example: Chart Integration</h3>
+
+  <p>The example below uses <code>afterNextRender()</code> alongside <code>afterRenderEffect()</code>. Note that <code>afterNextRender()</code> is a different category of thing entirely - it's not reactive (no signal tracking), not a lifecycle hook (no interface to implement), and not part of the signals system. It's a <strong>one-shot scheduling utility</strong>: "run this callback once after the next render completes, then never again." Think of it as a functional replacement for <code>ngAfterViewInit</code> - same timing, but called in the constructor instead of implemented as an interface method. It pairs naturally with <code>afterRenderEffect()</code> because DOM setup (one-time) and DOM updates (reactive) often go hand in hand.</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">import { afterRenderEffect, afterNextRender, viewChild, ElementRef } from '@angular/core';
+
+@Component({
+  template: `&lt;canvas #canvas&gt;&lt;/canvas&gt;`
+})
+export class PolicyChart {
+  chartData = input.required&lt;ChartData&gt;();
+  canvas = viewChild.required&lt;ElementRef&lt;HTMLCanvasElement&gt;&gt;('canvas');
+  chart!: ChartInstance;
+
+  constructor() {
+    // Initial setup - runs once after first render (not reactive)
+    afterNextRender({
+      write: () => {
+        this.chart = initializeChart(this.canvas().nativeElement, this.chartData());
+      }
+    });
+
+    // Reactive update - re-runs after DOM update whenever chartData changes
+    afterRenderEffect(() => {
+      this.chart.updateData(this.chartData());
+    });
+  }
+}</code></pre>
+  </div>
+
+  <p><code>afterRenderEffect</code> also supports render phases (<code>earlyRead</code>, <code>write</code>, <code>mixedReadWrite</code>, <code>read</code>) to avoid layout thrashing - but for most cases the simple form above is sufficient.</p>
+
+  <div class="key-concept">
+    <strong>When to use which:</strong>
+    <ul>
+      <li><code>effect()</code> - for non-DOM side effects (logging, storage, analytics)</li>
+      <li><code>afterRenderEffect()</code> - for DOM manipulation or third-party libraries that need the rendered DOM</li>
+      <li>Neither - for derived state (use <code>computed()</code> or <code>linkedSignal()</code>)</li>
+    </ul>
+  </div>
+
+  <h2>Manual Cleanup and Destroying Effects</h2>
+
+  <p>Effects are normally destroyed automatically with their component. If you need manual control:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">const effectRef = effect(() => {
+  console.log('Policy:', this.selectedPolicy()?.id);
+}, { manualCleanup: true });
+
+// Later, when you're done with it:
+effectRef.destroy();</code></pre>
+  </div>
+
+  <p>The <code>manualCleanup: true</code> option disables automatic destruction when the component dies. You take responsibility for calling <code>.destroy()</code>. Calling <code>.destroy()</code> stops the effect permanently and triggers its <code>onCleanup</code> callback (if registered). It takes no arguments.</p>
+
+  <p><strong>When is this useful?</strong> When the effect's lifetime doesn't map 1:1 to a component's lifetime - you need to start and stop it independently:</p>
+
+  <div class="code-wrapper">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-typescript">@Component({ /* ... */ })
+export class LivePolicyPanel {
+  private readonly injector = inject(Injector);
+  private readonly selectedPolicyId = input.required&lt;string&gt;();
+  private pollingEffect: EffectRef | null = null;
+
+  // Start polling when user opens the live panel
+  openLiveView(): void {
+    this.pollingEffect = effect(() => {
+      this.policyService.fetchLatest(this.selectedPolicyId());
+    }, { manualCleanup: true, injector: this.injector });
+  }
+
+  // Stop polling when they close it - component stays alive
+  closeLiveView(): void {
+    this.pollingEffect?.destroy(); // stops effect, runs onCleanup
+    this.pollingEffect = null;
+  }
+}</code></pre>
+  </div>
+
+  <p>Without <code>manualCleanup</code>, the only way to stop this effect would be to destroy the entire component. With it, you get fine-grained control over when the reactive work starts and stops. That said, this is rare - most effects should just live and die with their component.</p>
+
+  <h2>Quiz</h2>
+
+  <div class="quiz" role="group">
+    <h3>You want to update a chart library whenever your signal-based data changes. Which API do you use?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">effect() - it runs when signals change</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">afterRenderEffect() - it runs after the DOM is updated</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">computed() - it derives state from signals</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="quiz" role="group">
+    <h3>You read <code>theme()</code> after an <code>await</code> inside an effect. What happens?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">The effect re-runs whenever theme changes</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">theme is not tracked - changes to it won't re-trigger the effect</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Angular throws a runtime error about async reactive contexts</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="quiz" role="group">
+    <h3>You have <code>effect(() => { totalPrice.set(quantity() * unitPrice()) })</code>. What's wrong?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Nothing - this is the correct way to derive state</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">It will throw because you can't call .set() inside an effect</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">It's state propagation via effect - use computed() instead</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="quiz" role="group">
+    <h3>What does <code>untracked(counter)</code> do inside an effect?</h3>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Prevents counter from being modified by the effect</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, true)">Reads counter's value without making it a dependency of the effect</div>
+    <div class="quiz-option" role="button" tabindex="0" onclick="checkAnswer(this, false)">Marks counter as stale so it recalculates on next read</div>
+    <p class="quiz-feedback" aria-live="polite"></p>
+  </div>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <h2>Try It Yourself</h2>
+
+  <div class="exercise">
+    <h3>Exercise 1: localStorage Sync Effect</h3>
+    <p>Build an effect that persists the user's selected theme to <code>localStorage</code> whenever it changes. Requirements:</p>
+    <ol>
+      <li>Create a writable signal <code>theme</code> with initial value <code>'light'</code></li>
+      <li>Write an effect that saves the theme value to <code>localStorage</code> under the key <code>'app-theme'</code></li>
+      <li>The effect should NOT re-run when other signals in the component change</li>
+    </ol>
+    <p>Is this an appropriate use of <code>effect()</code>, or should it be a <code>computed()</code>? Why?</p>
+    <!-- reveal -->
+      <button class="reveal-toggle" aria-expanded="false">Reveal solution</button>
+ <div class="reveal-content"><div class="reveal-inner">
+      <div class="code-wrapper">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre><code class="language-typescript">import { signal, effect } from '@angular/core';
+
+@Component({ /* ... */ })
+export class ThemeManager {
+  readonly theme = signal&lt;'light' | 'dark'&gt;('light');
+
+  constructor() {
+    effect(() => {
+      localStorage.setItem('app-theme', this.theme());
+    });
+  }
+
+  toggle(): void {
+    this.theme.update(t => t === 'light' ? 'dark' : 'light');
+  }
+}</code></pre>
+      </div>
+      <p>This is an appropriate use of <code>effect()</code> because localStorage is an <em>external side effect</em> - you're crossing the boundary out of the reactive system. A <code>computed()</code> can't do this because it only derives values, it can't perform side effects. The effect only tracks <code>theme</code> because that's the only signal read in the function body.</p>
+    </div></div>
+ <!-- /reveal -->
+  </div>
+
+  <div class="exercise">
+    <h3>Exercise 2: Cleanup Challenge</h3>
+    <p>You're building a live policy feed that polls an API every 5 seconds. When the selected policy changes, the old polling interval should be cancelled and a new one started. Write the effect with proper cleanup:</p>
+    <div class="code-wrapper">
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre><code class="language-typescript">// Fill in the effect body
+const selectedPolicyId = signal('POL-001');
+
+effect((onCleanup) => {
+  // TODO: read the selected policy ID
+  // TODO: start a setInterval that polls every 5 seconds
+  // TODO: register cleanup to cancel the interval
+});</code></pre>
+    </div>
+    <!-- reveal -->
+      <button class="reveal-toggle" aria-expanded="false">Reveal solution</button>
+ <div class="reveal-content"><div class="reveal-inner">
+      <div class="code-wrapper">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre><code class="language-typescript">const selectedPolicyId = signal('POL-001');
+
+effect((onCleanup) => {
+  const policyId = selectedPolicyId(); // tracked dependency
+
+  const intervalId = setInterval(() => {
+    console.log(`Polling updates for ${policyId}...`);
+    // In reality: this.policyService.fetchLatest(policyId);
+  }, 5000);
+
+  onCleanup(() => {
+    clearInterval(intervalId); // cancel previous polling
+  });
+});</code></pre>
+      </div>
+      <p>When <code>selectedPolicyId</code> changes: (1) onCleanup fires, clearing the old interval, (2) the effect re-runs, reading the new ID and starting a fresh interval. When the component is destroyed, onCleanup fires one final time. No orphaned intervals.</p>
+    </div></div>
+ <!-- /reveal -->
+  </div>
+
+  <div class="exercise">
+    <h3>Exercise 3: Spot the Bug</h3>
+    <p>This effect is supposed to log analytics when the user navigates to a new policy, including a timestamp. But something's wrong with the dependency tracking. Find and fix the bug:</p>
+    <div class="code-wrapper">
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre><code class="language-typescript">const selectedPolicy = signal&lt;Policy | null&gt;(null);
+const currentTimestamp = signal(Date.now()); // updated every second elsewhere
+
+effect(() => {
+  const policy = selectedPolicy();
+  if (policy) {
+    analytics.track('policy_viewed', {
+      policyId: policy.id,
+      viewedAt: currentTimestamp(), // we want the timestamp at view time
+    });
+  }
+});</code></pre>
+    </div>
+    <p>Hint: how often should this analytics event fire? What's actually triggering it?</p>
+    <!-- reveal -->
+      <button class="reveal-toggle" aria-expanded="false">Reveal solution</button>
+ <div class="reveal-content"><div class="reveal-inner">
+      <div class="code-wrapper">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre><code class="language-typescript">effect(() => {
+  const policy = selectedPolicy();
+  if (policy) {
+    analytics.track('policy_viewed', {
+      policyId: policy.id,
+      viewedAt: untracked(currentTimestamp), // read but don't track
+    });
+  }
+});</code></pre>
+      </div>
+      <p>The bug: <code>currentTimestamp()</code> is a tracked dependency that updates every second. So the analytics event fires every second while a policy is selected - not just when the user navigates. The fix: wrap it in <code>untracked()</code> so we get the timestamp value without making it a dependency. The effect now only re-runs when <code>selectedPolicy</code> changes.</p>
+    </div></div>
+ <!-- /reveal -->
+  </div>
+
+  <h2>Your Tangible Win</h2>
+
+  <p>You now know the three tools in the signal side-effect toolkit: <code>effect()</code> for non-DOM side effects, <code>afterRenderEffect()</code> for DOM work, and <code>untracked()</code> for reading without dependency. More importantly, you know when <em>not</em> to use effects - which is most of the time. If you can express it as <code>computed()</code>, do that instead.</p>
+
+  <p>Next lesson, we'll look at <code>linkedSignal()</code> - the writable computed that fills the gap between <code>computed()</code> (read-only) and <code>signal()</code> (no reactive source).</p>
+
+  <div class="recommended">
+    <strong>Primary source:</strong>
+    <a href="https://angular.dev/guide/signals/effect">Side effects for non-reactive APIs - angular.dev</a> - the canonical documentation for effects.
+  </div>
+
+  <div class="ask-kiro">
+    Something unclear? Ask me follow-up questions - I'm your teacher and can clarify anything, adjust examples, or go deeper on any concept.
+  </div>
+
+  <div class="ad-footer" aria-label="Advertisement">Ad</div>
+
+  <div class="footer-nav">
+    <a href="0001-signals-the-reactive-primitive.html">&larr; Prev: Signals: The Reactive Primitive</a>
+    <a href="0003-linked-signal-and-dependent-state.html">Next: linkedSignal & Dependent State &rarr;</a>
+  </div>
+
+    </main>
+  </div>
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
+  <script src="/vendor/prism-typescript.min.js"></script>
+  <script src="/vendor/prism-bash.min.js"></script>
+</body>
+</html>

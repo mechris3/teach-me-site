@@ -1,0 +1,186 @@
+/* ===========================
+   Angular Signals Course — Course-Specific Styles
+   =========================== */
+
+/* Course-specific demo variables */
+:root[data-theme="dark"] {
+  --signal-demo-bg: #2c313a;
+  --signal-demo-border: #4b5263;
+  --signal-value: #00e5ff;
+  --signal-stale: #e06c75;
+  --signal-computed: #61afef;
+  --signal-invalidation: #ff6b2b;
+}
+
+:root[data-theme="light"] {
+  --signal-demo-bg: #f9f8f3;
+  --signal-demo-border: #d4d0c8;
+  --signal-value: #0891b2;
+  --signal-stale: #dc2626;
+  --signal-computed: #1a73e8;
+  --signal-invalidation: #d4520a;
+}
+
+/* Comparison tables — slightly tighter for side-by-side code */
+.comparison-table {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.comparison-table .code-wrapper {
+  margin: 0;
+}
+
+.comparison-label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  margin-bottom: 0.3rem;
+  font-weight: 600;
+}
+
+@media (max-width: 700px) {
+  .comparison-table {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===========================
+   Try It Yourself — Exercise Blocks
+   =========================== */
+
+.exercise {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  border: 2px solid var(--signal-computed, #1a73e8);
+  border-radius: 8px;
+  background: var(--signal-demo-bg, #f9f8f3);
+}
+
+.exercise h3 {
+  margin-top: 0;
+  font-size: 1rem;
+  color: var(--signal-computed, #1a73e8);
+}
+
+.exercise p {
+  margin: 0.75rem 0;
+}
+
+.exercise ol,
+.exercise ul {
+  margin: 0.5rem 0 1rem 1.5rem;
+}
+
+
+/* Reveal content — animated open/close */
+.exercise .reveal-content {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition: grid-template-rows 0.4s ease, opacity 0.3s ease 0.05s;
+}
+
+.exercise .reveal-content.is-open {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.exercise .reveal-content > .reveal-inner {
+  overflow: hidden;
+  min-height: 0;
+  padding-top: 0;
+}
+
+.exercise .reveal-content.is-open > .reveal-inner {
+  padding-top: 0.75rem;
+}
+
+.exercise .reveal-toggle {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--signal-computed, #1a73e8);
+  user-select: none;
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: inherit;
+  font-family: inherit;
+  margin-top: 1.25rem;
+  border-top: 1px solid var(--border, #d4d0c8);
+  padding-top: 1rem;
+  display: block;
+  width: 100%;
+  text-align: left;
+}
+
+.exercise .reveal-toggle::before {
+  content: '\25B6';
+  display: inline-block;
+  margin-right: 0.5rem;
+  font-size: 0.75rem;
+  transition: transform 0.3s ease;
+}
+
+.exercise .reveal-toggle.is-open::before {
+  transform: rotate(90deg);
+}
+
+.exercise .reveal-toggle:hover {
+  text-decoration: underline;
+}
+
+.exercise .code-wrapper {
+  margin: 0.75rem 0 0;
+}
+
+/* ===========================
+   Coming Soon — Unavailable Lessons
+   =========================== */
+
+.lesson-list .coming-soon a,
+.lesson-list .coming-soon span.lesson-title {
+  color: var(--muted);
+  pointer-events: none;
+  text-decoration: none;
+}
+
+.lesson-list .coming-soon::after {
+  content: "coming soon";
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  background: var(--bg-surface);
+  padding: 0.15em 0.5em;
+  border-radius: 3px;
+  margin-left: 0.5rem;
+  vertical-align: middle;
+}
+
+.sidebar li.coming-soon a {
+  color: var(--muted);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.reference-list .coming-soon a {
+  color: var(--muted);
+  pointer-events: none;
+  text-decoration: none;
+}
+
+.reference-list .coming-soon::after {
+  content: "coming soon";
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  background: var(--bg-surface);
+  padding: 0.15em 0.5em;
+  border-radius: 3px;
+  margin-left: 0.5rem;
+}
