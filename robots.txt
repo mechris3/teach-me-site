@@ -2,3 +2,4 @@ User-agent: *
 Allow: /
 
 Sitemap: https://teachmeskills.dev/sitemap.xml
+##

@@ -512,7 +512,7 @@ export const PolicyListStore = signalStore(
 
   <h2 id="with-methods">withMethods: Actions and Logic</h2>
 
-  <p><code>withMethods</code> defines the public API of your store - the functions that components call to trigger state changes. The factory receives the store instance (state signals + computed signals + any previously defined methods) and can also inject services:</p>
+  <p><code>withMethods</code> defines the public API of your store - the functions that components call to trigger state changes. It takes a factory function whose first argument is the accumulated store instance (state signals + computed signals + any previously defined methods). SignalStore passes this in automatically - you just name it. The factory can also inject services via subsequent default parameters:</p>
 
   <div class="code-wrapper">
     <button class="copy-btn" onclick="copyCode(this)">Copy</button>

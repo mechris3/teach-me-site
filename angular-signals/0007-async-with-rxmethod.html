@@ -132,6 +132,206 @@ const loadPolicies = rxMethod&lt;string&gt;(
 
   <p>The generic type parameter (<code>&lt;string&gt;</code>) defines what the pipeline receives as input. The <code>pipe(...)</code> receives an <code>Observable&lt;string&gt;</code> as its source - every value you feed in arrives on that source observable.</p>
 
+  <div class="key-concept">
+    <strong>Under the hood:</strong> <code>rxMethod</code> creates an internal <code>Subject&lt;Input&gt;</code> and subscribes your pipeline to it. When you call the method with a static value, it's literally <code>subject.next(value)</code>. When you pass a signal, an <code>effect()</code> watches it and calls <code>subject.next()</code> on every change. When you pass an observable, it subscribes and forwards each emission. The difference from wiring a Subject yourself: lifecycle management is automatic (tied to DestroyRef), signal-watching is built in, and each invocation returns a <code>destroy()</code> handle.
+  </div>
+
+  <div style="margin: 2rem 0; padding: 1.5rem; border: 1px solid var(--border); border-radius: 8px; background: var(--bg);">
+    <p style="font-size: 0.85rem; font-weight: 600; color: var(--text-h2); margin-bottom: 1rem; text-align: center;">rxMethod: Signal → Pipeline → Store</p>
+    <svg viewBox="0 -65 760 425" width="100%" style="display: block; max-width: 760px; margin: 0 auto;" aria-label="Animated diagram: a user types 'home' into a search box. Each keystroke emits into debounce. The first 3 are discarded. Only the final value passes through switchMap, HTTP, tapResponse, and into patchState.">
+      <defs>
+        <path id="rx-to-debounce" d="M155,-23 L155,50 L255,50 L255,120 L290,120"/>
+        <path id="rx-through-pipeline" d="M290,120 L393,120 L488,120 L488,195 L580,195 L580,120 L640,120 L640,270"/>
+      </defs>
+
+      <!-- Input box (simulated text field above swim lanes) -->
+      <rect x="100" y="-55" width="200" height="32" rx="4" fill="var(--bg, #1a1a2e)" stroke="var(--border, #444)" stroke-width="1.5"/>
+      <text x="108" y="-34" fill="var(--muted, #888)" font-size="10" font-family="-apple-system, sans-serif" opacity="0">
+        Search policies...
+        <animate attributeName="opacity" values="0.5;0.5;0;0" keyTimes="0;0.005;0.02;1" dur="12s" repeatCount="indefinite"/>
+      </text>
+      <!-- Typed letters appearing one by one -->
+      <text x="112" y="-35" fill="var(--text, #e0e0e0)" font-size="11" font-weight="500" font-family="'SF Mono', monospace" opacity="0">
+        h
+        <animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.02;0.125;0.13;1" dur="12s" repeatCount="indefinite"/>
+      </text>
+      <text x="112" y="-35" fill="var(--text, #e0e0e0)" font-size="11" font-weight="500" font-family="'SF Mono', monospace" opacity="0">
+        ho
+        <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.13;0.135;0.255;0.26;1" dur="12s" repeatCount="indefinite"/>
+      </text>
+      <text x="112" y="-35" fill="var(--text, #e0e0e0)" font-size="11" font-weight="500" font-family="'SF Mono', monospace" opacity="0">
+        hom
+        <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.26;0.265;0.375;0.38;1" dur="12s" repeatCount="indefinite"/>
+      </text>
+      <text x="112" y="-35" fill="var(--text, #e0e0e0)" font-size="11" font-weight="500" font-family="'SF Mono', monospace" opacity="0">
+        home
+        <animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.38;0.385;0.96;1" dur="12s" repeatCount="indefinite"/>
+      </text>
+      <!-- Blinking cursor -->
+      <rect y="-47" width="1.5" height="14" fill="var(--accent, #3b82f6)">
+        <animate attributeName="opacity" values="1;1;0;0" keyTimes="0;0.5;0.5001;1" dur="1s" repeatCount="indefinite"/>
+        <animate attributeName="x" values="112;119;119;126;126;133;133;140;140;140;112" keyTimes="0;0.02;0.13;0.135;0.26;0.265;0.375;0.38;0.96;0.99;1" dur="12s" repeatCount="indefinite" calcMode="discrete"/>
+      </rect>
+      <!-- Label -->
+      <text x="310" y="-35" fill="var(--muted, #888)" font-size="9" font-family="-apple-system, sans-serif" opacity="0.6">← bound to query signal</text>
+
+      <!-- Lane backgrounds -->
+      <rect x="20" y="25" width="720" height="50" rx="8" fill="var(--accent, #3b82f6)" opacity="0.07"/>
+      <rect x="20" y="90" width="720" height="65" rx="8" fill="var(--signal-invalidation, #f59e0b)" opacity="0.07"/>
+      <rect x="20" y="170" width="720" height="55" rx="8" fill="var(--signal-stale, #ef4444)" opacity="0.05"/>
+      <rect x="20" y="245" width="720" height="55" rx="8" fill="var(--accent, #3b82f6)" opacity="0.04"/>
+
+      <!-- Lane labels -->
+      <text x="35" y="55" fill="var(--accent, #3b82f6)" font-size="10" font-weight="700" font-family="-apple-system, sans-serif" opacity="0.8">SIGNAL</text>
+      <text x="35" y="128" fill="var(--signal-invalidation, #f59e0b)" font-size="10" font-weight="700" font-family="-apple-system, sans-serif" opacity="0.8">PIPELINE</text>
+      <text x="35" y="200" fill="var(--signal-stale, #ef4444)" font-size="10" font-weight="700" font-family="-apple-system, sans-serif" opacity="0.7">HTTP</text>
+      <text x="35" y="278" fill="var(--accent, #3b82f6)" font-size="10" font-weight="700" font-family="-apple-system, sans-serif" opacity="0.6">STORE</text>
+
+      <!-- Connectors (behind boxes) -->
+      <line x1="195" y1="50" x2="220" y2="50" stroke="var(--accent, #3b82f6)" stroke-width="1.2" stroke-dasharray="3,2" opacity="0.5"/>
+      <line x1="255" y1="65" x2="255" y2="105" stroke="var(--accent, #3b82f6)" stroke-width="1.2" stroke-dasharray="3,2" opacity="0.5"/>
+      <polygon points="251,99 255,105 259,99" fill="var(--accent, #3b82f6)" opacity="0.5"/>
+      <line x1="340" y1="120" x2="355" y2="120" stroke="var(--signal-invalidation, #f59e0b)" stroke-width="1.2" stroke-dasharray="3,2" opacity="0.4"/>
+      <line x1="430" y1="120" x2="445" y2="120" stroke="var(--signal-invalidation, #f59e0b)" stroke-width="1.2" stroke-dasharray="3,2" opacity="0.4"/>
+      <line x1="488" y1="135" x2="488" y2="172" stroke="var(--signal-stale, #ef4444)" stroke-width="1.2" stroke-dasharray="3,2" opacity="0.4"/>
+      <polygon points="484,172 488,180 492,172" fill="var(--signal-stale, #ef4444)" opacity="0.4"/>
+      <line x1="580" y1="172" x2="580" y2="143" stroke="var(--signal-stale, #ef4444)" stroke-width="1.2" stroke-dasharray="3,2" opacity="0.4"/>
+      <polygon points="576,143 580,135 584,143" fill="var(--signal-stale, #ef4444)" opacity="0.4"/>
+      <line x1="640" y1="135" x2="640" y2="247" stroke="var(--accent, #3b82f6)" stroke-width="1.2" stroke-dasharray="3,2" opacity="0.4"/>
+      <polygon points="636,247 640,255 644,247" fill="var(--accent, #3b82f6)" opacity="0.4"/>
+
+      <!-- Signal lane nodes -->
+      <rect x="115" y="35" width="80" height="30" rx="6" fill="var(--accent, #3b82f6)" opacity="0.15" stroke="var(--accent, #3b82f6)" stroke-width="1.5"/>
+      <text x="155" y="55" text-anchor="middle" fill="var(--accent, #3b82f6)" font-size="10" font-weight="600" font-family="'SF Mono', monospace">query()</text>
+      <rect x="220" y="35" width="70" height="30" rx="6" fill="var(--accent, #3b82f6)" opacity="0.1" stroke="var(--accent, #3b82f6)" stroke-width="1" stroke-dasharray="3,2"/>
+      <text x="255" y="55" text-anchor="middle" fill="var(--accent, #3b82f6)" font-size="9" font-weight="500" font-family="'SF Mono', monospace">effect()</text>
+
+      <!-- Pipeline lane nodes -->
+      <rect x="240" y="105" width="100" height="30" rx="6" fill="var(--signal-invalidation, #f59e0b)" opacity="0.15" stroke="var(--signal-invalidation, #f59e0b)" stroke-width="1.5"/>
+      <text x="290" y="125" text-anchor="middle" fill="var(--signal-invalidation, #f59e0b)" font-size="9" font-weight="600" font-family="'SF Mono', monospace">debounce(300)</text>
+      <rect x="355" y="105" width="75" height="30" rx="6" fill="var(--signal-invalidation, #f59e0b)" opacity="0.15" stroke="var(--signal-invalidation, #f59e0b)" stroke-width="1.5"/>
+      <text x="393" y="125" text-anchor="middle" fill="var(--signal-invalidation, #f59e0b)" font-size="9" font-weight="600" font-family="'SF Mono', monospace">distinct</text>
+      <rect x="445" y="105" width="85" height="30" rx="6" fill="var(--signal-invalidation, #f59e0b)" opacity="0.15" stroke="var(--signal-invalidation, #f59e0b)" stroke-width="1.5"/>
+      <text x="488" y="125" text-anchor="middle" fill="var(--signal-invalidation, #f59e0b)" font-size="9" font-weight="600" font-family="'SF Mono', monospace">switchMap</text>
+      <rect x="570" y="105" width="100" height="30" rx="6" fill="var(--signal-invalidation, #f59e0b)" opacity="0.15" stroke="var(--signal-invalidation, #f59e0b)" stroke-width="1.5"/>
+      <text x="620" y="125" text-anchor="middle" fill="var(--signal-invalidation, #f59e0b)" font-size="9" font-weight="600" font-family="'SF Mono', monospace">tapResponse</text>
+
+      <!-- HTTP lane -->
+      <rect x="448" y="180" width="145" height="30" rx="6" fill="var(--signal-stale, #ef4444)" opacity="0.1" stroke="var(--signal-stale, #ef4444)" stroke-width="1"/>
+      <text x="520" y="200" text-anchor="middle" fill="var(--signal-stale, #ef4444)" font-size="9" font-weight="600" font-family="'SF Mono', monospace">HTTP GET</text>
+
+      <!-- Store lane -->
+      <rect x="580" y="255" width="120" height="30" rx="6" fill="var(--accent, #3b82f6)" opacity="0.1" stroke="var(--accent, #3b82f6)" stroke-width="1.5"/>
+      <text x="640" y="275" text-anchor="middle" fill="var(--accent, #3b82f6)" font-size="9" font-weight="600" font-family="'SF Mono', monospace">patchState()</text>
+
+      <!-- ============================================================
+           ANIMATION: 12s cycle, 4 keystrokes
+           0-8%     "h" travels query→effect→debounce, fades (discarded)
+           12-20%   "ho" travels same path, fades (discarded)
+           25-33%   "hom" travels same path, fades (discarded)
+           37-45%   "home" travels to debounce, STAYS
+           46-54%   debounce timer expires, dot exits
+           54-88%   dot flows through distinct→switchMap→HTTP→tapResponse→store
+           88-100%  "entities updated" shown, pause
+           ============================================================ -->
+
+      <!-- Dashed connector: input box down to query() -->
+      <line x1="155" y1="-23" x2="155" y2="35" stroke="var(--accent, #3b82f6)" stroke-width="1.2" stroke-dasharray="3,2" opacity="0.3"/>
+      <polygon points="151,29 155,35 159,29" fill="var(--accent, #3b82f6)" opacity="0.3"/>
+
+      <!-- DOT 1: "h" follows path input→query→effect→debounce, then fades -->
+      <circle r="5" fill="#3b82f6" opacity="0">
+        <animateMotion dur="12s" repeatCount="indefinite" keyPoints="0;0;1;1" keyTimes="0;0.02;0.08;1" calcMode="linear">
+          <mpath href="#rx-to-debounce"/>
+        </animateMotion>
+        <animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.02;0.08;0.11;1" dur="12s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- DOT 2: "ho" follows same path, offset -->
+      <circle r="5" fill="#3b82f6" opacity="0">
+        <animateMotion dur="12s" repeatCount="indefinite" keyPoints="0;0;1;1" keyTimes="0;0.13;0.19;1" calcMode="linear">
+          <mpath href="#rx-to-debounce"/>
+        </animateMotion>
+        <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.12;0.13;0.19;0.22;1" dur="12s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- DOT 3: "hom" follows same path, offset -->
+      <circle r="5" fill="#3b82f6" opacity="0">
+        <animateMotion dur="12s" repeatCount="indefinite" keyPoints="0;0;1;1" keyTimes="0;0.26;0.32;1" calcMode="linear">
+          <mpath href="#rx-to-debounce"/>
+        </animateMotion>
+        <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.25;0.26;0.32;0.35;1" dur="12s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- DOT 4: "home" travels to debounce (part A) -->
+      <circle r="6" fill="#3b82f6" opacity="0">
+        <animateMotion dur="12s" repeatCount="indefinite" keyPoints="0;0;1;1" keyTimes="0;0.38;0.44;1" calcMode="linear">
+          <mpath href="#rx-to-debounce"/>
+        </animateMotion>
+        <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.37;0.38;0.44;0.46;1" dur="12s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- DOT 4 part B: exits debounce → distinct → switchMap → HTTP → tapResponse → store -->
+      <circle r="6" fill="#f59e0b" opacity="0">
+        <animateMotion dur="12s" repeatCount="indefinite" keyPoints="0;0;0.15;0.3;0.45;0.6;0.75;0.9;1;1" keyTimes="0;0.54;0.58;0.62;0.66;0.72;0.78;0.83;0.88;1" calcMode="linear">
+          <mpath href="#rx-through-pipeline"/>
+        </animateMotion>
+        <animate attributeName="opacity" values="0;0;1;1;1;1;1;1;0;0" keyTimes="0;0.53;0.54;0.6;0.66;0.72;0.78;0.85;0.89;1" dur="12s" repeatCount="indefinite"/>
+        <animate attributeName="fill" values="#f59e0b;#f59e0b;#f59e0b;#ef4444;#ef4444;#ef4444;#3b82f6;#3b82f6" keyTimes="0;0.54;0.62;0.66;0.72;0.78;0.83;1" dur="12s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- Debounce pulses: one per dot arrival, first 3 reset (small), 4th completes (big) -->
+      <circle cx="290" cy="120" r="8" fill="none" stroke="#f59e0b" stroke-width="1.5" opacity="0">
+        <animate attributeName="opacity" values="0;0.5;0;0" keyTimes="0;0.08;0.11;1" dur="12s" repeatCount="indefinite"/>
+        <animate attributeName="r" values="8;14;14;8" keyTimes="0;0.08;0.1;0.11" dur="12s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="290" cy="120" r="8" fill="none" stroke="#f59e0b" stroke-width="1.5" opacity="0">
+        <animate attributeName="opacity" values="0;0;0.5;0;0" keyTimes="0;0.19;0.2;0.23;1" dur="12s" repeatCount="indefinite"/>
+        <animate attributeName="r" values="8;8;14;14;8" keyTimes="0;0.19;0.2;0.22;0.23" dur="12s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="290" cy="120" r="8" fill="none" stroke="#f59e0b" stroke-width="1.5" opacity="0">
+        <animate attributeName="opacity" values="0;0;0.5;0;0" keyTimes="0;0.32;0.33;0.36;1" dur="12s" repeatCount="indefinite"/>
+        <animate attributeName="r" values="8;8;14;14;8" keyTimes="0;0.32;0.33;0.35;0.36" dur="12s" repeatCount="indefinite"/>
+      </circle>
+      <!-- "home" pulse — timer EXPIRES (bigger, brighter) -->
+      <circle cx="290" cy="120" r="8" fill="none" stroke="#f59e0b" stroke-width="2" opacity="0">
+        <animate attributeName="opacity" values="0;0;0.6;0.8;0;0" keyTimes="0;0.44;0.45;0.52;0.54;1" dur="12s" repeatCount="indefinite"/>
+        <animate attributeName="r" values="8;8;12;20;22;8" keyTimes="0;0.44;0.46;0.51;0.53;0.54" dur="12s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- "timer expired ✓" flash -->
+      <text x="290" y="98" text-anchor="middle" fill="#f59e0b" font-size="8" font-weight="600" font-family="-apple-system, sans-serif" opacity="0">
+        timer expired ✓
+        <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.52;0.53;0.56;0.58;1" dur="12s" repeatCount="indefinite"/>
+      </text>
+
+      <!-- "Policy[]" response label -->
+      <text x="503" y="172" text-anchor="middle" fill="#ef4444" font-size="9" font-weight="600" font-family="-apple-system, sans-serif" opacity="0">
+        Policy[]
+        <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.72;0.73;0.78;0.8;1" dur="12s" repeatCount="indefinite"/>
+      </text>
+
+      <!-- "entities updated ✓" at store -->
+      <text x="640" y="295" text-anchor="middle" fill="#3b82f6" font-size="9" font-weight="600" font-family="-apple-system, sans-serif" opacity="0">
+        entities updated ✓
+        <animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.86;0.87;0.95;0.98" dur="12s" repeatCount="indefinite"/>
+      </text>
+
+      <!-- Annotation -->
+      <text x="380" y="322" text-anchor="middle" fill="var(--muted)" font-size="8" font-family="-apple-system, sans-serif" opacity="0.6">
+        debounce discards rapid emissions · switchMap cancels in-flight · tapResponse keeps pipeline alive
+      </text>
+
+      <!-- Legend -->
+      <circle cx="120" cy="345" r="4" fill="#3b82f6"/>
+      <text x="130" y="349" fill="var(--muted)" font-size="9" font-family="-apple-system, sans-serif">Signal / Store</text>
+      <circle cx="270" cy="345" r="4" fill="#f59e0b"/>
+      <text x="280" y="349" fill="var(--muted)" font-size="9" font-family="-apple-system, sans-serif">Pipeline operators</text>
+      <circle cx="440" cy="345" r="4" fill="#ef4444"/>
+      <text x="450" y="349" fill="var(--muted)" font-size="9" font-family="-apple-system, sans-serif">Async (HTTP)</text>
+    </svg>
+  </div>
+
   <h2 id="three-ways-to-call">Three Ways to Call rxMethod</h2>
 
   <p>Once defined, an <code>rxMethod</code> accepts three kinds of input:</p>
@@ -213,6 +413,11 @@ export const PolicySearchStore = signalStore(
     resultCount: computed(() =&gt; entities().length),
   })),
   withMethods((store, policyService = inject(PolicyService)) =&gt; ({
+    //          ^^^^^
+    // First arg of your factory function — signalStore passes it in
+    // automatically. Contains everything defined above: query, isLoading,
+    // error (withState), entities/ids/entityMap (withEntities),
+    // resultCount (withComputed). Same pattern for withComputed/withHooks.
 
     setQuery(query: string): void {
       patchState(store, { query });
@@ -238,6 +443,8 @@ export const PolicySearchStore = signalStore(
   })),
   withHooks({
     onInit(store) {
+      // `store` here is the FULLY composed store — includes the methods
+      // defined above (setQuery, searchPolicies), so you can call them.
       // Connect the query signal to the search pipeline
       // Every time store.query() changes → pipeline re-runs (debounced)
       store.searchPolicies(store.query);
@@ -275,8 +482,9 @@ export class PolicyListComponent {
   private searchInput = signal('');
 
   constructor() {
-    // This watcher is tied to the component's DestroyRef
-    // Component destroyed → watcher cleaned up → no more emissions
+    // store.searchPolicies is the rxMethod&lt;string&gt; defined in the store.
+    // Passing a signal creates a watcher tied to this component's DestroyRef.
+    // Component destroyed → watcher cleaned up → no more emissions.
     this.store.searchPolicies(this.searchInput);
   }
 }</code></pre>
