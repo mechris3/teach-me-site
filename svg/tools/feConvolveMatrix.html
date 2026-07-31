@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>feConvolveMatrix Playground - SVG Filter Tool | Teach Me</title>
+  <meta name="description" content="Interactive feConvolveMatrix tool. Build custom 3×3 convolution kernels - sharpen, emboss, edge detection, and blur. See results in real time.">
+  <link rel="canonical" href="https://teachmeskills.dev/svg/tools/feConvolveMatrix.html">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://teachmeskills.dev/svg/tools/feConvolveMatrix.html">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "feConvolveMatrix Playground",
+  "description": "Interactive tool for SVG feConvolveMatrix. Build custom 3x3 convolution kernels: sharpen, emboss, edge detection.",
+  "url": "https://teachmeskills.dev/svg/tools/feConvolveMatrix.html",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "Teach Me",
+    "url": "https://teachmeskills.dev/"
+  },
+  "about": {
+    "@type": "Thing",
+    "name": "SVG Filter Primitives",
+    "description": "SVG Morphology filter primitive"
+  }
+}
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://teachmeskills.dev/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "SVG Course",
+      "item": "https://teachmeskills.dev/svg/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Filter Playground",
+      "item": "https://teachmeskills.dev/svg/tools/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 4,
+      "name": "feConvolveMatrix Playground - SVG Filter Tool",
+      "item": "https://teachmeskills.dev/svg/tools/feConvolveMatrix.html"
+    }
+  ]
+}
+  </script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/svg/tools/index.html">Filter Tools</a>
+      <a href="/svg/">SVG Course</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <main class="page-content" id="main-content">
+    <nav class="tool-nav" aria-label="Breadcrumb">
+      <a href="index.html">Filter Tools</a>
+      <span aria-hidden="true">›</span>
+      <span>feConvolveMatrix</span>
+    </nav>
+
+    <h1>&lt;feConvolveMatrix&gt; Playground</h1>
+    <p>Apply a custom convolution kernel to the input. Choose from presets (sharpen, emboss, edge detect) or build your own 3×3 kernel matrix.</p>
+
+    <div class="tool-layout">
+      <div class="preview-panel">
+        <h2>Preview</h2>
+        <div class="preview-svg-wrap">
+          <svg id="preview-svg" viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg">
+            <defs id="filter-defs">
+              <filter id="tool-filter">
+                <feConvolveMatrix order="3" kernelMatrix="0 -1 0 -1 5 -1 0 -1 0"/>
+              </filter>
+            </defs>
+            <rect width="320" height="200" fill="var(--demo-svg-bg)"/>
+            <g id="filtered-target" filter="url(#tool-filter)">
+              <g class="target-shape" data-target="shapes">
+                <rect x="20" y="30" width="80" height="80" rx="8" fill="#e5c07b"/>
+                <circle cx="180" cy="70" r="45" fill="#c678dd"/>
+                <polygon points="240,120 280,40 320,120" fill="#e06c75"/>
+                <rect x="60" y="130" width="200" height="30" rx="4" fill="#61afef"/>
+                <ellipse cx="260" cy="160" rx="30" ry="20" fill="#98c379"/>
+              </g>
+              <g class="target-shape" data-target="text" style="display:none">
+                <text x="160" y="80" font-size="48" font-weight="bold" fill="#61afef" text-anchor="middle" font-family="sans-serif">SVG</text>
+                <text x="160" y="130" font-size="24" fill="#e5c07b" text-anchor="middle" font-family="sans-serif">Filter Tools</text>
+                <text x="160" y="165" font-size="14" fill="#98c379" text-anchor="middle" font-family="sans-serif">Experiment &amp; Learn</text>
+              </g>
+              <g class="target-shape" data-target="gradient" style="display:none">
+                <defs>
+                  <linearGradient id="target-lg" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#667eea"/>
+                    <stop offset="50%" stop-color="#764ba2"/>
+                    <stop offset="100%" stop-color="#f093fb"/>
+                  </linearGradient>
+                  <radialGradient id="target-rg">
+                    <stop offset="0%" stop-color="#FFD700"/>
+                    <stop offset="100%" stop-color="#FF4500"/>
+                  </radialGradient>
+                </defs>
+                <rect x="10" y="10" width="300" height="180" rx="12" fill="url(#target-lg)"/>
+                <circle cx="160" cy="100" r="50" fill="url(#target-rg)" opacity="0.8"/>
+              </g>
+            </g>
+          </svg>
+        </div>
+        <div class="target-selector">
+          <label>Target</label>
+          <div class="target-buttons">
+            <button class="target-btn active" data-target="shapes">Shapes</button>
+            <button class="target-btn" data-target="text">Text</button>
+            <button class="target-btn" data-target="gradient">Gradient</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls-panel">
+        <h2>Parameters</h2>
+
+        <div class="control-group">
+          <label for="conv-preset">Preset</label>
+          <select id="conv-preset">
+            <option value="sharpen">Sharpen</option>
+            <option value="emboss">Emboss</option>
+            <option value="edge">Edge Detect</option>
+            <option value="blur">Box Blur</option>
+            <option value="identity">Identity (no effect)</option>
+            <option value="custom">Custom</option>
+          </select>
+          <small class="param-hint">Choose a common kernel or define your own 3x3 matrix below.</small>
+        </div>
+
+        <div class="control-group">
+          <label>3×3 Kernel Matrix</label>
+          <div class="matrix-grid" id="kernel-grid" style="grid-template-columns: repeat(3, 1fr);">
+            <input type="text" class="kernel-cell" value="0">
+            <input type="text" class="kernel-cell" value="-1">
+            <input type="text" class="kernel-cell" value="0">
+            <input type="text" class="kernel-cell" value="-1">
+            <input type="text" class="kernel-cell" value="5">
+            <input type="text" class="kernel-cell" value="-1">
+            <input type="text" class="kernel-cell" value="0">
+            <input type="text" class="kernel-cell" value="-1">
+            <input type="text" class="kernel-cell" value="0">
+          </div>
+        </div>
+
+        <div class="control-row">
+          <div class="control-group">
+            <label for="conv-divisor">divisor</label>
+            <input type="number" id="conv-divisor" value="1" step="0.1">
+          </div>
+          <div class="control-group">
+            <label for="conv-bias">bias</label>
+            <input type="number" id="conv-bias" value="0" step="0.1">
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label for="conv-edge">edgeMode</label>
+          <select id="conv-edge">
+            <option value="duplicate">duplicate</option>
+            <option value="wrap">wrap</option>
+            <option value="none">none</option>
+          </select>
+          <small class="param-hint">"duplicate" - extend edge pixels outward<br>"wrap" - tile edges<br>"none" - treat outside as transparent black</small>
+        </div>
+
+        <div class="control-group checkbox-row">
+          <input type="checkbox" id="conv-alpha" checked>
+          <label for="conv-alpha">preserveAlpha</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="code-output">
+      <div class="code-output-header">
+        <h2>Generated Code</h2>
+        <button class="copy-btn" id="copy-code-btn">Copy</button>
+      </div>
+      <pre><code id="code-output" class="language-html"></code></pre>
+    </div>
+
+    <div class="related-links">
+      <h2>Related</h2>
+      <ul>
+        <li><a href="/svg/07-filters.html">Lesson 7: SVG Filters</a></li>
+        <li><a href="feMorphology.html">feMorphology Tool</a></li>
+        <li><a href="feGaussianBlur.html">feGaussianBlur Tool</a></li>
+        <li><a href="index.html">All Filter Tools</a></li>
+      </ul>
+    </div>
+  </main>
+
+  <script src="/scripts.js"></script>
+  <script src="shared.js"></script>
+  <script>
+    const presets = {
+      sharpen:  [0, -1, 0, -1, 5, -1, 0, -1, 0],
+      emboss:   [-2, -1, 0, -1, 1, 1, 0, 1, 2],
+      edge:     [-1, -1, -1, -1, 8, -1, -1, -1, -1],
+      blur:     [1, 1, 1, 1, 1, 1, 1, 1, 1],
+      identity: [0, 0, 0, 0, 1, 0, 0, 0, 0]
+    };
+
+    const presetSelect = document.getElementById('conv-preset');
+    const cells = document.querySelectorAll('.kernel-cell');
+    const divisorInput = document.getElementById('conv-divisor');
+
+    presetSelect.addEventListener('change', () => {
+      const key = presetSelect.value;
+      if (presets[key]) {
+        cells.forEach((cell, i) => { cell.value = presets[key][i]; });
+        // Auto-set divisor for blur
+        divisorInput.value = key === 'blur' ? '9' : '1';
+        tool.update();
+      }
+    });
+
+    const tool = new FilterTool({
+      filterElement: 'feConvolveMatrix',
+      buildFilter() {
+        const matrix = Array.from(cells).map(c => c.value || '0').join(' ');
+        const divisor = this.val('conv-divisor');
+        const bias = this.val('conv-bias');
+        const edge = this.val('conv-edge');
+        const alpha = this.val('conv-alpha');
+
+        let attrs = `order="3"\n  kernelMatrix="${matrix}"`;
+        if (divisor !== '1') attrs += `\n  divisor="${divisor}"`;
+        if (bias !== '0') attrs += `\n  bias="${bias}"`;
+        if (edge !== 'duplicate') attrs += `\n  edgeMode="${edge}"`;
+        if (!alpha) attrs += `\n  preserveAlpha="false"`;
+
+        return `<feConvolveMatrix ${attrs}/>`;
+      }
+    });
+  </script>
+</body>
+</html>

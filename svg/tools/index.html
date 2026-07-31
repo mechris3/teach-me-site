@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>SVG Filter Playground - Interactive Tools | Teach Me</title>
+  <meta name="description" content="Interactive SVG filter playground. Experiment with all 17 SVG filter primitives in real time - adjust parameters, see instant results, and copy generated code.">
+  <link rel="canonical" href="https://teachmeskills.dev/svg/tools/">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://teachmeskills.dev/svg/tools/">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "SVG Filter Playground",
+  "description": "Interactive tools for all 17 SVG filter primitives. Adjust parameters in real time, see instant visual results, and copy generated code.",
+  "url": "https://teachmeskills.dev/svg/tools/",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "Teach Me",
+    "url": "https://teachmeskills.dev/"
+  },
+  "mainEntity": {
+    "@type": "ItemList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "url": "https://teachmeskills.dev/svg/tools/feGaussianBlur.html",
+        "name": "feGaussianBlur Playground"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "url": "https://teachmeskills.dev/svg/tools/feDropShadow.html",
+        "name": "feDropShadow Playground"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "url": "https://teachmeskills.dev/svg/tools/feColorMatrix.html",
+        "name": "feColorMatrix Playground"
+      },
+      {
+        "@type": "ListItem",
+        "position": 4,
+        "url": "https://teachmeskills.dev/svg/tools/feComponentTransfer.html",
+        "name": "feComponentTransfer Playground"
+      },
+      {
+        "@type": "ListItem",
+        "position": 5,
+        "url": "https://teachmeskills.dev/svg/tools/feFlood.html",
+        "name": "feFlood Playground"
+      },
+      {
+        "@type": "ListItem",
+        "position": 6,
+        "url": "https://teachmeskills.dev/svg/tools/feComposite.html",
+        "name": "feComposite Playground"
+      },
+      {
+        "@type": "ListItem",
+        "position": 7,
+        "url": "https://teachmeskills.dev/svg/tools/feBlend.html",
+        "name": "feBlend Playground"
+      },
+      {
+        "@type": "ListItem",
+        "position": 8,
+        "url": "https://teachmeskills.dev/svg/tools/feMerge.html",
+        "name": "feMerge Playground"
+      },
+      {
+        "@type": "ListItem",
+        "position": 9,
+        "url": "https://teachmeskills.dev/svg/tools/feOffset.html",
+        "name": "feOffset Playground"
+      },
+      {
+        "@type": "ListItem",
+        "position": 10,
+        "url": "https://teachmeskills.dev/svg/tools/feTile.html",
+        "name": "feTile Playground"
+      },
+      {
+        "@type": "ListItem",
+        "position": 11,
+        "url": "https://teachmeskills.dev/svg/tools/feDisplacementMap.html",
+        "name": "feDisplacementMap Playground"
+      },
+      {
+        "@type": "ListItem",
+        "position": 12,
+        "url": "https://teachmeskills.dev/svg/tools/feMorphology.html",
+        "name": "feMorphology Playground"
+      },
+      {
+        "@type": "ListItem",
+        "position": 13,
+        "url": "https://teachmeskills.dev/svg/tools/feConvolveMatrix.html",
+        "name": "feConvolveMatrix Playground"
+      },
+      {
+        "@type": "ListItem",
+        "position": 14,
+        "url": "https://teachmeskills.dev/svg/tools/feDiffuseLighting.html",
+        "name": "feDiffuseLighting Playground"
+      },
+      {
+        "@type": "ListItem",
+        "position": 15,
+        "url": "https://teachmeskills.dev/svg/tools/feSpecularLighting.html",
+        "name": "feSpecularLighting Playground"
+      },
+      {
+        "@type": "ListItem",
+        "position": 16,
+        "url": "https://teachmeskills.dev/svg/tools/feTurbulence.html",
+        "name": "feTurbulence Playground"
+      },
+      {
+        "@type": "ListItem",
+        "position": 17,
+        "url": "https://teachmeskills.dev/svg/tools/feImage.html",
+        "name": "feImage Playground"
+      }
+    ]
+  }
+}
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://teachmeskills.dev/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "SVG Course",
+      "item": "https://teachmeskills.dev/svg/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Filter Playground",
+      "item": "https://teachmeskills.dev/svg/tools/"
+    }
+  ]
+}
+  </script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/svg/">SVG Course</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <main class="page-content" id="main-content">
+    <h1>SVG Filter Playground</h1>
+    <p class="tagline">Experiment with all 17 SVG filter primitives. Adjust parameters in real time, see instant visual results, and copy the generated code.</p>
+
+    <h2>Blur &amp; Shadow</h2>
+    <div class="tools-grid">
+      <a href="feGaussianBlur.html" class="tool-card">
+        <span class="tool-category">Blur &amp; Shadow</span>
+        <h3>&lt;feGaussianBlur&gt;</h3>
+        <p>Gaussian blur with independent x/y radius control and edge mode options.</p>
+      </a>
+      <a href="feDropShadow.html" class="tool-card">
+        <span class="tool-category">Blur &amp; Shadow</span>
+        <h3>&lt;feDropShadow&gt;</h3>
+        <p>All-in-one drop shadow with offset, blur, colour, and opacity controls.</p>
+      </a>
+    </div>
+
+    <h2>Colour</h2>
+    <div class="tools-grid">
+      <a href="feColorMatrix.html" class="tool-card">
+        <span class="tool-category">Colour</span>
+        <h3>&lt;feColorMatrix&gt;</h3>
+        <p>Hue rotation, saturation, luminance-to-alpha, and full 4×5 matrix transforms.</p>
+      </a>
+      <a href="feComponentTransfer.html" class="tool-card">
+        <span class="tool-category">Colour</span>
+        <h3>&lt;feComponentTransfer&gt;</h3>
+        <p>Per-channel transfer functions: identity, table, discrete, linear, and gamma.</p>
+      </a>
+      <a href="feFlood.html" class="tool-card">
+        <span class="tool-category">Colour</span>
+        <h3>&lt;feFlood&gt;</h3>
+        <p>Fill the filter region with a solid colour and adjustable opacity.</p>
+      </a>
+    </div>
+
+    <h2>Compositing</h2>
+    <div class="tools-grid">
+      <a href="feComposite.html" class="tool-card">
+        <span class="tool-category">Compositing</span>
+        <h3>&lt;feComposite&gt;</h3>
+        <p>Porter-Duff compositing: over, in, out, atop, xor, and arithmetic mode.</p>
+      </a>
+      <a href="feBlend.html" class="tool-card">
+        <span class="tool-category">Compositing</span>
+        <h3>&lt;feBlend&gt;</h3>
+        <p>Blend modes: normal, multiply, screen, darken, lighten, and overlay.</p>
+      </a>
+      <a href="feMerge.html" class="tool-card">
+        <span class="tool-category">Compositing</span>
+        <h3>&lt;feMerge&gt;</h3>
+        <p>Layer multiple filter inputs on top of each other in a specified order.</p>
+      </a>
+    </div>
+
+    <h2>Spatial</h2>
+    <div class="tools-grid">
+      <a href="feOffset.html" class="tool-card">
+        <span class="tool-category">Spatial</span>
+        <h3>&lt;feOffset&gt;</h3>
+        <p>Shift pixels by dx/dy - the backbone of shadow pipelines.</p>
+      </a>
+      <a href="feTile.html" class="tool-card">
+        <span class="tool-category">Spatial</span>
+        <h3>&lt;feTile&gt;</h3>
+        <p>Tile the input image to fill the entire filter region.</p>
+      </a>
+      <a href="feDisplacementMap.html" class="tool-card">
+        <span class="tool-category">Spatial</span>
+        <h3>&lt;feDisplacementMap&gt;</h3>
+        <p>Distort pixels using another image's channels as a displacement map.</p>
+      </a>
+    </div>
+
+    <h2>Morphology</h2>
+    <div class="tools-grid">
+      <a href="feMorphology.html" class="tool-card">
+        <span class="tool-category">Morphology</span>
+        <h3>&lt;feMorphology&gt;</h3>
+        <p>Erode or dilate shapes - shrink or expand edges by a given radius.</p>
+      </a>
+      <a href="feConvolveMatrix.html" class="tool-card">
+        <span class="tool-category">Morphology</span>
+        <h3>&lt;feConvolveMatrix&gt;</h3>
+        <p>Custom convolution kernels: sharpen, emboss, edge detection, and more.</p>
+      </a>
+    </div>
+
+    <h2>Lighting</h2>
+    <div class="tools-grid">
+      <a href="feDiffuseLighting.html" class="tool-card">
+        <span class="tool-category">Lighting</span>
+        <h3>&lt;feDiffuseLighting&gt;</h3>
+        <p>Matte surface lighting with distant, point, or spot light sources.</p>
+      </a>
+      <a href="feSpecularLighting.html" class="tool-card">
+        <span class="tool-category">Lighting</span>
+        <h3>&lt;feSpecularLighting&gt;</h3>
+        <p>Shiny surface highlights with configurable specular exponent and light sources.</p>
+      </a>
+    </div>
+
+    <h2>Texture &amp; Utility</h2>
+    <div class="tools-grid">
+      <a href="feTurbulence.html" class="tool-card">
+        <span class="tool-category">Texture</span>
+        <h3>&lt;feTurbulence&gt;</h3>
+        <p>Generate Perlin noise or fractal turbulence patterns - clouds, fire, water.</p>
+      </a>
+      <a href="feImage.html" class="tool-card">
+        <span class="tool-category">Utility</span>
+        <h3>&lt;feImage&gt;</h3>
+        <p>Load an external image or SVG element as a filter input.</p>
+      </a>
+    </div>
+
+    <div class="related-links">
+      <h2>Learn More</h2>
+      <ul>
+        <li><a href="/svg/07-filters.html">Lesson 7: SVG Filters</a> - full tutorial on the filter pipeline model</li>
+        <li><a href="/svg/svg-elements-and-attributes.html#el-filter">Filter Reference</a> - all primitives and attributes</li>
+      </ul>
+    </div>
+  </main>
+
+  <script src="/scripts.js"></script>
+</body>
+</html>

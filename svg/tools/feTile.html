@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>feTile Playground - SVG Filter Tool | Teach Me</title>
+  <meta name="description" content="Interactive feTile tool. Tile an input image to fill the entire filter region. Combine with other primitives for repeating pattern effects.">
+  <link rel="canonical" href="https://teachmeskills.dev/svg/tools/feTile.html">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://teachmeskills.dev/svg/tools/feTile.html">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "feTile Playground",
+  "description": "Interactive tool for SVG feTile. Tile an input image to fill the entire filter region.",
+  "url": "https://teachmeskills.dev/svg/tools/feTile.html",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "Teach Me",
+    "url": "https://teachmeskills.dev/"
+  },
+  "about": {
+    "@type": "Thing",
+    "name": "SVG Filter Primitives",
+    "description": "SVG Spatial filter primitive"
+  }
+}
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://teachmeskills.dev/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "SVG Course",
+      "item": "https://teachmeskills.dev/svg/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Filter Playground",
+      "item": "https://teachmeskills.dev/svg/tools/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 4,
+      "name": "feTile Playground - SVG Filter Tool",
+      "item": "https://teachmeskills.dev/svg/tools/feTile.html"
+    }
+  ]
+}
+  </script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/svg/tools/index.html">Filter Tools</a>
+      <a href="/svg/">SVG Course</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <main class="page-content" id="main-content">
+    <nav class="tool-nav" aria-label="Breadcrumb">
+      <a href="index.html">Filter Tools</a>
+      <span aria-hidden="true">›</span>
+      <span>feTile</span>
+    </nav>
+
+    <h1>&lt;feTile&gt; Playground</h1>
+    <p>Tiles its input to fill the filter region. This demo shows feTile repeating a small offset portion of the source across the entire area. Combine with feOffset to control what gets tiled.</p>
+
+    <div class="tool-layout">
+      <div class="preview-panel">
+        <h2>Preview</h2>
+        <div class="preview-svg-wrap">
+          <svg id="preview-svg" viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg">
+            <defs id="filter-defs">
+              <filter id="tool-filter" x="0" y="0" width="100%" height="100%">
+                <feOffset in="SourceGraphic" dx="0" dy="0"/>
+                <feTile/>
+              </filter>
+            </defs>
+            <rect width="320" height="200" fill="var(--demo-svg-bg)"/>
+            <g id="filtered-target" filter="url(#tool-filter)">
+              <g class="target-shape" data-target="shapes">
+                <rect x="0" y="0" width="60" height="60" rx="6" fill="#e5c07b"/>
+                <circle cx="30" cy="30" r="10" fill="#c678dd"/>
+              </g>
+              <g class="target-shape" data-target="text" style="display:none">
+                <text x="10" y="30" font-size="20" font-weight="bold" fill="#61afef" font-family="sans-serif">Tile</text>
+              </g>
+              <g class="target-shape" data-target="gradient" style="display:none">
+                <defs>
+                  <linearGradient id="target-lg" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#667eea"/>
+                    <stop offset="100%" stop-color="#f093fb"/>
+                  </linearGradient>
+                </defs>
+                <rect x="0" y="0" width="60" height="60" rx="8" fill="url(#target-lg)"/>
+              </g>
+            </g>
+          </svg>
+        </div>
+        <div class="target-selector">
+          <label>Target</label>
+          <div class="target-buttons">
+            <button class="target-btn active" data-target="shapes">Shapes</button>
+            <button class="target-btn" data-target="text">Text</button>
+            <button class="target-btn" data-target="gradient">Gradient</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls-panel">
+        <h2>Parameters</h2>
+
+        <div class="control-group">
+          <label for="tile-input">in</label>
+          <select id="tile-input">
+            <option value="SourceGraphic">SourceGraphic</option>
+            <option value="SourceAlpha">SourceAlpha</option>
+          </select>
+          <small class="param-hint">The image to tile. SourceGraphic = full colour, SourceAlpha = silhouette.</small>
+        </div>
+
+        <div class="control-group">
+          <label>Offset dx (pre-tile) <input type="number" class="value-input" id="tile-dx-val" value="0" min="-30" step="1"></label>
+          <input type="range" id="tile-dx" min="-30" max="30" step="1" value="0">
+          <small class="param-hint">Shift the tile origin horizontally before repeating.</small>
+        </div>
+
+        <div class="control-group">
+          <label>Offset dy (pre-tile) <input type="number" class="value-input" id="tile-dy-val" value="0" min="-30" step="1"></label>
+          <input type="range" id="tile-dy" min="-30" max="30" step="1" value="0">
+          <small class="param-hint">Shift the tile origin vertically before repeating.</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="code-output">
+      <div class="code-output-header">
+        <h2>Generated Code</h2>
+        <button class="copy-btn" id="copy-code-btn">Copy</button>
+      </div>
+      <pre><code id="code-output" class="language-html"></code></pre>
+    </div>
+
+    <div class="related-links">
+      <h2>Related</h2>
+      <ul>
+        <li><a href="/svg/07-filters.html">Lesson 7: SVG Filters</a></li>
+        <li><a href="feOffset.html">feOffset Tool</a></li>
+        <li><a href="feTurbulence.html">feTurbulence Tool</a></li>
+        <li><a href="index.html">All Filter Tools</a></li>
+      </ul>
+    </div>
+  </main>
+
+  <script src="/scripts.js"></script>
+  <script src="shared.js"></script>
+  <script>
+    const tool = new FilterTool({
+      filterElement: 'feTile',
+      buildFilter() {
+        const input = this.val('tile-input');
+        const dx = this.val('tile-dx');
+        const dy = this.val('tile-dy');
+
+        let code = '';
+        if (dx !== '0' || dy !== '0') {
+          code += `<feOffset in="${input}" dx="${dx}" dy="${dy}" result="shifted"/>\n`;
+          code += `<feTile in="shifted"/>`;
+        } else {
+          code += `<feTile in="${input}"/>`;
+        }
+        return code;
+      }
+    });
+  </script>
+</body>
+</html>

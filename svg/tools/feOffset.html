@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>feOffset Playground - SVG Filter Tool | Teach Me</title>
+  <meta name="description" content="Interactive feOffset tool. Shift pixels by dx and dy - the essential building block for shadow pipelines. See results in real time.">
+  <link rel="canonical" href="https://teachmeskills.dev/svg/tools/feOffset.html">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://teachmeskills.dev/svg/tools/feOffset.html">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "feOffset Playground",
+  "description": "Interactive tool for SVG feOffset. Shift pixels by dx and dy, the building block for shadow pipelines.",
+  "url": "https://teachmeskills.dev/svg/tools/feOffset.html",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "Teach Me",
+    "url": "https://teachmeskills.dev/"
+  },
+  "about": {
+    "@type": "Thing",
+    "name": "SVG Filter Primitives",
+    "description": "SVG Spatial filter primitive"
+  }
+}
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://teachmeskills.dev/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "SVG Course",
+      "item": "https://teachmeskills.dev/svg/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Filter Playground",
+      "item": "https://teachmeskills.dev/svg/tools/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 4,
+      "name": "feOffset Playground - SVG Filter Tool",
+      "item": "https://teachmeskills.dev/svg/tools/feOffset.html"
+    }
+  ]
+}
+  </script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/svg/tools/index.html">Filter Tools</a>
+      <a href="/svg/">SVG Course</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <main class="page-content" id="main-content">
+    <nav class="tool-nav" aria-label="Breadcrumb">
+      <a href="index.html">Filter Tools</a>
+      <span aria-hidden="true">›</span>
+      <span>feOffset</span>
+    </nav>
+
+    <h1>&lt;feOffset&gt; Playground</h1>
+    <p>Shift the input image by dx/dy. Simple but fundamental - used in every drop shadow pipeline.</p>
+
+    <div class="tool-layout">
+      <div class="preview-panel">
+        <h2>Preview</h2>
+        <div class="preview-svg-wrap">
+          <svg id="preview-svg" viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg">
+            <defs id="filter-defs">
+              <filter id="tool-filter">
+                <feOffset dx="5" dy="5"/>
+              </filter>
+            </defs>
+            <rect width="320" height="200" fill="var(--demo-svg-bg)"/>
+            <g id="filtered-target" filter="url(#tool-filter)">
+              <g class="target-shape" data-target="shapes">
+                <rect x="20" y="30" width="80" height="80" rx="8" fill="#e5c07b"/>
+                <circle cx="180" cy="70" r="45" fill="#c678dd"/>
+                <polygon points="240,120 280,40 320,120" fill="#e06c75"/>
+                <rect x="60" y="130" width="200" height="30" rx="4" fill="#61afef"/>
+                <ellipse cx="260" cy="160" rx="30" ry="20" fill="#98c379"/>
+              </g>
+              <g class="target-shape" data-target="text" style="display:none">
+                <text x="160" y="80" font-size="48" font-weight="bold" fill="#61afef" text-anchor="middle" font-family="sans-serif">SVG</text>
+                <text x="160" y="130" font-size="24" fill="#e5c07b" text-anchor="middle" font-family="sans-serif">Filter Tools</text>
+                <text x="160" y="165" font-size="14" fill="#98c379" text-anchor="middle" font-family="sans-serif">Experiment &amp; Learn</text>
+              </g>
+              <g class="target-shape" data-target="gradient" style="display:none">
+                <defs>
+                  <linearGradient id="target-lg" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#667eea"/>
+                    <stop offset="50%" stop-color="#764ba2"/>
+                    <stop offset="100%" stop-color="#f093fb"/>
+                  </linearGradient>
+                  <radialGradient id="target-rg">
+                    <stop offset="0%" stop-color="#FFD700"/>
+                    <stop offset="100%" stop-color="#FF4500"/>
+                  </radialGradient>
+                </defs>
+                <rect x="10" y="10" width="300" height="180" rx="12" fill="url(#target-lg)"/>
+                <circle cx="160" cy="100" r="50" fill="url(#target-rg)" opacity="0.8"/>
+              </g>
+            </g>
+          </svg>
+        </div>
+        <div class="target-selector">
+          <label>Target</label>
+          <div class="target-buttons">
+            <button class="target-btn active" data-target="shapes">Shapes</button>
+            <button class="target-btn" data-target="text">Text</button>
+            <button class="target-btn" data-target="gradient">Gradient</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls-panel">
+        <h2>Parameters</h2>
+
+        <div class="control-group">
+          <label>
+            dx (horizontal offset)
+            <input type="number" class="value-input" id="offset-dx-val" value="5" min="-50" step="1">
+          </label>
+          <input type="range" id="offset-dx" min="-50" max="50" step="1" value="5">
+          <small class="param-hint">Pixels to shift right. Negative values shift left.</small>
+        </div>
+
+        <div class="control-group">
+          <label>
+            dy (vertical offset)
+            <input type="number" class="value-input" id="offset-dy-val" value="5" min="-50" step="1">
+          </label>
+          <input type="range" id="offset-dy" min="-50" max="50" step="1" value="5">
+          <small class="param-hint">Pixels to shift down. Negative values shift up.</small>
+        </div>
+
+        <div class="control-group">
+          <label for="offset-input">in</label>
+          <select id="offset-input">
+            <option value="SourceGraphic">SourceGraphic</option>
+            <option value="SourceAlpha">SourceAlpha</option>
+          </select>
+          <small class="param-hint">Input image.<br>"SourceGraphic" - full colour rendering<br>"SourceAlpha" - silhouette only (useful for shadows)</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="code-output">
+      <div class="code-output-header">
+        <h2>Generated Code</h2>
+        <button class="copy-btn" id="copy-code-btn">Copy</button>
+      </div>
+      <pre><code id="code-output" class="language-html"></code></pre>
+    </div>
+
+    <div class="related-links">
+      <h2>Related</h2>
+      <ul>
+        <li><a href="/svg/07-filters.html">Lesson 7: SVG Filters</a></li>
+        <li><a href="feDropShadow.html">feDropShadow Tool</a></li>
+        <li><a href="feGaussianBlur.html">feGaussianBlur Tool</a></li>
+        <li><a href="index.html">All Filter Tools</a></li>
+      </ul>
+    </div>
+  </main>
+
+  <script src="/scripts.js"></script>
+  <script src="shared.js"></script>
+  <script>
+    const tool = new FilterTool({
+      filterElement: 'feOffset',
+      buildFilter() {
+        const dx = this.val('offset-dx');
+        const dy = this.val('offset-dy');
+        const input = this.val('offset-input');
+        return `<feOffset in="${input}" dx="${dx}" dy="${dy}"/>`;
+      }
+    });
+  </script>
+</body>
+</html>

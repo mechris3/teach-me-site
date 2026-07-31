@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>feDisplacementMap Playground - SVG Filter Tool | Teach Me</title>
+  <meta name="description" content="Interactive feDisplacementMap tool. Distort pixels using turbulence as a displacement map. Control scale, channel selectors, and noise parameters.">
+  <link rel="canonical" href="https://teachmeskills.dev/svg/tools/feDisplacementMap.html">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://teachmeskills.dev/svg/tools/feDisplacementMap.html">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "feDisplacementMap Playground",
+  "description": "Interactive tool for SVG feDisplacementMap. Distort pixels using turbulence noise as a displacement source.",
+  "url": "https://teachmeskills.dev/svg/tools/feDisplacementMap.html",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "Teach Me",
+    "url": "https://teachmeskills.dev/"
+  },
+  "about": {
+    "@type": "Thing",
+    "name": "SVG Filter Primitives",
+    "description": "SVG Spatial filter primitive"
+  }
+}
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://teachmeskills.dev/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "SVG Course",
+      "item": "https://teachmeskills.dev/svg/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Filter Playground",
+      "item": "https://teachmeskills.dev/svg/tools/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 4,
+      "name": "feDisplacementMap Playground - SVG Filter Tool",
+      "item": "https://teachmeskills.dev/svg/tools/feDisplacementMap.html"
+    }
+  ]
+}
+  </script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/svg/tools/index.html">Filter Tools</a>
+      <a href="/svg/">SVG Course</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <main class="page-content" id="main-content">
+    <nav class="tool-nav" aria-label="Breadcrumb">
+      <a href="index.html">Filter Tools</a>
+      <span aria-hidden="true">›</span>
+      <span>feDisplacementMap</span>
+    </nav>
+
+    <h1>&lt;feDisplacementMap&gt; Playground</h1>
+    <p>Distort pixels by reading displacement values from another image's colour channels. Combined with feTurbulence, creates organic distortion effects like ripples and heat haze.</p>
+
+    <div class="tool-layout">
+      <div class="preview-panel">
+        <h2>Preview</h2>
+        <div class="preview-svg-wrap">
+          <svg id="preview-svg" viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg">
+            <defs id="filter-defs">
+              <filter id="tool-filter">
+                <feTurbulence type="turbulence" baseFrequency="0.03" numOctaves="2" result="noise"/>
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="15" xChannelSelector="R" yChannelSelector="G"/>
+              </filter>
+            </defs>
+            <rect width="320" height="200" fill="var(--demo-svg-bg)"/>
+            <g id="filtered-target" filter="url(#tool-filter)">
+              <g class="target-shape" data-target="shapes">
+                <rect x="20" y="30" width="80" height="80" rx="8" fill="#e5c07b"/>
+                <circle cx="180" cy="70" r="45" fill="#c678dd"/>
+                <polygon points="240,120 280,40 320,120" fill="#e06c75"/>
+                <rect x="60" y="130" width="200" height="30" rx="4" fill="#61afef"/>
+                <ellipse cx="260" cy="160" rx="30" ry="20" fill="#98c379"/>
+              </g>
+              <g class="target-shape" data-target="text" style="display:none">
+                <text x="160" y="80" font-size="48" font-weight="bold" fill="#61afef" text-anchor="middle" font-family="sans-serif">SVG</text>
+                <text x="160" y="130" font-size="24" fill="#e5c07b" text-anchor="middle" font-family="sans-serif">Filter Tools</text>
+                <text x="160" y="165" font-size="14" fill="#98c379" text-anchor="middle" font-family="sans-serif">Experiment &amp; Learn</text>
+              </g>
+              <g class="target-shape" data-target="gradient" style="display:none">
+                <defs>
+                  <linearGradient id="target-lg" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#667eea"/>
+                    <stop offset="50%" stop-color="#764ba2"/>
+                    <stop offset="100%" stop-color="#f093fb"/>
+                  </linearGradient>
+                  <radialGradient id="target-rg">
+                    <stop offset="0%" stop-color="#FFD700"/>
+                    <stop offset="100%" stop-color="#FF4500"/>
+                  </radialGradient>
+                </defs>
+                <rect x="10" y="10" width="300" height="180" rx="12" fill="url(#target-lg)"/>
+                <circle cx="160" cy="100" r="50" fill="url(#target-rg)" opacity="0.8"/>
+              </g>
+            </g>
+          </svg>
+        </div>
+        <div class="target-selector">
+          <label>Target</label>
+          <div class="target-buttons">
+            <button class="target-btn active" data-target="shapes">Shapes</button>
+            <button class="target-btn" data-target="text">Text</button>
+            <button class="target-btn" data-target="gradient">Gradient</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls-panel">
+        <h2>Parameters</h2>
+
+        <div class="control-group">
+          <label>scale <input type="number" class="value-input" id="disp-scale-val" value="15" min="0" step="1"></label>
+          <input type="range" id="disp-scale" min="0" max="80" step="1" value="15">
+          <small class="param-hint">How far pixels can be displaced. 0 = no distortion, higher = more extreme warping.</small>
+        </div>
+
+        <div class="control-group">
+          <label for="disp-x-channel">xChannelSelector</label>
+          <select id="disp-x-channel">
+            <option value="R" selected>R (red)</option>
+            <option value="G">G (green)</option>
+            <option value="B">B (blue)</option>
+            <option value="A">A (alpha)</option>
+          </select>
+          <small class="param-hint">Which colour channel of the noise controls horizontal displacement.</small>
+        </div>
+
+        <div class="control-group">
+          <label for="disp-y-channel">yChannelSelector</label>
+          <select id="disp-y-channel">
+            <option value="R">R (red)</option>
+            <option value="G" selected>G (green)</option>
+            <option value="B">B (blue)</option>
+            <option value="A">A (alpha)</option>
+          </select>
+          <small class="param-hint">Which colour channel of the noise controls vertical displacement.</small>
+        </div>
+
+        <div class="control-group" style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border);">
+          <label style="color: var(--text-h3);">Noise Source (feTurbulence)</label>
+        </div>
+
+        <div class="control-group">
+          <label>baseFrequency <input type="number" class="value-input" id="disp-freq-val" value="0.03" min="0.005" step="0.005"></label>
+          <input type="range" id="disp-freq" min="0.005" max="0.15" step="0.005" value="0.03">
+          <small class="param-hint">Noise zoom level. Lower = larger features, higher = finer grain.</small>
+        </div>
+
+        <div class="control-group">
+          <label>numOctaves <input type="number" class="value-input" id="disp-octaves-val" value="2" min="1" step="1"></label>
+          <input type="range" id="disp-octaves" min="1" max="8" step="1" value="2">
+          <small class="param-hint">Layers of detail in the noise. More = finer detail but slower.</small>
+        </div>
+
+        <div class="control-group">
+          <label for="disp-noise-type">Noise type</label>
+          <select id="disp-noise-type">
+            <option value="turbulence">turbulence</option>
+            <option value="fractalNoise">fractalNoise</option>
+          </select>
+          <small class="param-hint">"turbulence" - sharp, swirly<br>"fractalNoise" - smoother, cloud-like</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="code-output">
+      <div class="code-output-header">
+        <h2>Generated Code</h2>
+        <button class="copy-btn" id="copy-code-btn">Copy</button>
+      </div>
+      <pre><code id="code-output" class="language-html"></code></pre>
+    </div>
+
+    <div class="related-links">
+      <h2>Related</h2>
+      <ul>
+        <li><a href="/svg/07-filters.html">Lesson 7: SVG Filters</a></li>
+        <li><a href="feTurbulence.html">feTurbulence Tool</a></li>
+        <li><a href="feMorphology.html">feMorphology Tool</a></li>
+        <li><a href="index.html">All Filter Tools</a></li>
+      </ul>
+    </div>
+  </main>
+
+  <script src="/scripts.js"></script>
+  <script src="shared.js"></script>
+  <script>
+    const tool = new FilterTool({
+      filterElement: 'feDisplacementMap',
+      buildFilter() {
+        const scale = this.val('disp-scale');
+        const xCh = this.val('disp-x-channel');
+        const yCh = this.val('disp-y-channel');
+        const freq = this.val('disp-freq');
+        const octaves = this.val('disp-octaves');
+        const noiseType = this.val('disp-noise-type');
+
+        let code = `<feTurbulence type="${noiseType}" baseFrequency="${freq}" numOctaves="${octaves}" result="noise"/>\n`;
+        code += `<feDisplacementMap in="SourceGraphic" in2="noise"\n  scale="${scale}" xChannelSelector="${xCh}" yChannelSelector="${yCh}"/>`;
+        return code;
+      }
+    });
+  </script>
+</body>
+</html>

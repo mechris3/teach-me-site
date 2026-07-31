@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>feImage Playground - SVG Filter Tool | Teach Me</title>
+  <meta name="description" content="Interactive feImage tool. Load an external image or inline SVG element as a filter input. Useful for texture overlays and displacement maps.">
+  <link rel="canonical" href="https://teachmeskills.dev/svg/tools/feImage.html">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://teachmeskills.dev/svg/tools/feImage.html">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "feImage Playground",
+  "description": "Interactive tool for SVG feImage. Load an image or SVG element as a filter input for texture overlays.",
+  "url": "https://teachmeskills.dev/svg/tools/feImage.html",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "Teach Me",
+    "url": "https://teachmeskills.dev/"
+  },
+  "about": {
+    "@type": "Thing",
+    "name": "SVG Filter Primitives",
+    "description": "SVG Utility filter primitive"
+  }
+}
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://teachmeskills.dev/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "SVG Course",
+      "item": "https://teachmeskills.dev/svg/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Filter Playground",
+      "item": "https://teachmeskills.dev/svg/tools/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 4,
+      "name": "feImage Playground - SVG Filter Tool",
+      "item": "https://teachmeskills.dev/svg/tools/feImage.html"
+    }
+  ]
+}
+  </script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/svg/tools/index.html">Filter Tools</a>
+      <a href="/svg/">SVG Course</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <main class="page-content" id="main-content">
+    <nav class="tool-nav" aria-label="Breadcrumb">
+      <a href="index.html">Filter Tools</a>
+      <span aria-hidden="true">›</span>
+      <span>feImage</span>
+    </nav>
+
+    <h1>&lt;feImage&gt; Playground</h1>
+    <p>Loads an external image or references an SVG element as a filter input. This demo generates a data URI from an inline SVG pattern to demonstrate feImage without external dependencies.</p>
+
+    <div class="tool-layout">
+      <div class="preview-panel">
+        <h2>Preview</h2>
+        <div class="preview-svg-wrap">
+          <svg id="preview-svg" viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg">
+            <defs id="filter-defs">
+              <filter id="tool-filter" x="0" y="0" width="100%" height="100%">
+                <feImage href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Crect width='40' height='40' fill='%2361afef' opacity='0.3'/%3E%3Ccircle cx='20' cy='20' r='8' fill='%23e5c07b'/%3E%3C/svg%3E" width="320" height="200" result="img"/>
+                <feBlend in="SourceGraphic" in2="img" mode="normal"/>
+              </filter>
+            </defs>
+            <rect width="320" height="200" fill="var(--demo-svg-bg)"/>
+            <g id="filtered-target" filter="url(#tool-filter)">
+              <g class="target-shape" data-target="shapes">
+                <rect x="20" y="30" width="80" height="80" rx="8" fill="#e5c07b"/>
+                <circle cx="180" cy="70" r="45" fill="#c678dd"/>
+                <polygon points="240,120 280,40 320,120" fill="#e06c75"/>
+                <rect x="60" y="130" width="200" height="30" rx="4" fill="#61afef"/>
+                <ellipse cx="260" cy="160" rx="30" ry="20" fill="#98c379"/>
+              </g>
+              <g class="target-shape" data-target="text" style="display:none">
+                <text x="160" y="80" font-size="48" font-weight="bold" fill="#61afef" text-anchor="middle" font-family="sans-serif">SVG</text>
+                <text x="160" y="130" font-size="24" fill="#e5c07b" text-anchor="middle" font-family="sans-serif">Filter Tools</text>
+                <text x="160" y="165" font-size="14" fill="#98c379" text-anchor="middle" font-family="sans-serif">Experiment &amp; Learn</text>
+              </g>
+              <g class="target-shape" data-target="gradient" style="display:none">
+                <defs>
+                  <linearGradient id="target-lg" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#667eea"/>
+                    <stop offset="50%" stop-color="#764ba2"/>
+                    <stop offset="100%" stop-color="#f093fb"/>
+                  </linearGradient>
+                  <radialGradient id="target-rg">
+                    <stop offset="0%" stop-color="#FFD700"/>
+                    <stop offset="100%" stop-color="#FF4500"/>
+                  </radialGradient>
+                </defs>
+                <rect x="10" y="10" width="300" height="180" rx="12" fill="url(#target-lg)"/>
+                <circle cx="160" cy="100" r="50" fill="url(#target-rg)" opacity="0.8"/>
+              </g>
+            </g>
+          </svg>
+        </div>
+        <div class="target-selector">
+          <label>Target</label>
+          <div class="target-buttons">
+            <button class="target-btn active" data-target="shapes">Shapes</button>
+            <button class="target-btn" data-target="text">Text</button>
+            <button class="target-btn" data-target="gradient">Gradient</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls-panel">
+        <h2>Parameters</h2>
+
+        <div class="control-group">
+          <label for="img-preset">Image source preset</label>
+          <select id="img-preset">
+            <option value="dots">Dots pattern</option>
+            <option value="stripes">Diagonal stripes</option>
+            <option value="grid">Grid</option>
+            <option value="gradient">Gradient overlay</option>
+          </select>
+          <small class="param-hint">The pattern loaded into the filter. In practice, use a URL to an external image.</small>
+        </div>
+
+        <div class="control-group">
+          <label for="img-blend">Blend mode with source</label>
+          <select id="img-blend">
+            <option value="normal">normal</option>
+            <option value="multiply">multiply</option>
+            <option value="screen">screen</option>
+            <option value="overlay">overlay</option>
+            <option value="darken">darken</option>
+            <option value="lighten">lighten</option>
+          </select>
+          <small class="param-hint">How the loaded image is composited with the source graphic.</small>
+        </div>
+
+        <div class="control-group">
+          <label for="img-color">Pattern colour</label>
+          <input type="color" id="img-color" value="#61afef">
+          <small class="param-hint">Primary colour used in the generated pattern.</small>
+        </div>
+
+        <div class="control-group">
+          <label>Pattern opacity <input type="number" class="value-input" id="img-opacity-val" value="0.3" min="0" step="0.05"></label>
+          <input type="range" id="img-opacity" min="0" max="1" step="0.05" value="0.3">
+          <small class="param-hint">Transparency of the pattern overlay.</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="code-output">
+      <div class="code-output-header">
+        <h2>Generated Code</h2>
+        <button class="copy-btn" id="copy-code-btn">Copy</button>
+      </div>
+      <pre><code id="code-output" class="language-html"></code></pre>
+    </div>
+
+    <div class="related-links">
+      <h2>Related</h2>
+      <ul>
+        <li><a href="/svg/07-filters.html">Lesson 7: SVG Filters</a></li>
+        <li><a href="feTile.html">feTile Tool</a></li>
+        <li><a href="feBlend.html">feBlend Tool</a></li>
+        <li><a href="index.html">All Filter Tools</a></li>
+      </ul>
+    </div>
+  </main>
+
+  <script src="/scripts.js"></script>
+  <script src="shared.js"></script>
+  <script>
+    function buildDataUri(preset, color, opacity) {
+      const hex = encodeURIComponent(color);
+      const patterns = {
+        dots: `<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'><rect width='40' height='40' fill='${hex}' opacity='${opacity}'/><circle cx='20' cy='20' r='8' fill='%23e5c07b'/></svg>`,
+        stripes: `<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'><rect width='40' height='40' fill='transparent'/><line x1='0' y1='40' x2='40' y2='0' stroke='${hex}' stroke-width='4' opacity='${opacity}'/></svg>`,
+        grid: `<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'><rect width='40' height='40' fill='transparent'/><rect x='0' y='0' width='40' height='1' fill='${hex}' opacity='${opacity}'/><rect x='0' y='0' width='1' height='40' fill='${hex}' opacity='${opacity}'/></svg>`,
+        gradient: `<svg xmlns='http://www.w3.org/2000/svg' width='320' height='200'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%25' stop-color='${hex}' stop-opacity='${opacity}'/><stop offset='100%25' stop-color='${hex}' stop-opacity='0'/></linearGradient></defs><rect width='320' height='200' fill='url(%23g)'/></svg>`
+      };
+      return `data:image/svg+xml,${patterns[preset]}`;
+    }
+
+    const tool = new FilterTool({
+      filterElement: 'feImage',
+      buildFilter() {
+        const preset = this.val('img-preset');
+        const blend = this.val('img-blend');
+        const color = this.val('img-color');
+        const opacity = this.val('img-opacity');
+
+        // Build the live filter with actual data URI
+        const uri = buildDataUri(preset, color, opacity);
+        this._feImageOverride = `<filter id="tool-filter" x="0" y="0" width="100%" height="100%"><feImage href="${uri}" width="320" height="200" result="img"/><feBlend in="SourceGraphic" in2="img" mode="${blend}"/></filter>`;
+
+        // Return readable code (not the data URI)
+        return `<feImage href="your-image.svg" result="img"/>\n<feBlend in="SourceGraphic" in2="img" mode="${blend}"/>`;
+      },
+      onControlChange() {
+        // Override the filter defs with the full data URI version
+        if (tool && tool._feImageOverride) {
+          const filterDefs = document.getElementById('filter-defs');
+          const svgNS = 'http://www.w3.org/2000/svg';
+          while (filterDefs.firstChild) filterDefs.removeChild(filterDefs.firstChild);
+          const tempSvg = document.createElementNS(svgNS, 'svg');
+          tempSvg.innerHTML = tool._feImageOverride;
+          const newFilter = tempSvg.firstElementChild;
+          filterDefs.appendChild(filterDefs.ownerDocument.importNode(newFilter, true));
+        }
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>feTurbulence Playground - SVG Filter Tool | Teach Me</title>
+  <meta name="description" content="Interactive feTurbulence tool. Generate Perlin noise and fractal turbulence patterns. Control base frequency, octaves, seed, and type in real time.">
+  <link rel="canonical" href="https://teachmeskills.dev/svg/tools/feTurbulence.html">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://teachmeskills.dev/svg/tools/feTurbulence.html">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "feTurbulence Playground",
+  "description": "Interactive tool for SVG feTurbulence. Generate Perlin noise and fractal turbulence patterns with real-time controls.",
+  "url": "https://teachmeskills.dev/svg/tools/feTurbulence.html",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "Teach Me",
+    "url": "https://teachmeskills.dev/"
+  },
+  "about": {
+    "@type": "Thing",
+    "name": "SVG Filter Primitives",
+    "description": "SVG Texture filter primitive"
+  }
+}
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://teachmeskills.dev/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "SVG Course",
+      "item": "https://teachmeskills.dev/svg/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Filter Playground",
+      "item": "https://teachmeskills.dev/svg/tools/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 4,
+      "name": "feTurbulence Playground - SVG Filter Tool",
+      "item": "https://teachmeskills.dev/svg/tools/feTurbulence.html"
+    }
+  ]
+}
+  </script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/svg/tools/index.html">Filter Tools</a>
+      <a href="/svg/">SVG Course</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <main class="page-content" id="main-content">
+    <nav class="tool-nav" aria-label="Breadcrumb">
+      <a href="index.html">Filter Tools</a>
+      <span aria-hidden="true">›</span>
+      <span>feTurbulence</span>
+    </nav>
+
+    <h1>&lt;feTurbulence&gt; Playground</h1>
+    <p>Generate procedural noise patterns using Perlin noise. Creates organic textures - clouds, marble, fire, water ripples - from pure maths.</p>
+
+    <div class="tool-layout">
+      <div class="preview-panel">
+        <h2>Preview</h2>
+        <div class="preview-svg-wrap">
+          <svg id="preview-svg" viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg">
+            <defs id="filter-defs">
+              <filter id="tool-filter">
+                <feTurbulence type="turbulence" baseFrequency="0.02" numOctaves="3" seed="0"/>
+              </filter>
+            </defs>
+            <rect width="320" height="200" filter="url(#tool-filter)" id="filtered-target"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="controls-panel">
+        <h2>Parameters</h2>
+
+        <div class="control-group">
+          <label for="turb-type">type</label>
+          <select id="turb-type">
+            <option value="turbulence">turbulence</option>
+            <option value="fractalNoise">fractalNoise</option>
+          </select>
+          <small class="param-hint">"turbulence" - sharp, swirly patterns<br>"fractalNoise" - smoother, cloud-like gradients</small>
+        </div>
+
+        <div class="control-group">
+          <label>baseFrequency</label>
+          <small class="param-hint">Controls the "zoom level" of the noise. Lower = larger features.</small>
+          <div class="control-sub">
+            <label>X <input type="number" class="value-input" id="turb-fx-val" value="0.02" min="0.001" step="0.001"></label>
+            <input type="range" id="turb-fx" min="0.001" max="0.2" step="0.001" value="0.02">
+          </div>
+          <div class="control-sub">
+            <label>Y <input type="number" class="value-input" id="turb-fy-val" value="0.02" min="0.001" step="0.001"></label>
+            <input type="range" id="turb-fy" min="0.001" max="0.2" step="0.001" value="0.02">
+          </div>
+          <div class="link-toggle">
+            <label for="turb-link">
+              <input type="checkbox" id="turb-link" checked>
+              Lock both axes to the same value
+            </label>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label>numOctaves <input type="number" class="value-input" id="turb-octaves-val" value="3" min="1" step="1"></label>
+          <input type="range" id="turb-octaves" min="1" max="10" step="1" value="3">
+          <small class="param-hint">Layers of detail. More octaves = finer detail but slower rendering.</small>
+        </div>
+
+        <div class="control-group">
+          <label>seed <input type="number" class="value-input" id="turb-seed-val" value="0" min="0" step="1"></label>
+          <input type="range" id="turb-seed" min="0" max="100" step="1" value="0">
+          <small class="param-hint">Random seed - same settings + same seed = same pattern. Change for variety.</small>
+        </div>
+
+        <div class="control-group">
+          <label for="turb-stitch">stitchTiles</label>
+          <div class="link-toggle">
+            <label for="turb-stitch">
+              <input type="checkbox" id="turb-stitch">
+              Enable seamless tiling at region boundaries
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="code-output">
+      <div class="code-output-header">
+        <h2>Generated Code</h2>
+        <button class="copy-btn" id="copy-code-btn">Copy</button>
+      </div>
+      <pre><code id="code-output" class="language-html"></code></pre>
+    </div>
+
+    <div class="related-links">
+      <h2>Related</h2>
+      <ul>
+        <li><a href="/svg/07-filters.html">Lesson 7: SVG Filters</a></li>
+        <li><a href="feDisplacementMap.html">feDisplacementMap Tool</a></li>
+        <li><a href="feDiffuseLighting.html">feDiffuseLighting Tool</a></li>
+        <li><a href="index.html">All Filter Tools</a></li>
+      </ul>
+    </div>
+  </main>
+
+  <script src="/scripts.js"></script>
+  <script src="shared.js"></script>
+  <script>
+    const linkCheckbox = document.getElementById('turb-link');
+    const turbFx = document.getElementById('turb-fx');
+    const turbFy = document.getElementById('turb-fy');
+
+    turbFx.addEventListener('input', () => {
+      if (linkCheckbox.checked) {
+        turbFy.value = turbFx.value;
+        document.getElementById('turb-fy-val').value = turbFx.value;
+      }
+    });
+
+    turbFy.addEventListener('input', () => {
+      if (linkCheckbox.checked) {
+        turbFx.value = turbFy.value;
+        document.getElementById('turb-fx-val').value = turbFy.value;
+      }
+    });
+
+    const tool = new FilterTool({
+      filterElement: 'feTurbulence',
+      buildFilter() {
+        const type = this.val('turb-type');
+        const fx = this.val('turb-fx');
+        const fy = this.val('turb-fy');
+        const octaves = this.val('turb-octaves');
+        const seed = this.val('turb-seed');
+        const stitch = this.val('turb-stitch');
+
+        const freq = fx === fy ? fx : `${fx} ${fy}`;
+        let attrs = `type="${type}" baseFrequency="${freq}" numOctaves="${octaves}" seed="${seed}"`;
+        if (stitch) attrs += ` stitchTiles="stitch"`;
+
+        return `<feTurbulence ${attrs}/>`;
+      }
+    });
+  </script>
+</body>
+</html>

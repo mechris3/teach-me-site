@@ -13,7 +13,7 @@
 - [Angular Signals, NgRx SignalStore & Signal Forms](https://teachmeskills.dev/angular-signals/): A 19-lesson course (7 available, more releasing regularly) on Angular Signals, NgRx SignalStore, and Signal Forms for experienced Angular developers.
 - [Kiro Mastery](https://teachmeskills.dev/kiro/): A 16-lesson course covering Kiro configuration, extension, and advanced features from steering to team setup.
 - [CSS Mastery](https://teachmeskills.dev/css/): A 24-lesson advanced course covering modern CSS from custom properties to scroll-driven animations.
-- [SVG - From Coordinates to Animation](https://teachmeskills.dev/svg/): A 13-lesson course covering SVG from first principles through to complex animation.
+- [SVG - From Coordinates to Animation](https://teachmeskills.dev/svg/): A 13-lesson course covering SVG from first principles through to complex animation, plus interactive filter tools.
 
 ## Angular Signals Lessons (7 of 19 available)
 
@@ -73,6 +73,27 @@
 
 - [SVG Elements and Attributes](https://teachmeskills.dev/svg/svg-elements-and-attributes.html): comprehensive reference of all SVG elements and their attributes
 - [SVG DOM Methods](https://teachmeskills.dev/svg/svg-dom-methods.html): JavaScript API reference for SVG manipulation
+
+## SVG Tools
+
+- [SVG Filter Playground](https://teachmeskills.dev/svg/tools/): interactive tools for all 17 SVG filter primitives, adjust parameters in real time, see instant results, copy generated code
+- [feGaussianBlur Playground](https://teachmeskills.dev/svg/tools/feGaussianBlur.html): Gaussian blur with independent x/y radius control and edge mode options
+- [feDropShadow Playground](https://teachmeskills.dev/svg/tools/feDropShadow.html): all-in-one drop shadow with offset, blur, colour, and opacity controls
+- [feColorMatrix Playground](https://teachmeskills.dev/svg/tools/feColorMatrix.html): hue rotation, saturation, luminance-to-alpha, and full 4x5 matrix transforms
+- [feComponentTransfer Playground](https://teachmeskills.dev/svg/tools/feComponentTransfer.html): per-channel transfer functions - identity, table, discrete, linear, and gamma
+- [feFlood Playground](https://teachmeskills.dev/svg/tools/feFlood.html): fill the filter region with a solid colour and adjustable opacity
+- [feComposite Playground](https://teachmeskills.dev/svg/tools/feComposite.html): Porter-Duff compositing - over, in, out, atop, xor, and arithmetic mode
+- [feBlend Playground](https://teachmeskills.dev/svg/tools/feBlend.html): blend modes - normal, multiply, screen, darken, lighten, and overlay
+- [feMerge Playground](https://teachmeskills.dev/svg/tools/feMerge.html): layer multiple filter inputs on top of each other in a specified order
+- [feOffset Playground](https://teachmeskills.dev/svg/tools/feOffset.html): shift pixels by dx/dy - the backbone of shadow pipelines
+- [feTile Playground](https://teachmeskills.dev/svg/tools/feTile.html): tile the input image to fill the entire filter region
+- [feDisplacementMap Playground](https://teachmeskills.dev/svg/tools/feDisplacementMap.html): distort pixels using another image's channels as a displacement map
+- [feMorphology Playground](https://teachmeskills.dev/svg/tools/feMorphology.html): erode or dilate shapes - shrink or expand edges by a given radius
+- [feConvolveMatrix Playground](https://teachmeskills.dev/svg/tools/feConvolveMatrix.html): custom convolution kernels - sharpen, emboss, edge detection, and more
+- [feDiffuseLighting Playground](https://teachmeskills.dev/svg/tools/feDiffuseLighting.html): matte surface lighting with distant, point, or spot light sources
+- [feSpecularLighting Playground](https://teachmeskills.dev/svg/tools/feSpecularLighting.html): shiny surface highlights with configurable specular exponent and light sources
+- [feTurbulence Playground](https://teachmeskills.dev/svg/tools/feTurbulence.html): generate Perlin noise or fractal turbulence patterns - clouds, fire, water
+- [feImage Playground](https://teachmeskills.dev/svg/tools/feImage.html): load an external image or SVG element as a filter input
 
 ## CSS Mastery Lessons
 
