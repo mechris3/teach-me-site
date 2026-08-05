@@ -22,7 +22,7 @@
   color: var(--code-text);
 }
 
-/* The .step class (lesson 14) */
+/* The .step class (lesson 15) */
 :root[data-theme="dark"] .step {
   background: var(--bg-surface);
   border-color: var(--border);

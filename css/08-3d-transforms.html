@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>3D Transforms - Lesson 8 | Teach Me</title>
+  <meta name="description" content="Learn CSS 3D transforms with interactive demos. Adjust perspective, rotate on X/Y/Z axes, build a flippable card and 3D cube - all with live sliders and instant visual feedback.">
+  <link rel="canonical" href="https://teachmeskills.dev/css/08-3d-transforms.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/css/08-3d-transforms.html">
+  <meta property="og:title" content="3D Transforms - Lesson 8 | Teach Me">
+  <meta property="og:description" content="Learn CSS 3D transforms with interactive demos. Adjust perspective, rotate on X/Y/Z axes, build a flippable card and 3D cube - all with live sliders and instant visual feedback.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="3D Transforms - Lesson 8 | Teach Me">
+  <meta name="twitter:description" content="Learn CSS 3D transforms with interactive demos. Adjust perspective, rotate on X/Y/Z axes, build a flippable card and 3D cube - all with live sliders and instant visual feedback.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
+  <script type="application/ld+json">
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://teachmeskills.dev/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "CSS Mastery",
+        "item": "https://teachmeskills.dev/css/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "3D Transforms - Lesson 8",
+        "item": "https://teachmeskills.dev/css/08-3d-transforms.html"
+      }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "3D Transforms - Lesson 8",
+    "description": "Learn CSS 3D transforms with interactive demos. Adjust perspective, rotate on X/Y/Z axes, build a flippable card and 3D cube - all with live sliders and instant visual feedback.",
+    "url": "https://teachmeskills.dev/css/08-3d-transforms.html",
+    "isAccessibleForFree": true,
+    "inLanguage": "en",
+    "learningResourceType": "lesson",
+    "position": 8,
+    "isPartOf": {
+      "@type": "Course",
+      "name": "CSS Mastery",
+      "url": "https://teachmeskills.dev/css/"
+    },
+    "provider": {
+      "@type": "Organization",
+      "name": "Teach Me Skills",
+      "url": "https://teachmeskills.dev/"
+    }
+  }
+]
+  </script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header">
+        <a href="index.html">CSS Course</a>
+      </div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-custom-properties-fundamentals.html">1. Custom Properties</a></li>
+        <li><a href="02-registered-custom-properties.html">2. @property</a></li>
+        <li><a href="03-css-value-functions.html">3. Value Functions</a></li>
+        <li><a href="04-custom-css-functions.html">4. Custom Functions</a></li>
+        <li><a href="05-advanced-attr.html">5. Advanced attr()</a></li>
+        <li><a href="06-transitions.html">6. Transitions</a></li>
+        <li><a href="07-animations.html">7. Animations</a></li>
+        <li class="current"><a href="08-3d-transforms.html">8. 3D Transforms</a></li>
+        <li><a href="09-flexbox.html">9. Flexbox</a></li>
+        <li><a href="10-grid.html">10. Grid</a></li>
+        <li><a href="11-container-queries.html">11. Container Queries</a></li>
+        <li><a href="12-cascade-layers.html">12. Cascade Layers</a></li>
+        <li><a href="13-css-nesting.html">13. CSS Nesting</a></li>
+        <li><a href="14-modern-selectors.html">14. Modern Selectors</a></li>
+        <li><a href="15-the-cascade.html">15. The Cascade</a></li>
+        <li><a href="16-logical-properties.html">16. Logical Properties</a></li>
+        <li><a href="17-view-transitions.html">17. View Transitions</a></li>
+        <li><a href="18-anchor-positioning.html">18. Anchor Positioning</a></li>
+        <li><a href="19-advanced-colour.html">19. Advanced Colour</a></li>
+        <li><a href="20-scope.html">20. @scope</a></li>
+        <li><a href="21-selectors-deep-dive.html">21. Selectors Deep-Dive</a></li>
+        <li><a href="22-theming-deep-dive.html">22. Theming Deep-Dive</a></li>
+        <li><a href="23-responsive-design-patterns.html">23. Responsive Patterns</a></li>
+        <li><a href="24-scroll-driven-animations.html">24. Scroll-Driven Animations</a></li>
+        <li><a href="25-capstone-product-landing-page.html">25. Capstone Project</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="css-anatomy.html">CSS Anatomy</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 8</p>
+  <h1>3D Transforms - The Z-Axis</h1>
+  <p>CSS gives you a full three-dimensional coordinate system. The X-axis runs left-right, the Y-axis runs top-bottom, and the <strong>Z-axis</strong> points straight out of the screen towards you. This lesson covers how to think in 3D, how the browser renders depth, and how to build real interfaces that use it.</p>
+
+  <h2>The Mental Model</h2>
+
+  <h3>What "3D" actually means in CSS</h3>
+  <p>In normal 2D CSS, every element is a flat rectangle in a flat plane. <code>transform: rotate(45deg)</code> spins it within that plane - like rotating a piece of paper on a desk. You never see the paper from the side because you're always looking straight down at it.</p>
+  <p>3D transforms break out of that flat plane. <code>rotateX(45deg)</code> tips the element towards you (like tilting the paper so you see it at an angle). <code>rotateY(45deg)</code> turns it like a revolving door. <code>translateZ(100px)</code> lifts it off the desk towards your face.</p>
+  <p>But here's the critical thing: <strong>the browser doesn't show 3D by default</strong>. Even if you apply <code>rotateY(45deg)</code>, the browser projects the result back onto a flat 2D image - like taking a photograph of a rotated card. You lose the depth cues. To get actual perspective (where closer things look bigger and parallel lines converge), you need to explicitly set up a 3D rendering context.</p>
+
+  <h3>The three layers of 3D in CSS</h3>
+  <div class="key-concept">
+    <strong>The 3D coordinate system</strong>
+    <p>Every element lives on a flat 2D plane by default. When you apply 3D transforms, you're lifting that plane off the screen (positive Z) or pushing it behind the screen (negative Z), or rotating it around axes so you see it from an angle.</p>
+    <p>But here's the catch: <strong>the browser only shows 3D if you tell a parent to create a 3D rendering context</strong>. Without that, transforms are projected flat - like looking at a photograph of a 3D object rather than the object itself.</p>
+    <p>Two properties create that context:</p>
+    <ul style="margin-top: 0.5rem;">
+      <li><strong><code>perspective</code></strong> - the viewer's distance from the z=0 plane. Low values (100-300px) mean the viewer is close, producing dramatic foreshortening. High values (1000px+) mean the viewer is far away, producing a flatter, more subtle effect.</li>
+      <li><strong><code>transform-style: preserve-3d</code></strong> - tells the browser that children of this element actually exist in 3D space, rather than being flattened into a 2D image before rendering. Without it, even if children have different <code>translateZ</code> values, they'll be painted onto a single flat plane.</li>
+    </ul>
+    <p>With both in place, the transform functions (<code>rotateX</code>, <code>rotateY</code>, <code>translateZ</code>, etc.) produce real visual depth - closer things look bigger, rotated surfaces converge toward a vanishing point, and elements at different Z positions visually overlap correctly.</p>
+  </div>
+
+  <h3>The coordinate system</h3>
+  <p>CSS uses a left-handed coordinate system anchored to the element:</p>
+  <ul>
+    <li><strong>X-axis</strong> - positive goes right</li>
+    <li><strong>Y-axis</strong> - positive goes <em>down</em> (not up, like in maths - this matches CSS where top=0)</li>
+    <li><strong>Z-axis</strong> - positive comes <em>towards the viewer</em> (out of the screen)</li>
+  </ul>
+  <p>When you rotate around an axis, the element spins like it's on a skewer aligned with that axis. <code>rotateX</code> = skewer horizontal through the element, it tips forward/backward. <code>rotateY</code> = skewer vertical through the element, it turns left/right like a door. <code>rotateZ</code> = skewer pointing at you, it spins like a clock hand (same as 2D <code>rotate()</code>).</p>
+
+  <h3>What you need to set up</h3>
+  <p>Two properties create the 3D rendering context:</p>
+  <ul>
+    <li><code>perspective</code> on a parent - establishes viewer distance (the "camera")</li>
+    <li><code>transform-style: preserve-3d</code> on a container - lets children actually exist at different Z positions rather than being painted flat</li>
+  </ul>
+  <p>Without <code>perspective</code>, there are no depth cues - a rotated element looks the same width whether it's near or far. Without <code>preserve-3d</code>, children at different Z positions get collapsed back onto one plane before rendering.</p>
+
+  <h2>Perspective</h2>
+  <p>Perspective defines the distance between the viewer and the z=0 plane. It controls how much "convergence" you see - how strongly parallel lines appear to meet at a vanishing point.</p>
+  <ul>
+    <li><strong>Low values (50-300px)</strong> - extreme foreshortening, like holding something very close to your eye. Dramatic but can look distorted.</li>
+    <li><strong>Medium values (400-800px)</strong> - natural-looking depth. Good for most UI.</li>
+    <li><strong>High values (1000px+)</strong> - very subtle perspective. Close to an orthographic (flat) projection.</li>
+  </ul>
+
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code class="language-css">/* Applied to the PARENT that contains 3D-transformed children */
+.scene {
+  perspective: 600px;
+}
+
+/* OR applied per-element via the transform function */
+.element {
+  transform: perspective(600px) rotateY(45deg);
+}</code></pre></div>
+
+  <div class="key-concept">
+    <strong>perspective property vs perspective() function</strong>
+    <p><code>perspective</code> on a parent creates a <em>shared</em> vanishing point for all children - they all converge to the same point. The <code>perspective()</code> function inside <code>transform</code> gives each element its <em>own</em> vanishing point. For most UI work, you want the shared version on a parent.</p>
+  </div>
+
+  <h3>Interactive: Perspective Distance</h3>
+
+  <div class="demo">
+    <div id="persp-demo-scene" style="perspective:600px; width:100%; display:flex; justify-content:center; min-height:180px; align-items:center; overflow:hidden; border-radius:8px; background:var(--code-block-bg,#282c34); padding:2rem;">
+      <div style="width:120px; height:120px; background:var(--accent,#61afef); border-radius:8px; transform:rotateY(45deg); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:600; font-size:0.85rem;">rotateY(45deg)</div>
+    </div>
+    <div class="slider-controls">
+      <div class="slider-control">
+        <span class="slider-control__label">perspective</span>
+        <span class="slider-control__value"><strong id="persp-val">600</strong>px</span>
+        <input type="range" id="persp-range" min="0" max="100" value="66">
+      </div>
+    </div>
+    <pre id="persp-output" class="demo-output">.scene {
+  perspective: 600px;
+}
+.box {
+  transform: rotateY(45deg);
+}</pre>
+    <p class="demo-caption">The rotation stays at 45deg throughout. What changes is how dramatically you <em>perceive</em> the depth. Low values exaggerate the near/far difference; high values flatten it.</p>
+  </div>
+
+  <h3>perspective-origin</h3>
+  <p>By default the vanishing point is at the centre of the parent (50% 50%). <code>perspective-origin</code> lets you shift where that vanishing point sits - where parallel lines converge to. Think of it as moving the viewer's eye position left/right and up/down without changing their distance.</p>
+  <p>This is most visible when you have multiple children in the same perspective container - they all converge towards the same point, and moving that point changes how each child appears relative to the others.</p>
+
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-css">.scene {
+  perspective: 500px;
+  perspective-origin: 25% 75%; /* vanishing point shifted left and down */
+}</code></pre>
+  </div>
+
+  <h3>Interactive: Perspective Origin</h3>
+
+  <div class="demo">
+    <div style="display:grid; grid-template-columns:auto 1fr; grid-template-rows:1fr auto; gap:0.5rem; align-items:stretch;">
+      <div style="grid-row:1; grid-column:1; display:flex; align-items:center; justify-content:center;">
+        <div class="slider-control slider-control--vertical" style="width:160px;">
+          <span class="slider-control__label">y</span>
+          <span class="slider-control__value"><strong id="po-y-val">50</strong>%</span>
+          <input type="range" id="po-y" min="0" max="100" value="50">
+        </div>
+      </div>
+      <div id="po-scene" style="grid-row:1; grid-column:2; perspective:500px; perspective-origin:50% 50%; position:relative; display:grid; grid-template-columns:repeat(4,1fr); gap:0.75rem; padding:1.5rem; min-height:200px; border-radius:8px; background:var(--code-block-bg,#282c34);">
+        <div id="po-crosshair" style="position:absolute; left:50%; top:50%; width:0; height:0; pointer-events:none; z-index:10;">
+          <div style="position:absolute; left:-12px; top:0; width:24px; height:1px; background:var(--accent,#61afef); opacity:0.7;"></div>
+          <div style="position:absolute; top:-12px; left:0; width:1px; height:24px; background:var(--accent,#61afef); opacity:0.7;"></div>
+          <div style="position:absolute; left:-4px; top:-4px; width:8px; height:8px; border-radius:50%; border:1.5px solid var(--accent,#61afef); opacity:0.9;"></div>
+        </div>
+        <div style="height:55px;background:#e06c75;border-radius:6px;transform:rotateY(40deg);"></div>
+        <div style="height:55px;background:#98c379;border-radius:6px;transform:rotateY(40deg);"></div>
+        <div style="height:55px;background:#61afef;border-radius:6px;transform:rotateY(40deg);"></div>
+        <div style="height:55px;background:#e5c07b;border-radius:6px;transform:rotateY(40deg);"></div>
+        <div style="height:55px;background:#c678dd;border-radius:6px;transform:rotateY(40deg);"></div>
+        <div style="height:55px;background:#56b6c2;border-radius:6px;transform:rotateY(40deg);"></div>
+        <div style="height:55px;background:#d19a66;border-radius:6px;transform:rotateY(40deg);"></div>
+        <div style="height:55px;background:#be5046;border-radius:6px;transform:rotateY(40deg);"></div>
+        <div style="height:55px;background:#e06c75;border-radius:6px;transform:rotateY(40deg);opacity:0.6;"></div>
+        <div style="height:55px;background:#98c379;border-radius:6px;transform:rotateY(40deg);opacity:0.6;"></div>
+        <div style="height:55px;background:#61afef;border-radius:6px;transform:rotateY(40deg);opacity:0.6;"></div>
+        <div style="height:55px;background:#e5c07b;border-radius:6px;transform:rotateY(40deg);opacity:0.6;"></div>
+      </div>
+      <div style="grid-row:2; grid-column:2;">
+        <div class="slider-control">
+          <span class="slider-control__label">x</span>
+          <span class="slider-control__value"><strong id="po-x-val">50</strong>%</span>
+          <input type="range" id="po-x" min="0" max="100" value="50">
+        </div>
+      </div>
+    </div>
+    <p class="demo-caption">The crosshair marks the vanishing point. All boxes converge toward it. The spatial layout of the sliders matches what they control.</p>
+    <pre id="po-output" class="demo-output">.scene {
+  perspective: 500px;
+  perspective-origin: 50% 50%;
+}
+.box {
+  transform: rotateY(40deg);
+}</pre>
+  </div>
+
+  <h2>transform-style: preserve-3d</h2>
+
+  <p>By default, every element <strong>flattens</strong> its children back to 2D after applying its own transform. This is <code>transform-style: flat</code> (the default). To let children actually occupy different positions along the Z-axis, the parent needs:</p>
+
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code class="language-css">.container {
+  transform-style: preserve-3d;
+}</code></pre></div>
+
+  <h3>Interactive: preserve-3d vs flat</h3>
+
+  <div class="demo">
+    <div class="demo-controls" style="margin-top:0; margin-bottom:1rem;">
+      <label><input type="checkbox" id="preserve3d-toggle" checked> transform-style: preserve-3d</label>
+    </div>
+    <div id="preserve3d-scene" style="perspective:600px; width:100%; display:flex; justify-content:center;">
+      <div id="preserve3d-parent" style="width:200px; height:200px; position:relative; transform-style:preserve-3d; transform:rotateX(-15deg) rotateY(25deg);">
+        <div style="position:absolute;width:200px;height:200px;background:rgba(97,175,239,0.7);border-radius:8px;transform:translateZ(0px);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;">Z: 0</div>
+        <div style="position:absolute;width:200px;height:200px;background:rgba(152,195,121,0.7);border-radius:8px;transform:translateZ(60px);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;">Z: 60px</div>
+        <div style="position:absolute;width:200px;height:200px;background:rgba(224,108,117,0.7);border-radius:8px;transform:translateZ(120px);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;">Z: 120px</div>
+      </div>
+    </div>
+    <pre id="p3d-output" class="demo-output">.container {
+  transform-style: preserve-3d;
+  transform: rotateX(-15deg) rotateY(25deg);
+}
+.layer-1 { transform: translateZ(0); }
+.layer-2 { transform: translateZ(60px); }
+.layer-3 { transform: translateZ(120px); }</pre>
+    <p class="demo-caption">Toggle to see the difference. With <code>flat</code>, all three planes collapse onto each other. With <code>preserve-3d</code>, they stack in actual depth.</p>
+  </div>
+
+  <div class="warning">
+    <strong>Flattening gotcha</strong>
+    <p>Several common properties force flattening even if you set <code>preserve-3d</code>: <code>overflow: hidden</code>, <code>clip-path</code>, <code>opacity</code> (values other than 1), <code>filter</code>, and <code>mix-blend-mode</code>. If your 3D looks broken, check for these on ancestor elements.</p>
+  </div>
+
+  <div class="ad-inline" aria-label="Advertisement">Ad</div>
+
+  <h2>The 3D Transform Functions</h2>
+  <h3>Interactive: Rotation Playground</h3>
+  <p>Each slider is oriented to match the axis it controls: X across the top, Y down the side, Z diagonally.</p>
+
+  <div class="demo">
+    <div style="position:relative; padding-top:70px; padding-left:70px;">
+      <div class="slider-control" style="position:absolute; top:0; left:33%; right:0;">
+        <span class="slider-control__label">X</span>
+        <span class="slider-control__value"><strong id="rx-val">0</strong>deg</span>
+        <input type="range" id="rx" min="-180" max="180" value="0">
+      </div>
+      <div class="slider-control" style="position:absolute; bottom:0; left:60px; width:67%; transform:rotate(-90deg); transform-origin:bottom left;">
+        <span class="slider-control__label">Y</span>
+        <span class="slider-control__value"><strong id="ry-val">0</strong>deg</span>
+        <input type="range" id="ry" min="-180" max="180" value="0">
+      </div>
+      <div id="rot-scene" style="perspective:600px; display:flex; align-items:center; justify-content:center; aspect-ratio:1; border-radius:8px; background:var(--code-block-bg,#282c34); border:1px solid var(--border,#3e4451); padding:1.5rem; position:relative; overflow:visible;">
+        <div class="slider-control" style="position:absolute; top:2%; left:-8%; width:38%; transform:rotate(-45deg); z-index:20;">
+          <span class="slider-control__label">Z</span>
+          <span class="slider-control__value"><strong id="rz-val">0</strong>deg</span>
+          <input type="range" id="rz" min="-180" max="180" value="0">
+        </div>
+        <div id="axis-x" style="position:absolute; left:10%; right:10%; top:50%; height:1.5px; background:#e06c75; opacity:0; transition:opacity 0.2s; pointer-events:none;"></div>
+        <div id="axis-y" style="position:absolute; top:10%; bottom:10%; left:50%; width:1.5px; background:#98c379; opacity:0; transition:opacity 0.2s; pointer-events:none;"></div>
+        <div id="axis-z" style="position:absolute; left:50%; top:50%; width:1.5px; height:70%; background:#e5c07b; opacity:0; transition:opacity 0.2s; pointer-events:none; transform:translate(-50%,-50%) rotate(-45deg);"></div>
+        <div id="rotate-target" style="width:130px; height:130px; background:linear-gradient(135deg, #61afef, #c678dd); border-radius:12px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:600; font-size:0.8rem; position:relative; z-index:1;">X:0 Y:0 Z:0</div>
+      </div>
+    </div>
+    <pre id="rot-output" class="demo-output">.box {
+  transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+}</pre>
+    <p class="demo-caption">X (top) tips forward/back. Y (side) spins like a door. Z rotates like a clock hand.</p>
+  </div>
+
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code class="language-css">/* Rotate around the X-axis (tips forward/backward) */
+transform: rotateX(45deg);
+
+/* Rotate around the Y-axis (spins like a revolving door) */
+transform: rotateY(45deg);
+
+/* Rotate around the Z-axis (same as 2D rotate) */
+transform: rotateZ(45deg);
+
+/* Arbitrary axis */
+transform: rotate3d(1, 1, 0, 45deg);</code></pre></div>
+
+  <h3>Interactive: TranslateZ</h3>
+  <p>Move an element along the Z-axis. Positive values bring it closer (larger), negative values push it away (smaller).</p>
+
+  <div class="demo">
+    <div style="perspective:600px; width:100%; max-width:350px; margin:0 auto; aspect-ratio:1; display:flex; justify-content:center; align-items:center; position:relative; border-radius:8px; background:var(--code-block-bg,#282c34); overflow:hidden;">
+      <svg style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:0;" preserveAspectRatio="none">
+        <line x1="50%" y1="50%" x2="0" y2="0" stroke="var(--border,#3e4451)" stroke-width="1" stroke-dasharray="4"/>
+        <line x1="50%" y1="50%" x2="100%" y2="0" stroke="var(--border,#3e4451)" stroke-width="1" stroke-dasharray="4"/>
+        <line x1="50%" y1="50%" x2="0" y2="100%" stroke="var(--border,#3e4451)" stroke-width="1" stroke-dasharray="4"/>
+        <line x1="50%" y1="50%" x2="100%" y2="100%" stroke="var(--border,#3e4451)" stroke-width="1" stroke-dasharray="4"/>
+        <circle cx="50%" cy="50%" r="3" fill="var(--muted,#8b92a0)" opacity="0.4"/>
+      </svg>
+      <div id="tz-target" style="width:120px; height:120px; background:var(--accent,#61afef); border-radius:8px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:600; font-size:0.85rem; position:relative; z-index:1;">Z: 0px</div>
+    </div>
+    <div class="slider-controls">
+      <div class="slider-control">
+        <span class="slider-control__label">translateZ</span>
+        <span class="slider-control__value"><strong id="tz-val">0</strong>px</span>
+        <input type="range" id="tz" min="-300" max="300" value="0">
+      </div>
+    </div>
+    <pre id="tz-output" class="demo-output">.scene { perspective: 600px; }
+.box  { transform: translateZ(0px); }</pre>
+    <p class="demo-caption">The dashed lines converge to the vanishing point. The element isn't scaling - it's moving along the Z-axis. Closer = appears larger. Further = appears smaller.</p>
+  </div>
+
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code class="language-css">/* Move along the Z-axis - towards (+) or away from (-) the viewer */
+transform: translateZ(50px);
+
+/* Combined X, Y, Z */
+transform: translate3d(10px, 20px, 50px);</code></pre></div>
+
+  <h3>Interactive: Transform Origin in 3D</h3>
+  <p>Every transform (rotate, scale, skew) happens around a <strong>pivot point</strong> - the fixed point that doesn't move while everything else rotates or scales around it. By default that pivot is the centre of the element (50% 50%).</p>
+  <p>In 2D, <code>transform-origin</code> takes two values (X and Y). In 3D, it takes a third: the Z offset of the pivot. This is where it gets interesting - you can place the pivot point <em>behind</em> or <em>in front of</em> the element, turning a simple rotation into an orbiting motion.</p>
+
+  <div class="key-concept">
+    <strong>What transform-origin does</strong>
+    <p>Every rotation needs a fixed point - the point that stays still while everything else moves around it. By default that's the centre of the element. <code>transform-origin</code> lets you move that fixed point anywhere:</p>
+    <ul style="margin-top:0.5rem;">
+      <li><strong>50% 50%</strong> (default) - rotates in place, like spinning a basketball on your finger</li>
+      <li><strong>0% 50%</strong> - fixed point on the left edge, so it swings open like a door hinge</li>
+      <li><strong>50% 50% -100px</strong> - fixed point is 100px behind the element. Now it swings around that distant point - the element moves through space rather than spinning in place</li>
+    </ul>
+    <p>The first two values (X%, Y%) move the pivot across the element's face. The third value (Z px) pushes the pivot towards or away from the viewer. A pivot behind the element turns rotation into sweeping motion through space.</p>
+  </div>
+
+  <div class="demo">
+    <div style="perspective:600px; max-width:350px; margin:0 auto; aspect-ratio:1; display:flex; align-items:center; justify-content:center; border-radius:8px; background:var(--code-block-bg,#282c34); border:1px solid var(--border,#3e4451); position:relative; overflow:hidden;">
+      <div id="to-crosshair" style="position:absolute; left:50%; top:50%; width:0; height:0; pointer-events:none; z-index:10; transition:left 0.1s, top 0.1s;">
+        <div style="position:absolute; left:-10px; top:0; width:20px; height:1.5px; background:#e06c75; opacity:0.8;"></div>
+        <div style="position:absolute; top:-10px; left:0; width:1.5px; height:20px; background:#e06c75; opacity:0.8;"></div>
+        <div style="position:absolute; left:-3px; top:-3px; width:6px; height:6px; border-radius:50%; background:#e06c75; opacity:0.9;"></div>
+      </div>
+      <div id="to-target" style="width:120px; height:120px; background:#e5c07b; border-radius:8px; transform-origin:50% 50% 0px; transform:rotateY(45deg); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:600; font-size:0.75rem; text-align:center;">origin:<br>50% 50% 0px</div>
+    </div>
+    <div class="slider-controls--stacked" style="margin-top:1rem; grid-template-columns:1fr 1fr;">
+      <div class="slider-control">
+        <span class="slider-control__label">origin-x</span>
+        <span class="slider-control__value"><strong id="to-x-val">50</strong>%</span>
+        <input type="range" id="to-x" min="0" max="100" value="50">
+      </div>
+      <div class="slider-control">
+        <span class="slider-control__label">rotateX</span>
+        <span class="slider-control__value"><strong id="to-rx-val">0</strong>deg</span>
+        <input type="range" id="to-rx" min="-180" max="180" value="0">
+      </div>
+      <div class="slider-control">
+        <span class="slider-control__label">origin-y</span>
+        <span class="slider-control__value"><strong id="to-y-val">50</strong>%</span>
+        <input type="range" id="to-y" min="0" max="100" value="50">
+      </div>
+      <div class="slider-control">
+        <span class="slider-control__label">rotateY</span>
+        <span class="slider-control__value"><strong id="to-ry-val">45</strong>deg</span>
+        <input type="range" id="to-ry" min="-180" max="180" value="45">
+      </div>
+      <div class="slider-control">
+        <span class="slider-control__label">origin-z</span>
+        <span class="slider-control__value"><strong id="to-z-val">0</strong>px</span>
+        <input type="range" id="to-z" min="-150" max="150" value="0">
+      </div>
+      <div class="slider-control">
+        <span class="slider-control__label">rotateZ</span>
+        <span class="slider-control__value"><strong id="to-rz-val">0</strong>deg</span>
+        <input type="range" id="to-rz" min="-180" max="180" value="0">
+      </div>
+    </div>
+    <pre id="to-output" class="demo-output">.box {
+  transform-origin: 50% 50% 0px;
+  transform: rotateX(0deg) rotateY(45deg) rotateZ(0deg);
+}</pre>
+    <p class="demo-caption">Try: set origin-x to 0% (left edge hinge). Or set origin-z to -100px then rotateY - it orbits a distant point.</p>
+  </div>
+
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code class="language-css">/* The third value is the Z offset of the transform origin */
+transform-origin: 50% 50% -100px;
+
+/* Rotating now orbits around that distant pivot */
+transform: rotateY(90deg);</code></pre></div>
+
+  <h2>backface-visibility</h2>
+
+  <p>When you rotate an element more than 90 degrees, you see its back. By default CSS shows a mirror image of the front. To hide the back:</p>
+
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code class="language-css">.card-face {
+  backface-visibility: hidden;
+}</code></pre></div>
+
+  <h3>Interactive: backface-visibility</h3>
+
+  <div class="demo">
+    <div class="slider-controls" style="margin-top:0; margin-bottom:1rem;">
+      <div class="slider-control">
+        <span class="slider-control__label">rotateY</span>
+        <span class="slider-control__value"><strong id="bf-angle-val">0</strong>deg</span>
+        <input type="range" id="bf-angle" min="0" max="360" value="0">
+      </div>
+      <label style="font-size:0.85rem; color:var(--muted); display:flex; align-items:center; gap:0.4rem;"><input type="checkbox" id="bf-toggle"> backface-visibility: hidden</label>
+    </div>
+    <div style="perspective:800px; width:100%; display:flex; justify-content:center;">
+      <div id="bf-target" style="width:180px; height:120px; background:var(--accent,#61afef); border-radius:8px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:600; transform:rotateY(0deg);">FRONT</div>
+    </div>
+    <pre id="bf-output" class="demo-output">.box {
+  transform: rotateY(0deg);
+  backface-visibility: visible;
+}</pre>
+    <p class="demo-caption">Rotate past 90deg to see the back. Toggle the checkbox - with <code>hidden</code>, the element disappears when facing away.</p>
+  </div>
+
+  <h2>Pattern: Card Flip</h2>
+
+  <p>The classic use case for 3D transforms. Click or hover the card below:</p>
+
+  <div class="demo">
+    <div id="flip-scene" style="perspective:800px; width:250px; height:160px; margin:1rem auto;">
+      <div id="flip-card" style="width:100%; height:100%; position:relative; transform-style:preserve-3d; transition:transform 0.6s ease;">
+        <div style="position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:1.1rem;background:var(--accent,#61afef);color:#fff;">Front</div>
+        <div style="position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:1.1rem;background:#c678dd;color:#fff;transform:rotateY(180deg);">Back</div>
+      </div>
+    </div>
+    <div class="demo-controls">
+      <button onclick="document.getElementById('flip-card').style.transform=document.getElementById('flip-card').style.transform==='rotateY(180deg)'?'':'rotateY(180deg)'" style="padding:0.4rem 1rem;border-radius:4px;border:1px solid var(--border);background:var(--bg-surface);color:var(--text);cursor:pointer;">Click to flip</button>
+      <label style="font-size:0.85rem;color:var(--muted);">(or hover)</label>
+    </div>
+    <p class="demo-caption">Both faces use <code>backface-visibility: hidden</code>. The back face is pre-rotated 180deg.</p>
+  </div>
+
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code class="language-markup">&lt;div class="flip-scene"&gt;
+  &lt;div class="flip-card"&gt;
+    &lt;div class="flip-card__face flip-card__face--front"&gt;Front&lt;/div&gt;
+    &lt;div class="flip-card__face flip-card__face--back"&gt;Back&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre></div>
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code class="language-css">/* 1. Perspective - establishes viewer distance */
+.flip-scene {
+  perspective: 800px;
+  width: 250px;
+  height: 160px;
+}
+
+/* 2. preserve-3d - children exist in real 3D space */
+.flip-card {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.6s ease;
+}
+
+/* 3. Trigger the flip */
+.flip-scene:hover .flip-card {
+  transform: rotateY(180deg);
+}
+
+/* 4. Each face: stacked, back hidden */
+.flip-card__face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+}
+
+/* 5. Back face pre-rotated 180deg */
+.flip-card__face--back {
+  transform: rotateY(180deg);
+}</code></pre></div>
+
+  <h2>Pattern: CSS Cube</h2>
+
+  <p>Six faces, each rotated into position then pushed out by half the cube size via <code>translateZ</code>. Drag the sliders to inspect it from any angle:</p>
+
+  <div class="demo">
+    <div id="cube-scene" style="perspective:600px; width:220px; height:220px; margin:0 auto;">
+      <div id="cube" style="width:200px; height:200px; position:relative; transform-style:preserve-3d; transform:rotateX(-20deg) rotateY(30deg); transition:transform 0.15s; margin:10px;">
+        <div style="position:absolute;width:200px;height:200px;border:2px solid rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:600;color:#fff;background:rgba(97,175,239,0.8);transform:translateZ(100px);">Front</div>
+        <div style="position:absolute;width:200px;height:200px;border:2px solid rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:600;color:#fff;background:rgba(198,120,221,0.8);transform:rotateY(180deg) translateZ(100px);">Back</div>
+        <div style="position:absolute;width:200px;height:200px;border:2px solid rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:600;color:#fff;background:rgba(152,195,121,0.8);transform:rotateY(90deg) translateZ(100px);">Right</div>
+        <div style="position:absolute;width:200px;height:200px;border:2px solid rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:600;color:#fff;background:rgba(229,192,123,0.8);transform:rotateY(-90deg) translateZ(100px);">Left</div>
+        <div style="position:absolute;width:200px;height:200px;border:2px solid rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:600;color:#fff;background:rgba(224,108,117,0.8);transform:rotateX(90deg) translateZ(100px);">Top</div>
+        <div style="position:absolute;width:200px;height:200px;border:2px solid rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:600;color:#fff;background:rgba(86,182,194,0.8);transform:rotateX(-90deg) translateZ(100px);">Bottom</div>
+      </div>
+    </div>
+    <div class="slider-controls--stacked" style="margin-top:2rem; grid-template-columns:1fr;">
+      <div class="slider-control">
+        <span class="slider-control__label">X</span>
+        <span class="slider-control__value"><strong id="cube-x-val">-20</strong>deg</span>
+        <input type="range" id="cube-x" min="-180" max="180" value="-20">
+      </div>
+      <div class="slider-control">
+        <span class="slider-control__label">Y</span>
+        <span class="slider-control__value"><strong id="cube-y-val">30</strong>deg</span>
+        <input type="range" id="cube-y" min="-180" max="180" value="30">
+      </div>
+      <div class="slider-control">
+        <span class="slider-control__label">Z</span>
+        <span class="slider-control__value"><strong id="cube-z-val">0</strong>deg</span>
+        <input type="range" id="cube-z" min="-180" max="180" value="0">
+      </div>
+    </div>
+    <pre id="cube-output" class="demo-output">.cube {
+  transform: rotateX(-20deg) rotateY(30deg) rotateZ(0deg);
+}</pre>
+    <p class="demo-caption">A full 3D cube built with 6 <code>&lt;div&gt;</code> elements and pure CSS transforms.</p>
+  </div>
+
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code class="language-markup">&lt;div class="scene"&gt;
+  &lt;div class="cube"&gt;
+    &lt;div class="face face--front"&gt;Front&lt;/div&gt;
+    &lt;div class="face face--back"&gt;Back&lt;/div&gt;
+    &lt;div class="face face--right"&gt;Right&lt;/div&gt;
+    &lt;div class="face face--left"&gt;Left&lt;/div&gt;
+    &lt;div class="face face--top"&gt;Top&lt;/div&gt;
+    &lt;div class="face face--bottom"&gt;Bottom&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre></div>
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code class="language-css">/* 1. Perspective on the scene */
+.scene {
+  perspective: 600px;
+}
+
+/* 2. preserve-3d on the cube - faces exist in real 3D */
+.cube {
+  width: 200px;
+  height: 200px;
+  position: relative;
+  transform-style: preserve-3d;
+}
+
+/* 3. Each face: absolute, same size as cube */
+.face {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+}
+
+/* 4. Position each face: rotate into place, then push out */
+.face--front  { transform: translateZ(100px); }
+.face--back   { transform: rotateY(180deg) translateZ(100px); }
+.face--right  { transform: rotateY(90deg) translateZ(100px); }
+.face--left   { transform: rotateY(-90deg) translateZ(100px); }
+.face--top    { transform: rotateX(90deg) translateZ(100px); }
+.face--bottom { transform: rotateX(-90deg) translateZ(100px); }</code></pre></div>
+
+  <div class="key-concept">
+    <strong>Why translateZ comes after rotate</strong>
+    <p>Transform functions are applied right-to-left (each one transforms the element's local coordinate system). When you <code>rotateY(90deg)</code>, the local Z-axis now points right in world space. Then <code>translateZ(100px)</code> pushes along that new local Z - to the right. That's how faces end up in their correct positions.</p>
+  </div>
+
+  <h2>Pattern: Layered Depth (Parallax)</h2>
+
+  <p>Place elements at different Z positions inside a perspective container. Elements further back (negative Z) appear smaller due to perspective - just like distant objects in real life.</p>
+
+  <div class="demo">
+    <div id="parallax-scene" style="perspective:400px; height:250px; position:relative; border-radius:8px; background:var(--code-block-bg,#282c34); overflow:hidden; transform-style:preserve-3d;">
+      <div style="position:absolute;inset:20px;display:flex;align-items:flex-start;justify-content:flex-start;padding:0.75rem;font-weight:600;font-size:0.85rem;color:#98c379;border-radius:8px;border:2px dashed rgba(152,195,121,0.4);background:rgba(152,195,121,0.1);transform:translateZ(-200px);">Back (Z: -200px)</div>
+      <div style="position:absolute;inset:20px;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:0.85rem;color:#61afef;border-radius:8px;border:2px dashed rgba(97,175,239,0.4);background:rgba(97,175,239,0.1);transform:translateZ(-100px);">Mid (Z: -100px)</div>
+      <div style="position:absolute;inset:20px;display:flex;align-items:flex-end;justify-content:flex-end;padding:0.75rem;font-weight:600;font-size:0.85rem;color:#e06c75;border-radius:8px;border:2px solid rgba(224,108,117,0.5);background:rgba(224,108,117,0.08);transform:translateZ(0);">Front (Z: 0)</div>
+    </div>
+    <div class="slider-controls" style="margin-top:0.75rem;">
+      <div class="slider-control" style="flex:1;">
+        <span class="slider-control__label">perspective</span>
+        <span class="slider-control__value"><strong id="para-p-val">400</strong>px</span>
+        <input type="range" id="para-p" min="0" max="100" value="55">
+      </div>
+    </div>
+    <pre id="para-output" class="demo-output">.container { perspective: 400px; }
+.back  { transform: translateZ(-200px); }
+.mid   { transform: translateZ(-100px); }
+.front { transform: translateZ(0); }</pre>
+    <p class="demo-caption">No scale compensation - you can clearly see how perspective shrinks distant layers. Low values = dramatic size difference. High values = nearly flat.</p>
+  </div>
+
+  <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code class="language-css">/* Container: perspective + scrollable */
+.parallax-container {
+  perspective: 500px;
+  height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  transform-style: preserve-3d;
+}
+
+/* Layers at different Z depths - further back = appears smaller */
+.layer--back  { transform: translateZ(-200px); }
+.layer--mid   { transform: translateZ(-100px); }
+.layer--front { transform: translateZ(0); }
+
+/* Production tip: add scale() to counteract perspective shrink
+   so layers appear equal size at rest.
+   Formula: scale = 1 + (abs(Z) / perspective)
+   e.g. Z=-200px, perspective=500 -> scale(1.4) */</code></pre></div>
+
+  <h2>Performance Notes</h2>
+  <ul>
+    <li><strong>Compositing:</strong> 3D-transformed elements get their own GPU layer. This is fast for animation but uses memory - don't create hundreds of layers.</li>
+    <li><strong>will-change:</strong> Use <code>will-change: transform</code> on elements you know will animate. Remove when done.</li>
+    <li><strong>Repaints:</strong> Changing <code>perspective</code> or <code>perspective-origin</code> repaints all children. Animate child transforms instead.</li>
+    <li><strong>Stacking context:</strong> Any 3D-transformed element creates a new stacking context, affecting z-index interactions.</li>
+  </ul>
+
+  <h2>Common Pitfalls</h2>
+
+  <table>
+    <thead><tr><th>Problem</th><th>Likely cause</th></tr></thead>
+    <tbody>
+      <tr><td>3D looks flat</td><td>Missing <code>perspective</code> on parent</td></tr>
+      <tr><td>Children are flat despite transforms</td><td>Missing <code>transform-style: preserve-3d</code></td></tr>
+      <tr><td>preserve-3d ignored</td><td>Ancestor has <code>overflow: hidden</code>, <code>filter</code>, or <code>opacity &lt; 1</code></td></tr>
+      <tr><td>Mirror image showing</td><td>Need <code>backface-visibility: hidden</code></td></tr>
+      <tr><td>Card flip flickers</td><td>Both faces need <code>position: absolute</code> + same dimensions</td></tr>
+      <tr><td>Rotation seems off-centre</td><td>Check <code>transform-origin</code> (especially the Z value)</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Quiz</h2>
+
+  <div class="quiz">
+    <h3>Question 1</h3>
+    <p>What does <code>perspective: 300px</code> on a parent element do?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Moves the element 300px along the Z-axis</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">Sets the viewer's distance from the z=0 plane to 300px, creating a strong 3D effect</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Adds 300px of padding in the Z direction</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">Creates a 300px gap between front and back faces</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz">
+    <h3>Question 2</h3>
+    <p>Why does a card flip need <code>backface-visibility: hidden</code>?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">To improve animation performance</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">To prevent the card from being clickable when flipped</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">To hide each face when rotated away from the viewer, so only the facing side shows</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">To enable preserve-3d on child elements</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz">
+    <h3>Question 3</h3>
+    <p>Which property forces flattening even when <code>transform-style: preserve-3d</code> is set?</p>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">display: flex</div>
+    <div class="quiz-option" onclick="checkAnswer(this, true)">overflow: hidden</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">position: relative</div>
+    <div class="quiz-option" onclick="checkAnswer(this, false)">z-index: 1</div>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="footer-nav">
+    <a href="07-animations.html">&larr; Prev: Animations</a>
+    <a href="index.html">Index</a>
+    <a href="09-flexbox.html">Next: Flexbox &rarr;</a>
+  </div>
+
+    </main>
+  </div>
+
+  <aside class="ad-sidebar" aria-label="Advertisement">Ad</aside>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script>
+    // --- Perspective distance demo (exponential slider) ---
+    const perspRange = document.getElementById('persp-range');
+    const perspVal = document.getElementById('persp-val');
+    const perspScene = document.getElementById('persp-demo-scene');
+    const perspOutput = document.getElementById('persp-output');
+    function sliderToPersp(val) {
+      const t = val / 100;
+      return Math.round(50 * Math.pow(2000/50, t));
+    }
+    perspRange.addEventListener('input', () => {
+      const px = sliderToPersp(perspRange.value);
+      perspVal.textContent = px;
+      perspScene.style.perspective = px + 'px';
+      perspOutput.textContent = `.scene {\n  perspective: ${px}px;\n}\n.box {\n  transform: rotateY(45deg);\n}`;
+    });
+
+    // --- Perspective origin demo ---
+    const poX = document.getElementById('po-x');
+    const poY = document.getElementById('po-y');
+    const poScene = document.getElementById('po-scene');
+    const poCrosshair = document.getElementById('po-crosshair');
+    const poOutput = document.getElementById('po-output');
+    function updatePO() {
+      document.getElementById('po-x-val').textContent = poX.value;
+      document.getElementById('po-y-val').textContent = poY.value;
+      poScene.style.perspectiveOrigin = poX.value + '% ' + poY.value + '%';
+      poCrosshair.style.left = poX.value + '%';
+      poCrosshair.style.top = poY.value + '%';
+      poOutput.textContent = `.scene {\n  perspective: 500px;\n  perspective-origin: ${poX.value}% ${poY.value}%;\n}\n.box {\n  transform: rotateY(40deg);\n}`;
+    }
+    poX.addEventListener('input', updatePO);
+    poY.addEventListener('input', updatePO);
+
+    // --- preserve-3d toggle ---
+    const p3dToggle = document.getElementById('preserve3d-toggle');
+    const p3dParent = document.getElementById('preserve3d-parent');
+    const p3dOutput = document.getElementById('p3d-output');
+    p3dToggle.addEventListener('change', () => {
+      const val = p3dToggle.checked ? 'preserve-3d' : 'flat';
+      p3dParent.style.transformStyle = val;
+      p3dOutput.textContent = `.container {\n  transform-style: ${val};\n  transform: rotateX(-15deg) rotateY(25deg);\n}\n.layer-1 { transform: translateZ(0); }\n.layer-2 { transform: translateZ(60px); }\n.layer-3 { transform: translateZ(120px); }`;
+    });
+
+    // --- Rotation playground ---
+    const rx = document.getElementById('rx');
+    const ry = document.getElementById('ry');
+    const rz = document.getElementById('rz');
+    const rotTarget = document.getElementById('rotate-target');
+    const rotOutput = document.getElementById('rot-output');
+    const axisX = document.getElementById('axis-x');
+    const axisY = document.getElementById('axis-y');
+    const axisZ = document.getElementById('axis-z');
+    function updateRotation() {
+      document.getElementById('rx-val').textContent = rx.value;
+      document.getElementById('ry-val').textContent = ry.value;
+      document.getElementById('rz-val').textContent = rz.value;
+      rotTarget.style.transform = `rotateX(${rx.value}deg) rotateY(${ry.value}deg) rotateZ(${rz.value}deg)`;
+      rotTarget.textContent = `X:${rx.value} Y:${ry.value} Z:${rz.value}`;
+      rotOutput.textContent = `.box {\n  transform: rotateX(${rx.value}deg) rotateY(${ry.value}deg) rotateZ(${rz.value}deg);\n}`;
+      axisX.style.opacity = rx.value != 0 ? '0.6' : '0';
+      axisY.style.opacity = ry.value != 0 ? '0.6' : '0';
+      axisZ.style.opacity = rz.value != 0 ? '0.6' : '0';
+    }
+    rx.addEventListener('input', updateRotation);
+    ry.addEventListener('input', updateRotation);
+    rz.addEventListener('input', updateRotation);
+
+    // --- TranslateZ demo ---
+    const tz = document.getElementById('tz');
+    const tzTarget = document.getElementById('tz-target');
+    const tzOutput = document.getElementById('tz-output');
+    tz.addEventListener('input', () => {
+      document.getElementById('tz-val').textContent = tz.value;
+      tzTarget.style.transform = `translateZ(${tz.value}px)`;
+      tzTarget.textContent = `Z: ${tz.value}px`;
+      tzOutput.textContent = `.scene { perspective: 600px; }\n.box  { transform: translateZ(${tz.value}px); }`;
+    });
+
+    // --- Transform origin demo ---
+    const toX = document.getElementById('to-x');
+    const toY = document.getElementById('to-y');
+    const toZ = document.getElementById('to-z');
+    const toRX = document.getElementById('to-rx');
+    const toRY = document.getElementById('to-ry');
+    const toRZ = document.getElementById('to-rz');
+    const toTarget = document.getElementById('to-target');
+    const toOutput = document.getElementById('to-output');
+    const toCrosshair = document.getElementById('to-crosshair');
+    function updateTO() {
+      document.getElementById('to-x-val').textContent = toX.value;
+      document.getElementById('to-y-val').textContent = toY.value;
+      document.getElementById('to-z-val').textContent = toZ.value;
+      document.getElementById('to-rx-val').textContent = toRX.value;
+      document.getElementById('to-ry-val').textContent = toRY.value;
+      document.getElementById('to-rz-val').textContent = toRZ.value;
+      toTarget.style.transformOrigin = `${toX.value}% ${toY.value}% ${toZ.value}px`;
+      toTarget.style.transform = `rotateX(${toRX.value}deg) rotateY(${toRY.value}deg) rotateZ(${toRZ.value}deg)`;
+      toTarget.innerHTML = `origin:<br>${toX.value}% ${toY.value}% ${toZ.value}px`;
+      toOutput.textContent = `.box {\n  transform-origin: ${toX.value}% ${toY.value}% ${toZ.value}px;\n  transform: rotateX(${toRX.value}deg) rotateY(${toRY.value}deg) rotateZ(${toRZ.value}deg);\n}`;
+      const scene = toCrosshair.parentElement;
+      const sceneSize = scene.offsetWidth;
+      const elSize = 120;
+      const elOffset = (sceneSize - elSize) / 2;
+      const crossX = elOffset + (toX.value / 100) * elSize;
+      const crossY = elOffset + (toY.value / 100) * elSize;
+      toCrosshair.style.left = crossX + 'px';
+      toCrosshair.style.top = crossY + 'px';
+    }
+    toX.addEventListener('input', updateTO);
+    toY.addEventListener('input', updateTO);
+    toZ.addEventListener('input', updateTO);
+    toRX.addEventListener('input', updateTO);
+    toRY.addEventListener('input', updateTO);
+    toRZ.addEventListener('input', updateTO);
+
+    // --- Backface visibility demo ---
+    const bfAngle = document.getElementById('bf-angle');
+    const bfToggle = document.getElementById('bf-toggle');
+    const bfTarget = document.getElementById('bf-target');
+    const bfOutput = document.getElementById('bf-output');
+    function updateBF() {
+      document.getElementById('bf-angle-val').textContent = bfAngle.value;
+      bfTarget.style.transform = `rotateY(${bfAngle.value}deg)`;
+      const bfVal = bfToggle.checked ? 'hidden' : 'visible';
+      bfTarget.style.backfaceVisibility = bfVal;
+      bfOutput.textContent = `.box {\n  transform: rotateY(${bfAngle.value}deg);\n  backface-visibility: ${bfVal};\n}`;
+    }
+    bfAngle.addEventListener('input', updateBF);
+    bfToggle.addEventListener('change', updateBF);
+
+    // --- Flip card hover support ---
+    const flipScene = document.getElementById('flip-scene');
+    const flipCard = document.getElementById('flip-card');
+    flipScene.addEventListener('mouseenter', () => {
+      if (flipCard.style.transform !== 'rotateY(180deg)') {
+        flipCard.style.transform = 'rotateY(180deg)';
+      }
+    });
+    flipScene.addEventListener('mouseleave', () => {
+      flipCard.style.transform = '';
+    });
+
+    // --- Cube rotation demo ---
+    const cubeX = document.getElementById('cube-x');
+    const cubeY = document.getElementById('cube-y');
+    const cubeZ = document.getElementById('cube-z');
+    const cube = document.getElementById('cube');
+    const cubeOutput = document.getElementById('cube-output');
+    function updateCube() {
+      document.getElementById('cube-x-val').textContent = cubeX.value;
+      document.getElementById('cube-y-val').textContent = cubeY.value;
+      document.getElementById('cube-z-val').textContent = cubeZ.value;
+      cube.style.transform = `rotateX(${cubeX.value}deg) rotateY(${cubeY.value}deg) rotateZ(${cubeZ.value}deg)`;
+      cubeOutput.textContent = `.cube {\n  transform: rotateX(${cubeX.value}deg) rotateY(${cubeY.value}deg) rotateZ(${cubeZ.value}deg);\n}`;
+    }
+    cubeX.addEventListener('input', updateCube);
+    cubeY.addEventListener('input', updateCube);
+    cubeZ.addEventListener('input', updateCube);
+
+    // --- Parallax perspective demo (exponential slider) ---
+    const paraP = document.getElementById('para-p');
+    const paraScene = document.getElementById('parallax-scene');
+    const paraOutput = document.getElementById('para-output');
+    function sliderToParaPersp(val) {
+      const t = val / 100;
+      return Math.round(50 * Math.pow(2000/50, t));
+    }
+    paraP.addEventListener('input', () => {
+      const px = sliderToParaPersp(paraP.value);
+      document.getElementById('para-p-val').textContent = px;
+      paraScene.style.perspective = px + 'px';
+      paraOutput.textContent = `.container { perspective: ${px}px; }\n.back  { transform: translateZ(-200px); }\n.mid   { transform: translateZ(-100px); }\n.front { transform: translateZ(0); }`;
+    });
+  </script>
+  <script defer src="/_vercel/insights/script.js"></script>
+  <script src="/vendor/prism.min.js"></script>
+</body>
+</html>

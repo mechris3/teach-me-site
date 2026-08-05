@@ -371,6 +371,65 @@ strong { color: var(--text-heading); }
   background: var(--bg-raised);
 }
 
+/* --- Slider control (uniform interactive sliders) --- */
+.slider-control {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.6rem 1rem;
+  min-width: 100px;
+  flex: 1;
+}
+.slider-control__label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text);
+  text-align: center;
+  line-height: 1.2;
+}
+.slider-control__value {
+  font-size: 0.8rem;
+  font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+  color: var(--accent);
+  text-align: center;
+}
+.slider-control input[type="range"] {
+  width: 100%;
+  margin: 0;
+}
+.slider-controls {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+  justify-content: center;
+}
+.slider-controls--stacked {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+.slider-control--horizontal {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+}
+.slider-control--horizontal input[type="range"] {
+  width: auto;
+  flex: 1;
+}
+.slider-control--vertical {
+  transform: rotate(-90deg);
+}
+.slider-control--diagonal {
+  transform: rotate(-45deg);
+}
+
 /* --- Quiz --- */
 .quiz { background: var(--quiz-bg); border: 1px solid var(--border); border-radius: 6px; padding: 1.5rem; margin: 2rem 0; }
 .quiz h3 { margin-top: 0; color: var(--text); }

@@ -316,87 +316,92 @@
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://teachmeskills.dev/css/08-flexbox.html</loc>
+        <loc>https://teachmeskills.dev/css/08-3d-transforms.html</loc>
         <changefreq>yearly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://teachmeskills.dev/css/09-grid.html</loc>
+        <loc>https://teachmeskills.dev/css/09-flexbox.html</loc>
         <changefreq>yearly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://teachmeskills.dev/css/10-container-queries.html</loc>
+        <loc>https://teachmeskills.dev/css/10-grid.html</loc>
         <changefreq>yearly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://teachmeskills.dev/css/11-cascade-layers.html</loc>
+        <loc>https://teachmeskills.dev/css/11-container-queries.html</loc>
         <changefreq>yearly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://teachmeskills.dev/css/12-css-nesting.html</loc>
+        <loc>https://teachmeskills.dev/css/12-cascade-layers.html</loc>
         <changefreq>yearly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://teachmeskills.dev/css/13-modern-selectors.html</loc>
+        <loc>https://teachmeskills.dev/css/13-css-nesting.html</loc>
         <changefreq>yearly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://teachmeskills.dev/css/14-the-cascade.html</loc>
+        <loc>https://teachmeskills.dev/css/14-modern-selectors.html</loc>
         <changefreq>yearly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://teachmeskills.dev/css/15-logical-properties.html</loc>
+        <loc>https://teachmeskills.dev/css/15-the-cascade.html</loc>
         <changefreq>yearly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://teachmeskills.dev/css/16-view-transitions.html</loc>
+        <loc>https://teachmeskills.dev/css/16-logical-properties.html</loc>
         <changefreq>yearly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://teachmeskills.dev/css/17-anchor-positioning.html</loc>
+        <loc>https://teachmeskills.dev/css/17-view-transitions.html</loc>
         <changefreq>yearly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://teachmeskills.dev/css/18-advanced-colour.html</loc>
+        <loc>https://teachmeskills.dev/css/18-anchor-positioning.html</loc>
         <changefreq>yearly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://teachmeskills.dev/css/19-scope.html</loc>
+        <loc>https://teachmeskills.dev/css/19-advanced-colour.html</loc>
         <changefreq>yearly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://teachmeskills.dev/css/20-selectors-deep-dive.html</loc>
+        <loc>https://teachmeskills.dev/css/20-scope.html</loc>
         <changefreq>yearly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://teachmeskills.dev/css/21-theming-deep-dive.html</loc>
+        <loc>https://teachmeskills.dev/css/21-selectors-deep-dive.html</loc>
         <changefreq>yearly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://teachmeskills.dev/css/22-responsive-design-patterns.html</loc>
+        <loc>https://teachmeskills.dev/css/22-theming-deep-dive.html</loc>
         <changefreq>yearly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://teachmeskills.dev/css/23-scroll-driven-animations.html</loc>
+        <loc>https://teachmeskills.dev/css/23-responsive-design-patterns.html</loc>
         <changefreq>yearly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://teachmeskills.dev/css/24-capstone-product-landing-page.html</loc>
+        <loc>https://teachmeskills.dev/css/24-scroll-driven-animations.html</loc>
+        <changefreq>yearly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>https://teachmeskills.dev/css/25-capstone-product-landing-page.html</loc>
         <changefreq>yearly</changefreq>
         <priority>0.8</priority>
     </url>
