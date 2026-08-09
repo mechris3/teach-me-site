@@ -1,0 +1,21 @@
+{
+  "redirects": [
+    { "source": "/css/08-flexbox.html", "destination": "/css/09-flexbox.html", "permanent": true },
+    { "source": "/css/09-grid.html", "destination": "/css/10-grid.html", "permanent": true },
+    { "source": "/css/10-container-queries.html", "destination": "/css/11-container-queries.html", "permanent": true },
+    { "source": "/css/11-cascade-layers.html", "destination": "/css/12-cascade-layers.html", "permanent": true },
+    { "source": "/css/12-css-nesting.html", "destination": "/css/13-css-nesting.html", "permanent": true },
+    { "source": "/css/13-modern-selectors.html", "destination": "/css/14-modern-selectors.html", "permanent": true },
+    { "source": "/css/14-the-cascade.html", "destination": "/css/15-the-cascade.html", "permanent": true },
+    { "source": "/css/15-logical-properties.html", "destination": "/css/16-logical-properties.html", "permanent": true },
+    { "source": "/css/16-view-transitions.html", "destination": "/css/17-view-transitions.html", "permanent": true },
+    { "source": "/css/17-anchor-positioning.html", "destination": "/css/18-anchor-positioning.html", "permanent": true },
+    { "source": "/css/18-advanced-colour.html", "destination": "/css/19-advanced-colour.html", "permanent": true },
+    { "source": "/css/19-scope.html", "destination": "/css/20-scope.html", "permanent": true },
+    { "source": "/css/20-selectors-deep-dive.html", "destination": "/css/21-selectors-deep-dive.html", "permanent": true },
+    { "source": "/css/21-theming-deep-dive.html", "destination": "/css/22-theming-deep-dive.html", "permanent": true },
+    { "source": "/css/22-responsive-design-patterns.html", "destination": "/css/23-responsive-design-patterns.html", "permanent": true },
+    { "source": "/css/23-scroll-driven-animations.html", "destination": "/css/24-scroll-driven-animations.html", "permanent": true },
+    { "source": "/css/24-capstone-product-landing-page.html", "destination": "/css/25-capstone-product-landing-page.html", "permanent": true }
+  ]
+}
