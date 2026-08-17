@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>The Input Domain - Lesson 7 | Teach Me</title>
+  <meta name="description" content="Lesson 7 of the Chrome DevTools Protocol course: The Input Domain">
+  <link rel="canonical" href="https://teachmeskills.dev/cdp/07-input-domain.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/cdp/07-input-domain.html">
+  <meta property="og:title" content="The Input Domain - Lesson 7 | Teach Me">
+  <meta property="og:description" content="Lesson 7 of the Chrome DevTools Protocol course. Synthesising mouse, keyboard, and touch events for browser automation.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="The Input Domain - Lesson 7 | Teach Me">
+  <meta name="twitter:description" content="Lesson 7 of the Chrome DevTools Protocol course. Synthesising mouse, keyboard, and touch events for browser automation.">
+  <script type="application/ld+json">
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://teachmeskills.dev/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Chrome DevTools Protocol",
+        "item": "https://teachmeskills.dev/cdp/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "The Input Domain"
+      }
+    ]
+  }
+]
+  </script>
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header"><a href="index.html">CDP Course</a></div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-what-is-cdp.html">1. What Is the Chrome DevTools Protocol?</a></li>
+        <li><a href="02-first-connection.html">2. Your First CDP Connection</a></li>
+        <li><a href="03-dom-domain.html">3. The DOM Domain</a></li>
+        <li><a href="04-runtime-domain.html">4. The Runtime Domain</a></li>
+        <li><a href="05-network-domain.html">5. The Network Domain</a></li>
+        <li><a href="06-combined-monitoring.html">6. Combined Monitoring</a></li>
+        <li class="current"><a href="07-input-domain.html">7. The Input Domain</a></li>
+        <li><a href="08-page-domain.html">8. The Page Domain</a></li>
+        <li><a href="09-debugger-domain.html">9. The Debugger Domain</a></li>
+        <li><a href="10-target-session-management.html">10. Target & Session Management</a></li>
+        <li><a href="11-performance-tracing.html">11. Performance & Tracing</a></li>
+        <li><a href="12-emulation-css.html">12. Emulation & CSS</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="glossary.html">Glossary</a></li>
+        <li><a href="cdp-complete-reference.html">Complete Reference</a></li>
+        <li><a href="chrome-flags.html">Chrome Flags</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 7</p>
+  <h1>The Input Domain</h1>
+
+<h2>What You'll Learn</h2>
+
+<p>The <code>Input</code> domain lets you synthesise user interactions - clicks, typing, scrolling, touch gestures - at the browser's input pipeline level. This is what Puppeteer's <code>page.click()</code> and <code>page.type()</code> call under the hood.</p>
+
+<p>For a CDP adapter, this is the "action" side: the <code>DiagnosticCollector</code> observes, and the Input domain acts.</p>
+
+<h2>Two Approaches to Clicking</h2>
+
+<p>There are two ways to trigger a click via CDP:</p>
+
+<h3>1. <code>Input.dispatchMouseEvent</code> - simulate real mouse input</h3>
+
+<p>This sends actual mouse events through the browser's input pipeline. The page sees <code>mousedown</code>, <code>mouseup</code>, and <code>click</code> events exactly as if a real user clicked:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// A click requires three dispatches: mousePressed, mouseReleased
+// (the browser generates the 'click' event from the pair)
+
+async function click(x, y) {
+  await send('Input.dispatchMouseEvent', {
+    type: 'mousePressed',
+    x,
+    y,
+    button: 'left',
+    clickCount: 1
+  });
+
+  await send('Input.dispatchMouseEvent', {
+    type: 'mouseReleased',
+    x,
+    y,
+    button: 'left',
+    clickCount: 1
+  });
+}</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p>You need pixel coordinates. To click on a specific element, you first need to find its position (we'll cover that below).</p>
+
+<h3>2. <code>Runtime.evaluate</code> - call <code>element.click()</code> directly</h3>
+
+<div class="code-wrapper"><pre><code class="language-javascript">await send('Runtime.evaluate', {
+  expression: 'document.querySelector("[data-testid=\\"submit-btn\\"]").click()'
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p>This is simpler but less realistic - it doesn't simulate mouse movement, doesn't trigger <code>mouseenter</code>/<code>mouseleave</code> events, and bypasses any pointer-event CSS restrictions. Some frameworks rely on the full event sequence.</p>
+
+<div class="key-concept">
+  <strong>Which should a CDP adapter use?</strong> For most journey steps (clicking buttons, selecting options), <code>element.click()</code> via Runtime.evaluate is simpler and more reliable - you don't need to calculate coordinates. Use <code>Input.dispatchMouseEvent</code> when you need realistic input simulation (testing hover states, drag-and-drop, or when click() doesn't work due to event delegation patterns).
+</div>
+
+<h2>Getting Element Coordinates</h2>
+
+<p>If you do need pixel coordinates (for <code>dispatchMouseEvent</code>), use <code>DOM.getBoxModel</code>:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Find the element
+const doc = await send('DOM.getDocument', { depth: 0 });
+const buttonNode = await send('DOM.querySelector', {
+  nodeId: doc.root.nodeId,
+  selector: '[data-testid="submit-btn"]'
+});
+
+// Get its position and size
+const box = await send('DOM.getBoxModel', {
+  nodeId: buttonNode.nodeId
+});
+
+// box.model.content is an array of 8 numbers: [x1,y1, x2,y2, x3,y3, x4,y4]
+// representing the four corners of the content box
+const [x1, y1, x2, y2, x3, y3, x4, y4] = box.model.content;
+
+// Calculate the center point
+const centerX = (x1 + x3) / 2;
+const centerY = (y1 + y3) / 2;
+
+// Now click at the center
+await click(centerX, centerY);</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h2>Keyboard Input</h2>
+
+<p>There are three ways to put text into an input field via CDP. They differ significantly in what browser events they generate - which matters for Angular forms.</p>
+
+<h3>Option 1: <code>Input.dispatchKeyEvent</code> - full keystroke simulation</h3>
+
+<p>This simulates the complete keyboard event sequence for each character. For the letter "a", the browser generates:</p>
+
+<ol>
+  <li><code>keydown</code> (key pressed down)</li>
+  <li><code>keypress</code> (character is about to be inserted - deprecated but still fired)</li>
+  <li>The character is inserted into the focused element's value</li>
+  <li><code>input</code> event fires (value changed)</li>
+  <li><code>keyup</code> (key released)</li>
+</ol>
+
+<p>This is the most realistic simulation - identical to a real user pressing keys one at a time. Angular's form listeners see every <code>input</code> event, one per character.</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Type "Hello" character by character - full event sequence per character
+async function typeTextRealistic(text) {
+  for (const char of text) {
+    await send('Input.dispatchKeyEvent', {
+      type: 'char',
+      text: char
+    });
+  }
+}
+
+// The 'char' type is a shortcut that combines keyDown + character insertion + keyUp
+// For full fidelity you'd send keyDown then char then keyUp separately, but
+// 'char' alone is sufficient for most inputs.</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p><strong>When to use:</strong> When you need per-character events (e.g., autocomplete/typeahead that reacts to each keystroke), or when testing debounced input handlers that fire on individual key events.</p>
+
+<h3>Option 2: <code>Input.insertText</code> - bulk insertion via the input method</h3>
+
+<p>This inserts the entire text at once, as if the user pasted it or used an input method editor (IME). It goes through the browser's "text input" pipeline but does NOT fire individual <code>keydown</code>/<code>keyup</code> events.</p>
+
+<p>What the browser generates:</p>
+
+<ol>
+  <li>A single <code>beforeinput</code> event (with <code>inputType: 'insertText'</code>)</li>
+  <li>The entire text is inserted into the focused element's value at once</li>
+  <li>A single <code>input</code> event fires (value changed)</li>
+</ol>
+
+<p>No <code>keydown</code>, no <code>keyup</code>, no <code>keypress</code>. Just <code>beforeinput</code> → text inserted → <code>input</code>.</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Insert "Hello, World!" in one shot - one input event, not 13
+await send('Input.insertText', {
+  text: 'Hello, World!'
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p><strong>Crucially:</strong> The <code>input</code> event still fires. This means Angular's form listeners detect the change - the model updates correctly. You get the benefit of speed (one CDP call instead of a loop) without the Angular forms gotcha.</p>
+
+<p><strong>When to use:</strong> Most of the time. It's fast (single CDP command), fires the <code>input</code> event Angular needs, and is what Puppeteer uses internally for <code>page.type()</code> in fast mode.</p>
+
+<h3>Option 3: <code>element.value = 'x'</code> via Runtime.evaluate - direct property mutation</h3>
+
+<p>This bypasses the browser's input pipeline entirely. It's just JavaScript mutating a DOM property.</p>
+
+<p>What the browser generates: <strong>nothing</strong>. No events at all.</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Sets the value but fires NO events - Angular won't see the change
+await send('Runtime.evaluate', {
+  expression: `document.querySelector('#email').value = 'test@example.com'`
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p><strong>This is the approach that breaks Angular forms.</strong> You'd need to manually dispatch events afterward:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Fix: manually fire the events Angular listens for
+await send('Runtime.evaluate', {
+  expression: `
+    const el = document.querySelector('#email');
+    el.value = 'test@example.com';
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+    el.dispatchEvent(new Event('change', { bubbles: true }));
+  `
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p><strong>When to use:</strong> Rarely. Only when you need to set a value without simulating user interaction (e.g., pre-filling a hidden field), or when the above two approaches don't work for a specific edge case.</p>
+
+<h3>Summary comparison</h3>
+
+<table style="width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.85rem;">
+  <thead>
+    <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+      <th style="padding: 0.5rem;">Approach</th>
+      <th style="padding: 0.5rem;">Fires keydown/keyup?</th>
+      <th style="padding: 0.5rem;">Fires input event?</th>
+      <th style="padding: 0.5rem;">Angular sees it?</th>
+      <th style="padding: 0.5rem;">Speed</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>dispatchKeyEvent</code> (per char)</td>
+      <td style="padding: 0.5rem;">Yes</td>
+      <td style="padding: 0.5rem;">Yes (per char)</td>
+      <td style="padding: 0.5rem;">Yes</td>
+      <td style="padding: 0.5rem;">Slow (N calls)</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Input.insertText</code></td>
+      <td style="padding: 0.5rem;">No</td>
+      <td style="padding: 0.5rem;">Yes (once)</td>
+      <td style="padding: 0.5rem;">Yes</td>
+      <td style="padding: 0.5rem;">Fast (1 call)</td>
+    </tr>
+    <tr>
+      <td style="padding: 0.5rem;"><code>element.value = x</code></td>
+      <td style="padding: 0.5rem;">No</td>
+      <td style="padding: 0.5rem;">No</td>
+      <td style="padding: 0.5rem;">No (needs manual fix)</td>
+      <td style="padding: 0.5rem;">Fast (1 call)</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="key-concept">
+  <strong>Recommendation for a CDP adapter:</strong> Use <code>Input.insertText</code> as the default for typing into form fields. It's fast, fires the right events, and Angular stays happy. Only fall back to per-character <code>dispatchKeyEvent</code> when testing typeahead/autocomplete behaviour that depends on individual keystrokes.
+</div>
+
+<h3>Special keys</h3>
+
+<p>For keys like Enter, Tab, Escape, you need <code>keyDown</code> and <code>keyUp</code> events with the appropriate key code (there's no <code>insertText</code> equivalent for non-character keys):</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Press Enter
+await send('Input.dispatchKeyEvent', {
+  type: 'keyDown',
+  key: 'Enter',
+  code: 'Enter',
+  windowsVirtualKeyCode: 13,
+  nativeVirtualKeyCode: 13
+});
+await send('Input.dispatchKeyEvent', {
+  type: 'keyUp',
+  key: 'Enter',
+  code: 'Enter',
+  windowsVirtualKeyCode: 13,
+  nativeVirtualKeyCode: 13
+});
+
+// Press Tab
+await send('Input.dispatchKeyEvent', {
+  type: 'keyDown',
+  key: 'Tab',
+  code: 'Tab',
+  windowsVirtualKeyCode: 9,
+  nativeVirtualKeyCode: 9
+});
+await send('Input.dispatchKeyEvent', {
+  type: 'keyUp',
+  key: 'Tab',
+  code: 'Tab',
+  windowsVirtualKeyCode: 9,
+  nativeVirtualKeyCode: 9
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h3>Modifier keys (Ctrl, Shift, Alt)</h3>
+
+<p>For keyboard shortcuts, set the <code>modifiers</code> bitmask:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Ctrl+A (select all)
+// Modifiers: Alt=1, Ctrl=2, Meta/Command=4, Shift=8
+await send('Input.dispatchKeyEvent', {
+  type: 'keyDown',
+  key: 'a',
+  code: 'KeyA',
+  modifiers: 2,  // Ctrl
+  windowsVirtualKeyCode: 65
+});
+await send('Input.dispatchKeyEvent', {
+  type: 'keyUp',
+  key: 'a',
+  code: 'KeyA',
+  modifiers: 2,
+  windowsVirtualKeyCode: 65
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<div class="key-concept">
+  <strong>Modifier bitmask values:</strong> Alt = 1, Ctrl = 2, Meta/Command = 4, Shift = 8. Combine with bitwise OR: Ctrl+Shift = 2 | 8 = 10.
+</div>
+
+<h2>Practical Adapter Helpers</h2>
+
+<p>Combining the approaches above, here's what a CDP adapter's action methods would look like in practice:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Click - simplest approach for a CDP adapter
+async function clickElement(selector) {
+  await send('Runtime.evaluate', {
+    expression: `document.querySelector('${selector}').click()`
+  });
+}
+
+// Type into a focused input - insertText fires the 'input' event Angular needs
+async function typeInto(selector, text) {
+  // Focus the element first
+  await send('Runtime.evaluate', {
+    expression: `document.querySelector('${selector}').focus()`
+  });
+
+  // Insert the text - fires beforeinput + input events, Angular model updates
+  await send('Input.insertText', { text });
+}
+
+// Clear and type (common pattern for form inputs)
+async function clearAndType(selector, text) {
+  // Focus and select all existing content
+  await send('Runtime.evaluate', {
+    expression: `
+      const el = document.querySelector('${selector}');
+      el.focus();
+      el.select();
+    `
+  });
+
+  // insertText replaces the selection - fires input event
+  await send('Input.insertText', { text });
+}
+
+// Select a dropdown option
+async function selectOption(selector, value) {
+  await send('Runtime.evaluate', {
+    expression: `
+      const select = document.querySelector('${selector}');
+      select.value = '${value}';
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+    `
+  });
+}</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<div class="key-concept">
+  <strong>Angular forms note:</strong> Angular's reactive forms and template-driven forms listen for <code>input</code> and <code>change</code> events to update their models. When setting values programmatically, you need to dispatch these events manually (as shown above) or Angular won't know the value changed. This is a common gotcha in automation.
+</div>
+
+<h2>Scrolling</h2>
+
+<p>Scroll events are dispatched via <code>Input.dispatchMouseEvent</code> with the <code>mouseWheel</code> type:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Scroll down by 500 pixels
+await send('Input.dispatchMouseEvent', {
+  type: 'mouseWheel',
+  x: 400,          // position in viewport
+  y: 300,
+  deltaX: 0,
+  deltaY: 500      // positive = scroll down
+});
+
+// Or scroll an element into view programmatically (simpler)
+await send('Runtime.evaluate', {
+  expression: `document.querySelector('${selector}').scrollIntoView({ behavior: 'smooth' })`
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h2>Touch Events</h2>
+
+<p>For testing mobile interactions, use <code>Input.dispatchTouchEvent</code>:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Tap at coordinates
+await send('Input.dispatchTouchEvent', {
+  type: 'touchStart',
+  touchPoints: [{ x: 200, y: 300 }]
+});
+await send('Input.dispatchTouchEvent', {
+  type: 'touchEnd',
+  touchPoints: []
+});
+
+// Swipe (touch start, move, end)
+await send('Input.dispatchTouchEvent', {
+  type: 'touchStart',
+  touchPoints: [{ x: 200, y: 500 }]
+});
+await send('Input.dispatchTouchEvent', {
+  type: 'touchMove',
+  touchPoints: [{ x: 200, y: 200 }]  // swipe up
+});
+await send('Input.dispatchTouchEvent', {
+  type: 'touchEnd',
+  touchPoints: []
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h2>Key Commands Reference</h2>
+
+<table style="width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem;">
+  <thead>
+    <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+      <th style="padding: 0.5rem;">Command</th>
+      <th style="padding: 0.5rem;">Purpose</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Input.dispatchMouseEvent</code></td>
+      <td style="padding: 0.5rem;">Simulate mouse actions (click, move, wheel scroll)</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Input.dispatchKeyEvent</code></td>
+      <td style="padding: 0.5rem;">Simulate individual key presses (keyDown, keyUp, char)</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Input.insertText</code></td>
+      <td style="padding: 0.5rem;">Bulk insert text (like paste - no individual key events)</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Input.dispatchTouchEvent</code></td>
+      <td style="padding: 0.5rem;">Simulate touch interactions (tap, swipe)</td>
+    </tr>
+    <tr>
+      <td style="padding: 0.5rem;"><code>DOM.getBoxModel</code></td>
+      <td style="padding: 0.5rem;">Get element position (needed for coordinate-based clicks)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>For the full list, see the <a href="cdp-complete-reference.html#Input">Input section of the complete reference</a>.</p>
+
+<div class="recommended">
+  <strong>Key takeaway:</strong> You now know how to drive the browser programmatically - clicking, typing, scrolling, and touching - at the CDP level. For a CDP adapter, the hybrid approach (Runtime.evaluate for simple actions, Input domain for realistic simulation when needed) gives you both simplicity and fidelity.
+</div>
+
+<h2>Primary Source</h2>
+
+<p>Read the <a href="https://chromedevtools.github.io/devtools-protocol/tot/Input/">Input domain documentation</a>. Pay attention to the <code>dispatchMouseEvent</code> type values (<code>mousePressed</code>, <code>mouseReleased</code>, <code>mouseMoved</code>, <code>mouseWheel</code>) and the key event types (<code>keyDown</code>, <code>keyUp</code>, <code>char</code>, <code>rawKeyDown</code>).</p>
+
+      <nav class="footer-nav">
+        <a href="06-combined-monitoring.html">&larr; Combined Monitoring</a>
+        <a href="08-page-domain.html">The Page Domain &rarr;</a>
+      </nav>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script src="/vendor/prism.min.js"></script>
+  <script src="/vendor/prism-javascript.min.js"></script>
+  <script src="/vendor/prism-json.min.js"></script>
+  <script src="/vendor/prism-typescript.min.js"></script>
+  <script src="/vendor/prism-bash.min.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

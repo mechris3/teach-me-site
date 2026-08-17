@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>The Debugger Domain - Lesson 9 | Teach Me</title>
+  <meta name="description" content="Lesson 9 of the Chrome DevTools Protocol course: The Debugger Domain">
+  <link rel="canonical" href="https://teachmeskills.dev/cdp/09-debugger-domain.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/cdp/09-debugger-domain.html">
+  <meta property="og:title" content="The Debugger Domain - Lesson 9 | Teach Me">
+  <meta property="og:description" content="Lesson 9 of the Chrome DevTools Protocol course. Setting breakpoints, stepping through code, and inspecting call stacks programmatically.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="The Debugger Domain - Lesson 9 | Teach Me">
+  <meta name="twitter:description" content="Lesson 9 of the Chrome DevTools Protocol course. Setting breakpoints, stepping through code, and inspecting call stacks programmatically.">
+  <script type="application/ld+json">
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://teachmeskills.dev/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Chrome DevTools Protocol",
+        "item": "https://teachmeskills.dev/cdp/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "The Debugger Domain"
+      }
+    ]
+  }
+]
+  </script>
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header"><a href="index.html">CDP Course</a></div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-what-is-cdp.html">1. What Is the Chrome DevTools Protocol?</a></li>
+        <li><a href="02-first-connection.html">2. Your First CDP Connection</a></li>
+        <li><a href="03-dom-domain.html">3. The DOM Domain</a></li>
+        <li><a href="04-runtime-domain.html">4. The Runtime Domain</a></li>
+        <li><a href="05-network-domain.html">5. The Network Domain</a></li>
+        <li><a href="06-combined-monitoring.html">6. Combined Monitoring</a></li>
+        <li><a href="07-input-domain.html">7. The Input Domain</a></li>
+        <li><a href="08-page-domain.html">8. The Page Domain</a></li>
+        <li class="current"><a href="09-debugger-domain.html">9. The Debugger Domain</a></li>
+        <li><a href="10-target-session-management.html">10. Target & Session Management</a></li>
+        <li><a href="11-performance-tracing.html">11. Performance & Tracing</a></li>
+        <li><a href="12-emulation-css.html">12. Emulation & CSS</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="glossary.html">Glossary</a></li>
+        <li><a href="cdp-complete-reference.html">Complete Reference</a></li>
+        <li><a href="chrome-flags.html">Chrome Flags</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 9</p>
+  <h1>The Debugger Domain</h1>
+
+<h2>What You'll Learn</h2>
+
+<p>The <code>Debugger</code> domain goes beyond what Puppeteer exposes. It gives you the full power of the Sources panel's debugger - programmatically. You can:</p>
+
+<ol>
+  <li>Set breakpoints by URL and line number</li>
+  <li>Pause on exceptions (all, or just uncaught)</li>
+  <li>Step through code (step over, step into, step out)</li>
+  <li>Inspect the call stack and local variables when paused</li>
+  <li>Evaluate expressions in a specific call frame's scope</li>
+  <li>Modify variable values mid-execution</li>
+  <li>Edit source code live (hot-patching)</li>
+</ol>
+
+<p>This is genuinely new territory compared to Puppeteer - and potentially powerful for an AI debugging agent. Imagine the AI setting a breakpoint at the line where an error occurs, inspecting the local variables, and diagnosing the issue from the actual runtime state.</p>
+
+<h2>Enabling the Debugger</h2>
+
+<div class="code-wrapper"><pre><code class="language-javascript">await send('Debugger.enable');
+
+// You'll immediately receive Debugger.scriptParsed events for every script the page has loaded:
+// { method: 'Debugger.scriptParsed', params: { scriptId: '1', url: 'http://localhost:4200/main.js', ... } }
+// { method: 'Debugger.scriptParsed', params: { scriptId: '2', url: 'http://localhost:4200/polyfills.js', ... } }
+// ...</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p>Each <code>Debugger.scriptParsed</code> event gives you a <code>scriptId</code>, the script's URL, and its <code>sourceMapURL</code>. You'd track these as they arrive so you can look up the ID for any script later:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Build a lookup table as scriptParsed events arrive
+const scriptsByUrl = new Map();
+
+// In your message handler:
+if (msg.method === 'Debugger.scriptParsed') {
+  const { scriptId, url, sourceMapURL } = msg.params;
+  scriptsByUrl.set(url, { scriptId, sourceMapURL });
+}
+
+// Later, when you need a scriptId:
+const mainScript = scriptsByUrl.get('http://localhost:4200/main.js');
+// mainScript = { scriptId: '7', sourceMapURL: 'main.js.map' }</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h2>Setting Breakpoints</h2>
+
+<h3>By URL and line number (most common)</h3>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Set a breakpoint at line 42 of main.js
+const bp = await send('Debugger.setBreakpointByUrl', {
+  lineNumber: 42,          // 0-indexed
+  url: 'http://localhost:4200/main.js',
+  columnNumber: 0,         // Optional - start of line
+  condition: ''            // Optional - conditional breakpoint expression
+});
+
+// bp = {
+//   breakpointId: 'bp-1',
+//   locations: [{ scriptId: '7', lineNumber: 42, columnNumber: 0 }]
+// }</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<div class="key-concept">
+  <strong>Line numbers are 0-indexed</strong> in CDP. Line 1 in your editor = line 0 in CDP. This is a common source of off-by-one errors when translating from source map positions.
+</div>
+
+<h3>Conditional breakpoints</h3>
+
+<p>Only pause when a condition is true - exactly like right-clicking a breakpoint in DevTools and adding a condition:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Only pause when userId is undefined
+await send('Debugger.setBreakpointByUrl', {
+  lineNumber: 42,
+  url: 'http://localhost:4200/main.js',
+  condition: 'userId === undefined'
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h3>By script ID and exact location</h3>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// If you already have the scriptId (from Debugger.scriptParsed)
+await send('Debugger.setBreakpoint', {
+  location: {
+    scriptId: '7',
+    lineNumber: 42,
+    columnNumber: 0
+  },
+  condition: ''
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h3>Setting breakpoints from TypeScript locations</h3>
+
+<p>CDP only knows about the compiled JavaScript running in the browser. To set a breakpoint at a TypeScript line, you need to resolve the source map in the opposite direction (TS → JS):</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">import { SourceMapConsumer } from 'source-map';
+
+// You want to break at src/app/my-component.ts, line 28
+const mapResponse = await fetch('http://localhost:4200/main.js.map');
+const consumer = await new SourceMapConsumer(await mapResponse.json());
+
+// Map TS location → compiled JS location
+const generated = consumer.generatedPositionFor({
+  source: 'src/app/my-component.ts',
+  line: 28,
+  column: 0
+});
+
+// Set breakpoint at the JS location
+// Note: source-map library uses 1-indexed lines, CDP uses 0-indexed
+await send('Debugger.setBreakpointByUrl', {
+  lineNumber: generated.line - 1,
+  url: 'http://localhost:4200/main.js',
+  columnNumber: generated.column
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p>DevTools does this transparently when you click a line in a <code>.ts</code> file. With raw CDP, you handle the mapping yourself.</p>
+
+<h3>Pause on exceptions</h3>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Pause on all exceptions (caught and uncaught)
+await send('Debugger.setPauseOnExceptions', {
+  state: 'all'    // 'none', 'uncaught', or 'all'
+});
+
+// More useful: pause only on uncaught exceptions
+await send('Debugger.setPauseOnExceptions', {
+  state: 'uncaught'
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h3>Removing breakpoints</h3>
+
+<div class="code-wrapper"><pre><code class="language-javascript">await send('Debugger.removeBreakpoint', {
+  breakpointId: 'bp-1'
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h2>The Paused Event</h2>
+
+<p>When execution hits a breakpoint (or pauses for another reason), CDP fires <code>Debugger.paused</code>. This is the richest event in the entire protocol - it gives you the complete execution state:</p>
+
+<div class="code-wrapper"><pre><code class="language-json">{
+  "method": "Debugger.paused",
+  "params": {
+    "callFrames": [
+      {
+        "callFrameId": "0",
+        "functionName": "renderComponent",
+        "location": {
+          "scriptId": "7",
+          "lineNumber": 42,
+          "columnNumber": 15
+        },
+        "url": "http://localhost:4200/main.js",
+        "scopeChain": [
+          {
+            "type": "local",
+            "object": { "objectId": "scope-obj-1" },
+            "name": "renderComponent"
+          },
+          {
+            "type": "closure",
+            "object": { "objectId": "scope-obj-2" },
+            "name": "AppComponent"
+          },
+          {
+            "type": "global",
+            "object": { "objectId": "scope-obj-3" }
+          }
+        ],
+        "this": { "type": "object", "objectId": "this-obj-1" }
+      },
+      {
+        "callFrameId": "1",
+        "functionName": "detectChanges",
+        "location": { "scriptId": "3", "lineNumber": 891 },
+        "url": "http://localhost:4200/vendor.js",
+        "scopeChain": [ ... ]
+      }
+    ],
+    "reason": "breakpoint",    // 'breakpoint', 'exception', 'debugCommand', etc.
+    "hitBreakpoints": ["bp-1"]
+  }
+}</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p>Key fields:</p>
+<ul>
+  <li><code>callFrames</code> - the full call stack. Frame 0 is where execution paused; frames 1+ are the callers.</li>
+  <li><code>scopeChain</code> - each frame has a scope chain (local, closure, global). Each scope has an <code>objectId</code> you can inspect with <code>Runtime.getProperties</code>.</li>
+  <li><code>reason</code> - why execution paused: <code>breakpoint</code>, <code>exception</code>, <code>debugCommand</code> (from <code>Debugger.pause</code>), <code>OOM</code>, etc.</li>
+  <li><code>this</code> - the value of <code>this</code> at that point in execution.</li>
+</ul>
+
+<h2>Inspecting Variables When Paused</h2>
+
+<p>With execution paused, you can inspect any scope's variables using the <code>objectId</code> from the scope chain:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Get local variables from the current frame
+const localScope = pausedEvent.params.callFrames[0].scopeChain
+  .find(scope => scope.type === 'local');
+
+const localVars = await send('Runtime.getProperties', {
+  objectId: localScope.object.objectId,
+  ownProperties: true
+});
+
+// localVars.result = [
+//   { name: 'userId', value: { type: 'undefined' } },         ← the bug!
+//   { name: 'componentRef', value: { type: 'object', ... } },
+//   { name: 'template', value: { type: 'string', value: '...' } }
+// ]</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h2>Evaluating in a Call Frame's Scope</h2>
+
+<p><code>Debugger.evaluateOnCallFrame</code> lets you run an expression with access to that frame's local variables - like typing in the Console while paused at a breakpoint:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Evaluate an expression in the context of the paused frame
+const result = await send('Debugger.evaluateOnCallFrame', {
+  callFrameId: '0',    // The frame we want to evaluate in
+  expression: 'userId',
+  returnByValue: true
+});
+// result = { result: { type: 'undefined' } }
+
+// Or something more complex
+const diagnostics = await send('Debugger.evaluateOnCallFrame', {
+  callFrameId: '0',
+  expression: 'JSON.stringify({ userId, componentRef: !!componentRef, thisType: typeof this })',
+  returnByValue: true
+});
+// Get a snapshot of the local state for debugging</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<div class="key-concept">
+  <strong>For AI integration:</strong> When paused at an exception, the agent could call <code>evaluateOnCallFrame</code> to inspect the variables that caused the error - without needing you to manually check the Sources panel. It sees the exact state that led to the crash.
+</div>
+
+<h2>Stepping Through Code</h2>
+
+<p>Once paused, you can control execution step by step:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Step over - execute the current line, pause at the next line
+await send('Debugger.stepOver');
+
+// Step into - if the current line has a function call, enter that function
+await send('Debugger.stepInto');
+
+// Step out - run until the current function returns, pause at the caller
+await send('Debugger.stepOut');
+
+// Resume - continue execution normally until the next breakpoint or exception
+await send('Debugger.resume');
+
+// Continue to a specific location (skip intermediate breakpoints)
+await send('Debugger.continueToLocation', {
+  location: {
+    scriptId: '7',
+    lineNumber: 55
+  }
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p>After each step command, a new <code>Debugger.paused</code> event fires with the updated call stack and scope - letting you inspect the new state.</p>
+
+<p>When you resume (or the page finishes), <code>Debugger.resumed</code> fires.</p>
+
+<h2>Reading Script Source</h2>
+
+<p>You can retrieve the actual source code of any loaded script:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">const source = await send('Debugger.getScriptSource', {
+  scriptId: '7'
+});
+// source.scriptSource = 'the entire contents of main.js...'</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p>Combined with source maps, the AI could read the exact TypeScript source where the error occurred.</p>
+
+<h2>Live Editing (Hot Patching)</h2>
+
+<p><code>Debugger.setScriptSource</code> lets you modify a script's source while the page is running - changes take effect immediately for future calls to those functions:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Get the current source
+const source = await send('Debugger.getScriptSource', { scriptId: '7' });
+
+// Modify it
+const modifiedSource = source.scriptSource.replace(
+  'return this.userData.name;',
+  'return this.userData?.name ?? "Unknown";'
+);
+
+// Apply the change - takes effect immediately
+await send('Debugger.setScriptSource', {
+  scriptId: '7',
+  scriptSource: modifiedSource
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<div class="key-concept">
+  <strong>Limitations:</strong> Live editing works for function bodies but has restrictions - you can't add new variables to a closure's scope, change function signatures in ways that affect the stack, or modify code that's currently on the call stack. It's equivalent to the "Edit and save" feature in DevTools Sources. Also, changes are lost on page reload.
+</div>
+
+<h2>Blackboxing (Skipping Framework Code)</h2>
+
+<p>When stepping through Angular code, you don't want to step through zone.js, RxJS internals, or Angular's change detection. Blackboxing tells the debugger to skip specific scripts:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Skip framework files when stepping
+await send('Debugger.setBlackboxPatterns', {
+  patterns: [
+    'node_modules/zone\\.js/.*',
+    'node_modules/@angular/.*',
+    'node_modules/rxjs/.*',
+    'polyfills\\.js'
+  ]
+});
+
+// Now stepInto/stepOver will skip over these files entirely
+// - exactly like blackboxing in DevTools Settings</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h2>Pause on Next Statement</h2>
+
+<p>You can pause execution at the very next JavaScript statement - useful when you want to examine what happens next after a user interaction:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Pause at the very next statement executed
+await send('Debugger.pause');
+
+// Then trigger something (a click, a timer, etc.)
+// Execution will pause at the first statement that runs
+
+// You could also set a function-level breakpoint (experimental)
+await send('Debugger.setBreakpointOnFunctionCall', {
+  objectId: functionObjectId   // A Runtime objectId pointing to a function
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h2>Async Call Stacks</h2>
+
+<p>Modern JavaScript is heavily asynchronous. By default, when you pause inside a <code>then()</code> or <code>async/await</code>, the call stack only shows the current microtask - not what scheduled it. Enable async stack tracking to see the full chain:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Track up to 32 frames of async call stack
+await send('Debugger.setAsyncCallStackDepth', {
+  maxDepth: 32
+});
+
+// Now when paused inside an async function, callFrames will include
+// the full chain: who awaited what, which setTimeout/Promise/Observable scheduled this</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<div class="key-concept">
+  <strong>Why this matters for Angular:</strong> Angular's change detection, HTTP calls, and event handlers are all async. Without async stack tracking, you'd only see the immediate call site. With it, you see the full chain: "user clicked button → event handler called → HTTP request made → response handler ran → change detection triggered → component rendered → error here."
+</div>
+
+<h2>Key Commands Reference</h2>
+
+<table style="width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem;">
+  <thead>
+    <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+      <th style="padding: 0.5rem;">Command</th>
+      <th style="padding: 0.5rem;">Purpose</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Debugger.enable</code></td>
+      <td style="padding: 0.5rem;">Enable debugger and receive scriptParsed events</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Debugger.setBreakpointByUrl</code></td>
+      <td style="padding: 0.5rem;">Set a breakpoint by file URL and line number</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Debugger.setPauseOnExceptions</code></td>
+      <td style="padding: 0.5rem;">Pause on exceptions (all, uncaught, or none)</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Debugger.resume</code></td>
+      <td style="padding: 0.5rem;">Resume execution</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Debugger.stepOver</code></td>
+      <td style="padding: 0.5rem;">Execute current line, pause at next</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Debugger.stepInto</code></td>
+      <td style="padding: 0.5rem;">Enter a function call</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Debugger.stepOut</code></td>
+      <td style="padding: 0.5rem;">Run to end of current function</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Debugger.evaluateOnCallFrame</code></td>
+      <td style="padding: 0.5rem;">Evaluate expression in a paused frame's scope</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Debugger.getScriptSource</code></td>
+      <td style="padding: 0.5rem;">Get a script's source code</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Debugger.setScriptSource</code></td>
+      <td style="padding: 0.5rem;">Hot-patch a script's source (live editing)</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Debugger.setBlackboxPatterns</code></td>
+      <td style="padding: 0.5rem;">Skip framework code when stepping</td>
+    </tr>
+    <tr>
+      <td style="padding: 0.5rem;"><code>Debugger.setAsyncCallStackDepth</code></td>
+      <td style="padding: 0.5rem;">Track async call chains (Promises, timers, etc.)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>For the full list, see the <a href="cdp-complete-reference.html#Debugger">Debugger section of the complete reference</a>.</p>
+
+<div class="recommended">
+  <strong>Key takeaway:</strong> You can now programmatically do everything the Sources panel debugger does - set breakpoints, pause on exceptions, step through code, inspect local variables, evaluate in scope, and even live-edit source. For an AI debugging agent, this means it could pause at an error, inspect the exact state that caused it, and potentially even hot-patch a fix to test whether it works - all without you touching DevTools.
+</div>
+
+<h2>Primary Source</h2>
+
+<p>Read the <a href="https://chromedevtools.github.io/devtools-protocol/tot/Debugger/">Debugger domain documentation</a>. Pay attention to the <code>CallFrame</code> type definition - it's the key data structure for everything you can do when paused.</p>
+
+      <nav class="footer-nav">
+        <a href="08-page-domain.html">&larr; The Page Domain</a>
+        <a href="10-target-session-management.html">Target & Session Management &rarr;</a>
+      </nav>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script src="/vendor/prism.min.js"></script>
+  <script src="/vendor/prism-javascript.min.js"></script>
+  <script src="/vendor/prism-json.min.js"></script>
+  <script src="/vendor/prism-typescript.min.js"></script>
+  <script src="/vendor/prism-bash.min.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

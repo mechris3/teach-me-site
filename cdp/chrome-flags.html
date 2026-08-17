@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>Chrome/Chromium Flags for CDP Automation | Teach Me</title>
+  <meta name="description" content="The command-line flags relevant to CDP automation, testing, and browser control - categorised by purpose with recommended combinations.">
+  <link rel="canonical" href="https://teachmeskills.dev/cdp/chrome-flags.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/cdp/chrome-flags.html">
+  <meta property="og:title" content="Chrome/Chromium Flags for CDP Automation | Teach Me">
+  <meta property="og:description" content="The command-line flags relevant to CDP automation, testing, and browser control - categorised by purpose with recommended combinations.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Chrome/Chromium Flags for CDP Automation | Teach Me">
+  <meta name="twitter:description" content="The command-line flags relevant to CDP automation, testing, and browser control - categorised by purpose with recommended combinations.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <main class="page-content" id="main-content">
+    <a href="index.html" class="back-link">&larr; Back to Course Index</a>
+
+<h1>Chrome/Chromium Command-Line Flags for CDP Automation</h1>
+<p class="subtitle">The flags you'll actually use when launching a browser for programmatic control.</p>
+
+<p>Chrome/Chromium has 1000+ command-line flags. Most are internal or experimental. This reference covers the ones relevant to CDP automation, testing, and a CDP-based tool.</p>
+
+<h2>Essential - Required for CDP</h2>
+
+<table>
+  <thead><tr><th>Flag</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><code>--remote-debugging-port=9222</code></td>
+      <td>Starts the CDP WebSocket server on this port. Without this flag, CDP is unavailable. Port is your choice (9222 is convention).</td>
+    </tr>
+    <tr>
+      <td><code>--user-data-dir=/path/to/profile</code></td>
+      <td>Use a specific browser profile directory. Controls cookies, extensions, settings, localStorage. Use a temp dir for isolation, or a real profile to load extensions.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Headless Mode</h2>
+
+<table>
+  <thead><tr><th>Flag</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><code>--headless</code></td>
+      <td>Run without a visible window (new headless mode since Chrome 112 - same rendering engine as headful). Good for CI.</td>
+    </tr>
+    <tr>
+      <td><code>--headless=old</code></td>
+      <td>Use the old headless implementation (separate renderer, less compatible). Rarely needed now.</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="key-concept">
+  <strong>New vs old headless:</strong> Since Chrome 112, <code>--headless</code> runs the same browser engine as the visible mode - full CSS, extensions, and rendering. The old headless was a separate implementation with subtle rendering differences. Always use the new mode unless you have a specific reason.
+</div>
+
+<h2>Startup Behaviour</h2>
+
+<table>
+  <thead><tr><th>Flag</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><code>--no-first-run</code></td>
+      <td>Skip "Welcome to Chrome/Brave" first-run dialogs and setup.</td>
+    </tr>
+    <tr>
+      <td><code>--no-default-browser-check</code></td>
+      <td>Don't prompt to make this the default browser.</td>
+    </tr>
+    <tr>
+      <td><code>--disable-default-apps</code></td>
+      <td>Don't install default apps (Gmail, YouTube shortcuts, etc.) on first run.</td>
+    </tr>
+    <tr>
+      <td><code>--disable-extensions</code></td>
+      <td>Disable all extensions. Use when you want a clean environment without extension interference.</td>
+    </tr>
+    <tr>
+      <td><code>--disable-component-extensions-with-background-pages</code></td>
+      <td>Disable background pages for built-in component extensions (reduces noise).</td>
+    </tr>
+    <tr>
+      <td><code>--disable-popup-blocking</code></td>
+      <td>Allow popups (useful if your app uses <code>window.open()</code>).</td>
+    </tr>
+    <tr>
+      <td><code>--start-maximized</code></td>
+      <td>Start with the window maximized.</td>
+    </tr>
+    <tr>
+      <td><code>--new-window</code></td>
+      <td>Open a new window instead of a new tab in an existing instance.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Window & Display</h2>
+
+<table>
+  <thead><tr><th>Flag</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><code>--window-size=1920,1080</code></td>
+      <td>Set the initial window size (width,height in pixels).</td>
+    </tr>
+    <tr>
+      <td><code>--window-position=0,0</code></td>
+      <td>Set the initial window position on screen.</td>
+    </tr>
+    <tr>
+      <td><code>--force-device-scale-factor=2</code></td>
+      <td>Force a specific device pixel ratio (e.g., 2 for Retina simulation).</td>
+    </tr>
+    <tr>
+      <td><code>--hide-scrollbars</code></td>
+      <td>Hide scrollbars (useful for consistent screenshots).</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Security & Permissions</h2>
+
+<table>
+  <thead><tr><th>Flag</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><code>--disable-web-security</code></td>
+      <td>Disable same-origin policy and CORS. <strong>Dangerous</strong> - only for testing. Lets your page make cross-origin requests freely.</td>
+    </tr>
+    <tr>
+      <td><code>--allow-insecure-localhost</code></td>
+      <td>Allow invalid/self-signed certificates on localhost. Useful for local dev servers with HTTPS.</td>
+    </tr>
+    <tr>
+      <td><code>--ignore-certificate-errors</code></td>
+      <td>Ignore all SSL certificate errors. <strong>Dangerous</strong> - only for testing against self-signed certs.</td>
+    </tr>
+    <tr>
+      <td><code>--disable-features=IsolateOrigins,site-per-process</code></td>
+      <td>Disable site isolation (can simplify iframe interaction in testing, but reduces security).</td>
+    </tr>
+    <tr>
+      <td><code>--auto-accept-camera-and-microphone-capture</code></td>
+      <td>Auto-grant camera/microphone permissions without prompting.</td>
+    </tr>
+    <tr>
+      <td><code>--use-fake-ui-for-media-stream</code></td>
+      <td>Use fake UI for camera/mic permission prompts (auto-accept).</td>
+    </tr>
+    <tr>
+      <td><code>--use-fake-device-for-media-stream</code></td>
+      <td>Use a fake camera/mic device (no real hardware needed).</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Network</h2>
+
+<table>
+  <thead><tr><th>Flag</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><code>--proxy-server=http://host:port</code></td>
+      <td>Route all traffic through a proxy.</td>
+    </tr>
+    <tr>
+      <td><code>--proxy-bypass-list=localhost,127.0.0.1</code></td>
+      <td>Bypass the proxy for specified hosts.</td>
+    </tr>
+    <tr>
+      <td><code>--host-resolver-rules="MAP * 127.0.0.1"</code></td>
+      <td>Override DNS resolution (map hostnames to specific IPs).</td>
+    </tr>
+    <tr>
+      <td><code>--remote-debugging-address=0.0.0.0</code></td>
+      <td>Allow remote CDP connections from other machines (default is localhost only). <strong>Security risk</strong> - only for trusted networks.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Performance & Resource Usage</h2>
+
+<table>
+  <thead><tr><th>Flag</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><code>--disable-gpu</code></td>
+      <td>Disable GPU hardware acceleration. Useful in CI/Docker environments without GPU access.</td>
+    </tr>
+    <tr>
+      <td><code>--disable-dev-shm-usage</code></td>
+      <td>Write shared memory to /tmp instead of /dev/shm. Fixes crashes in Docker where /dev/shm is too small.</td>
+    </tr>
+    <tr>
+      <td><code>--no-sandbox</code></td>
+      <td>Disable the Chrome sandbox. <strong>Required</strong> when running as root in Docker, but a security risk otherwise.</td>
+    </tr>
+    <tr>
+      <td><code>--disable-setuid-sandbox</code></td>
+      <td>Disable setuid sandbox (less aggressive than --no-sandbox, sometimes sufficient).</td>
+    </tr>
+    <tr>
+      <td><code>--single-process</code></td>
+      <td>Run everything in one process (reduces memory in resource-constrained environments, but less stable).</td>
+    </tr>
+    <tr>
+      <td><code>--disable-background-timer-throttling</code></td>
+      <td>Don't throttle timers in background tabs. Important for testing - ensures setInterval/setTimeout run at full speed even when the tab isn't focused.</td>
+    </tr>
+    <tr>
+      <td><code>--disable-backgrounding-occluded-windows</code></td>
+      <td>Don't reduce priority for windows that are occluded (hidden behind other windows).</td>
+    </tr>
+    <tr>
+      <td><code>--disable-renderer-backgrounding</code></td>
+      <td>Don't reduce priority for renderer processes of background pages.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Automation-Specific</h2>
+
+<table>
+  <thead><tr><th>Flag</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><code>--enable-automation</code></td>
+      <td>Enable automation mode (shows "Chrome is being controlled by automated test software" bar). Some sites detect this.</td>
+    </tr>
+    <tr>
+      <td><code>--disable-blink-features=AutomationControlled</code></td>
+      <td>Prevent <code>navigator.webdriver</code> from being set to <code>true</code>. Helps avoid bot detection.</td>
+    </tr>
+    <tr>
+      <td><code>--disable-infobars</code></td>
+      <td>Suppress all info bars (including the "controlled by automation" bar). Deprecated in newer Chrome versions.</td>
+    </tr>
+    <tr>
+      <td><code>--disable-hang-monitor</code></td>
+      <td>Disable the "Page unresponsive" dialog. Useful in automation where long scripts are expected.</td>
+    </tr>
+    <tr>
+      <td><code>--disable-ipc-flooding-protection</code></td>
+      <td>Disable throttling of IPC messages. Useful when sending many CDP commands rapidly.</td>
+    </tr>
+    <tr>
+      <td><code>--password-store=basic</code></td>
+      <td>Don't use the system keychain for passwords (avoids keychain prompts on macOS).</td>
+    </tr>
+    <tr>
+      <td><code>--use-mock-keychain</code></td>
+      <td>Use a mock keychain (macOS - avoids system keychain access prompts).</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Testing & Debugging</h2>
+
+<table>
+  <thead><tr><th>Flag</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><code>--enable-logging=stderr</code></td>
+      <td>Print Chrome's internal logs to stderr. Useful for debugging browser-level issues.</td>
+    </tr>
+    <tr>
+      <td><code>--v=1</code></td>
+      <td>Set verbose logging level (1 = verbose, 2 = very verbose).</td>
+    </tr>
+    <tr>
+      <td><code>--disable-features=TranslateUI</code></td>
+      <td>Disable the translation prompt bar (interferes with page layout during testing).</td>
+    </tr>
+    <tr>
+      <td><code>--lang=en-US</code></td>
+      <td>Force the browser language (consistent rendering in tests regardless of system locale).</td>
+    </tr>
+    <tr>
+      <td><code>--font-render-hinting=none</code></td>
+      <td>Disable font hinting (more consistent text rendering across platforms for screenshot comparison).</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Recommended Combinations</h2>
+
+<h3>Local development/debugging (visible browser)</h3>
+
+<div class="code-wrapper"><pre><code class="language-bash">/Applications/Brave\ Browser.app/Contents/MacOS/Brave\ Browser \
+  --remote-debugging-port=9222 \
+  --user-data-dir=/path/to/test-profile \
+  --no-first-run \
+  --no-default-browser-check \
+  --disable-background-timer-throttling</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h3>CI/headless (Docker or GitHub Actions)</h3>
+
+<div class="code-wrapper"><pre><code class="language-bash">google-chrome \
+  --headless \
+  --remote-debugging-port=9222 \
+  --user-data-dir=/tmp/chrome-test \
+  --no-first-run \
+  --no-sandbox \
+  --disable-gpu \
+  --disable-dev-shm-usage \
+  --disable-background-timer-throttling \
+  --disable-backgrounding-occluded-windows \
+  --disable-renderer-backgrounding \
+  --window-size=1920,1080 \
+  --hide-scrollbars</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h3>Testing with extensions loaded (Brave profile)</h3>
+
+<div class="code-wrapper"><pre><code class="language-bash">/Applications/Brave\ Browser.app/Contents/MacOS/Brave\ Browser \
+  --remote-debugging-port=9222 \
+  --user-data-dir="/path/to/your/brave-profile" \
+  --no-first-run \
+  --no-default-browser-check \
+  --disable-background-timer-throttling \
+  --disable-popup-blocking</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h3>Clean isolated run (no extensions, no history)</h3>
+
+<div class="code-wrapper"><pre><code class="language-bash">/Applications/Brave\ Browser.app/Contents/MacOS/Brave\ Browser \
+  --remote-debugging-port=9222 \
+  --user-data-dir=/tmp/cdp-clean-run \
+  --no-first-run \
+  --no-default-browser-check \
+  --disable-extensions \
+  --disable-default-apps \
+  --disable-background-timer-throttling \
+  --password-store=basic \
+  --use-mock-keychain</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<div class="key-concept">
+  <strong>Full list:</strong> For all 1000+ flags, see <a href="https://chrome-flags.com/">chrome-flags.com</a> or the <a href="https://source.chromium.org/chromium/chromium/src/+/main:chrome/common/chrome_switches.cc">Chromium source (chrome_switches.cc)</a>. The flags above are the ones relevant to CDP automation.
+</div>
+  </main>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script src="/vendor/prism.min.js"></script>
+  <script src="/vendor/prism-bash.min.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>Performance & Tracing - Lesson 11 | Teach Me</title>
+  <meta name="description" content="Lesson 11 of the Chrome DevTools Protocol course: Performance & Tracing">
+  <link rel="canonical" href="https://teachmeskills.dev/cdp/11-performance-tracing.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/cdp/11-performance-tracing.html">
+  <meta property="og:title" content="Performance & Tracing - Lesson 11 | Teach Me">
+  <meta property="og:description" content="Lesson 11 of the Chrome DevTools Protocol course. Collecting performance metrics and trace data for profiling and analysis.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Performance & Tracing - Lesson 11 | Teach Me">
+  <meta name="twitter:description" content="Lesson 11 of the Chrome DevTools Protocol course. Collecting performance metrics and trace data for profiling and analysis.">
+  <script type="application/ld+json">
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://teachmeskills.dev/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Chrome DevTools Protocol",
+        "item": "https://teachmeskills.dev/cdp/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Performance & Tracing"
+      }
+    ]
+  }
+]
+  </script>
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header"><a href="index.html">CDP Course</a></div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-what-is-cdp.html">1. What Is the Chrome DevTools Protocol?</a></li>
+        <li><a href="02-first-connection.html">2. Your First CDP Connection</a></li>
+        <li><a href="03-dom-domain.html">3. The DOM Domain</a></li>
+        <li><a href="04-runtime-domain.html">4. The Runtime Domain</a></li>
+        <li><a href="05-network-domain.html">5. The Network Domain</a></li>
+        <li><a href="06-combined-monitoring.html">6. Combined Monitoring</a></li>
+        <li><a href="07-input-domain.html">7. The Input Domain</a></li>
+        <li><a href="08-page-domain.html">8. The Page Domain</a></li>
+        <li><a href="09-debugger-domain.html">9. The Debugger Domain</a></li>
+        <li><a href="10-target-session-management.html">10. Target & Session Management</a></li>
+        <li class="current"><a href="11-performance-tracing.html">11. Performance & Tracing</a></li>
+        <li><a href="12-emulation-css.html">12. Emulation & CSS</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="glossary.html">Glossary</a></li>
+        <li><a href="cdp-complete-reference.html">Complete Reference</a></li>
+        <li><a href="chrome-flags.html">Chrome Flags</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 11</p>
+  <h1>Performance & Tracing</h1>
+
+<h2>What You'll Learn</h2>
+
+<p>Two domains cover performance analysis in CDP:</p>
+
+<ul>
+  <li><strong><code>Performance</code></strong> - lightweight runtime metrics (JS heap size, DOM node count, layout count, etc.). Think "dashboard gauges."</li>
+  <li><strong><code>Tracing</code></strong> - full Chrome trace recording (the same data you see in DevTools' Performance panel). Think "flight recorder."</li>
+</ul>
+
+<p>These are different tools for different jobs. Performance gives you quick numbers; Tracing gives you deep analysis.</p>
+
+<h2>The Performance Domain - Runtime Metrics</h2>
+
+<h3>Enabling and reading metrics</h3>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Enable metric collection
+await send('Performance.enable');
+
+// Get current metric values at any time
+const metrics = await send('Performance.getMetrics');
+// metrics.metrics = [
+//   { name: 'Timestamp', value: 1719012345.678 },
+//   { name: 'Documents', value: 1 },
+//   { name: 'Frames', value: 1 },
+//   { name: 'JSEventListeners', value: 47 },
+//   { name: 'Nodes', value: 312 },
+//   { name: 'LayoutCount', value: 14 },
+//   { name: 'RecalcStyleCount', value: 18 },
+//   { name: 'LayoutDuration', value: 0.023 },
+//   { name: 'RecalcStyleDuration', value: 0.011 },
+//   { name: 'ScriptDuration', value: 0.156 },
+//   { name: 'TaskDuration', value: 0.312 },
+//   { name: 'JSHeapUsedSize', value: 8453120 },
+//   { name: 'JSHeapTotalSize', value: 12582912 },
+//   ... more metrics
+// ]</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h3>Key metrics explained</h3>
+
+<table style="width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.85rem;">
+  <thead>
+    <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+      <th style="padding: 0.5rem;">Metric</th>
+      <th style="padding: 0.5rem;">What it tells you</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Nodes</code></td>
+      <td style="padding: 0.5rem;">Total DOM nodes. High/growing = potential memory leak or excessive DOM</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>JSHeapUsedSize</code></td>
+      <td style="padding: 0.5rem;">JS memory in use (bytes). Growing over time = memory leak</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>JSHeapTotalSize</code></td>
+      <td style="padding: 0.5rem;">Total JS heap allocated. Much larger than Used = fragmentation</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>JSEventListeners</code></td>
+      <td style="padding: 0.5rem;">Number of active event listeners. Growing = listeners not being cleaned up</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>LayoutCount</code></td>
+      <td style="padding: 0.5rem;">Number of layout recalculations. High = layout thrashing</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>RecalcStyleCount</code></td>
+      <td style="padding: 0.5rem;">Number of style recalculations. High = excessive CSS changes</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>ScriptDuration</code></td>
+      <td style="padding: 0.5rem;">Time spent executing JS (seconds). High = expensive computations</td>
+    </tr>
+    <tr>
+      <td style="padding: 0.5rem;"><code>TaskDuration</code></td>
+      <td style="padding: 0.5rem;">Total time for all tasks (JS + layout + style + paint). The "main thread busy" metric</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Taking metric snapshots during a journey</h3>
+
+<p>You can call <code>getMetrics</code> at different points during a journey to detect performance regressions:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Capture before an action
+const before = await send('Performance.getMetrics');
+
+// Perform the action (navigate, click, load data)
+await send('Page.navigate', { url: 'http://localhost:4200/dashboard' });
+await waitForSelector('[data-testid="dashboard-loaded"]');
+
+// Capture after
+const after = await send('Performance.getMetrics');
+
+// Compare
+function getMetricValue(metrics, name) {
+  const metric = metrics.metrics.find(m => m.name === name);
+  return metric ? metric.value : 0;
+}
+
+const heapGrowth = getMetricValue(after, 'JSHeapUsedSize') - getMetricValue(before, 'JSHeapUsedSize');
+const nodeGrowth = getMetricValue(after, 'Nodes') - getMetricValue(before, 'Nodes');
+
+console.log(`Heap grew by: ${(heapGrowth / 1024 / 1024).toFixed(2)} MB`);
+console.log(`DOM nodes added: ${nodeGrowth}`);</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<div class="key-concept">
+  <strong>For the package:</strong> You could capture metrics before and after each journey step and flag anomalies (huge heap growth, thousands of new DOM nodes, excessive layout recalculations). This is lightweight - one CDP call per measurement - and gives early warning of performance issues without full tracing.
+</div>
+
+<h2>The Tracing Domain - Full Trace Recording</h2>
+
+<p>The Tracing domain records the same data you see in DevTools' Performance panel - a complete timeline of everything the browser did: JavaScript execution, layout, paint, network, compositor activity, GPU work.</p>
+
+<h3>Recording a trace</h3>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Collect trace events as they arrive
+const traceEvents = [];
+
+// Listen for trace data chunks
+// (Tracing.dataCollected fires multiple times with batches of events)
+ws.on('message', (data) => {
+  const msg = JSON.parse(data.toString());
+  if (msg.method === 'Tracing.dataCollected') {
+    traceEvents.push(...msg.params.value);
+  }
+});
+
+// Start recording
+await send('Tracing.start', {
+  categories: '-*,devtools.timeline,v8.execute,disabled-by-default-devtools.timeline',
+  transferMode: 'ReportEvents'   // Send events as they happen
+});
+
+// ... perform the actions you want to profile ...
+await send('Page.navigate', { url: 'http://localhost:4200' });
+await waitForSelector('[data-testid="app-ready"]');
+
+// Stop recording
+await send('Tracing.end');
+
+// Wait for tracingComplete event (signals all data has been sent)
+await new Promise((resolve) => {
+  const handler = (data) => {
+    const msg = JSON.parse(data.toString());
+    if (msg.method === 'Tracing.tracingComplete') {
+      ws.removeListener('message', handler);
+      resolve();
+    }
+  };
+  ws.on('message', handler);
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h3>Trace categories</h3>
+
+<p>Categories control what gets recorded. Common useful categories:</p>
+
+<ul>
+  <li><code>devtools.timeline</code> - main thread activity (JS, layout, paint, compositing)</li>
+  <li><code>v8.execute</code> - V8 JavaScript execution details</li>
+  <li><code>disabled-by-default-devtools.timeline</code> - additional timeline data (stack traces for events)</li>
+  <li><code>disabled-by-default-devtools.timeline.frame</code> - frame rendering data</li>
+  <li><code>disabled-by-default-v8.cpu_profiler</code> - CPU profile samples</li>
+  <li><code>blink.user_timing</code> - <code>performance.mark()</code> and <code>performance.measure()</code> from your code</li>
+</ul>
+
+<p>The <code>-*</code> prefix disables all categories first, then you selectively enable what you need. Without it, you get everything - which can be enormous.</p>
+
+<p>To see all available categories:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">const categories = await send('Tracing.getCategories');
+// categories.categories = ['devtools.timeline', 'v8', 'blink', 'cc', 'gpu', ...]</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h3>Saving the trace to a file</h3>
+
+<p>The trace data is in Chrome's trace format - you can save it as JSON and load it directly into DevTools' Performance panel (or <a href="https://ui.perfetto.dev">Perfetto</a>) for visual analysis:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">import { writeFileSync } from 'fs';
+
+// Chrome trace format is just a JSON array of trace events
+const traceFile = JSON.stringify(traceEvents);
+writeFileSync('trace.json', traceFile);
+
+console.log(`Trace saved: ${traceEvents.length} events`);
+// Open in DevTools: Performance panel → Load profile → select trace.json
+// Or open https://ui.perfetto.dev and drag the file in</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h3>Analysing trace data programmatically</h3>
+
+<p>Each trace event has this shape:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">{
+  "cat": "devtools.timeline",        // Category
+  "name": "FunctionCall",             // Event type
+  "ph": "X",                          // Phase: 'X' = complete, 'B' = begin, 'E' = end
+  "ts": 1234567890,                   // Timestamp (microseconds)
+  "dur": 5000,                        // Duration (microseconds) - for complete events
+  "pid": 1234,                        // Process ID
+  "tid": 5678,                        // Thread ID
+  "args": {                           // Event-specific data
+    "data": {
+      "functionName": "renderComponent",
+      "scriptId": "7",
+      "url": "http://localhost:4200/main.js",
+      "lineNumber": 42
+    }
+  }
+}</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p>You can analyse this programmatically to find performance bottlenecks:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Find the longest JavaScript functions
+const longFunctions = traceEvents
+  .filter(event => event.name === 'FunctionCall' && event.dur)
+  .sort((a, b) => b.dur - a.dur)
+  .slice(0, 10)
+  .map(event => ({
+    name: event.args?.data?.functionName || 'anonymous',
+    duration: `${(event.dur / 1000).toFixed(1)}ms`,
+    url: event.args?.data?.url
+  }));
+
+console.log('Top 10 slowest functions:', longFunctions);
+
+// Find layout thrashing (forced reflows)
+const forcedLayouts = traceEvents
+  .filter(event => event.name === 'Layout' && event.args?.beginData?.dirtyObjects > 0);
+
+console.log(`Forced layouts: ${forcedLayouts.length}`);
+
+// Find long tasks (> 50ms - these block the main thread)
+const longTasks = traceEvents
+  .filter(event => event.name === 'RunTask' && event.dur > 50000);  // 50ms in microseconds
+
+console.log(`Long tasks (> 50ms): ${longTasks.length}`);</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<div class="key-concept">
+  <strong>User timing marks:</strong> If an Angular app uses <code>performance.mark('route-loaded')</code> and <code>performance.measure()</code>, these show up in the trace under the <code>blink.user_timing</code> category. You could instrument the application with strategic marks and then programmatically read them from the trace to measure specific user-perceived performance metrics.
+</div>
+
+<h2>Performance vs Tracing: When to Use Which</h2>
+
+<table style="width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.85rem;">
+  <thead>
+    <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+      <th style="padding: 0.5rem;"></th>
+      <th style="padding: 0.5rem;">Performance domain</th>
+      <th style="padding: 0.5rem;">Tracing domain</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;">Data type</td>
+      <td style="padding: 0.5rem;">Point-in-time metrics (current values)</td>
+      <td style="padding: 0.5rem;">Full timeline of events</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;">Overhead</td>
+      <td style="padding: 0.5rem;">Near zero</td>
+      <td style="padding: 0.5rem;">Moderate (recording impacts performance)</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;">Output size</td>
+      <td style="padding: 0.5rem;">A few KB (metric values)</td>
+      <td style="padding: 0.5rem;">Potentially hundreds of MB for long recordings</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;">Good for</td>
+      <td style="padding: 0.5rem;">Quick health checks, regression detection, CI assertions</td>
+      <td style="padding: 0.5rem;">Deep investigation, understanding why something is slow</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;">Always-on?</td>
+      <td style="padding: 0.5rem;">Yes - lightweight enough to leave enabled</td>
+      <td style="padding: 0.5rem;">No - enable only when investigating</td>
+    </tr>
+    <tr>
+      <td style="padding: 0.5rem;">Analogy</td>
+      <td style="padding: 0.5rem;">Car dashboard (speed, fuel, temperature)</td>
+      <td style="padding: 0.5rem;">Black box flight recorder</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Practical Use</h2>
+
+<p>For a CDP-based journey runner:</p>
+
+<ul>
+  <li><strong>Performance metrics:</strong> Always enabled. Capture before/after each journey step. Flag anomalies (heap growing, node count exploding). Include in diagnostic reports.</li>
+  <li><strong>Tracing:</strong> Opt-in. When a journey is slow and you need to understand why, enable tracing for that run and save the trace file for manual analysis in DevTools or Perfetto.</li>
+</ul>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// In the package's diagnostic collector:
+class DiagnosticCollector {
+  // ...existing code...
+
+  async captureMetricsSnapshot(label) {
+    const metrics = await this.send('Performance.getMetrics');
+    this.#metricsSnapshots = [
+      ...this.#metricsSnapshots,
+      { label, timestamp: Date.now(), metrics: metrics.metrics }
+    ];
+  }
+
+  getMetricsReport() {
+    return this.#metricsSnapshots;
+  }
+}</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h2>Key Commands Reference</h2>
+
+<table style="width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem;">
+  <thead>
+    <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+      <th style="padding: 0.5rem;">Command</th>
+      <th style="padding: 0.5rem;">Purpose</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Performance.enable</code></td>
+      <td style="padding: 0.5rem;">Start collecting metrics</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Performance.getMetrics</code></td>
+      <td style="padding: 0.5rem;">Read current metric values</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Tracing.start</code></td>
+      <td style="padding: 0.5rem;">Begin recording a trace (specify categories)</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Tracing.end</code></td>
+      <td style="padding: 0.5rem;">Stop recording</td>
+    </tr>
+    <tr>
+      <td style="padding: 0.5rem;"><code>Tracing.getCategories</code></td>
+      <td style="padding: 0.5rem;">List all available trace categories</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>For the full list, see the <a href="cdp-complete-reference.html#Performance">Performance</a> and <a href="cdp-complete-reference.html#Tracing">Tracing</a> sections of the complete reference.</p>
+
+<div class="recommended">
+  <strong>Key takeaway:</strong> You understand both levels of performance tooling in CDP - lightweight metrics for quick health checks (always-on, low overhead) and full tracing for deep analysis (opt-in, high detail). The package can use Performance metrics as part of its diagnostic collection, and offer tracing as an opt-in feature for investigating slow journeys.
+</div>
+
+<h2>Primary Source</h2>
+
+<p>Read the <a href="https://chromedevtools.github.io/devtools-protocol/tot/Performance/">Performance domain documentation</a> and the <a href="https://chromedevtools.github.io/devtools-protocol/tot/Tracing/">Tracing domain documentation</a>. For understanding trace file format, see <a href="https://docs.google.com/document/d/1CvAClvFfyA5R-PhYUmn5OOQtYMH4h6I0nSsKchNAySU/preview">Chrome's Trace Event Format documentation</a>.</p>
+
+      <nav class="footer-nav">
+        <a href="10-target-session-management.html">&larr; Target & Session Management</a>
+        <a href="12-emulation-css.html">Emulation & CSS &rarr;</a>
+      </nav>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script src="/vendor/prism.min.js"></script>
+  <script src="/vendor/prism-javascript.min.js"></script>
+  <script src="/vendor/prism-json.min.js"></script>
+  <script src="/vendor/prism-typescript.min.js"></script>
+  <script src="/vendor/prism-bash.min.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

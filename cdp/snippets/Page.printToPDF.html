@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Page.printToPDF - CDP Snippet</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root { --bg:#fffff8; --fg:#111; --accent:#1a73e8; --muted:#555; --border:#ddd; --code-bg:#f5f5f0; --font-body:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; --font-heading:"Source Serif 4","Iowan Old Style",Georgia,serif; }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    html { font-size:16px; }
+    body { font-family:var(--font-body); line-height:1.6; color:var(--fg); background:var(--bg); max-width:900px; margin:0 auto; padding:2.5rem 1.5rem 4rem; }
+    h1 { font-family:var(--font-heading); font-size:1.5rem; font-weight:600; margin-bottom:0.25rem; }
+    .subtitle { font-size:0.9rem; color:var(--muted); margin-bottom:2rem; font-style:italic; }
+    h2 { font-family:var(--font-heading); font-size:1.1rem; font-weight:600; margin-top:2rem; margin-bottom:0.5rem; }
+    p { margin-bottom:0.75rem; font-size:0.9rem; }
+    code { font-family:"SF Mono","Fira Code","Consolas",monospace; font-size:0.82rem; background:var(--code-bg); padding:0.1em 0.35em; border-radius:3px; }
+    pre { background:var(--code-bg); border:1px solid var(--border); border-radius:4px; padding:1rem 1.25rem; overflow-x:auto; margin:0.75rem 0 1.25rem; line-height:1.5; position:relative; }
+    pre code { background:none; padding:0; font-size:0.8rem; }
+    a { color:var(--accent); text-decoration:none; }
+    a:hover { text-decoration:underline; }
+    .back-link { display:block; margin-bottom:1.5rem; font-size:0.9rem; }
+    .meta { font-size:0.8rem; color:var(--muted); margin-bottom:1.5rem; }
+    .meta span { display:inline-block; margin-right:1rem; }
+    .badge { font-size:0.7rem; font-weight:500; padding:0.15em 0.5em; border-radius:3px; vertical-align:middle; }
+    .stable { background:#e8f5e9; color:#2e7d32; }
+    .experimental { background:#fff3e0; color:#e65100; }
+    .deprecated { background:#ffebee; color:#c62828; }
+    table { width:100%; border-collapse:collapse; margin:0.75rem 0; font-size:0.85rem; }
+    th, td { padding:0.4rem 0.6rem; border-bottom:1px solid var(--border); text-align:left; }
+    th { font-weight:600; }
+    .copy-btn { position:absolute; top:0.5rem; right:0.5rem; background:var(--border); border:none; border-radius:3px; padding:0.25rem 0.4rem; cursor:pointer; font-size:0.75rem; color:var(--muted); opacity:0.6; transition:opacity 0.15s; }
+    .copy-btn:hover { opacity:1; background:#ccc; }
+    .copy-btn.copied { color:#2e7d32; }
+  </style>
+</head>
+<body>
+
+<a href="../cdp-complete-reference.html#Page" class="back-link">&larr; Back to Page domain</a>
+
+<h1><code>Page.printToPDF</code></h1>
+<p class="subtitle">Print page as PDF.</p>
+<div class="meta">
+  <span>Domain: <strong>Page</strong></span>
+  <span class="badge stable">stable</span>
+</div>
+
+<h2>Parameters</h2>
+<table>
+  <thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td><code>landscape</code> (optional)</td><td><code>boolean</code></td><td>Paper orientation. Defaults to false.</td></tr>
+    <tr><td><code>displayHeaderFooter</code> (optional)</td><td><code>boolean</code></td><td>Display header and footer. Defaults to false.</td></tr>
+    <tr><td><code>printBackground</code> (optional)</td><td><code>boolean</code></td><td>Print background graphics. Defaults to false.</td></tr>
+    <tr><td><code>scale</code> (optional)</td><td><code>number</code></td><td>Scale of the webpage rendering. Defaults to 1.</td></tr>
+    <tr><td><code>paperWidth</code> (optional)</td><td><code>number</code></td><td>Paper width in inches. Defaults to 8.5 inches.</td></tr>
+    <tr><td><code>paperHeight</code> (optional)</td><td><code>number</code></td><td>Paper height in inches. Defaults to 11 inches.</td></tr>
+    <tr><td><code>marginTop</code> (optional)</td><td><code>number</code></td><td>Top margin in inches. Defaults to 1cm (~0.4 inches).</td></tr>
+    <tr><td><code>marginBottom</code> (optional)</td><td><code>number</code></td><td>Bottom margin in inches. Defaults to 1cm (~0.4 inches).</td></tr>
+    <tr><td><code>marginLeft</code> (optional)</td><td><code>number</code></td><td>Left margin in inches. Defaults to 1cm (~0.4 inches).</td></tr>
+    <tr><td><code>marginRight</code> (optional)</td><td><code>number</code></td><td>Right margin in inches. Defaults to 1cm (~0.4 inches).</td></tr>
+    <tr><td><code>pageRanges</code> (optional)</td><td><code>string</code></td><td>Paper ranges to print, one based, e.g., '1-5, 8, 11-13'. Pages are
+printed in the document order, not in the order specified, and no
+more than once.
+Defaults to empty string, which implies the entire document is printed.
+The page numbers are quietly capped to actual page count of the
+document, and ranges beyond the end of the document are ignored.
+If this results in no pages to print, an error is reported.
+It is an error to specify a range with start greater than end.</td></tr>
+    <tr><td><code>headerTemplate</code> (optional)</td><td><code>string</code></td><td>HTML template for the print header. Should be valid HTML markup with following
+classes used to inject printing values into them:
+- `date`: formatted print date
+- `title`: document title
+- `url`: document location
+- `pageNumber`: current page number
+- `totalPages`: total pages in the document
+
+For example, `&lt;span class=title&gt;&lt;/span&gt;` would generate span containing the title.</td></tr>
+    <tr><td><code>footerTemplate</code> (optional)</td><td><code>string</code></td><td>HTML template for the print footer. Should use the same format as the `headerTemplate`.</td></tr>
+    <tr><td><code>preferCSSPageSize</code> (optional)</td><td><code>boolean</code></td><td>Whether or not to prefer page size as defined by css. Defaults to false,
+in which case the content will be scaled to fit the paper size.</td></tr>
+    <tr><td><code>transferMode</code> (optional)</td><td><code>string</code></td><td>return as stream</td></tr>
+    <tr><td><code>generateTaggedPDF</code> (optional)</td><td><code>boolean</code></td><td>Whether or not to generate tagged (accessible) PDF. Defaults to embedder choice.</td></tr>
+    <tr><td><code>generateDocumentOutline</code> (optional)</td><td><code>boolean</code></td><td>Whether or not to embed the document outline into the PDF.</td></tr>
+  </tbody>
+</table>
+
+<h2>Returns</h2>
+<table>
+  <thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td><code>data</code></td><td><code>string</code></td><td>Base64-encoded pdf data. Empty if |returnAsStream| is specified. (Encoded as a base64 string when passed over JSON)</td></tr>
+    <tr><td><code>stream</code></td><td><code>IO.StreamHandle</code></td><td>A handle of the stream that holds resulting PDF data.</td></tr>
+  </tbody>
+</table>
+
+<h2>Example Request</h2>
+<pre><code>{
+  "id": 1,
+  "method": "Page.printToPDF"
+}</code></pre>
+
+<h2>Example Response</h2>
+<pre><code>{
+  "id": 1,
+  "result": {
+    "data": "base64-encoded-data...",
+    "stream": "stream-value"
+  }
+}</code></pre>
+
+<h2>Usage in Node.js</h2>
+<pre><code>const result = await send('Page.printToPDF');
+console.log(result);
+// {"data": "base64-encoded-data...", "stream": "stream-value"}</code></pre>
+
+<script>
+document.querySelectorAll('pre').forEach(pre => {
+  const btn = document.createElement('button');
+  btn.className = 'copy-btn';
+  btn.textContent = '\u29c9 Copy';
+  btn.addEventListener('click', async () => {
+    const code = pre.querySelector('code')?.textContent || pre.textContent;
+    await navigator.clipboard.writeText(code);
+    btn.textContent = '\u2713 Copied';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '\u29c9 Copy'; btn.classList.remove('copied'); }, 1500);
+  });
+  pre.appendChild(btn);
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>Target & Session Management - Lesson 10 | Teach Me</title>
+  <meta name="description" content="Lesson 10 of the Chrome DevTools Protocol course: Target & Session Management">
+  <link rel="canonical" href="https://teachmeskills.dev/cdp/10-target-session-management.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/cdp/10-target-session-management.html">
+  <meta property="og:title" content="Target & Session Management - Lesson 10 | Teach Me">
+  <meta property="og:description" content="Lesson 10 of the Chrome DevTools Protocol course. Managing multiple targets, attaching sessions, and browser context isolation.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Target & Session Management - Lesson 10 | Teach Me">
+  <meta name="twitter:description" content="Lesson 10 of the Chrome DevTools Protocol course. Managing multiple targets, attaching sessions, and browser context isolation.">
+  <script type="application/ld+json">
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://teachmeskills.dev/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Chrome DevTools Protocol",
+        "item": "https://teachmeskills.dev/cdp/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Target & Session Management"
+      }
+    ]
+  }
+]
+  </script>
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header"><a href="index.html">CDP Course</a></div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-what-is-cdp.html">1. What Is the Chrome DevTools Protocol?</a></li>
+        <li><a href="02-first-connection.html">2. Your First CDP Connection</a></li>
+        <li><a href="03-dom-domain.html">3. The DOM Domain</a></li>
+        <li><a href="04-runtime-domain.html">4. The Runtime Domain</a></li>
+        <li><a href="05-network-domain.html">5. The Network Domain</a></li>
+        <li><a href="06-combined-monitoring.html">6. Combined Monitoring</a></li>
+        <li><a href="07-input-domain.html">7. The Input Domain</a></li>
+        <li><a href="08-page-domain.html">8. The Page Domain</a></li>
+        <li><a href="09-debugger-domain.html">9. The Debugger Domain</a></li>
+        <li class="current"><a href="10-target-session-management.html">10. Target & Session Management</a></li>
+        <li><a href="11-performance-tracing.html">11. Performance & Tracing</a></li>
+        <li><a href="12-emulation-css.html">12. Emulation & CSS</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="glossary.html">Glossary</a></li>
+        <li><a href="cdp-complete-reference.html">Complete Reference</a></li>
+        <li><a href="chrome-flags.html">Chrome Flags</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 10</p>
+  <h1>Target & Session Management</h1>
+
+<h2>What You'll Learn</h2>
+
+<p>In <a href="01-what-is-cdp.html">Lesson 1</a> we introduced targets and sessions at a high level. Now we'll go deep into the <code>Target</code> domain - the plumbing that manages the relationship between your connection and the browser's debuggable entities.</p>
+
+<ol>
+  <li>Discovering and listing targets</li>
+  <li>Creating and closing tabs programmatically</li>
+  <li>The two connection models (one WebSocket per target vs multiplexed)</li>
+  <li>Attaching and detaching from targets</li>
+  <li>Auto-attach (watching for new targets)</li>
+  <li>Browser contexts (isolated profiles)</li>
+  <li>Handling target crashes</li>
+</ol>
+
+<h2>Recap: What Is a Target?</h2>
+
+<p>A target is anything debuggable in the browser:</p>
+
+<ul>
+  <li><code>page</code> - a tab or window</li>
+  <li><code>iframe</code> - an out-of-process iframe</li>
+  <li><code>service_worker</code> - a service worker</li>
+  <li><code>shared_worker</code> - a shared worker</li>
+  <li><code>worker</code> - a dedicated web worker</li>
+  <li><code>browser</code> - the browser process itself</li>
+  <li><code>other</code> - background pages, extensions, etc.</li>
+</ul>
+
+<h2>Two Connection Models</h2>
+
+<p>There are two fundamentally different ways to communicate with targets over CDP. Understanding both is important - they have different tradeoffs and suit different use cases.</p>
+
+<h3>Model 1: One WebSocket per target (direct connection)</h3>
+
+<p>Each target has its own WebSocket URL. You connect directly to that URL and commands go straight to that target:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Discover targets via HTTP
+const targets = await fetch('http://localhost:9222/json/list').then(r => r.json());
+const page = targets.find(t => t.type === 'page');
+
+// Connect directly to this target's WebSocket
+const ws = new WebSocket(page.webSocketDebuggerUrl);
+// ws://localhost:9222/devtools/page/ABC123
+
+// All commands on this WebSocket go to this one target
+// No sessionId needed - the connection IS the session
+await send('Page.navigate', { url: 'https://example.com' });</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p><strong>How it works:</strong></p>
+<ul>
+  <li>You open a WebSocket to <code>ws://localhost:9222/devtools/page/{targetId}</code></li>
+  <li>The connection is dedicated to that single target</li>
+  <li>No <code>sessionId</code> field needed - every message implicitly targets the connected page</li>
+  <li>To talk to a second target, you open a second WebSocket connection</li>
+</ul>
+
+<p><strong>Advantages:</strong></p>
+<ul>
+  <li>Simple - no session management, no routing logic</li>
+  <li>Easy to reason about - one connection, one target, one set of events</li>
+  <li>Good for single-tab use cases (most journey runs)</li>
+</ul>
+
+<p><strong>Disadvantages:</strong></p>
+<ul>
+  <li>Doesn't scale - 5 tabs = 5 WebSocket connections to manage</li>
+  <li>Can't do browser-level operations (creating tabs, browser contexts) - those require the browser-level endpoint</li>
+  <li>Can't observe new targets appearing (e.g., <code>window.open()</code> popups) from this connection</li>
+  <li>Each connection has its own state - <code>nodeId</code>s from one connection are meaningless on another</li>
+</ul>
+
+<h3>Model 2: Single connection, multiplexed sessions (browser-level connection)</h3>
+
+<p>Connect to the <em>browser-level</em> WebSocket endpoint, then create sessions to individual targets over that single connection:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Get the browser-level WebSocket URL (different from per-target URLs)
+const versionInfo = await fetch('http://localhost:9222/json/version').then(r => r.json());
+const ws = new WebSocket(versionInfo.webSocketDebuggerUrl);
+// ws://localhost:9222/devtools/browser/BROWSER_UUID
+
+// This connection is NOT attached to any page - it's the browser itself
+// You can run browser-level commands directly:
+await send('Target.createTarget', { url: 'about:blank' });
+await send('Target.createBrowserContext');
+
+// To talk to a specific page, attach to it - creating a session:
+const targets = await send('Target.getTargets');
+const appTarget = targets.targetInfos.find(
+  target => target.type === 'page' && target.url.includes('localhost:4200')
+);
+
+const session = await send('Target.attachToTarget', {
+  targetId: appTarget.targetId,
+  flatten: true
+});
+// session = { sessionId: 'SESSION_ABC123' }
+
+// Now include sessionId in every command destined for that target:
+ws.send(JSON.stringify({
+  id: 1,
+  method: 'Page.navigate',
+  params: { url: 'https://example.com' },
+  sessionId: 'SESSION_ABC123'
+}));
+
+// You can attach to multiple targets simultaneously:
+const session2 = await send('Target.attachToTarget', {
+  targetId: anotherTarget.targetId,
+  flatten: true
+});
+// session2 = { sessionId: 'SESSION_DEF456' }
+
+// Same WebSocket, different sessionId → commands go to different targets</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p><strong>How it works:</strong></p>
+<ul>
+  <li>You open one WebSocket to the browser-level endpoint (<code>ws://localhost:9222/devtools/browser/...</code>)</li>
+  <li>Commands without a <code>sessionId</code> go to the browser itself (Target, Browser domains)</li>
+  <li>Commands with a <code>sessionId</code> are routed to the corresponding attached target</li>
+  <li>Events from targets also carry the <code>sessionId</code> so you know which target they came from</li>
+</ul>
+
+<p><strong>Advantages:</strong></p>
+<ul>
+  <li>One connection manages everything - browser operations + multiple targets</li>
+  <li>Can create/close tabs, manage browser contexts, and auto-attach to new targets</li>
+  <li>Can observe targets appearing and disappearing (popups, workers, iframes)</li>
+  <li>More efficient - single TCP connection multiplexed across many targets</li>
+  <li>This is what Puppeteer and Playwright use internally</li>
+</ul>
+
+<p><strong>Disadvantages:</strong></p>
+<ul>
+  <li>More complex - you must route messages by <code>sessionId</code></li>
+  <li>Your message handler needs to demultiplex: "is this for session A, session B, or the browser?"</li>
+  <li>Harder to debug - all messages from all targets arrive on the same WebSocket</li>
+</ul>
+
+<h3>Which should the package use?</h3>
+
+<p>Model 2 (browser-level connection with sessions). Here's why:</p>
+
+<ul>
+  <li>You need <code>Target.createBrowserContext</code> for test isolation - only available at the browser level</li>
+  <li>You need <code>Target.createTarget</code> to open tabs programmatically</li>
+  <li>If a journey triggers a popup (<code>window.open</code>), you can auto-attach to it</li>
+  <li>Single connection is simpler to manage in the package's lifecycle (one WebSocket to open/close)</li>
+</ul>
+
+<p>For most journeys you'll only have one active session (one tab), so the multiplexing complexity is minimal - you just always pass the same <code>sessionId</code>. But the browser-level connection gives you the flexibility to do more when needed.</p>
+
+<h3>Comparison at a glance</h3>
+
+<table style="width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.85rem;">
+  <thead>
+    <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+      <th style="padding: 0.5rem;"></th>
+      <th style="padding: 0.5rem;">Model 1 (per-target)</th>
+      <th style="padding: 0.5rem;">Model 2 (browser-level)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;">Connects to</td>
+      <td style="padding: 0.5rem;"><code>/devtools/page/{id}</code></td>
+      <td style="padding: 0.5rem;"><code>/devtools/browser/{uuid}</code></td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;">Needs sessionId?</td>
+      <td style="padding: 0.5rem;">No</td>
+      <td style="padding: 0.5rem;">Yes (for target commands)</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;">Can create tabs?</td>
+      <td style="padding: 0.5rem;">No</td>
+      <td style="padding: 0.5rem;">Yes</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;">Can create browser contexts?</td>
+      <td style="padding: 0.5rem;">No</td>
+      <td style="padding: 0.5rem;">Yes</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;">Multi-target?</td>
+      <td style="padding: 0.5rem;">Separate connection each</td>
+      <td style="padding: 0.5rem;">All on one connection</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;">See new targets?</td>
+      <td style="padding: 0.5rem;">No</td>
+      <td style="padding: 0.5rem;">Yes (auto-attach / discover)</td>
+    </tr>
+    <tr>
+      <td style="padding: 0.5rem;">Complexity</td>
+      <td style="padding: 0.5rem;">Low</td>
+      <td style="padding: 0.5rem;">Medium</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>When to use each model</h3>
+
+<table style="width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.85rem;">
+  <thead>
+    <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+      <th style="padding: 0.5rem;">Scenario</th>
+      <th style="padding: 0.5rem;">Use</th>
+      <th style="padding: 0.5rem;">Why</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;">Quick one-off script (screenshot, evaluate)</td>
+      <td style="padding: 0.5rem;">Model 1</td>
+      <td style="padding: 0.5rem;">Simplest setup, no session management needed</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;">Single-tab journey run</td>
+      <td style="padding: 0.5rem;">Either (Model 2 preferred)</td>
+      <td style="padding: 0.5rem;">Model 1 works, but Model 2 gives you browser context isolation</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;">Journey that opens popups or new tabs</td>
+      <td style="padding: 0.5rem;">Model 2</td>
+      <td style="padding: 0.5rem;">Need auto-attach to see new targets as they appear</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;">Running multiple journeys in parallel</td>
+      <td style="padding: 0.5rem;">Model 2</td>
+      <td style="padding: 0.5rem;">One connection, multiple browser contexts, no resource waste</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;">Need clean state per test (no cookie/storage leakage)</td>
+      <td style="padding: 0.5rem;">Model 2</td>
+      <td style="padding: 0.5rem;">Browser contexts provide isolation without restarting the browser</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;">Attaching to a browser already running with <code>--remote-debugging-port</code></td>
+      <td style="padding: 0.5rem;">Model 1</td>
+      <td style="padding: 0.5rem;">Just connect to the tab you care about, no setup overhead</td>
+    </tr>
+    <tr>
+      <td style="padding: 0.5rem;">Building a test framework or long-running tool</td>
+      <td style="padding: 0.5rem;">Model 2</td>
+      <td style="padding: 0.5rem;">Full control over lifecycle, targets, and isolation</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Creating and Closing Targets</h2>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Create a new tab
+const newTarget = await send('Target.createTarget', {
+  url: 'https://example.com',    // Initial URL (can be 'about:blank')
+  newWindow: false,              // false = new tab, true = new window
+  background: false              // false = focus the new tab
+});
+// newTarget = { targetId: 'NEW_TARGET_001' }
+
+// Close a target (closes the tab)
+await send('Target.closeTarget', {
+  targetId: 'NEW_TARGET_001'
+});
+
+// Bring a tab to front (focus it)
+await send('Target.activateTarget', {
+  targetId: 'EXISTING_TARGET_ID'
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h2>Discovering Targets</h2>
+
+<p>Enable target discovery to be notified when targets are created or destroyed:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Start receiving targetCreated/targetDestroyed events
+await send('Target.setDiscoverTargets', {
+  discover: true
+});
+
+// You'll receive these events:
+// Target.targetCreated - a new tab, worker, or iframe appeared
+// Target.targetDestroyed - a target was closed
+// Target.targetInfoChanged - a target's URL or title changed
+// Target.targetCrashed - a target's renderer process crashed</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p>You can also query the current list at any time:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">const targets = await send('Target.getTargets');
+// targets.targetInfos = [
+//   { targetId: '...', type: 'page', title: 'Example', url: 'https://example.com', attached: true },
+//   { targetId: '...', type: 'service_worker', url: 'sw.js', attached: false },
+//   ...
+// ]</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h2>Auto-Attach</h2>
+
+<p>Instead of manually attaching to each new target, you can ask CDP to automatically attach to new targets as they appear:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Automatically attach to new pages and workers
+await send('Target.setAutoAttach', {
+  autoAttach: true,
+  waitForDebuggerOnStart: false,   // true = pause new targets until you resume them
+  flatten: true                     // flat session mode
+});
+
+// Now when a new tab opens (e.g., window.open()), you'll receive:
+// Target.attachedToTarget event with the sessionId
+// - ready to send commands immediately</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<div class="key-concept">
+  <strong><code>waitForDebuggerOnStart</code>:</strong> When <code>true</code>, new targets pause before executing any JavaScript - giving you time to set up breakpoints, enable domains, etc. before the page runs. You must call <code>Runtime.runIfWaitingForDebugger</code> to let it continue. This is how Puppeteer ensures it can intercept network requests from the very first load.
+</div>
+
+<h2>Browser Contexts (Incognito-like Isolation)</h2>
+
+<p>A browser context is like an incognito window - isolated cookies, storage, and cache. Useful for running tests that don't interfere with each other:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Create an isolated browser context
+const context = await send('Target.createBrowserContext');
+// context = { browserContextId: 'CONTEXT_001' }
+
+// Create a tab in that context
+const tab = await send('Target.createTarget', {
+  url: 'https://example.com',
+  browserContextId: 'CONTEXT_001'
+});
+
+// ... run a journey in this isolated context ...
+
+// Dispose the context (closes all its tabs and clears all state)
+await send('Target.disposeBrowserContext', {
+  browserContextId: 'CONTEXT_001'
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p>This is the CDP equivalent of Puppeteer's <code>browser.createIncognitoBrowserContext()</code>. Each journey run could get its own context for complete isolation.</p>
+
+<div class="key-concept">
+  <strong>For the package:</strong> Creating a fresh browser context per journey run gives you clean state (no leftover cookies, localStorage, or cached responses from previous runs) without restarting the browser. This is significantly faster than closing and relaunching Brave for each test.
+</div>
+
+<h2>Handling Target Crashes</h2>
+
+<p>Renderer processes can crash (out of memory, illegal access, etc.). CDP tells you when this happens:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Target.targetCrashed event
+{
+  "method": "Target.targetCrashed",
+  "params": {
+    "targetId": "CRASHED_TARGET_001",
+    "status": "crashed",     // or 'oom' (out of memory)
+    "errorCode": 139
+  }
+}</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p>A CDP tool should handle this gracefully - log the crash, clean up the session, and report it as a journey failure with diagnostic context ("target crashed during step X").</p>
+
+<h2>Detaching</h2>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Detach from a target (session ends, but target stays alive)
+await send('Target.detachFromTarget', {
+  sessionId: 'SESSION_ABC123'
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p>Detaching doesn't close the tab - it just disconnects your debugging session from it. The tab continues running. This is useful if you want to observe a tab temporarily and then let it go.</p>
+
+<h2>Practical Pattern: Connection Setup</h2>
+
+<p>Here's how a CDP tool would typically initialise:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">import WebSocket from 'ws';
+
+async function createCDPConnection(port = 9222) {
+  // Connect to the browser-level endpoint
+  const versionInfo = await fetch(`http://localhost:${port}/json/version`)
+    .then(response => response.json());
+
+  const ws = new WebSocket(versionInfo.webSocketDebuggerUrl);
+  await new Promise(resolve => ws.on('open', resolve));
+
+  // Set up command/response infrastructure (from Lesson 2)
+  let nextId = 1;
+  const pending = new Map();
+
+  function send(method, params = {}, sessionId = undefined) {
+    const id = nextId++;
+    const message = { id, method, params };
+    if (sessionId) message.sessionId = sessionId;
+
+    const promise = new Promise((resolve) => {
+      pending.set(id, resolve);
+    });
+    ws.send(JSON.stringify(message));
+    return promise;
+  }
+
+  ws.on('message', (data) => {
+    const msg = JSON.parse(data.toString());
+    if (msg.id && pending.has(msg.id)) {
+      const resolvePromise = pending.get(msg.id);
+      resolvePromise(msg.result || msg.error);
+      pending.delete(msg.id);
+      return;
+    }
+    // Events go to the diagnostic collector, etc.
+  });
+
+  // Create an isolated context for this test run
+  const context = await send('Target.createBrowserContext');
+
+  // Create a tab in that context
+  const target = await send('Target.createTarget', {
+    url: 'about:blank',
+    browserContextId: context.browserContextId
+  });
+
+  // Attach to the tab
+  const session = await send('Target.attachToTarget', {
+    targetId: target.targetId,
+    flatten: true
+  });
+
+  // Enable core domains on this session
+  const sessionId = session.sessionId;
+  await send('Page.enable', {}, sessionId);
+  await send('Runtime.enable', {}, sessionId);
+  await send('Network.enable', {}, sessionId);
+  await send('DOM.enable', {}, sessionId);
+
+  return {
+    send: (method, params = {}) => send(method, params, sessionId),
+    close: async () => {
+      await send('Target.disposeBrowserContext', {
+        browserContextId: context.browserContextId
+      });
+      ws.close();
+    }
+  };
+}</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h2>Key Commands Reference</h2>
+
+<table style="width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem;">
+  <thead>
+    <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+      <th style="padding: 0.5rem;">Command</th>
+      <th style="padding: 0.5rem;">Purpose</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Target.getTargets</code></td>
+      <td style="padding: 0.5rem;">List all current targets</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Target.createTarget</code></td>
+      <td style="padding: 0.5rem;">Open a new tab/window</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Target.closeTarget</code></td>
+      <td style="padding: 0.5rem;">Close a tab</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Target.attachToTarget</code></td>
+      <td style="padding: 0.5rem;">Create a session with a target (flat mode)</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Target.detachFromTarget</code></td>
+      <td style="padding: 0.5rem;">End a session (target stays alive)</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Target.setDiscoverTargets</code></td>
+      <td style="padding: 0.5rem;">Enable target created/destroyed notifications</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Target.setAutoAttach</code></td>
+      <td style="padding: 0.5rem;">Auto-attach to new targets as they appear</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Target.createBrowserContext</code></td>
+      <td style="padding: 0.5rem;">Create an isolated profile (incognito-like)</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Target.disposeBrowserContext</code></td>
+      <td style="padding: 0.5rem;">Destroy a browser context (closes its tabs, clears state)</td>
+    </tr>
+    <tr>
+      <td style="padding: 0.5rem;"><code>Target.activateTarget</code></td>
+      <td style="padding: 0.5rem;">Focus/bring a tab to front</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>For the full list, see the <a href="cdp-complete-reference.html#Target">Target section of the complete reference</a>.</p>
+
+<div class="recommended">
+  <strong>Key takeaway:</strong> You understand both connection models (per-target WebSocket vs multiplexed sessions), can create isolated browser contexts for clean test runs, and know how to manage the target lifecycle. The "Practical Pattern" section is essentially the skeleton of the package's connection layer.
+</div>
+
+<h2>Primary Source</h2>
+
+<p>Read the <a href="https://chromedevtools.github.io/devtools-protocol/tot/Target/">Target domain documentation</a>. Focus on <code>attachToTarget</code> with <code>flatten: true</code> - this is the modern approach all tools use.</p>
+
+      <nav class="footer-nav">
+        <a href="09-debugger-domain.html">&larr; The Debugger Domain</a>
+        <a href="11-performance-tracing.html">Performance & Tracing &rarr;</a>
+      </nav>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script src="/vendor/prism.min.js"></script>
+  <script src="/vendor/prism-javascript.min.js"></script>
+  <script src="/vendor/prism-json.min.js"></script>
+  <script src="/vendor/prism-typescript.min.js"></script>
+  <script src="/vendor/prism-bash.min.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

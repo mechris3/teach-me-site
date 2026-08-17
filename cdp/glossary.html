@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>CDP Glossary | Teach Me</title>
+  <meta name="description" content="Canonical terminology for the Chrome DevTools Protocol - definitions for all key concepts used throughout the course.">
+  <link rel="canonical" href="https://teachmeskills.dev/cdp/glossary.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/cdp/glossary.html">
+  <meta property="og:title" content="CDP Glossary | Teach Me">
+  <meta property="og:description" content="Canonical terminology for the Chrome DevTools Protocol - definitions for all key concepts used throughout the course.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="CDP Glossary | Teach Me">
+  <meta name="twitter:description" content="Canonical terminology for the Chrome DevTools Protocol - definitions for all key concepts used throughout the course.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <main class="page-content" id="main-content">
+    <a href="index.html" class="back-link">&larr; Back to Course Index</a>
+
+    <h1>Chrome DevTools Protocol - Glossary</h1>
+    <p class="tagline">Canonical terminology used throughout this course.</p>
+
+    <h2>Core Architecture</h2>
+
+    <dl>
+      <dt>CDP (Chrome DevTools Protocol)</dt>
+      <dd>The JSON-over-WebSocket protocol that Chromium exposes for external inspection, debugging, and automation of browser internals.</dd>
+      <dd class="avoid"><em>Avoid:</em> DevTools API, Chrome debug API, remote debugging protocol (too vague)</dd>
+
+      <dt>Client</dt>
+      <dd>Any program that connects to the browser's CDP server and sends commands / receives events. DevTools GUI, Puppeteer, Playwright, and custom scripts are all clients. They have equal access.</dd>
+      <dd class="avoid"><em>Avoid:</em> consumer, caller, debugger (ambiguous - "Debugger" is also a CDP domain)</dd>
+
+      <dt>Target</dt>
+      <dd>A debuggable entity inside the browser: a page (tab), service worker, shared worker, iframe, or the browser process itself. Each target is independently addressable via CDP.</dd>
+      <dd class="avoid"><em>Avoid:</em> tab (too narrow - service workers are also targets), window</dd>
+
+      <dt>Session</dt>
+      <dd>An active CDP connection scoped to a specific target. A single WebSocket connection to the browser can multiplex multiple sessions (one per target) using <code>sessionId</code>.</dd>
+      <dd class="avoid"><em>Avoid:</em> connection (a connection can carry multiple sessions)</dd>
+
+      <dt>Domain</dt>
+      <dd>A namespace grouping related CDP commands, events, and types. Examples: <code>Page</code>, <code>DOM</code>, <code>Network</code>, <code>Runtime</code>. Most domains must be explicitly enabled before they emit events.</dd>
+      <dd class="avoid"><em>Avoid:</em> module, API, namespace (technically correct but not what the protocol calls them)</dd>
+    </dl>
+
+    <h2>Message Types</h2>
+
+    <dl>
+      <dt>Command</dt>
+      <dd>A message sent from client to browser, containing an <code>id</code>, a <code>method</code> (format: <code>Domain.methodName</code>), and optional <code>params</code>. Requests a specific action or piece of data.</dd>
+      <dd class="avoid"><em>Avoid:</em> request (conflicts with HTTP/network terminology in CDP context)</dd>
+
+      <dt>Response</dt>
+      <dd>The browser's reply to a command, echoing the same <code>id</code> and carrying either a <code>result</code> object or an <code>error</code> object.</dd>
+
+      <dt>Event</dt>
+      <dd>An asynchronous notification pushed from browser to client. Has a <code>method</code> and <code>params</code> but no <code>id</code>. Only emitted for domains the client has enabled.</dd>
+      <dd class="avoid"><em>Avoid:</em> notification, message (too generic)</dd>
+    </dl>
+
+    <h2>Transport</h2>
+
+    <dl>
+      <dt>Remote debugging port</dt>
+      <dd>The TCP port (conventionally <code>9222</code>) that Chrome/Brave exposes when launched with <code>--remote-debugging-port</code>. Serves both an HTTP endpoint for target discovery and WebSocket endpoints for protocol sessions.</dd>
+
+      <dt>Target discovery</dt>
+      <dd>The HTTP API at <code>http://localhost:9222/json/list</code> that enumerates available targets, each with a <code>webSocketDebuggerUrl</code> for direct connection.</dd>
+    </dl>
+  </main>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 520" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif">
+  <!-- Background -->
+  <rect width="720" height="520" fill="#fffff8"/>
+
+  <!-- Browser container -->
+  <rect x="60" y="30" width="600" height="260" rx="8" ry="8" fill="none" stroke="#333" stroke-width="2"/>
+  <text x="360" y="58" text-anchor="middle" font-size="14" font-weight="600" fill="#333">CHROMIUM BROWSER</text>
+
+  <!-- Tab A -->
+  <rect x="100" y="80" width="140" height="60" rx="6" ry="6" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="170" y="106" text-anchor="middle" font-size="12" font-weight="500" fill="#1a73e8">Tab A</text>
+  <text x="170" y="126" text-anchor="middle" font-size="11" fill="#555">(target)</text>
+
+  <!-- Tab B -->
+  <rect x="280" y="80" width="140" height="60" rx="6" ry="6" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="350" y="106" text-anchor="middle" font-size="12" font-weight="500" fill="#1a73e8">Tab B</text>
+  <text x="350" y="126" text-anchor="middle" font-size="11" fill="#555">(target)</text>
+
+  <!-- Service Worker -->
+  <rect x="460" y="80" width="160" height="60" rx="6" ry="6" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="540" y="106" text-anchor="middle" font-size="12" font-weight="500" fill="#1a73e8">Service Worker</text>
+  <text x="540" y="126" text-anchor="middle" font-size="11" fill="#555">(target)</text>
+
+  <!-- Lines from targets down to CDP Server -->
+  <line x1="170" y1="140" x2="170" y2="170" stroke="#999" stroke-width="1.5"/>
+  <line x1="350" y1="140" x2="350" y2="170" stroke="#999" stroke-width="1.5"/>
+  <line x1="540" y1="140" x2="540" y2="170" stroke="#999" stroke-width="1.5"/>
+
+  <!-- Merge lines into CDP Server -->
+  <line x1="170" y1="170" x2="350" y2="190" stroke="#999" stroke-width="1.5"/>
+  <line x1="350" y1="170" x2="350" y2="190" stroke="#999" stroke-width="1.5"/>
+  <line x1="540" y1="170" x2="350" y2="190" stroke="#999" stroke-width="1.5"/>
+
+  <!-- CDP Server -->
+  <rect x="270" y="190" width="160" height="60" rx="6" ry="6" fill="#fff3e0" stroke="#e65100" stroke-width="1.5"/>
+  <text x="350" y="216" text-anchor="middle" font-size="12" font-weight="600" fill="#e65100">CDP Server</text>
+  <text x="350" y="236" text-anchor="middle" font-size="11" fill="#555">(port 9222)</text>
+
+  <!-- Line from CDP Server down through browser boundary -->
+  <line x1="350" y1="250" x2="350" y2="310" stroke="#333" stroke-width="2" stroke-dasharray="6,4"/>
+
+  <!-- WebSocket label -->
+  <rect x="280" y="296" width="140" height="24" rx="4" ry="4" fill="#fffff8"/>
+  <text x="350" y="313" text-anchor="middle" font-size="11" font-weight="500" fill="#333">WebSocket (JSON)</text>
+
+  <!-- Arrow markers -->
+  <defs>
+    <marker id="arrow-down" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+      <polygon points="0,0 8,4 0,8" fill="#333"/>
+    </marker>
+    <marker id="arrow-up" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto-start-reverse">
+      <polygon points="0,0 8,4 0,8" fill="#333"/>
+    </marker>
+  </defs>
+
+  <!-- Fan-out lines to clients (bidirectional) -->
+  <line x1="350" y1="330" x2="150" y2="384" stroke="#333" stroke-width="1.5" marker-end="url(#arrow-down)" marker-start="url(#arrow-up)"/>
+  <line x1="350" y1="330" x2="350" y2="384" stroke="#333" stroke-width="1.5" marker-end="url(#arrow-down)" marker-start="url(#arrow-up)"/>
+  <line x1="350" y1="330" x2="550" y2="384" stroke="#333" stroke-width="1.5" marker-end="url(#arrow-down)" marker-start="url(#arrow-up)"/>
+
+  <!-- DevTools GUI client -->
+  <rect x="80" y="390" width="140" height="70" rx="6" ry="6" fill="#e8f5e9" stroke="#2e7d32" stroke-width="1.5"/>
+  <text x="150" y="420" text-anchor="middle" font-size="12" font-weight="500" fill="#2e7d32">DevTools GUI</text>
+  <text x="150" y="440" text-anchor="middle" font-size="11" fill="#555">(client)</text>
+
+  <!-- Puppeteer / Playwright client -->
+  <rect x="280" y="390" width="140" height="70" rx="6" ry="6" fill="#e8f5e9" stroke="#2e7d32" stroke-width="1.5"/>
+  <text x="350" y="420" text-anchor="middle" font-size="12" font-weight="500" fill="#2e7d32">Puppeteer /</text>
+  <text x="350" y="436" text-anchor="middle" font-size="12" font-weight="500" fill="#2e7d32">Playwright</text>
+  <text x="350" y="452" text-anchor="middle" font-size="11" fill="#555">(client)</text>
+
+  <!-- Your Script client -->
+  <rect x="480" y="390" width="140" height="70" rx="6" ry="6" fill="#e8f5e9" stroke="#2e7d32" stroke-width="1.5"/>
+  <text x="550" y="420" text-anchor="middle" font-size="12" font-weight="500" fill="#2e7d32">YOUR SCRIPT</text>
+  <text x="550" y="440" text-anchor="middle" font-size="11" fill="#555">(client)</text>
+
+  <!-- Legend -->
+  <text x="360" y="500" text-anchor="middle" font-size="10" fill="#999">All clients are equal peers — they all speak the same protocol</text>
+</svg>

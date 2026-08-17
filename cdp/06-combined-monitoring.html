@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>Combined Monitoring - Lesson 6 | Teach Me</title>
+  <meta name="description" content="Lesson 6 of the Chrome DevTools Protocol course: Combined Monitoring">
+  <link rel="canonical" href="https://teachmeskills.dev/cdp/06-combined-monitoring.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/cdp/06-combined-monitoring.html">
+  <meta property="og:title" content="Combined Monitoring - Lesson 6 | Teach Me">
+  <meta property="og:description" content="Lesson 6 of the Chrome DevTools Protocol course. Combining DOM, Runtime, and Network domains for comprehensive page monitoring.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Combined Monitoring - Lesson 6 | Teach Me">
+  <meta name="twitter:description" content="Lesson 6 of the Chrome DevTools Protocol course. Combining DOM, Runtime, and Network domains for comprehensive page monitoring.">
+  <script type="application/ld+json">
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://teachmeskills.dev/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Chrome DevTools Protocol",
+        "item": "https://teachmeskills.dev/cdp/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Combined Monitoring"
+      }
+    ]
+  }
+]
+  </script>
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header"><a href="index.html">CDP Course</a></div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-what-is-cdp.html">1. What Is the Chrome DevTools Protocol?</a></li>
+        <li><a href="02-first-connection.html">2. Your First CDP Connection</a></li>
+        <li><a href="03-dom-domain.html">3. The DOM Domain</a></li>
+        <li><a href="04-runtime-domain.html">4. The Runtime Domain</a></li>
+        <li><a href="05-network-domain.html">5. The Network Domain</a></li>
+        <li class="current"><a href="06-combined-monitoring.html">6. Combined Monitoring</a></li>
+        <li><a href="07-input-domain.html">7. The Input Domain</a></li>
+        <li><a href="08-page-domain.html">8. The Page Domain</a></li>
+        <li><a href="09-debugger-domain.html">9. The Debugger Domain</a></li>
+        <li><a href="10-target-session-management.html">10. Target & Session Management</a></li>
+        <li><a href="11-performance-tracing.html">11. Performance & Tracing</a></li>
+        <li><a href="12-emulation-css.html">12. Emulation & CSS</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="glossary.html">Glossary</a></li>
+        <li><a href="cdp-complete-reference.html">Complete Reference</a></li>
+        <li><a href="chrome-flags.html">Chrome Flags</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 6</p>
+  <h1>Combined Monitoring</h1>
+
+<h2>The Goal</h2>
+
+<p>In lessons 3–5 we explored each domain in isolation. In practice, a diagnostic adapter will enable all three simultaneously and collect a unified stream of events. This lesson builds a <strong>DiagnosticCollector</strong> - a single class that observes everything and produces a structured diagnostic report.</p>
+
+<p>This is the direct precursor to the diagnostic adapter. The collector doesn't drive the browser (no navigation or clicking) - it just watches and records. Later, the adapter will combine this collector with the action methods a journeys call.</p>
+
+<h2>Architecture</h2>
+
+<p>The collector sits alongside your CDP connection and categorises everything it sees:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// What the collector produces
+const diagnosticReport = {
+  consoleErrors: [],      // Runtime.consoleAPICalled where type === 'error'
+  exceptions: [],         // Runtime.exceptionThrown
+  networkFailures: [],    // Network.loadingFailed + responses with status >= 400
+  networkRequests: [],    // All API calls (XHR/Fetch) with their outcomes
+  domMutations: [],       // DOM.childNodeInserted, childNodeRemoved, attributeModified
+  timeline: []            // All events in chronological order, for context
+};</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h2>The DiagnosticCollector Class</h2>
+
+<div class="code-wrapper"><pre><code class="language-javascript">export class DiagnosticCollector {
+  #consoleErrors = [];
+  #exceptions = [];
+  #networkFailures = [];
+  #networkRequests = new Map();  // requestId → request details
+  #domMutations = [];
+  #timeline = [];
+
+  constructor(sendCommand) {
+    // Store the send function so we can enable domains
+    this.send = sendCommand;
+  }
+
+  async enable() {
+    // Enable all three observation domains
+    await this.send('Runtime.enable');
+    await this.send('Network.enable');
+    await this.send('DOM.enable');
+  }
+
+  // Event handler registry - maps CDP event names to handler methods
+  #handlers = new Map([
+    ['Runtime.consoleAPICalled', (params) => this.#handleConsoleCall(params)],
+    ['Runtime.exceptionThrown', (params) => this.#handleException(params)],
+    ['Network.requestWillBeSent', (params) => this.#handleRequestSent(params)],
+    ['Network.responseReceived', (params) => this.#handleResponseReceived(params)],
+    ['Network.loadingFailed', (params) => this.#handleLoadingFailed(params)],
+    ['DOM.childNodeInserted', (params) => this.#handleDOMMutation('childNodeInserted', params)],
+    ['DOM.childNodeRemoved', (params) => this.#handleDOMMutation('childNodeRemoved', params)],
+    ['DOM.attributeModified', (params) => this.#handleDOMMutation('attributeModified', params)],
+    ['DOM.attributeRemoved', (params) => this.#handleDOMMutation('attributeRemoved', params)],
+  ]);
+
+  // Call this for every CDP event message received
+  handleEvent(method, params) {
+    const timestamp = Date.now();
+    this.#timeline.push({ timestamp, method, params });
+
+    const handler = this.#handlers.get(method);
+    if (!handler) return;
+    handler(params);
+  }
+
+  #handleConsoleCall(params) {
+    if (params.type !== 'error' && params.type !== 'warning') return;
+
+    this.#consoleErrors.push({
+      type: params.type,
+      args: params.args.map(arg => arg.value || arg.description || `[${arg.type}]`),
+      stackTrace: params.stackTrace,
+      timestamp: params.timestamp
+    });
+  }
+
+  #handleException(params) {
+    const details = params.exceptionDetails;
+    this.#exceptions.push({
+      text: details.text,
+      description: details.exception?.description || details.text,
+      url: details.url,
+      lineNumber: details.lineNumber,
+      columnNumber: details.columnNumber,
+      stackTrace: details.stackTrace
+    });
+  }
+
+  #handleRequestSent(params) {
+    const { requestId, request, type } = params;
+    // Only track application-level requests (XHR and Fetch), not static assets
+    if (type === 'XHR' || type === 'Fetch') {
+      this.#networkRequests.set(requestId, {
+        url: request.url,
+        method: request.method,
+        type,
+        status: 'pending',
+        startTime: params.timestamp
+      });
+    }
+  }
+
+  #handleResponseReceived(params) {
+    const { requestId, response } = params;
+    if (!this.#networkRequests.has(requestId)) return;
+
+    const request = this.#networkRequests.get(requestId);
+    request.status = response.status;
+    request.statusText = response.statusText;
+    request.mimeType = response.mimeType;
+
+    // Flag client/server errors
+    if (response.status >= 400) {
+      this.#networkFailures.push({
+        ...request,
+        failureType: 'http-error'
+      });
+    }
+  }
+
+  #handleLoadingFailed(params) {
+    const { requestId, errorText } = params;
+    if (!this.#networkRequests.has(requestId)) return;
+
+    const request = this.#networkRequests.get(requestId);
+    request.status = 'failed';
+    request.errorText = errorText;
+
+    this.#networkFailures.push({
+      ...request,
+      failureType: 'network-error'
+    });
+  }
+
+  #handleDOMMutation(method, params) {
+    this.#domMutations.push({
+      type: method.replace('DOM.', ''),
+      ...params
+    });
+  }
+
+  // Produce the final diagnostic report
+  getReport() {
+    return {
+      consoleErrors: [...this.#consoleErrors],
+      exceptions: [...this.#exceptions],
+      networkFailures: [...this.#networkFailures],
+      networkRequests: [...this.#networkRequests.values()],
+      domMutations: [...this.#domMutations],
+      timeline: [...this.#timeline],
+      summary: {
+        totalConsoleErrors: this.#consoleErrors.length,
+        totalExceptions: this.#exceptions.length,
+        totalNetworkFailures: this.#networkFailures.length,
+        totalApiCalls: this.#networkRequests.size,
+        totalDOMMutations: this.#domMutations.length
+      }
+    };
+  }
+
+  // Get just the errors - useful for quick "did anything go wrong?" checks
+  getErrors() {
+    return {
+      consoleErrors: [...this.#consoleErrors],
+      exceptions: [...this.#exceptions],
+      networkFailures: [...this.#networkFailures]
+    };
+  }
+
+  // Clear all collected data (useful between test steps)
+  reset() {
+    this.#consoleErrors = [];
+    this.#exceptions = [];
+    this.#networkFailures = [];
+    this.#networkRequests.clear();
+    this.#domMutations = [];
+    this.#timeline = [];
+  }
+}</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h2>Wiring It Up</h2>
+
+<p>Here's how you'd integrate the collector with a WebSocket connection:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">import WebSocket from 'ws';
+import { DiagnosticCollector } from './diagnostic-collector.mjs';
+
+// Connect to the browser
+const targets = await fetch('http://localhost:9222/json/list').then(response => response.json());
+const page = targets.find(target => target.type === 'page');
+const ws = new WebSocket(page.webSocketDebuggerUrl);
+
+// Set up the send/receive machinery
+let nextId = 1;
+const pending = new Map();
+
+function send(method, params = {}) {
+  const id = nextId++;
+  const promise = new Promise((resolve) => {
+    pending.set(id, resolve);
+  });
+  ws.send(JSON.stringify({ id, method, params }));
+  return promise;
+}
+
+// Create the collector
+const collector = new DiagnosticCollector(send);
+
+ws.on('message', (data) => {
+  const msg = JSON.parse(data.toString());
+
+  // Handle command responses
+  if (msg.id && pending.has(msg.id)) {
+    const resolvePromise = pending.get(msg.id);
+    resolvePromise(msg.result || msg.error);
+    pending.delete(msg.id);
+    return;
+  }
+
+  // Handle events - pass to the collector
+  if (msg.method) {
+    collector.handleEvent(msg.method, msg.params);
+  }
+});
+
+ws.on('open', async () => {
+  // Enable all observation domains
+  await collector.enable();
+
+  // Navigate to the app
+  await send('Page.enable');
+  await send('Page.navigate', { url: 'http://localhost:4200' });
+
+  // ... let the app run, interact with it, etc. ...
+
+  // At any point, get the diagnostic report
+  const report = collector.getReport();
+  console.log('Diagnostic Summary:', report.summary);
+
+  // Or just check for errors
+  const errors = collector.getErrors();
+  if (errors.exceptions.length > 0) {
+    console.error('Unhandled exceptions found:');
+    errors.exceptions.forEach(exception => {
+      console.error(`  ${exception.description}`);
+      console.error(`  at ${exception.url}:${exception.lineNumber}`);
+    });
+  }
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h2>Using the Collector Between Journey Steps</h2>
+
+<p>In a diagnostic adapter, you'd check for errors at each step of a journey. The pattern:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">class CDPDiagnosticAdapter {
+  #collector;
+
+  async clickOption(index) {
+    // Perform the click (we'll cover Input domain in Lesson 7)
+    await this.performClick(selector);
+
+    // After each action, check if anything went wrong
+    const errors = this.#collector.getErrors();
+    if (errors.exceptions.length > 0 || errors.networkFailures.length > 0) {
+      // Don't throw yet - record the context for later reporting
+      this.#stepDiagnostics.push({
+        step: 'clickOption',
+        args: { index },
+        errorsAtThisPoint: errors
+      });
+    }
+  }
+
+  async waitForSelector(selector, timeout = 5000) {
+    const startTime = Date.now();
+
+    while (Date.now() - startTime < timeout) {
+      const doc = await this.send('DOM.getDocument', { depth: 0 });
+      const result = await this.send('DOM.querySelector', {
+        nodeId: doc.root.nodeId,
+        selector
+      });
+      if (result.nodeId !== 0) return;
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+
+    // Timeout - produce rich diagnostic context
+    throw new DiagnosticError(`Selector "${selector}" not found`, {
+      waitedMs: timeout,
+      selector,
+      report: this.#collector.getReport()
+    });
+  }
+}</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<div class="key-concept">
+  <strong>The key idea:</strong> The collector runs passively in the background. It doesn't interfere with a journey's actions - it just watches. At any point (after a step, on failure, at the end), you can ask "what happened?" and get a complete picture.
+</div>
+
+<h2>The Diagnostic Report as AI Context</h2>
+
+<p>When a journey step fails, the report gives the AI everything it needs:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// What the AI receives when waitForSelector times out:
+{
+  "error": "Selector '[data-testid=\"quiz-results-title\"]' not found within 5000ms",
+  "step": "verifyTitle",
+  "diagnostics": {
+    "summary": {
+      "totalConsoleErrors": 1,
+      "totalExceptions": 1,
+      "totalNetworkFailures": 0,
+      "totalApiCalls": 3,
+      "totalDOMMutations": 47
+    },
+    "exceptions": [
+      {
+        "text": "Uncaught TypeError: Cannot read properties of undefined (reading 'title')",
+        "url": "http://localhost:4200/main.js",
+        "lineNumber": 234,
+        "stackTrace": { "callFrames": [...] }
+      }
+    ],
+    "consoleErrors": [
+      {
+        "type": "error",
+        "args": ["ERROR", "QuizResultsComponent failed to render"],
+        "stackTrace": { "callFrames": [...] }
+      }
+    ],
+    "networkRequests": [
+      { "url": "/api/quiz/results", "method": "GET", "status": 200 },
+      { "url": "/api/quiz/config", "method": "GET", "status": 200 }
+    ]
+  }
+}</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p>From this, the AI can reason: "The selector isn't found because the component threw a TypeError trying to read <code>.title</code> from undefined. The API calls succeeded (status 200), so the issue is in the component's data handling, not the backend." - without you copying anything.</p>
+
+<h2>Design Decisions</h2>
+
+<h3>What to track vs what to ignore</h3>
+<ul>
+  <li><strong>Track:</strong> XHR/Fetch requests (the application's API calls), console errors/warnings, exceptions, DOM mutations</li>
+  <li><strong>Ignore:</strong> Static asset requests (images, CSS, JS files), <code>console.log</code>/<code>console.debug</code> (too noisy), performance events (not relevant to functional bugs)</li>
+</ul>
+
+<h3>When to reset</h3>
+<ul>
+  <li>Between unrelated journey steps? Probably not - the error might have been triggered two steps before it manifests</li>
+  <li>Between journey runs? Yes - start clean for each rerun</li>
+  <li>After navigation? Optional - depends on whether cross-page context matters</li>
+</ul>
+
+<h3>Timeline vs categorised data</h3>
+<p>The collector stores both: the timeline gives chronological context ("API call, then mutation, then exception"), while the categorised arrays give quick access to specific error types. The AI benefits from both - timeline for understanding causation, categories for quick triage.</p>
+
+<h2>Context Window Management</h2>
+
+<p>A raw diagnostic dump can easily blow up an AI's context window - 500 DOM mutations, 50 network requests, and a full timeline could be thousands of tokens. You need to filter intelligently.</p>
+
+<h3>Priority tiers</h3>
+
+<p>Not all data is equally useful. Structure the report in tiers:</p>
+
+<ul>
+  <li><strong>Always include (Tier 1):</strong> exceptions, console errors, failed network requests. These are the likely root cause.</li>
+  <li><strong>Include if relevant (Tier 2):</strong> the last 5–10 network requests, DOM state at the failure point, the failed selector.</li>
+  <li><strong>Only on request (Tier 3):</strong> full timeline, all DOM mutations, all successful network requests, response bodies.</li>
+</ul>
+
+<h3>Windowing</h3>
+
+<p>Events from 30 seconds before the failure are probably irrelevant. Keep only events within a time window around the failure (e.g., last 5 seconds or last 20 events):</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">getRecentEvents(windowMs = 5000) {
+  const cutoff = Date.now() - windowMs;
+  return this.#timeline.filter(entry => entry.timestamp >= cutoff);
+}</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h3>Summarise, don't dump</h3>
+
+<p>Instead of sending 47 raw DOM mutations, summarise them:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">getDOMMutationSummary() {
+  const grouped = this.#domMutations.reduce((summary, mutation) => {
+    const key = mutation.type;
+    summary[key] = (summary[key] || 0) + 1;
+    return summary;
+  }, {});
+
+  return {
+    total: this.#domMutations.length,
+    breakdown: grouped,
+    // Only include mutations involving the selectors the journey cares about
+    relevant: this.#domMutations.filter(mutation =>
+      this.#watchedSelectors.some(selector =>
+        mutation.nodeName?.includes(selector) || mutation.parentNodeId === this.#watchedNodeId
+      )
+    )
+  };
+}</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h3>Pull model (preferred)</h3>
+
+<p>Send nothing by default. The AI is told "journey failed at step X" - then it decides what to query. Each piece of diagnostic data is available via a separate tool/method that the AI calls on demand:</p>
+
+<ul>
+  <li><code>getConsoleErrors()</code> → console errors with stack traces</li>
+  <li><code>getExceptions()</code> → unhandled exceptions</li>
+  <li><code>getNetworkFailures()</code> → failed requests</li>
+  <li><code>getNetworkLog()</code> → all API calls with status codes</li>
+  <li><code>getResponseBody(requestId)</code> → body of a specific response</li>
+  <li><code>getDOMSnapshot(selector)</code> → current DOM around a specific element</li>
+  <li><code>getTimeline(lastN)</code> → the last N events in chronological order</li>
+</ul>
+
+<p>Zero wasted context. The AI only pulls what its reasoning tells it to. The collector still records everything in the background - like a flight recorder that's always running but only inspected when something goes wrong.</p>
+
+<p>This maps perfectly to MCP tools: each method becomes a tool the AI can invoke. If exceptions explain the bug, it never needs to look at network or DOM data. If the problem is a missing element with no errors, it asks for the DOM snapshot. The AI drives its own investigation.</p>
+
+<div class="key-concept">
+  <strong>Design principle:</strong> Collect everything, expose selectively. The collector records all events without filtering - the filtering happens at the reporting layer when you decide what to send to the AI. This means you never lose data; you just choose how much to reveal at each step.
+</div>
+
+<div class="recommended">
+  <strong>Key takeaway:</strong> You've seen how to combine DOM, Runtime, and Network observation into a single diagnostic collector that produces structured reports. This is the core of the diagnostic adapter - the passive observation layer that runs alongside a journey steps and captures everything the AI needs to debug a failure.
+</div>
+
+      <nav class="footer-nav">
+        <a href="05-network-domain.html">&larr; The Network Domain</a>
+        <a href="07-input-domain.html">The Input Domain &rarr;</a>
+      </nav>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script src="/vendor/prism.min.js"></script>
+  <script src="/vendor/prism-javascript.min.js"></script>
+  <script src="/vendor/prism-json.min.js"></script>
+  <script src="/vendor/prism-typescript.min.js"></script>
+  <script src="/vendor/prism-bash.min.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

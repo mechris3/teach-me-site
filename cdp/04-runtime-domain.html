@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>The Runtime Domain - Lesson 4 | Teach Me</title>
+  <meta name="description" content="Lesson 4 of the Chrome DevTools Protocol course: The Runtime Domain">
+  <link rel="canonical" href="https://teachmeskills.dev/cdp/04-runtime-domain.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/cdp/04-runtime-domain.html">
+  <meta property="og:title" content="The Runtime Domain - Lesson 4 | Teach Me">
+  <meta property="og:description" content="Lesson 4 of the Chrome DevTools Protocol course. Evaluating JavaScript, managing remote objects, and interacting with execution contexts.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="The Runtime Domain - Lesson 4 | Teach Me">
+  <meta name="twitter:description" content="Lesson 4 of the Chrome DevTools Protocol course. Evaluating JavaScript, managing remote objects, and interacting with execution contexts.">
+  <script type="application/ld+json">
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://teachmeskills.dev/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Chrome DevTools Protocol",
+        "item": "https://teachmeskills.dev/cdp/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "The Runtime Domain"
+      }
+    ]
+  }
+]
+  </script>
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header"><a href="index.html">CDP Course</a></div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-what-is-cdp.html">1. What Is the Chrome DevTools Protocol?</a></li>
+        <li><a href="02-first-connection.html">2. Your First CDP Connection</a></li>
+        <li><a href="03-dom-domain.html">3. The DOM Domain</a></li>
+        <li class="current"><a href="04-runtime-domain.html">4. The Runtime Domain</a></li>
+        <li><a href="05-network-domain.html">5. The Network Domain</a></li>
+        <li><a href="06-combined-monitoring.html">6. Combined Monitoring</a></li>
+        <li><a href="07-input-domain.html">7. The Input Domain</a></li>
+        <li><a href="08-page-domain.html">8. The Page Domain</a></li>
+        <li><a href="09-debugger-domain.html">9. The Debugger Domain</a></li>
+        <li><a href="10-target-session-management.html">10. Target & Session Management</a></li>
+        <li><a href="11-performance-tracing.html">11. Performance & Tracing</a></li>
+        <li><a href="12-emulation-css.html">12. Emulation & CSS</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="glossary.html">Glossary</a></li>
+        <li><a href="cdp-complete-reference.html">Complete Reference</a></li>
+        <li><a href="chrome-flags.html">Chrome Flags</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 4</p>
+  <h1>The Runtime Domain</h1>
+
+<h2>What You'll Learn</h2>
+
+<p>The <code>Runtime</code> domain is the Console panel made programmatic. It lets you:</p>
+
+<ol>
+  <li>Evaluate arbitrary JavaScript in the page context</li>
+  <li>Work with remote objects (references to objects living in the browser)</li>
+  <li>Call functions on specific objects</li>
+  <li>Listen for console output (<code>console.log</code>, <code>console.error</code>, etc.)</li>
+  <li>Catch unhandled exceptions</li>
+  <li>Understand execution contexts (important for iframes and workers)</li>
+</ol>
+
+<p>For an AI debugging agent, this domain is critical - it's how the agent reads console errors, evaluates assertions, and inspects application state.</p>
+
+<h2>Enabling the Runtime Domain</h2>
+
+<p>As with most domains, you need to enable it to receive events:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">await send('Runtime.enable');</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p>Once enabled, you'll start receiving:</p>
+<ul>
+  <li><code>Runtime.executionContextCreated</code> - when a new JS context appears (page load, iframe, worker)</li>
+  <li><code>Runtime.consoleAPICalled</code> - every <code>console.log</code>, <code>console.error</code>, etc.</li>
+  <li><code>Runtime.exceptionThrown</code> - unhandled exceptions</li>
+</ul>
+
+<h2>Evaluating Expressions</h2>
+
+<h3>Simple values with <code>returnByValue</code></h3>
+
+<p>For primitive values (strings, numbers, booleans) or serialisable objects, use <code>returnByValue: true</code> to get the actual data back directly:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">const titleResult = await send('Runtime.evaluate', {
+  expression: 'document.title',
+  returnByValue: true
+});
+// titleResult = { result: { type: 'string', value: 'Example Domain' } }
+
+const countResult = await send('Runtime.evaluate', {
+  expression: 'document.querySelectorAll("p").length',
+  returnByValue: true
+});
+// countResult = { result: { type: 'number', value: 2 } }</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h3>Complex objects: remote references</h3>
+
+<p>For non-serialisable objects (DOM nodes, class instances, functions), CDP returns a <strong>remote object reference</strong> - an <code>objectId</code> that points to the object living in the browser's memory:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">const bodyResult = await send('Runtime.evaluate', {
+  expression: 'document.body'
+});
+// bodyResult = {
+//   result: {
+//     type: 'object',
+//     subtype: 'node',
+//     className: 'HTMLBodyElement',
+//     objectId: '{"injectedScriptId":1,"id":5}'  ← reference, not the actual body
+//   }
+// }</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p>The <code>objectId</code> is an opaque handle. You can't read it directly - you use it with other commands to inspect or interact with the object.</p>
+
+<div class="key-concept">
+  <strong>The key decision: <code>returnByValue</code> or not?</strong>
+  <ul style="margin-top: 0.5rem;">
+    <li><code>returnByValue: true</code> - CDP serialises the result and sends it over the wire. Works for primitives and plain objects. Fails (or loses data) for DOM nodes, circular references, and class instances.</li>
+    <li>Without <code>returnByValue</code> - you get an <code>objectId</code> reference. The object stays in the browser; you inspect it with further commands. This is how DevTools shows expandable objects in the Console.</li>
+  </ul>
+</div>
+
+<h2>Inspecting Remote Objects</h2>
+
+<p>Once you have an <code>objectId</code>, you can inspect its properties with <code>Runtime.getProperties</code>:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// First, get a reference to an object
+const objResult = await send('Runtime.evaluate', {
+  expression: '({ name: "test", count: 42, nested: { x: 1 } })'
+});
+
+const objectId = objResult.result.objectId;
+
+// Now inspect its properties
+const props = await send('Runtime.getProperties', {
+  objectId: objectId,
+  ownProperties: true  // Only own properties, not inherited from prototype
+});
+
+// props.result is an array of PropertyDescriptor objects:
+// [
+//   { name: 'name', value: { type: 'string', value: 'test' } },
+//   { name: 'count', value: { type: 'number', value: 42 } },
+//   { name: 'nested', value: { type: 'object', objectId: '...' } }
+// ]</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<div class="key-concept">
+  <strong>Depth control.</strong> Notice that <code>nested</code> comes back as another <code>objectId</code>, not its contents. CDP doesn't recursively expand objects - you inspect one level at a time. This is the same behaviour as expanding an object in the DevTools Console: you click the arrow to see one level deeper. In practice, if you need the full object, using <code>returnByValue: true</code> with <code>JSON.stringify()</code> in the expression is often simpler.
+</div>
+
+<h2>Calling Functions on Objects</h2>
+
+<p><code>Runtime.callFunctionOn</code> lets you call a function <em>on</em> a specific object - <code>this</code> inside the function refers to that object:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Get a reference to an element
+const elResult = await send('Runtime.evaluate', {
+  expression: 'document.querySelector("h1")'
+});
+
+// Call a function on it
+const textResult = await send('Runtime.callFunctionOn', {
+  objectId: elResult.result.objectId,
+  functionDeclaration: 'function() { return this.textContent; }',
+  returnByValue: true
+});
+// textResult = { result: { type: 'string', value: 'Example Domain' } }</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p>This is more powerful than <code>Runtime.evaluate</code> when you already have a reference to a specific object and want to call methods on it. It's also how you'd inspect Angular component state:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Assuming you have an objectId for an Angular component's host element
+const componentState = await send('Runtime.callFunctionOn', {
+  objectId: hostElementObjectId,
+  functionDeclaration: `function() {
+    const component = ng.getComponent(this);
+    return JSON.stringify(component, null, 2);
+  }`,
+  returnByValue: true
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h2>Listening for Console Output</h2>
+
+<p>With <code>Runtime.enable</code> active, every <code>console.*</code> call in the page emits a <code>Runtime.consoleAPICalled</code> event:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// The event structure:
+{
+  "method": "Runtime.consoleAPICalled",
+  "params": {
+    "type": "log",           // 'log', 'error', 'warning', 'info', 'debug', etc.
+    "args": [                // Array of RemoteObject - the arguments passed to console
+      {
+        "type": "string",
+        "value": "User clicked submit"
+      }
+    ],
+    "executionContextId": 1,
+    "timestamp": 1719012345.678,
+    "stackTrace": {          // Where console was called from
+      "callFrames": [
+        {
+          "functionName": "handleSubmit",
+          "scriptId": "42",
+          "url": "http://localhost:4200/main.js",
+          "lineNumber": 156,
+          "columnNumber": 8
+        }
+      ]
+    }
+  }
+}</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p>Key fields:</p>
+<ul>
+  <li><code>type</code> - the console method: <code>log</code>, <code>error</code>, <code>warning</code>, <code>info</code>, <code>debug</code>, <code>table</code>, <code>trace</code>, etc.</li>
+  <li><code>args</code> - array of <code>RemoteObject</code> values. For primitives you get the value directly. For objects you get an <code>objectId</code> you can inspect further.</li>
+  <li><code>stackTrace</code> - tells you exactly where in the code the console call happened. Invaluable for debugging.</li>
+</ul>
+
+<div class="key-concept">
+  <strong>For a debugging agent:</strong> Filtering <code>consoleAPICalled</code> events where <code>type === 'error'</code> gives you every <code>console.error()</code> in the application - with full stack traces. This alone catches a huge class of bugs without any DOM inspection needed.
+</div>
+
+<h2>Catching Unhandled Exceptions</h2>
+
+<p>Even better than console errors: <code>Runtime.exceptionThrown</code> fires for any unhandled exception (thrown errors that don't get caught):</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// The event structure:
+{
+  "method": "Runtime.exceptionThrown",
+  "params": {
+    "timestamp": 1719012345.678,
+    "exceptionDetails": {
+      "exceptionId": 1,
+      "text": "Uncaught TypeError: Cannot read properties of null",
+      "lineNumber": 42,
+      "columnNumber": 15,
+      "scriptId": "7",
+      "url": "http://localhost:4200/main.js",
+      "stackTrace": {
+        "callFrames": [
+          {
+            "functionName": "renderComponent",
+            "scriptId": "7",
+            "url": "http://localhost:4200/main.js",
+            "lineNumber": 42,
+            "columnNumber": 15
+          }
+        ]
+      },
+      "exception": {
+        "type": "object",
+        "subtype": "error",
+        "className": "TypeError",
+        "description": "TypeError: Cannot read properties of null (reading 'nativeElement')"
+      }
+    }
+  }
+}</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p>This gives you:</p>
+<ul>
+  <li>The error message and type</li>
+  <li>The exact file, line, and column</li>
+  <li>The full call stack</li>
+  <li>A reference to the exception object itself (if you want to inspect it further)</li>
+</ul>
+
+<p>For Angular apps, you'll commonly see <code>TypeError</code>s from template bindings hitting null/undefined values, <code>HttpErrorResponse</code> from failed API calls, and <code>ExpressionChangedAfterItHasBeenCheckedError</code> in dev mode.</p>
+
+<h3>Source Maps: Getting TypeScript Locations</h3>
+
+<p>The exception events give you <em>compiled JavaScript</em> locations (<code>main.js</code>, line 42). But you write TypeScript. DevTools resolves this transparently using source maps - CDP does not. You need to do it yourself:</p>
+
+<ol>
+  <li>Fetch the source map from the dev server (Angular serves them at <code>${url}.map</code> by default during <code>ng serve</code>)</li>
+  <li>Parse it with a library like <code>source-map</code> (npm)</li>
+  <li>Map the JS line/column to the original TS file and line</li>
+</ol>
+
+<div class="code-wrapper"><pre><code class="language-javascript">import { SourceMapConsumer } from 'source-map';
+
+// Fetch the source map served alongside the compiled JS
+const mapResponse = await fetch('http://localhost:4200/main.js.map');
+const sourceMap = await mapResponse.json();
+const consumer = await new SourceMapConsumer(sourceMap);
+
+// Translate compiled JS coordinates → original TypeScript coordinates
+const original = consumer.originalPositionFor({
+  line: 42,
+  column: 15
+});
+
+// original = {
+//   source: 'src/app/my-component.ts',
+//   line: 28,
+//   column: 4,
+//   name: 'nativeElement'
+// }</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<div class="key-concept">
+  <strong>For a debugging agent:</strong> After catching an exception, the agent could resolve the source map, identify the exact <code>.ts</code> file and line, then read that file directly from disk to understand the context around the error - all without human involvement. This is the same trick DevTools performs invisibly when it shows you TypeScript locations in the Console.
+</div>
+
+<h2>Execution Contexts</h2>
+
+<p>A page can have multiple JavaScript execution contexts:</p>
+
+<ul>
+  <li>The <strong>main page</strong> context (where an Angular app runs)</li>
+  <li><strong>iframe</strong> contexts (each iframe has its own)</li>
+  <li><strong>Web Worker</strong> contexts</li>
+  <li><strong>Extension content script</strong> contexts</li>
+</ul>
+
+<p>When <code>Runtime.enable</code> is active, you receive <code>Runtime.executionContextCreated</code> for each context:</p>
+
+<div class="code-wrapper"><pre><code class="language-json">{
+  "method": "Runtime.executionContextCreated",
+  "params": {
+    "context": {
+      "id": 1,
+      "origin": "https://example.com",
+      "name": "",
+      "uniqueId": "context-unique-id"
+    }
+  }
+}</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p>By default, <code>Runtime.evaluate</code> runs in the main page context. To evaluate in a specific context (e.g., an iframe), pass <code>contextId</code>:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Evaluate in a specific execution context (e.g., an iframe)
+const result = await send('Runtime.evaluate', {
+  expression: 'document.title',
+  contextId: 2,  // The iframe's execution context ID
+  returnByValue: true
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<div class="key-concept">
+  <strong>SPA relevance:</strong> In a typical Angular app, you'll mostly work with context ID 1 (the main page). But if the application uses iframes (e.g., embedded content, payment forms, third-party widgets), each one gets its own context. <code>Runtime.executionContextDestroyed</code> fires when a context goes away - useful for knowing when an iframe was removed.
+</div>
+
+<h2>Awaiting Promises</h2>
+
+<p>If your expression returns a Promise, you can ask CDP to wait for it to resolve using <code>awaitPromise: true</code>:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">const result = await send('Runtime.evaluate', {
+  expression: 'fetch("https://jsonplaceholder.typicode.com/todos/1").then(r => r.json())',
+  awaitPromise: true,
+  returnByValue: true
+});
+// result = { result: { type: 'object', value: { userId: 1, id: 1, title: '...', completed: false } } }</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p>Without <code>awaitPromise</code>, you'd get back a Promise object reference rather than the resolved value. This is essential for testing async operations - API calls, Angular's <code>HttpClient</code>, timer-based logic, etc.</p>
+
+<h2>Object Groups and Cleanup</h2>
+
+<p>Every remote object reference consumes memory in the browser. CDP provides two cleanup mechanisms:</p>
+
+<ul>
+  <li><code>Runtime.releaseObject({ objectId })</code> - release a specific reference</li>
+  <li><code>Runtime.releaseObjectGroup({ objectGroup })</code> - release all references in a named group</li>
+</ul>
+
+<p>You can assign objects to groups when evaluating:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Assign to a named group
+const result = await send('Runtime.evaluate', {
+  expression: 'document.body',
+  objectGroup: 'my-inspection'
+});
+
+// ... do your inspection work ...
+
+// Release everything in the group at once
+await send('Runtime.releaseObjectGroup', {
+  objectGroup: 'my-inspection'
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p>For short-lived scripts this doesn't matter much (disconnecting releases everything). But for a long-running agent that inspects many pages over time, proper cleanup prevents memory leaks in the browser.</p>
+
+<h2>Key Commands Reference</h2>
+
+<table style="width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem;">
+  <thead>
+    <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+      <th style="padding: 0.5rem;">Command</th>
+      <th style="padding: 0.5rem;">Purpose</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Runtime.enable</code></td>
+      <td style="padding: 0.5rem;">Start receiving console and exception events</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Runtime.evaluate</code></td>
+      <td style="padding: 0.5rem;">Run an expression in the page context</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Runtime.callFunctionOn</code></td>
+      <td style="padding: 0.5rem;">Call a function on a specific object (by objectId)</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Runtime.getProperties</code></td>
+      <td style="padding: 0.5rem;">Inspect properties of a remote object</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Runtime.awaitPromise</code></td>
+      <td style="padding: 0.5rem;">Wait for a promise to resolve and get its value</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Runtime.releaseObject</code></td>
+      <td style="padding: 0.5rem;">Release a remote object reference (free memory)</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Runtime.releaseObjectGroup</code></td>
+      <td style="padding: 0.5rem;">Release all objects in a named group</td>
+    </tr>
+    <tr>
+      <td style="padding: 0.5rem;"><code>Runtime.discardConsoleEntries</code></td>
+      <td style="padding: 0.5rem;">Clear accumulated console messages</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>For the full list, see the <a href="cdp-complete-reference.html#Runtime">Runtime section of the complete reference</a>.</p>
+
+<div class="recommended">
+  <strong>Key takeaway:</strong> You now understand both sides of Runtime: the <em>request</em> side (evaluate expressions, call functions, inspect objects) and the <em>event</em> side (console output, unhandled exceptions). Combined with the DOM domain from Lesson 3, you have the two primary senses an AI debugging agent needs: see the page structure (DOM) and hear what the code is saying (Runtime).
+</div>
+
+<h2>Primary Source</h2>
+
+<p>Read the <a href="https://chromedevtools.github.io/devtools-protocol/tot/Runtime/">Runtime domain documentation</a>. Focus on the <code>RemoteObject</code> type definition - it's the return type of almost every Runtime command, and understanding its shape (type, subtype, value, objectId, description) is essential.</p>
+
+      <nav class="footer-nav">
+        <a href="03-dom-domain.html">&larr; The DOM Domain</a>
+        <a href="05-network-domain.html">The Network Domain &rarr;</a>
+      </nav>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script src="/vendor/prism.min.js"></script>
+  <script src="/vendor/prism-javascript.min.js"></script>
+  <script src="/vendor/prism-json.min.js"></script>
+  <script src="/vendor/prism-typescript.min.js"></script>
+  <script src="/vendor/prism-bash.min.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

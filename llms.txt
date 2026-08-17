@@ -10,10 +10,32 @@
 
 ## Courses
 
+- [Chrome DevTools Protocol](https://teachmeskills.dev/cdp/): A 12-lesson course on the Chrome DevTools Protocol - from architecture fundamentals through every major CDP domain to building browser automation tooling.
 - [Angular Signals, NgRx SignalStore & Signal Forms](https://teachmeskills.dev/angular-signals/): A 19-lesson course (7 available, more releasing regularly) on Angular Signals, NgRx SignalStore, and Signal Forms for experienced Angular developers.
 - [Kiro Mastery](https://teachmeskills.dev/kiro/): A 16-lesson course covering Kiro configuration, extension, and advanced features from steering to team setup.
 - [CSS Mastery](https://teachmeskills.dev/css/): A 25-lesson advanced course covering modern CSS from custom properties to scroll-driven animations.
 - [SVG - From Coordinates to Animation](https://teachmeskills.dev/svg/): A 13-lesson course covering SVG from first principles through to complex animation, plus interactive filter tools.
+
+## Chrome DevTools Protocol Lessons
+
+- [What Is the Chrome DevTools Protocol?](https://teachmeskills.dev/cdp/01-what-is-cdp.html): architecture, message format, domains, targets, sessions, how DevTools uses CDP
+- [Your First CDP Connection](https://teachmeskills.dev/cdp/02-first-connection.html): launching Chrome with remote debugging, discovering targets, sending commands
+- [The DOM Domain](https://teachmeskills.dev/cdp/03-dom-domain.html): inspecting and manipulating the DOM tree programmatically via CDP
+- [The Runtime Domain](https://teachmeskills.dev/cdp/04-runtime-domain.html): evaluating JavaScript, managing remote objects, execution contexts
+- [The Network Domain](https://teachmeskills.dev/cdp/05-network-domain.html): monitoring HTTP traffic, intercepting requests, inspecting responses
+- [Combined Monitoring](https://teachmeskills.dev/cdp/06-combined-monitoring.html): combining DOM, Runtime, and Network domains for comprehensive page monitoring
+- [The Input Domain](https://teachmeskills.dev/cdp/07-input-domain.html): synthesising mouse, keyboard, and touch events for browser automation
+- [The Page Domain](https://teachmeskills.dev/cdp/08-page-domain.html): navigation, lifecycle events, screenshots, PDF generation
+- [The Debugger Domain](https://teachmeskills.dev/cdp/09-debugger-domain.html): setting breakpoints, stepping through code, inspecting call stacks
+- [Target & Session Management](https://teachmeskills.dev/cdp/10-target-session-management.html): managing multiple targets, attaching sessions, browser context isolation
+- [Performance & Tracing](https://teachmeskills.dev/cdp/11-performance-tracing.html): collecting performance metrics and trace data for profiling
+- [Emulation & CSS](https://teachmeskills.dev/cdp/12-emulation-css.html): device emulation, CSS inspection, computed style manipulation
+
+## Chrome DevTools Protocol Reference
+
+- [CDP Glossary](https://teachmeskills.dev/cdp/glossary.html): canonical terminology for all key concepts
+- [CDP Complete Reference](https://teachmeskills.dev/cdp/cdp-complete-reference.html): all 57 domains, 668 commands, 237 events, 613 types with usage examples
+- [Chrome Flags for Automation](https://teachmeskills.dev/cdp/chrome-flags.html): command-line flags relevant to CDP automation and testing
 
 ## Angular Signals Lessons (7 of 19 available)
 

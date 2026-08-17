@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>The DOM Domain - Lesson 3 | Teach Me</title>
+  <meta name="description" content="Lesson 3 of the Chrome DevTools Protocol course: The DOM Domain">
+  <link rel="canonical" href="https://teachmeskills.dev/cdp/03-dom-domain.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/cdp/03-dom-domain.html">
+  <meta property="og:title" content="The DOM Domain - Lesson 3 | Teach Me">
+  <meta property="og:description" content="Lesson 3 of the Chrome DevTools Protocol course. Inspecting and manipulating the DOM tree programmatically via CDP.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="The DOM Domain - Lesson 3 | Teach Me">
+  <meta name="twitter:description" content="Lesson 3 of the Chrome DevTools Protocol course. Inspecting and manipulating the DOM tree programmatically via CDP.">
+  <script type="application/ld+json">
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://teachmeskills.dev/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Chrome DevTools Protocol",
+        "item": "https://teachmeskills.dev/cdp/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "The DOM Domain"
+      }
+    ]
+  }
+]
+  </script>
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header"><a href="index.html">CDP Course</a></div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-what-is-cdp.html">1. What Is the Chrome DevTools Protocol?</a></li>
+        <li><a href="02-first-connection.html">2. Your First CDP Connection</a></li>
+        <li class="current"><a href="03-dom-domain.html">3. The DOM Domain</a></li>
+        <li><a href="04-runtime-domain.html">4. The Runtime Domain</a></li>
+        <li><a href="05-network-domain.html">5. The Network Domain</a></li>
+        <li><a href="06-combined-monitoring.html">6. Combined Monitoring</a></li>
+        <li><a href="07-input-domain.html">7. The Input Domain</a></li>
+        <li><a href="08-page-domain.html">8. The Page Domain</a></li>
+        <li><a href="09-debugger-domain.html">9. The Debugger Domain</a></li>
+        <li><a href="10-target-session-management.html">10. Target & Session Management</a></li>
+        <li><a href="11-performance-tracing.html">11. Performance & Tracing</a></li>
+        <li><a href="12-emulation-css.html">12. Emulation & CSS</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="glossary.html">Glossary</a></li>
+        <li><a href="cdp-complete-reference.html">Complete Reference</a></li>
+        <li><a href="chrome-flags.html">Chrome Flags</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 3</p>
+  <h1>The DOM Domain</h1>
+
+<h2>What You'll Learn</h2>
+
+<p>The <code>DOM</code> domain gives you programmatic access to the same tree you see in the Elements panel. In this lesson you'll:</p>
+
+<ol>
+  <li>Retrieve the document root</li>
+  <li>Query for specific nodes using CSS selectors</li>
+  <li>Read node attributes and content</li>
+  <li>Modify the DOM (set attributes, change content, remove nodes)</li>
+  <li>Watch for DOM mutations in real time</li>
+</ol>
+
+<p>A practical application: an AI agent checking whether Angular rendered the expected elements, in the expected state.</p>
+
+<h2>The DOM Model in CDP</h2>
+
+<p>Before we touch code, understand how CDP represents the DOM. It's different from the browser's in-memory DOM - it's a <strong>mirrored subset</strong>.</p>
+
+<ul>
+  <li>Each node has a <strong><code>nodeId</code></strong> - an integer assigned by the CDP server. These are session-scoped (they reset if you disconnect).</li>
+  <li>CDP doesn't send you the entire DOM tree upfront. It gives you the top-level nodes and you <strong>request children on demand</strong>. This keeps the wire traffic manageable for large pages.</li>
+  <li>Nodes have a <code>nodeType</code> (1 = element, 3 = text, 9 = document - same as the standard DOM <code>Node.nodeType</code> values you already know).</li>
+</ul>
+
+<div class="key-concept">
+  <strong>Key concept: <code>nodeId</code> vs <code>backendNodeId</code> vs <code>objectId</code>.</strong> CDP has three ways to reference a node:
+  <ul style="margin-top: 0.5rem;">
+    <li><code>nodeId</code> - assigned by CDP for the session's use. Invalidated when you disconnect, or when CDP decides to reassign them (e.g., after DOM mutations). Very ephemeral - treat as disposable.</li>
+    <li><code>backendNodeId</code> - tied to the DOM node's lifetime in the browser, independent of your CDP session. If you disconnect and reconnect, the same node still has the same <code>backendNodeId</code>. But if the node is removed from the DOM (navigation, Angular destroying a component), the ID dies with it. Tied to the node's existence, not your connection.</li>
+    <li><code>objectId</code> - a Runtime domain reference (a JS object handle). Tied to a specific execution context, destroyed on page navigation (because navigation creates a new context).</li>
+  </ul>
+  In practice, for automation and debugging you'll query nodes fresh at the point of assertion rather than storing references. This is especially important in SPAs (like Angular apps) where the page doesn't navigate but the DOM changes radically as components are created and destroyed by the router or structural directives (<code>*ngIf</code>, <code>*ngFor</code>). When Angular destroys a component, its DOM nodes are removed and any <code>nodeId</code> or <code>backendNodeId</code> referencing them becomes stale. The pattern: query by selector at the moment you need to inspect, not ahead of time.
+</div>
+
+<h2>Setup: Connect and Navigate</h2>
+
+<p>We'll reuse the connection pattern from <a href="02-first-connection.html">Lesson 2</a>. Create <code>dom-exploration.mjs</code>:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">import WebSocket from 'ws';
+
+// Connect to the first page target
+const targets = await fetch('http://localhost:9222/json/list').then(response => response.json());
+const page = targets.find(target => target.type === 'page');
+const ws = new WebSocket(page.webSocketDebuggerUrl);
+
+// Promise-based send (from Lesson 2)
+let nextId = 1;
+const pending = new Map();
+
+function send(method, params = {}) {
+  const id = nextId++;
+  const promise = new Promise((resolve) => {
+    pending.set(id, resolve);
+  });
+  ws.send(JSON.stringify({ id, method, params }));
+  return promise;
+}
+
+// Collect events for later inspection
+const events = [];
+
+ws.on('message', (data) => {
+  const msg = JSON.parse(data.toString());
+
+  if (!msg.id || !pending.has(msg.id)) {
+    // It's an event - store it
+    if (msg.method) events.push(msg);
+    return;
+  }
+
+  const resolvePromise = pending.get(msg.id);
+  resolvePromise(msg.result || msg.error);
+  pending.delete(msg.id);
+});
+
+// Wait for connection, then start exploring
+ws.on('open', async () => {
+  console.log('Connected. Navigating to example.com...\n');
+
+  await send('Page.enable');
+  await send('DOM.enable');
+  await send('Page.navigate', { url: 'https://example.com' });
+
+  // Wait for page load
+  await new Promise((resolve) => {
+    const checkForLoad = setInterval(() => {
+      const loadEvent = events.find(event => event.method === 'Page.loadEventFired');
+      if (loadEvent) {
+        clearInterval(checkForLoad);
+        resolve();
+      }
+    }, 100);
+  });
+
+  console.log('Page loaded. Starting DOM exploration...\n');
+
+  // --- DOM exploration begins here ---
+  await exploreDOM();
+
+  ws.close();
+});
+
+async function exploreDOM() {
+  // We'll fill this in step by step below
+}</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h2>Step 1: Get the Document Root</h2>
+
+<p>Everything starts with <code>DOM.getDocument</code>. This returns the root node of the DOM tree:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">async function exploreDOM() {
+  // Get the document root node
+  const doc = await send('DOM.getDocument', { depth: 0 });
+  console.log('Document root nodeId:', doc.root.nodeId);
+  console.log('Document URL:', doc.root.documentURL);
+  console.log('Children count:', doc.root.childNodeCount);
+}</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p>The response looks like:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">{
+  "root": {
+    "nodeId": 1,
+    "backendNodeId": 2,
+    "nodeType": 9,          // Document node
+    "nodeName": "#document",
+    "childNodeCount": 2,    // Usually DOCTYPE + html element
+    "documentURL": "https://example.com/",
+    "baseURL": "https://example.com/"
+  }
+}</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<div class="key-concept">
+  <strong>The <code>depth</code> parameter.</strong> By default, <code>DOM.getDocument</code> returns 2 levels of children. Set <code>depth: -1</code> to get the entire tree at once (useful for small pages), or <code>depth: 0</code> to get just the root (then request children as needed). For large pages, requesting the full tree can be slow - request on demand instead.
+</div>
+
+<h2>Step 2: Query Nodes with CSS Selectors</h2>
+
+<p>The most common operation: find nodes by CSS selector. This is <code>DOM.querySelector</code> (single result) and <code>DOM.querySelectorAll</code> (all matches):</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">async function exploreDOM() {
+  const doc = await send('DOM.getDocument', { depth: -1 });
+  const rootNodeId = doc.root.nodeId;
+
+  // Find a single element - like document.querySelector('h1')
+  const h1Result = await send('DOM.querySelector', {
+    nodeId: rootNodeId,
+    selector: 'h1'
+  });
+  console.log('h1 nodeId:', h1Result.nodeId);
+
+  // Find all matching elements - like document.querySelectorAll('p')
+  const paragraphs = await send('DOM.querySelectorAll', {
+    nodeId: rootNodeId,
+    selector: 'p'
+  });
+  console.log('Paragraph nodeIds:', paragraphs.nodeIds);
+  console.log('Number of paragraphs:', paragraphs.nodeIds.length);
+}</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p><code>DOM.querySelector</code> returns a single <code>nodeId</code>. <code>DOM.querySelectorAll</code> returns an array of <code>nodeIds</code>. If no match is found, <code>querySelector</code> returns <code>nodeId: 0</code>.</p>
+
+<h2>Step 3: Read Node Content and Attributes</h2>
+
+<p>Once you have a <code>nodeId</code>, you can inspect it:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">async function exploreDOM() {
+  const doc = await send('DOM.getDocument', { depth: -1 });
+  const rootNodeId = doc.root.nodeId;
+
+  // Find the h1
+  const h1Result = await send('DOM.querySelector', {
+    nodeId: rootNodeId,
+    selector: 'h1'
+  });
+
+  // Get its outer HTML (the element itself + its content)
+  const outerHTML = await send('DOM.getOuterHTML', {
+    nodeId: h1Result.nodeId
+  });
+  console.log('h1 outerHTML:', outerHTML.outerHTML);
+  // → '&lt;h1&gt;Example Domain&lt;/h1&gt;'
+
+  // Get attributes of the &lt;div&gt; element
+  const divResult = await send('DOM.querySelector', {
+    nodeId: rootNodeId,
+    selector: 'div'
+  });
+
+  const attrs = await send('DOM.getAttributes', {
+    nodeId: divResult.nodeId
+  });
+  console.log('div attributes:', attrs.attributes);
+  // → ['class', 'container', 'id', 'main'] (flat array of name, value pairs)
+}</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<div class="key-concept">
+  <strong>Attribute format.</strong> <code>DOM.getAttributes</code> returns a flat interleaved array: <code>[name1, value1, name2, value2, ...]</code>. Not an object. A quirky CDP design choice - likely an early performance optimisation. To work with it more naturally:
+  <div class="code-wrapper"><pre><code class="language-javascript">function parseAttributes(flatArray) {
+  return flatArray.reduce((result, value, index, array) => {
+    if (index % 2 === 0) {
+      result[value] = array[index + 1];
+    }
+    return result;
+  }, {});
+}</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+</div>
+
+<h2>Step 4: Modify the DOM</h2>
+
+<p>You can change the page in real time - exactly like editing in the Elements panel:</p>
+
+<div class="code-wrapper"><pre><code class="language-bash">async function exploreDOM() {
+  const doc = await send('DOM.getDocument', { depth: -1 });
+  const rootNodeId = doc.root.nodeId;
+
+  const h1Result = await send('DOM.querySelector', {
+    nodeId: rootNodeId,
+    selector: 'h1'
+  });
+
+  // Change the text content of the h1
+  await send('DOM.setOuterHTML', {
+    nodeId: h1Result.nodeId,
+    outerHTML: '&lt;h1 style="color: red;"&gt;Modified by CDP!&lt;/h1&gt;'
+  });
+  console.log('h1 content changed!');
+
+  // Set an attribute on an element
+  const divResult = await send('DOM.querySelector', {
+    nodeId: rootNodeId,
+    selector: 'div'
+  });
+
+  await send('DOM.setAttributeValue', {
+    nodeId: divResult.nodeId,
+    name: 'data-tested',
+    value: 'true'
+  });
+  console.log('Attribute set!');
+
+  // Remove a node entirely
+  const paragraphs = await send('DOM.querySelectorAll', {
+    nodeId: rootNodeId,
+    selector: 'p'
+  });
+
+  if (paragraphs.nodeIds.length > 0) {
+    await send('DOM.removeNode', {
+      nodeId: paragraphs.nodeIds[0]
+    });
+    console.log('First paragraph removed!');
+  }
+}</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p>Look at the Brave window while running this - you'll see the page change in real time.</p>
+
+<h2>Step 5: Watch for DOM Mutations</h2>
+
+<p>For debugging, you often want to know <em>when</em> the DOM changes - not just read its current state. CDP sends mutation events automatically for any nodes it has already delivered to your session.</p>
+
+<p>The key insight: when you call <code>DOM.getDocument({ depth: -1 })</code>, CDP sends you the full tree. From that point on, it will push events whenever those nodes change. No extra subscription command needed - <code>DOM.enable</code> plus having requested the nodes is enough.</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">async function exploreDOM() {
+  // Get the full document tree - CDP will track mutations for nodes it knows about
+  const doc = await send('DOM.getDocument', { depth: -1 });
+  const rootNodeId = doc.root.nodeId;
+
+  const bodyResult = await send('DOM.querySelector', {
+    nodeId: rootNodeId,
+    selector: 'body'
+  });
+
+  console.log('Watching for DOM mutations...');
+  console.log('(Modify the page in DevTools or via CDP to see events)\n');
+
+  // Trigger a change - add a new element via Runtime.evaluate
+  await send('Runtime.evaluate', {
+    expression: `
+      const newEl = document.createElement('p');
+      newEl.textContent = 'Dynamically added by CDP!';
+      newEl.id = 'cdp-added';
+      document.body.appendChild(newEl);
+    `
+  });
+
+  // Give events a moment to arrive
+  await new Promise(resolve => setTimeout(resolve, 500));
+
+  // Check what mutation events we received
+  const domEvents = events.filter(event => event.method.startsWith('DOM.'));
+  console.log('DOM events received:');
+  domEvents.forEach(event => {
+    console.log(`  ${event.method}`, JSON.stringify(event.params).slice(0, 100));
+  });
+}</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p>Common DOM events you'll see:</p>
+<ul>
+  <li><code>DOM.childNodeInserted</code> - a new node was added</li>
+  <li><code>DOM.childNodeRemoved</code> - a node was removed</li>
+  <li><code>DOM.attributeModified</code> - an attribute changed</li>
+  <li><code>DOM.attributeRemoved</code> - an attribute was removed</li>
+  <li><code>DOM.characterDataModified</code> - text content changed</li>
+  <li><code>DOM.childNodeCountUpdated</code> - the number of children changed</li>
+</ul>
+
+<div class="key-concept">
+  <strong>For an AI debugging agent:</strong> These mutation events are how you'd watch Angular render components. After navigating to a route, you could wait for specific DOM mutations to confirm the component tree rendered correctly - or detect when expected elements <em>don't</em> appear within a timeout.
+</div>
+
+<h2>Combining DOM + Runtime: Inspecting Angular Components</h2>
+
+<p>The DOM domain gives you the tree structure, but for Angular-specific state you'd combine it with <code>Runtime.evaluate</code>:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Find an Angular component's host element by selector
+const appRoot = await send('DOM.querySelector', {
+  nodeId: rootNodeId,
+  selector: 'app-root'
+});
+
+// Use DOM.resolveNode to get a Runtime object reference for this element
+const resolved = await send('DOM.resolveNode', {
+  nodeId: appRoot.nodeId
+});
+
+// Now use Runtime.callFunctionOn to call ng.getComponent() on it
+const componentState = await send('Runtime.callFunctionOn', {
+  objectId: resolved.object.objectId,
+  functionDeclaration: `function() { return JSON.stringify(ng.getComponent(this)); }`,
+  returnByValue: true
+});
+
+console.log('Angular component state:', componentState.result.value);</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<div class="key-concept">
+  <strong><code>DOM.resolveNode</code></strong> is the bridge between the DOM domain and the Runtime domain. It takes a <code>nodeId</code> and gives you an <code>objectId</code> - which lets you call JavaScript methods on that element. This is how you cross from "I found this element in the tree" to "let me inspect its Angular component instance."
+</div>
+
+<h2>Key Commands Reference</h2>
+
+<p>The DOM domain commands you'll use most often:</p>
+
+<table style="width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem;">
+  <thead>
+    <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+      <th style="padding: 0.5rem;">Command</th>
+      <th style="padding: 0.5rem;">Purpose</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>DOM.getDocument</code></td>
+      <td style="padding: 0.5rem;">Get the root node (entry point for everything)</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>DOM.querySelector</code></td>
+      <td style="padding: 0.5rem;">Find one node by CSS selector</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>DOM.querySelectorAll</code></td>
+      <td style="padding: 0.5rem;">Find all nodes matching a CSS selector</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>DOM.getOuterHTML</code></td>
+      <td style="padding: 0.5rem;">Read the HTML of a node</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>DOM.getAttributes</code></td>
+      <td style="padding: 0.5rem;">Read all attributes of a node</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>DOM.setOuterHTML</code></td>
+      <td style="padding: 0.5rem;">Replace a node's HTML</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>DOM.setAttributeValue</code></td>
+      <td style="padding: 0.5rem;">Set or add an attribute</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>DOM.removeNode</code></td>
+      <td style="padding: 0.5rem;">Delete a node from the tree</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>DOM.resolveNode</code></td>
+      <td style="padding: 0.5rem;">Get a Runtime objectId for a DOM node</td>
+    </tr>
+    <tr>
+      <td style="padding: 0.5rem;"><code>DOM.requestChildNodes</code></td>
+      <td style="padding: 0.5rem;">Fetch children of a node (for lazy-loaded subtrees)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>For the full list, see the <a href="cdp-complete-reference.html#DOM">DOM section of the complete reference</a>.</p>
+
+<div class="recommended">
+  <strong>Key takeaway:</strong> You can now query, read, modify, and watch the DOM tree programmatically via CDP. Combined with <code>Runtime.evaluate</code>, you can also bridge into Angular's component model. This is the foundation for an agent that can verify "did the page render correctly?"
+</div>
+
+<h2>Primary Source</h2>
+
+<p>Read the <a href="https://chromedevtools.github.io/devtools-protocol/tot/DOM/">DOM domain documentation</a>. Pay attention to the difference between <code>DOM.querySelector</code> (returns one nodeId) and <code>DOM.querySelectorAll</code> (returns an array). Also browse the events section - particularly <code>childNodeInserted</code> and <code>attributeModified</code>.</p>
+
+      <nav class="footer-nav">
+        <a href="02-first-connection.html">&larr; Your First CDP Connection</a>
+        <a href="04-runtime-domain.html">The Runtime Domain &rarr;</a>
+      </nav>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script src="/vendor/prism.min.js"></script>
+  <script src="/vendor/prism-javascript.min.js"></script>
+  <script src="/vendor/prism-json.min.js"></script>
+  <script src="/vendor/prism-typescript.min.js"></script>
+  <script src="/vendor/prism-bash.min.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+/* ===========================
+   Chrome DevTools Protocol Course - Course-Specific Styles
+   =========================== */
+
+/* Course-specific variables */
+:root[data-theme="dark"] {
+  --cdp-command: #61afef;
+  --cdp-event: #98c379;
+  --cdp-response: #e5c07b;
+  --cdp-domain: #c678dd;
+}
+
+:root[data-theme="light"] {
+  --cdp-command: #1a73e8;
+  --cdp-event: #16803d;
+  --cdp-response: #8b5e00;
+  --cdp-domain: #6d28d9;
+}

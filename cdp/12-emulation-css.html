@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>Emulation & CSS - Lesson 12 | Teach Me</title>
+  <meta name="description" content="Lesson 12 of the Chrome DevTools Protocol course: Emulation & CSS">
+  <link rel="canonical" href="https://teachmeskills.dev/cdp/12-emulation-css.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/cdp/12-emulation-css.html">
+  <meta property="og:title" content="Emulation & CSS - Lesson 12 | Teach Me">
+  <meta property="og:description" content="Lesson 12 of the Chrome DevTools Protocol course. Device emulation, CSS inspection, and computed style manipulation via CDP.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Emulation & CSS - Lesson 12 | Teach Me">
+  <meta name="twitter:description" content="Lesson 12 of the Chrome DevTools Protocol course. Device emulation, CSS inspection, and computed style manipulation via CDP.">
+  <script type="application/ld+json">
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://teachmeskills.dev/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Chrome DevTools Protocol",
+        "item": "https://teachmeskills.dev/cdp/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Emulation & CSS"
+      }
+    ]
+  }
+]
+  </script>
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header"><a href="index.html">CDP Course</a></div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-what-is-cdp.html">1. What Is the Chrome DevTools Protocol?</a></li>
+        <li><a href="02-first-connection.html">2. Your First CDP Connection</a></li>
+        <li><a href="03-dom-domain.html">3. The DOM Domain</a></li>
+        <li><a href="04-runtime-domain.html">4. The Runtime Domain</a></li>
+        <li><a href="05-network-domain.html">5. The Network Domain</a></li>
+        <li><a href="06-combined-monitoring.html">6. Combined Monitoring</a></li>
+        <li><a href="07-input-domain.html">7. The Input Domain</a></li>
+        <li><a href="08-page-domain.html">8. The Page Domain</a></li>
+        <li><a href="09-debugger-domain.html">9. The Debugger Domain</a></li>
+        <li><a href="10-target-session-management.html">10. Target & Session Management</a></li>
+        <li><a href="11-performance-tracing.html">11. Performance & Tracing</a></li>
+        <li class="current"><a href="12-emulation-css.html">12. Emulation & CSS</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="glossary.html">Glossary</a></li>
+        <li><a href="cdp-complete-reference.html">Complete Reference</a></li>
+        <li><a href="chrome-flags.html">Chrome Flags</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 12</p>
+  <h1>Emulation & CSS</h1>
+
+<h2>What You'll Learn</h2>
+
+<p>The <code>Emulation</code> domain lets you fake the device environment - screen size, pixel ratio, user agent, geolocation, timezone, and more. The <code>CSS</code> domain gives you programmatic access to stylesheets and computed styles. Together, they cover responsive design testing and CSS debugging.</p>
+
+<ol>
+  <li>Setting viewport and device dimensions</li>
+  <li>Emulating mobile devices (touch, user agent, pixel ratio)</li>
+  <li>Overriding media features (dark mode, reduced motion, print)</li>
+  <li>Geolocation, timezone, and locale overrides</li>
+  <li>CPU throttling (simulating slow devices)</li>
+  <li>Reading computed styles</li>
+  <li>Inspecting and modifying stylesheets</li>
+  <li>Tracking CSS coverage (unused rules)</li>
+</ol>
+
+<h2>The Emulation Domain</h2>
+
+<h3>Setting viewport and device metrics</h3>
+
+<p>This is the CDP equivalent of the device toolbar in DevTools:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Emulate an iPhone 14 Pro viewport
+await send('Emulation.setDeviceMetricsOverride', {
+  width: 393,
+  height: 852,
+  deviceScaleFactor: 3,    // Retina (3x pixel ratio)
+  mobile: true,            // Enable mobile rendering mode
+  screenWidth: 393,
+  screenHeight: 852
+});
+
+// Reset to default (actual device dimensions)
+await send('Emulation.clearDeviceMetricsOverride');</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<div class="key-concept">
+  <strong>For the package:</strong> You could run the same journey at multiple viewport sizes to test responsive behaviour - loop through breakpoints (mobile, tablet, desktop) and capture screenshots at each. The journey code doesn't change; only the emulation settings do.
+</div>
+
+<h3>Touch emulation</h3>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Enable touch event emulation (mobile testing)
+await send('Emulation.setTouchEmulationEnabled', {
+  enabled: true,
+  maxTouchPoints: 5
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h3>User agent override</h3>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Pretend to be a mobile Safari browser
+await send('Emulation.setUserAgentOverride', {
+  userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
+  platform: 'iPhone'
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h3>Emulating media features (dark mode, reduced motion, print)</h3>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Emulate dark mode - triggers @media (prefers-color-scheme: dark) in CSS
+await send('Emulation.setEmulatedMedia', {
+  features: [
+    { name: 'prefers-color-scheme', value: 'dark' }
+  ]
+});
+
+// Emulate reduced motion preference
+await send('Emulation.setEmulatedMedia', {
+  features: [
+    { name: 'prefers-reduced-motion', value: 'reduce' }
+  ]
+});
+
+// Emulate print media (for testing @media print styles)
+await send('Emulation.setEmulatedMedia', {
+  media: 'print'
+});
+
+// Reset to defaults
+await send('Emulation.setEmulatedMedia', {
+  media: '',
+  features: []
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h3>Vision deficiency emulation</h3>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Simulate how the page looks for users with colour blindness
+await send('Emulation.setEmulatedVisionDeficiency', {
+  type: 'deuteranopia'    // 'none', 'blurredVision', 'deuteranopia',
+                          // 'protanopia', 'tritanopia', 'achromatopsia'
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h3>Geolocation override</h3>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Fake the user's location (for location-based features)
+await send('Emulation.setGeolocationOverride', {
+  latitude: 51.5074,     // London
+  longitude: -0.1278,
+  accuracy: 1
+});
+
+// Clear the override
+await send('Emulation.clearGeolocationOverride');</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h3>Timezone and locale</h3>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Override timezone (affects Date objects and Intl formatting)
+await send('Emulation.setTimezoneOverride', {
+  timezoneId: 'America/New_York'
+});
+
+// Override locale (affects number/date formatting)
+await send('Emulation.setLocaleOverride', {
+  locale: 'de-DE'
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h3>CPU throttling</h3>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Simulate a 4x slower CPU (like a low-end mobile device)
+await send('Emulation.setCPUThrottlingRate', {
+  rate: 4    // 1 = no throttle, 4 = 4x slower, 6 = 6x slower
+});
+
+// Reset
+await send('Emulation.setCPUThrottlingRate', { rate: 1 });</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<div class="key-concept">
+  <strong>Combined with network throttling</strong> (from <code>Network.emulateNetworkConditions</code>), CPU throttling lets you simulate a realistic low-end mobile experience - slow CPU + slow network. Useful for testing perceived performance under constrained conditions.
+</div>
+
+<h3>Other useful overrides</h3>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Disable JavaScript (test progressive enhancement / no-JS fallbacks)
+await send('Emulation.setScriptExecutionDisabled', {
+  value: true
+});
+
+// Force page to think it's focused (useful in headless mode where
+// the page might think it's in a background tab)
+await send('Emulation.setFocusEmulationEnabled', {
+  enabled: true
+});
+
+// Force dark mode rendering at the browser level
+await send('Emulation.setAutoDarkModeOverride', {
+  enabled: true
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h2>The CSS Domain</h2>
+
+<p>The CSS domain is experimental but gives you deep access to styles - the same data powering the Styles panel in DevTools.</p>
+
+<h3>Enable the domain</h3>
+
+<div class="code-wrapper"><pre><code class="language-javascript">await send('CSS.enable');</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h3>Reading computed styles</h3>
+
+<p>Get the final computed style for any node (all resolved values after cascade, inheritance, and specificity):</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// First, get the nodeId (from DOM domain)
+const doc = await send('DOM.getDocument', { depth: 0 });
+const h1 = await send('DOM.querySelector', {
+  nodeId: doc.root.nodeId,
+  selector: 'h1'
+});
+
+// Get computed styles for that node
+const computed = await send('CSS.getComputedStyleForNode', {
+  nodeId: h1.nodeId
+});
+
+// computed.computedStyle = [
+//   { name: 'color', value: 'rgb(17, 17, 17)' },
+//   { name: 'font-size', value: '28.8px' },
+//   { name: 'font-family', value: '"Source Serif 4", Georgia, serif' },
+//   { name: 'display', value: 'block' },
+//   { name: 'margin-bottom', value: '4px' },
+//   ... hundreds more properties
+// ]</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p>This is useful for assertions: "is this element actually red?" "is it display: none?"</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Helper to get a specific computed property
+function getComputedValue(computedStyle, property) {
+  const entry = computedStyle.find(style => style.name === property);
+  return entry ? entry.value : null;
+}
+
+const display = getComputedValue(computed.computedStyle, 'display');
+const visibility = getComputedValue(computed.computedStyle, 'visibility');
+const color = getComputedValue(computed.computedStyle, 'color');
+
+console.log(`h1: display=${display}, visibility=${visibility}, color=${color}`);</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h3>Getting matched styles (which rules apply to an element)</h3>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Get all CSS rules that match this element (like the Styles panel)
+const matched = await send('CSS.getMatchedStylesForNode', {
+  nodeId: h1.nodeId
+});
+
+// matched.matchedCSSRules = array of rules with selectors, properties, and source locations
+// matched.inherited = styles inherited from parent elements
+// matched.inlineStyle = inline style attribute</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h3>Modifying styles</h3>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Get inline styles for the element
+const inline = await send('CSS.getInlineStylesForNode', {
+  nodeId: h1.nodeId
+});
+
+// Set style properties
+await send('CSS.setStyleTexts', {
+  edits: [{
+    styleSheetId: inline.inlineStyle.styleSheetId,
+    range: inline.inlineStyle.range,
+    text: 'color: red; font-size: 48px;'
+  }]
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h3>CSS coverage (finding unused rules)</h3>
+
+<p>Track which CSS rules are actually used - valuable for identifying dead CSS:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Start tracking CSS rule usage
+await send('CSS.startRuleUsageTracking');
+
+// ... navigate and interact with the page ...
+await send('Page.navigate', { url: 'http://localhost:4200' });
+await waitForSelector('[data-testid="app-ready"]');
+
+// Stop and get the coverage report
+const coverage = await send('CSS.stopRuleUsageTracking');
+// coverage.ruleUsage = [
+//   { styleSheetId: '1', startOffset: 0, endOffset: 150, used: true },
+//   { styleSheetId: '1', startOffset: 151, endOffset: 300, used: false },  ← unused rule
+//   ...
+// ]
+
+const totalRules = coverage.ruleUsage.length;
+const usedRules = coverage.ruleUsage.filter(rule => rule.used).length;
+const unusedRules = totalRules - usedRules;
+
+console.log(`CSS Coverage: ${usedRules}/${totalRules} rules used (${unusedRules} unused)`);</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h3>Forcing pseudo-states</h3>
+
+<p>Force an element into :hover, :focus, :active, or :visited state - without actually hovering or focusing:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Force the button to be in :hover state (to inspect hover styles)
+await send('CSS.forcePseudoState', {
+  nodeId: buttonNodeId,
+  forcedPseudoClasses: ['hover']
+});
+
+// Force multiple states simultaneously
+await send('CSS.forcePseudoState', {
+  nodeId: inputNodeId,
+  forcedPseudoClasses: ['focus', 'valid']
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h2>Practical Patterns</h2>
+
+<h3>Responsive testing loop</h3>
+
+<div class="code-wrapper"><pre><code class="language-javascript">const viewports = [
+  { name: 'Mobile', width: 375, height: 812, deviceScaleFactor: 3, mobile: true },
+  { name: 'Tablet', width: 768, height: 1024, deviceScaleFactor: 2, mobile: true },
+  { name: 'Desktop', width: 1920, height: 1080, deviceScaleFactor: 1, mobile: false },
+];
+
+for (const viewport of viewports) {
+  await send('Emulation.setDeviceMetricsOverride', viewport);
+  await send('Page.navigate', { url: 'http://localhost:4200' });
+  await waitForSelector('[data-testid="app-ready"]');
+
+  const screenshot = await send('Page.captureScreenshot', { format: 'png' });
+  writeFileSync(`screenshot-${viewport.name}.png`, Buffer.from(screenshot.data, 'base64'));
+
+  console.log(`${viewport.name}: screenshot captured`);
+}</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h3>Checking visibility for assertions</h3>
+
+<div class="code-wrapper"><pre><code class="language-bash">async function isVisible(selector) {
+  const doc = await send('DOM.getDocument', { depth: 0 });
+  const node = await send('DOM.querySelector', { nodeId: doc.root.nodeId, selector });
+
+  if (node.nodeId === 0) return false;  // Element doesn't exist
+
+  const computed = await send('CSS.getComputedStyleForNode', { nodeId: node.nodeId });
+
+  const display = getComputedValue(computed.computedStyle, 'display');
+  const visibility = getComputedValue(computed.computedStyle, 'visibility');
+  const opacity = getComputedValue(computed.computedStyle, 'opacity');
+
+  return display !== 'none' && visibility !== 'hidden' && opacity !== '0';
+}</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h2>Key Commands Reference</h2>
+
+<table style="width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem;">
+  <thead>
+    <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+      <th style="padding: 0.5rem;">Command</th>
+      <th style="padding: 0.5rem;">Purpose</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Emulation.setDeviceMetricsOverride</code></td>
+      <td style="padding: 0.5rem;">Set viewport size, pixel ratio, mobile mode</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Emulation.setEmulatedMedia</code></td>
+      <td style="padding: 0.5rem;">Emulate media type/features (dark mode, print, reduced motion)</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Emulation.setUserAgentOverride</code></td>
+      <td style="padding: 0.5rem;">Fake the browser's user agent string</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Emulation.setCPUThrottlingRate</code></td>
+      <td style="padding: 0.5rem;">Simulate slow CPU (rate: 4 = 4x slower)</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Emulation.setGeolocationOverride</code></td>
+      <td style="padding: 0.5rem;">Fake geolocation coordinates</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Emulation.setTimezoneOverride</code></td>
+      <td style="padding: 0.5rem;">Override system timezone</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>CSS.getComputedStyleForNode</code></td>
+      <td style="padding: 0.5rem;">Get resolved CSS values for an element</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>CSS.getMatchedStylesForNode</code></td>
+      <td style="padding: 0.5rem;">Get all CSS rules matching an element</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>CSS.startRuleUsageTracking</code></td>
+      <td style="padding: 0.5rem;">Begin tracking CSS coverage</td>
+    </tr>
+    <tr>
+      <td style="padding: 0.5rem;"><code>CSS.forcePseudoState</code></td>
+      <td style="padding: 0.5rem;">Force :hover, :focus, :active states</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>For the full list, see the <a href="cdp-complete-reference.html#Emulation">Emulation</a> and <a href="cdp-complete-reference.html#CSS">CSS</a> sections of the complete reference.</p>
+
+<div class="recommended">
+  <strong>Key takeaway:</strong> You can now emulate any device environment (viewport, user agent, pixel ratio, geolocation, timezone, colour scheme), inspect CSS computed and matched styles, track coverage, and force pseudo-states. Combined with screenshot capture from Lesson 8, you have everything needed for automated responsive design testing and CSS debugging.
+</div>
+
+<h2>Primary Source</h2>
+
+<p>Read the <a href="https://chromedevtools.github.io/devtools-protocol/tot/Emulation/">Emulation domain documentation</a> and the <a href="https://chromedevtools.github.io/devtools-protocol/tot/CSS/">CSS domain documentation</a>. The Emulation domain is stable; CSS is experimental but widely used.</p>
+
+      <nav class="footer-nav">
+        <a href="11-performance-tracing.html">&larr; Performance & Tracing</a>
+        <span></span>
+      </nav>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script src="/vendor/prism.min.js"></script>
+  <script src="/vendor/prism-javascript.min.js"></script>
+  <script src="/vendor/prism-json.min.js"></script>
+  <script src="/vendor/prism-typescript.min.js"></script>
+  <script src="/vendor/prism-bash.min.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

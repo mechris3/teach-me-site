@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>The Network Domain - Lesson 5 | Teach Me</title>
+  <meta name="description" content="Lesson 5 of the Chrome DevTools Protocol course: The Network Domain">
+  <link rel="canonical" href="https://teachmeskills.dev/cdp/05-network-domain.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/cdp/05-network-domain.html">
+  <meta property="og:title" content="The Network Domain - Lesson 5 | Teach Me">
+  <meta property="og:description" content="Lesson 5 of the Chrome DevTools Protocol course. Monitoring HTTP traffic, intercepting requests, and inspecting responses via CDP.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="The Network Domain - Lesson 5 | Teach Me">
+  <meta name="twitter:description" content="Lesson 5 of the Chrome DevTools Protocol course. Monitoring HTTP traffic, intercepting requests, and inspecting responses via CDP.">
+  <script type="application/ld+json">
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://teachmeskills.dev/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Chrome DevTools Protocol",
+        "item": "https://teachmeskills.dev/cdp/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "The Network Domain"
+      }
+    ]
+  }
+]
+  </script>
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header"><a href="index.html">CDP Course</a></div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-what-is-cdp.html">1. What Is the Chrome DevTools Protocol?</a></li>
+        <li><a href="02-first-connection.html">2. Your First CDP Connection</a></li>
+        <li><a href="03-dom-domain.html">3. The DOM Domain</a></li>
+        <li><a href="04-runtime-domain.html">4. The Runtime Domain</a></li>
+        <li class="current"><a href="05-network-domain.html">5. The Network Domain</a></li>
+        <li><a href="06-combined-monitoring.html">6. Combined Monitoring</a></li>
+        <li><a href="07-input-domain.html">7. The Input Domain</a></li>
+        <li><a href="08-page-domain.html">8. The Page Domain</a></li>
+        <li><a href="09-debugger-domain.html">9. The Debugger Domain</a></li>
+        <li><a href="10-target-session-management.html">10. Target & Session Management</a></li>
+        <li><a href="11-performance-tracing.html">11. Performance & Tracing</a></li>
+        <li><a href="12-emulation-css.html">12. Emulation & CSS</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="glossary.html">Glossary</a></li>
+        <li><a href="cdp-complete-reference.html">Complete Reference</a></li>
+        <li><a href="chrome-flags.html">Chrome Flags</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 5</p>
+  <h1>The Network Domain</h1>
+
+<h2>What You'll Learn</h2>
+
+<p>The <code>Network</code> domain is the Network panel made programmatic. Combined with the <code>Fetch</code> domain (which handles interception), you can:</p>
+
+<ol>
+  <li>Observe every HTTP request and response</li>
+  <li>Read response bodies after they arrive</li>
+  <li>Detect failed requests (404s, CORS errors, timeouts)</li>
+  <li>Block specific URLs</li>
+  <li>Intercept requests and modify them before they reach the server</li>
+  <li>Mock API responses without changing application code</li>
+</ol>
+
+<p>For an AI debugging agent, this is the third "sense": DOM gives you sight (page structure), Runtime gives you hearing (console/errors), and Network gives you the data flow - you can see every API call an Angular app makes and whether it succeeded.</p>
+
+<h2>Network vs Fetch: Two Domains, Two Roles</h2>
+
+<p>CDP splits network functionality across two domains:</p>
+
+<ul>
+  <li><strong><code>Network</code></strong> - passive observation. Enable it and you receive events for every request/response. You can also read response bodies, manage cookies, and block URLs.</li>
+  <li><strong><code>Fetch</code></strong> - active interception. Pauses requests mid-flight so you can modify, mock, or fail them before they complete.</li>
+</ul>
+
+<p>Think of <code>Network</code> as a read-only wiretap, and <code>Fetch</code> as a man-in-the-middle proxy.</p>
+
+<h2>Observing Traffic with Network.enable</h2>
+
+<div class="code-wrapper"><pre><code class="language-javascript">await send('Network.enable');</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p>Once enabled, you'll receive events for every request the page makes. The lifecycle of a single request produces these events in order:</p>
+
+<ol>
+  <li><code>Network.requestWillBeSent</code> - request is about to go out</li>
+  <li><code>Network.responseReceived</code> - headers arrived from the server</li>
+  <li><code>Network.dataReceived</code> - body chunks arriving (may fire multiple times)</li>
+  <li><code>Network.loadingFinished</code> - request complete, body fully received</li>
+</ol>
+
+<p>Or, if something goes wrong:</p>
+<ol>
+  <li><code>Network.requestWillBeSent</code></li>
+  <li><code>Network.loadingFailed</code> - with an error reason (CORS, timeout, connection refused, etc.)</li>
+</ol>
+
+<h3>The Request Event</h3>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Network.requestWillBeSent event
+{
+  "method": "Network.requestWillBeSent",
+  "params": {
+    "requestId": "req-001",
+    "request": {
+      "url": "https://api.example.com/users",
+      "method": "GET",
+      "headers": {
+        "Authorization": "Bearer token-here",
+        "Accept": "application/json"
+      }
+    },
+    "timestamp": 1719012345.678,
+    "type": "XHR",             // or "Fetch", "Document", "Stylesheet", etc.
+    "initiator": {
+      "type": "script",
+      "stackTrace": {
+        "callFrames": [
+          {
+            "functionName": "fetchUsers",
+            "url": "http://localhost:4200/main.js",
+            "lineNumber": 89
+          }
+        ]
+      }
+    }
+  }
+}</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p>Key fields:</p>
+<ul>
+  <li><code>requestId</code> - use this to correlate with the response and body later</li>
+  <li><code>request.url</code>, <code>request.method</code>, <code>request.headers</code> - what was sent</li>
+  <li><code>type</code> - the resource type (<code>XHR</code>, <code>Fetch</code>, <code>Document</code>, <code>Stylesheet</code>, <code>Script</code>, <code>Image</code>, etc.)</li>
+  <li><code>initiator</code> - what triggered this request. For XHR/fetch calls from your Angular code, this includes a stack trace showing which function made the call</li>
+</ul>
+
+<h3>The Response Event</h3>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Network.responseReceived event
+{
+  "method": "Network.responseReceived",
+  "params": {
+    "requestId": "req-001",
+    "response": {
+      "url": "https://api.example.com/users",
+      "status": 200,
+      "statusText": "OK",
+      "headers": {
+        "content-type": "application/json",
+        "content-length": "1234"
+      },
+      "mimeType": "application/json"
+    },
+    "type": "XHR"
+  }
+}</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h3>Failed Requests</h3>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Network.loadingFailed event
+{
+  "method": "Network.loadingFailed",
+  "params": {
+    "requestId": "req-002",
+    "errorText": "net::ERR_CONNECTION_REFUSED",
+    "canceled": false,
+    "type": "XHR"
+  }
+}</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p>Common <code>errorText</code> values you'll encounter:</p>
+<ul>
+  <li><code>net::ERR_CONNECTION_REFUSED</code> - server isn't running</li>
+  <li><code>net::ERR_NAME_NOT_RESOLVED</code> - DNS failure</li>
+  <li><code>net::ERR_FAILED</code> - often a CORS block (check <code>Network.responseReceivedExtraInfo</code> for details)</li>
+  <li><code>net::ERR_TIMED_OUT</code> - request took too long</li>
+  <li><code>net::ERR_CERT_AUTHORITY_INVALID</code> - SSL certificate problem</li>
+</ul>
+
+<div class="key-concept">
+  <strong>For a debugging agent:</strong> Monitoring <code>Network.loadingFailed</code> catches API connection issues (backend not running, wrong URL, CORS misconfiguration) - a common class of Angular bugs that produce confusing error messages in the UI but have a clear root cause in the network layer.
+</div>
+
+<h2>Reading Response Bodies</h2>
+
+<p>The response events give you headers and status, but not the body. To get the body, use <code>Network.getResponseBody</code> after the request completes (<code>loadingFinished</code>):</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Wait for loadingFinished, then read the body
+const body = await send('Network.getResponseBody', {
+  requestId: 'req-001'
+});
+
+// body = {
+//   body: '{"users": [{"id": 1, "name": "Alice"}]}',
+//   base64Encoded: false
+// }</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p>If <code>base64Encoded</code> is <code>true</code>, the body is binary content (images, fonts, etc.) encoded as base64. For JSON API responses, it'll be <code>false</code> and you get the raw string.</p>
+
+<div class="key-concept">
+  <strong>Timing matters.</strong> You can only call <code>getResponseBody</code> after <code>Network.loadingFinished</code> fires for that <code>requestId</code>. Calling it too early will return an error. The pattern: store requestIds from <code>requestWillBeSent</code>, then read bodies when <code>loadingFinished</code> arrives with the same ID.
+</div>
+
+<h2>Blocking URLs</h2>
+
+<p>You can block specific URL patterns from loading - useful for testing how the application handles missing resources:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Block all requests matching these patterns
+await send('Network.setBlockedURLs', {
+  urls: [
+    'https://api.example.com/analytics*',   // Block analytics
+    '*.png',                                 // Block all PNGs
+    'https://ads.example.com/*'             // Block ads
+  ]
+});
+
+// Blocked requests will fire loadingFailed with errorText: "net::ERR_BLOCKED_BY_CLIENT"</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h2>Request Interception with the Fetch Domain</h2>
+
+<p>For actively modifying requests (not just observing), use the <code>Fetch</code> domain. This is how you'd mock API responses for testing:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Enable interception for specific URL patterns
+await send('Fetch.enable', {
+  patterns: [
+    { urlPattern: 'https://api.example.com/*', requestStage: 'Response' }
+  ]
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p>When a matching request is made, the browser <strong>pauses</strong> it and sends you a <code>Fetch.requestPaused</code> event. You must respond - either continue normally, modify, or provide a mock response:</p>
+
+<h3>Continue unmodified</h3>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Let the request proceed as normal
+await send('Fetch.continueRequest', {
+  requestId: pausedEvent.params.requestId
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h3>Provide a mock response</h3>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Respond with fake data - the server is never contacted
+await send('Fetch.fulfillRequest', {
+  requestId: pausedEvent.params.requestId,
+  responseCode: 200,
+  responseHeaders: [
+    { name: 'Content-Type', value: 'application/json' }
+  ],
+  body: btoa(JSON.stringify({
+    users: [{ id: 1, name: 'Mock User' }]
+  }))  // body must be base64 encoded
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h3>Fail the request</h3>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Simulate a network failure
+await send('Fetch.failRequest', {
+  requestId: pausedEvent.params.requestId,
+  reason: 'ConnectionRefused'
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<div class="key-concept">
+  <strong>Important:</strong> When <code>Fetch.enable</code> is active and a request matches your patterns, the request is <em>paused</em>. You <strong>must</strong> respond with <code>continueRequest</code>, <code>fulfillRequest</code>, or <code>failRequest</code>. If you don't respond, the request hangs indefinitely. This is by design - it gives you complete control, but requires you to handle every matched request.
+</div>
+
+<h2>Practical Pattern: Watching API Calls in Angular</h2>
+
+<p>Here's how you'd monitor all API calls from an Angular app and detect failures:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">await send('Network.enable');
+
+// Track requests and their outcomes
+const apiCalls = new Map();
+
+ws.on('message', (data) => {
+  const msg = JSON.parse(data.toString());
+
+  if (!msg.method) return;  // Not an event
+
+  // Track outgoing API requests
+  if (msg.method === 'Network.requestWillBeSent') {
+    const { requestId, request, type } = msg.params;
+    if (type === 'XHR' || type === 'Fetch') {
+      apiCalls.set(requestId, {
+        url: request.url,
+        method: request.method,
+        status: 'pending'
+      });
+    }
+  }
+
+  // Record successful responses
+  if (msg.method === 'Network.responseReceived') {
+    const { requestId, response } = msg.params;
+    if (apiCalls.has(requestId)) {
+      const call = apiCalls.get(requestId);
+      call.status = response.status;
+      call.statusText = response.statusText;
+
+      // Flag non-2xx responses
+      if (response.status >= 400) {
+        console.error(`API FAILURE: ${call.method} ${call.url} → ${response.status}`);
+      }
+    }
+  }
+
+  // Record network-level failures
+  if (msg.method === 'Network.loadingFailed') {
+    const { requestId, errorText } = msg.params;
+    if (apiCalls.has(requestId)) {
+      const call = apiCalls.get(requestId);
+      call.status = 'failed';
+      call.error = errorText;
+      console.error(`NETWORK FAILURE: ${call.method} ${call.url} → ${errorText}`);
+    }
+  }
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h2>Edit and Resend Requests</h2>
+
+<p>Firefox DevTools has a "Edit and Resend" feature for network requests. Chrome's GUI doesn't offer this, but with CDP you can do it programmatically. The approach: capture the original request details, modify what you need, then fire a new request via <code>Runtime.evaluate</code>.</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Step 1: Capture original request details from a Network.requestWillBeSent event.
+// (You'd store these as events arrive)
+const originalRequest = {
+  url: 'https://api.example.com/users',
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer original-token'
+  },
+  body: JSON.stringify({ name: 'Alice', role: 'admin' })
+};
+
+// Step 2: Modify whatever you want to change
+const modifiedRequest = {
+  ...originalRequest,
+  headers: {
+    ...originalRequest.headers,
+    'Authorization': 'Bearer new-token'       // Changed: different auth token
+  },
+  body: JSON.stringify({ name: 'Alice', role: 'viewer' })  // Changed: different role
+};
+
+// Step 3: Resend via Runtime.evaluate (executes a fetch in the page context)
+const resendResult = await send('Runtime.evaluate', {
+  expression: `
+    fetch('${modifiedRequest.url}', {
+      method: '${modifiedRequest.method}',
+      headers: ${JSON.stringify(modifiedRequest.headers)},
+      body: ${JSON.stringify(modifiedRequest.body)}
+    }).then(response => response.json())
+  `,
+  awaitPromise: true,
+  returnByValue: true
+});
+
+console.log('Resend result:', resendResult.result.value);</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p>You can also use <code>Network.replayXHR</code> for a straight replay (no modifications) of a previous XHR request:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Replay the exact same request - no modification possible
+await send('Network.replayXHR', {
+  requestId: 'req-001'  // The requestId from the original Network.requestWillBeSent event
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<div class="key-concept">
+  <strong>Getting the original request body:</strong> <code>Network.requestWillBeSent</code> includes the URL, method, and headers, but not always the POST body. To capture it, use <code>Network.getRequestPostData({ requestId })</code> after the request fires. This gives you the raw body string to modify and resend.
+</div>
+
+<h2>Cookies and Cache</h2>
+
+<p>The Network domain also gives you access to cookies and cache - useful for debugging auth issues:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Get all cookies for the current page
+const cookies = await send('Network.getCookies');
+// cookies.cookies = [{ name: 'session', value: '...', domain: '...', ... }]
+
+// Set a cookie
+await send('Network.setCookie', {
+  name: 'debug-mode',
+  value: 'true',
+  domain: 'localhost',
+  path: '/'
+});
+
+// Clear all cookies
+await send('Network.clearBrowserCookies');
+
+// Disable cache (like having DevTools "Disable cache" checked)
+await send('Network.setCacheDisabled', {
+  cacheDisabled: true
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h2>Key Commands Reference</h2>
+
+<table style="width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem;">
+  <thead>
+    <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+      <th style="padding: 0.5rem;">Command</th>
+      <th style="padding: 0.5rem;">Purpose</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Network.enable</code></td>
+      <td style="padding: 0.5rem;">Start receiving network events</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Network.getResponseBody</code></td>
+      <td style="padding: 0.5rem;">Read the response body (after loadingFinished)</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Network.setBlockedURLs</code></td>
+      <td style="padding: 0.5rem;">Block requests matching URL patterns</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Network.getCookies</code></td>
+      <td style="padding: 0.5rem;">Read cookies for the current page</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Network.setCacheDisabled</code></td>
+      <td style="padding: 0.5rem;">Toggle cache (like DevTools "Disable cache")</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Fetch.enable</code></td>
+      <td style="padding: 0.5rem;">Start intercepting requests (with URL patterns)</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Fetch.continueRequest</code></td>
+      <td style="padding: 0.5rem;">Let an intercepted request proceed</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Fetch.fulfillRequest</code></td>
+      <td style="padding: 0.5rem;">Respond with mock data (bypass server)</td>
+    </tr>
+    <tr>
+      <td style="padding: 0.5rem;"><code>Fetch.failRequest</code></td>
+      <td style="padding: 0.5rem;">Simulate a network failure</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>For the full list, see the <a href="cdp-complete-reference.html#Network">Network</a> and <a href="cdp-complete-reference.html#Fetch">Fetch</a> sections of the complete reference.</p>
+
+<div class="recommended">
+  <strong>Key takeaway:</strong> You now have all three "senses" for a debugging agent: DOM (page structure), Runtime (console/errors), and Network (data flow). You can observe every API call, detect failures, read response bodies, and even mock responses for testing. Combined, these three domains cover the vast majority of front-end debugging scenarios.
+</div>
+
+<h2>Primary Source</h2>
+
+<p>Read the <a href="https://chromedevtools.github.io/devtools-protocol/tot/Network/">Network domain documentation</a> and the <a href="https://chromedevtools.github.io/devtools-protocol/tot/Fetch/">Fetch domain documentation</a>. Note how <code>Network</code> is passive (observe) while <code>Fetch</code> is active (intercept and modify).</p>
+
+      <nav class="footer-nav">
+        <a href="04-runtime-domain.html">&larr; The Runtime Domain</a>
+        <a href="06-combined-monitoring.html">Combined Monitoring &rarr;</a>
+      </nav>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script src="/vendor/prism.min.js"></script>
+  <script src="/vendor/prism-javascript.min.js"></script>
+  <script src="/vendor/prism-json.min.js"></script>
+  <script src="/vendor/prism-typescript.min.js"></script>
+  <script src="/vendor/prism-bash.min.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

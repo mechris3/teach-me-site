@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>The Page Domain - Lesson 8 | Teach Me</title>
+  <meta name="description" content="Lesson 8 of the Chrome DevTools Protocol course: The Page Domain">
+  <link rel="canonical" href="https://teachmeskills.dev/cdp/08-page-domain.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/cdp/08-page-domain.html">
+  <meta property="og:title" content="The Page Domain - Lesson 8 | Teach Me">
+  <meta property="og:description" content="Lesson 8 of the Chrome DevTools Protocol course. Navigation, lifecycle events, screenshots, and PDF generation via CDP.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="The Page Domain - Lesson 8 | Teach Me">
+  <meta name="twitter:description" content="Lesson 8 of the Chrome DevTools Protocol course. Navigation, lifecycle events, screenshots, and PDF generation via CDP.">
+  <script type="application/ld+json">
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://teachmeskills.dev/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Chrome DevTools Protocol",
+        "item": "https://teachmeskills.dev/cdp/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "The Page Domain"
+      }
+    ]
+  }
+]
+  </script>
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header"><a href="index.html">CDP Course</a></div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-what-is-cdp.html">1. What Is the Chrome DevTools Protocol?</a></li>
+        <li><a href="02-first-connection.html">2. Your First CDP Connection</a></li>
+        <li><a href="03-dom-domain.html">3. The DOM Domain</a></li>
+        <li><a href="04-runtime-domain.html">4. The Runtime Domain</a></li>
+        <li><a href="05-network-domain.html">5. The Network Domain</a></li>
+        <li><a href="06-combined-monitoring.html">6. Combined Monitoring</a></li>
+        <li><a href="07-input-domain.html">7. The Input Domain</a></li>
+        <li class="current"><a href="08-page-domain.html">8. The Page Domain</a></li>
+        <li><a href="09-debugger-domain.html">9. The Debugger Domain</a></li>
+        <li><a href="10-target-session-management.html">10. Target & Session Management</a></li>
+        <li><a href="11-performance-tracing.html">11. Performance & Tracing</a></li>
+        <li><a href="12-emulation-css.html">12. Emulation & CSS</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="glossary.html">Glossary</a></li>
+        <li><a href="cdp-complete-reference.html">Complete Reference</a></li>
+        <li><a href="chrome-flags.html">Chrome Flags</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 8</p>
+  <h1>The Page Domain</h1>
+
+<h2>What You'll Learn</h2>
+
+<p>The <code>Page</code> domain covers the page's lifecycle - navigation, loading, frames, screenshots, and more. For a CDP adapter, the critical skill is knowing <em>when</em> a page (or SPA route change) has finished loading and is ready to inspect.</p>
+
+<ol>
+  <li>Navigation and the page lifecycle events</li>
+  <li>Waiting for load reliably (traditional navigation vs SPA)</li>
+  <li>Frame management (iframes)</li>
+  <li>Screenshots and PDF generation</li>
+  <li>Injecting scripts that run on every page load</li>
+  <li>Handling JavaScript dialogs (alert, confirm, prompt)</li>
+</ol>
+
+<h2>The Navigation Lifecycle</h2>
+
+<p>When you call <code>Page.navigate</code>, a cascade of events follows. Understanding this sequence is essential for knowing when it's safe to inspect the page:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Enable lifecycle tracking
+await send('Page.enable');
+await send('Page.setLifecycleEventsEnabled', { enabled: true });
+
+// Navigate
+await send('Page.navigate', { url: 'https://example.com' });</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p>The events fire in this order:</p>
+
+<ol>
+  <li><code>Page.frameStartedNavigating</code> - navigation begins (experimental but useful)</li>
+  <li><code>Page.frameNavigated</code> - the frame has navigated to the new URL (headers received, document committed)</li>
+  <li><code>Page.domContentEventFired</code> - DOM is fully parsed (equivalent to <code>DOMContentLoaded</code> event)</li>
+  <li><code>Page.lifecycleEvent</code> with <code>name: 'DOMContentLoaded'</code> - same moment, different event format</li>
+  <li><code>Page.loadEventFired</code> - all resources loaded (equivalent to <code>window.onload</code>)</li>
+  <li><code>Page.lifecycleEvent</code> with <code>name: 'load'</code> - same moment</li>
+  <li><code>Page.lifecycleEvent</code> with <code>name: 'networkIdle'</code> - no network activity for 500ms</li>
+</ol>
+
+<div class="key-concept">
+  <strong>Which event should a CDP adapter wait for?</strong>
+  <ul style="margin-top: 0.5rem;">
+    <li><code>domContentEventFired</code> - safe to query the DOM, but images/fonts may still be loading</li>
+    <li><code>loadEventFired</code> - everything loaded, safe for screenshots</li>
+    <li><code>networkIdle</code> - all network settled, best for SPAs that make API calls after load</li>
+  </ul>
+  For Angular apps, <code>networkIdle</code> is usually the right choice - the initial HTML loads fast, but the app then makes API calls to fetch data before rendering meaningful content.
+</div>
+
+<h2>Waiting for Navigation - Traditional Pages</h2>
+
+<p>For traditional full-page navigations, wait for <code>Page.loadEventFired</code>:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">function waitForLoad() {
+  return new Promise((resolve) => {
+    const handler = (data) => {
+      const msg = JSON.parse(data.toString());
+      if (msg.method === 'Page.loadEventFired') {
+        ws.removeListener('message', handler);
+        resolve();
+      }
+    };
+    ws.on('message', handler);
+  });
+}
+
+await send('Page.navigate', { url: 'https://example.com' });
+await waitForLoad();
+// Page is now ready to inspect</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h2>Waiting for SPA Route Changes</h2>
+
+<p>Angular's router doesn't trigger traditional navigation events - the URL changes via the History API, and the page's execution context stays alive. There's no <code>loadEventFired</code> for a route change.</p>
+
+<p>CDP fires <code>Page.navigatedWithinDocument</code> for same-document navigations (History API pushState/replaceState):</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Fires when Angular's router changes the URL
+{
+  "method": "Page.navigatedWithinDocument",
+  "params": {
+    "frameId": "ABC123",
+    "url": "http://localhost:4200/dashboard"
+  }
+}</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p>But this only tells you the URL changed - not that the new view has rendered. For SPAs, you typically need to wait for one of:</p>
+
+<ul>
+  <li>A specific element to appear in the DOM (<code>DOM.querySelector</code> polling)</li>
+  <li>Network to go quiet (no pending XHR/Fetch requests)</li>
+  <li>A custom "ready" signal from the app</li>
+</ul>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Wait for a selector to appear - the most reliable approach for SPAs
+async function waitForSelector(selector, timeout = 5000) {
+  const startTime = Date.now();
+
+  while (Date.now() - startTime < timeout) {
+    const doc = await send('DOM.getDocument', { depth: 0 });
+    const result = await send('DOM.querySelector', {
+      nodeId: doc.root.nodeId,
+      selector
+    });
+
+    if (result.nodeId !== 0) return result.nodeId;
+    await new Promise(resolve => setTimeout(resolve, 100));
+  }
+
+  throw new Error(`Selector "${selector}" not found within ${timeout}ms`);
+}
+
+// Navigate via the app's router (click a link, or evaluate)
+await send('Runtime.evaluate', {
+  expression: `window.history.pushState({}, '', '/dashboard')`
+});
+
+// Wait for the dashboard component to render
+await waitForSelector('[data-testid="dashboard-header"]');</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<div class="key-concept">
+  <strong>Angular-specific:</strong> You could also wait by evaluating <code>ng.getComponent()</code> on an expected element, or by checking Angular's <code>Zone.js</code> stability (<code>NgZone.isStable</code>). But selector-based waiting is framework-agnostic and works regardless of how the component renders.
+</div>
+
+<h2>Frames (iframes)</h2>
+
+<p>Pages can contain iframes - each is a separate frame with its own document and execution context. The Page domain tracks the frame tree:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Get the complete frame tree
+const frameTree = await send('Page.getFrameTree');
+// frameTree.frameTree = {
+//   frame: { id: 'main', url: 'http://localhost:4200', ... },
+//   childFrames: [
+//     { frame: { id: 'iframe-1', url: 'https://payment-provider.com/checkout', ... } }
+//   ]
+// }</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p>Frame lifecycle events:</p>
+<ul>
+  <li><code>Page.frameAttached</code> - a new iframe was added to the DOM</li>
+  <li><code>Page.frameNavigated</code> - an iframe navigated to a new URL</li>
+  <li><code>Page.frameDetached</code> - an iframe was removed from the DOM</li>
+</ul>
+
+<p>To interact with an iframe's content, you need its execution context (from <code>Runtime.executionContextCreated</code>) and target it with <code>contextId</code> in <code>Runtime.evaluate</code>, or attach to it as a separate target via the Target domain.</p>
+
+<h2>Screenshots</h2>
+
+<p><code>Page.captureScreenshot</code> captures the current viewport (or a specific region):</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Full viewport screenshot
+const screenshot = await send('Page.captureScreenshot', {
+  format: 'png'    // 'png', 'jpeg', or 'webp'
+});
+// screenshot.data = base64-encoded image
+
+// Specific region (clip)
+const regionShot = await send('Page.captureScreenshot', {
+  format: 'png',
+  clip: {
+    x: 0,
+    y: 0,
+    width: 800,
+    height: 600,
+    scale: 1
+  }
+});
+
+// Full page (beyond viewport - captures the entire scrollable content)
+// First, get the full page dimensions
+const metrics = await send('Page.getLayoutMetrics');
+const fullPageShot = await send('Page.captureScreenshot', {
+  format: 'png',
+  clip: {
+    x: 0,
+    y: 0,
+    width: metrics.cssContentSize.width,
+    height: metrics.cssContentSize.height,
+    scale: 1
+  }
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h2>PDF Generation</h2>
+
+<p><code>Page.printToPDF</code> renders the page as a PDF (headless mode only):</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">const pdf = await send('Page.printToPDF', {
+  landscape: false,
+  printBackground: true,
+  preferCSSPageSize: true
+});
+// pdf.data = base64-encoded PDF</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h2>Injecting Scripts on Every Page Load</h2>
+
+<p><code>Page.addScriptToEvaluateOnNewDocument</code> registers a script that runs in every frame before any other scripts. This is how you'd inject test helpers or override APIs:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Inject a script that runs before the page's own JavaScript
+await send('Page.addScriptToEvaluateOnNewDocument', {
+  source: `
+    // Override Date.now() to return a fixed time (useful for snapshot testing)
+    Date.now = () => 1719012345678;
+
+    // Or inject a test helper
+    window.__CDP_READY__ = false;
+    window.addEventListener('load', () => { window.__CDP_READY__ = true; });
+  `
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<div class="key-concept">
+  <strong>Use cases for a CDP adapter:</strong>
+  <ul style="margin-top: 0.5rem;">
+    <li>Inject a "ready" flag that signals when Angular has finished bootstrapping</li>
+    <li>Mock <code>Date.now()</code> for deterministic test output</li>
+    <li>Override <code>Math.random()</code> for reproducible behaviour</li>
+    <li>Disable animations (<code>* { animation-duration: 0s !important; }</code> via style injection)</li>
+  </ul>
+</div>
+
+<h2>Handling JavaScript Dialogs</h2>
+
+<p>When the page calls <code>alert()</code>, <code>confirm()</code>, or <code>prompt()</code>, CDP fires <code>Page.javascriptDialogOpening</code>. You must handle it or the page hangs:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Listen for dialog events
+// Event: Page.javascriptDialogOpening
+{
+  "method": "Page.javascriptDialogOpening",
+  "params": {
+    "url": "http://localhost:4200",
+    "message": "Are you sure you want to delete?",
+    "type": "confirm",     // 'alert', 'confirm', 'prompt', 'beforeunload'
+    "defaultPrompt": ""    // For prompt() - the default value
+  }
+}
+
+// Accept or dismiss the dialog
+await send('Page.handleJavaScriptDialog', {
+  accept: true,           // true = OK/Yes, false = Cancel/No
+  promptText: ''          // For prompt() - the text to enter
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<div class="key-concept">
+  <strong>Auto-handling in a CDP adapter:</strong> You'd likely want to automatically dismiss all dialogs by default (most journey steps don't expect them). Set up a listener that calls <code>handleJavaScriptDialog</code> immediately when <code>javascriptDialogOpening</code> fires. Allow journeys to override this for steps that specifically test dialog behaviour.
+</div>
+
+<h3>Full dialog handling example</h3>
+
+<p>Here's how you'd wire up automatic dialog handling in the WebSocket message listener. The key pattern: listen for the dialog event, then immediately respond to it:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Store a configurable dialog handler - default behaviour is to accept all dialogs
+let dialogHandler = (dialogParams) => ({
+  accept: true,
+  promptText: ''
+});
+
+// In your message listener, watch for dialog events and respond immediately
+ws.on('message', (data) => {
+  const msg = JSON.parse(data.toString());
+
+  // Handle pending promise responses (from earlier lessons)
+  if (msg.id && pending.has(msg.id)) {
+    const resolvePromise = pending.get(msg.id);
+    resolvePromise(msg.result || msg.error);
+    pending.delete(msg.id);
+    return;
+  }
+
+  // Handle dialog events - must respond or the page hangs
+  if (msg.method === 'Page.javascriptDialogOpening') {
+    const { message, type, defaultPrompt } = msg.params;
+    console.log(`Dialog opened: [${type}] "${message}"`);
+
+    // Ask the configurable handler what to do
+    const response = dialogHandler(msg.params);
+
+    // Respond to the dialog - this unblocks the page
+    send('Page.handleJavaScriptDialog', {
+      accept: response.accept,
+      promptText: response.promptText || ''
+    });
+    return;
+  }
+
+  // Pass other events to the diagnostic collector, etc.
+  if (msg.method) {
+    collector.handleEvent(msg.method, msg.params);
+  }
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p>To override for a specific journey step (e.g., testing that a delete confirmation works):</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Temporarily override the dialog handler for one step
+async function clickDeleteAndConfirm(selector) {
+  // Set up: expect a confirm dialog and accept it
+  const dialogPromise = new Promise((resolve) => {
+    dialogHandler = (params) => {
+      resolve(params);  // Capture the dialog details for assertion
+      return { accept: true };
+    };
+  });
+
+  // Trigger the action that opens the dialog
+  await send('Runtime.evaluate', {
+    expression: `document.querySelector('${selector}').click()`
+  });
+
+  // Wait for the dialog to appear and be handled
+  const dialogDetails = await dialogPromise;
+  console.log(`Confirmed: "${dialogDetails.message}"`);
+
+  // Restore default handler
+  dialogHandler = () => ({ accept: true, promptText: '' });
+}
+
+// For a prompt dialog where you need to enter text
+async function handlePromptDialog(selector, textToEnter) {
+  dialogHandler = (params) => {
+    return { accept: true, promptText: textToEnter };
+  };
+
+  await send('Runtime.evaluate', {
+    expression: `document.querySelector('${selector}').click()`
+  });
+
+  // Restore default
+  dialogHandler = () => ({ accept: true, promptText: '' });
+}</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<div class="key-concept">
+  <strong>Why you must respond immediately:</strong> When a dialog is open (<code>alert</code>, <code>confirm</code>, <code>prompt</code>), the page's JavaScript execution is completely blocked - nothing else runs until the dialog is dismissed. If a CDP adapter doesn't call <code>handleJavaScriptDialog</code>, the page will hang and subsequent CDP commands targeting that page will queue indefinitely.
+</div>
+
+<h2>Reloading</h2>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// Simple reload
+await send('Page.reload');
+
+// Reload ignoring cache (like Ctrl+Shift+R)
+await send('Page.reload', {
+  ignoreCache: true
+});
+
+// Stop a loading page
+await send('Page.stopLoading');</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h2>Key Commands Reference</h2>
+
+<table style="width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem;">
+  <thead>
+    <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+      <th style="padding: 0.5rem;">Command</th>
+      <th style="padding: 0.5rem;">Purpose</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Page.navigate</code></td>
+      <td style="padding: 0.5rem;">Navigate to a URL</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Page.reload</code></td>
+      <td style="padding: 0.5rem;">Reload the page (optionally ignoring cache)</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Page.setLifecycleEventsEnabled</code></td>
+      <td style="padding: 0.5rem;">Enable lifecycle events (DOMContentLoaded, load, networkIdle)</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Page.getFrameTree</code></td>
+      <td style="padding: 0.5rem;">Get the iframe hierarchy</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Page.captureScreenshot</code></td>
+      <td style="padding: 0.5rem;">Capture viewport or full page as image</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Page.printToPDF</code></td>
+      <td style="padding: 0.5rem;">Render page as PDF (headless only)</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Page.addScriptToEvaluateOnNewDocument</code></td>
+      <td style="padding: 0.5rem;">Inject script that runs before page JS on every load</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Page.handleJavaScriptDialog</code></td>
+      <td style="padding: 0.5rem;">Accept or dismiss alert/confirm/prompt dialogs</td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;"><code>Page.getLayoutMetrics</code></td>
+      <td style="padding: 0.5rem;">Get page dimensions (for full-page screenshots)</td>
+    </tr>
+    <tr>
+      <td style="padding: 0.5rem;"><code>Page.setDocumentContent</code></td>
+      <td style="padding: 0.5rem;">Replace the page's HTML entirely</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>For the full list, see the <a href="cdp-complete-reference.html#Page">Page section of the complete reference</a>.</p>
+
+<div class="recommended">
+  <strong>Key takeaway:</strong> You understand the page lifecycle events and, critically, how to wait for readiness in both traditional navigations and SPA route changes. Combined with the Input domain from Lesson 7, you can now navigate, interact, and know when the result is ready to inspect - the core loop of any browser automation.
+</div>
+
+<h2>Primary Source</h2>
+
+<p>Read the <a href="https://chromedevtools.github.io/devtools-protocol/tot/Page/">Page domain documentation</a>. Focus on the lifecycle events and the <code>navigate</code> command's return values (<code>frameId</code>, <code>loaderId</code>, <code>errorText</code>).</p>
+
+      <nav class="footer-nav">
+        <a href="07-input-domain.html">&larr; The Input Domain</a>
+        <a href="09-debugger-domain.html">The Debugger Domain &rarr;</a>
+      </nav>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script src="/vendor/prism.min.js"></script>
+  <script src="/vendor/prism-javascript.min.js"></script>
+  <script src="/vendor/prism-json.min.js"></script>
+  <script src="/vendor/prism-typescript.min.js"></script>
+  <script src="/vendor/prism-bash.min.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

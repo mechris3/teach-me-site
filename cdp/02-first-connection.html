@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>Your First CDP Connection - Lesson 2 | Teach Me</title>
+  <meta name="description" content="Lesson 2 of the Chrome DevTools Protocol course: Your First CDP Connection">
+  <link rel="canonical" href="https://teachmeskills.dev/cdp/02-first-connection.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/cdp/02-first-connection.html">
+  <meta property="og:title" content="Your First CDP Connection - Lesson 2 | Teach Me">
+  <meta property="og:description" content="Lesson 2 of the Chrome DevTools Protocol course. Launching Chrome with remote debugging, discovering targets, and sending your first CDP commands.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Your First CDP Connection - Lesson 2 | Teach Me">
+  <meta name="twitter:description" content="Lesson 2 of the Chrome DevTools Protocol course. Launching Chrome with remote debugging, discovering targets, and sending your first CDP commands.">
+  <script type="application/ld+json">
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://teachmeskills.dev/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Chrome DevTools Protocol",
+        "item": "https://teachmeskills.dev/cdp/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Your First CDP Connection"
+      }
+    ]
+  }
+]
+  </script>
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header"><a href="index.html">CDP Course</a></div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li><a href="01-what-is-cdp.html">1. What Is the Chrome DevTools Protocol?</a></li>
+        <li class="current"><a href="02-first-connection.html">2. Your First CDP Connection</a></li>
+        <li><a href="03-dom-domain.html">3. The DOM Domain</a></li>
+        <li><a href="04-runtime-domain.html">4. The Runtime Domain</a></li>
+        <li><a href="05-network-domain.html">5. The Network Domain</a></li>
+        <li><a href="06-combined-monitoring.html">6. Combined Monitoring</a></li>
+        <li><a href="07-input-domain.html">7. The Input Domain</a></li>
+        <li><a href="08-page-domain.html">8. The Page Domain</a></li>
+        <li><a href="09-debugger-domain.html">9. The Debugger Domain</a></li>
+        <li><a href="10-target-session-management.html">10. Target & Session Management</a></li>
+        <li><a href="11-performance-tracing.html">11. Performance & Tracing</a></li>
+        <li><a href="12-emulation-css.html">12. Emulation & CSS</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="glossary.html">Glossary</a></li>
+        <li><a href="cdp-complete-reference.html">Complete Reference</a></li>
+        <li><a href="chrome-flags.html">Chrome Flags</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 2</p>
+  <h1>Your First CDP Connection</h1>
+
+<h2>What You'll Do</h2>
+
+<p>In this lesson you'll:</p>
+<ol>
+  <li>Launch Brave with remote debugging enabled</li>
+  <li>Discover available targets via the HTTP endpoint</li>
+  <li>Connect to a page target over WebSocket</li>
+  <li>Send your first CDP command and receive a response</li>
+  <li>Subscribe to events and watch them stream in</li>
+</ol>
+
+<p>No libraries beyond the <code>ws</code> WebSocket package. Just you and the raw protocol.</p>
+
+<h2>Prerequisites</h2>
+
+<ul>
+  <li>Node.js installed (you already have this)</li>
+  <li>Brave Browser installed (or any Chromium-based browser)</li>
+  <li>A terminal</li>
+</ul>
+
+<h2>Step 1: Launch Brave with Remote Debugging</h2>
+
+<p>Open a terminal and run:</p>
+
+<div class="code-wrapper"><pre><code class="language-bash">/Applications/Brave\ Browser.app/Contents/MacOS/Brave\ Browser \
+  --remote-debugging-port=9222 \
+  --user-data-dir=/tmp/cdp-lesson</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<div class="key-concept">
+  <strong>Why <code>--user-data-dir</code>?</strong> This tells Brave to use a fresh, disposable profile directory. Without it, Brave would try to use an existing profile - and since only one instance can use a profile at a time, it would either fail to launch or interfere with your normal browsing session. Using <code>/tmp/cdp-lesson</code> gives you an isolated, throwaway browser instance.
+</div>
+
+<p>You should see Brave open with an empty tab. The browser is now listening for CDP connections on port 9222.</p>
+
+<h2>Step 2: Discover Targets</h2>
+
+<p>In a second terminal, query the HTTP discovery endpoint:</p>
+
+<div class="code-wrapper"><pre><code class="language-bash">curl http://localhost:9222/json/list</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p>You'll get back a JSON array like this:</p>
+
+<div class="code-wrapper"><pre><code class="language-json">[
+  {
+    "description": "",
+    "devtoolsFrontendUrl": "/devtools/inspector.html?ws=localhost:9222/devtools/page/ABC123",
+    "id": "ABC123",
+    "title": "New Tab",
+    "type": "page",
+    "url": "chrome://newtab/",
+    "webSocketDebuggerUrl": "ws://localhost:9222/devtools/page/ABC123"
+  }
+]</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p>Key fields:</p>
+<ul>
+  <li><code>id</code> - unique identifier for this target</li>
+  <li><code>type</code> - "page", "service_worker", "browser", etc.</li>
+  <li><code>webSocketDebuggerUrl</code> - the WebSocket URL you'll connect to</li>
+</ul>
+
+<p>There are other useful HTTP endpoints too:</p>
+<ul>
+  <li><code>/json/version</code> - browser version info and the <em>browser-level</em> WebSocket URL</li>
+  <li><code>/json/protocol</code> - the full protocol schema as JSON (this is what we used to generate the <a href="cdp-complete-reference.html">complete reference</a>)</li>
+  <li><code>/json/new?url=https://example.com</code> - create a new tab and navigate it</li>
+  <li><code>/json/close/{id}</code> - close a target by ID</li>
+</ul>
+
+<h2>Step 3: Set Up a Node.js Script</h2>
+
+<p>Create a working directory and install the <code>ws</code> package:</p>
+
+<div class="code-wrapper"><pre><code class="language-bash">mkdir cdp-playground && cd cdp-playground
+npm init -y
+npm install ws</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p>Create a file called <code>first-connection.mjs</code>:</p>
+
+<div class="key-concept">
+  <strong>Why <code>.mjs</code>?</strong> The <code>.mjs</code> extension tells Node.js to treat the file as an ES module, enabling <code>import</code> syntax and top-level <code>await</code> (using <code>await</code> outside an <code>async function</code> - the whole module is an implicit async context). Alternatively, you could use <code>.js</code> and add <code>"type": "module"</code> to your <code>package.json</code> - same effect.
+</div>
+
+<div class="code-wrapper"><pre><code class="language-javascript">import WebSocket from 'ws';
+
+// Step 1: Discover targets
+const response = await fetch('http://localhost:9222/json/list');
+const targets = await response.json();
+
+// Find the first page target
+const page = targets.find(t => t.type === 'page');
+if (!page) {
+  console.error('No page target found. Is Brave running with --remote-debugging-port?');
+  process.exit(1);
+}
+
+console.log(`Connecting to: ${page.title} (${page.url})`);
+console.log(`WebSocket URL: ${page.webSocketDebuggerUrl}`);
+
+// Step 2: Connect via WebSocket
+const ws = new WebSocket(page.webSocketDebuggerUrl);
+
+// Track command IDs
+let nextId = 1;
+
+function send(method, params = {}) {
+  const id = nextId++;
+  const message = JSON.stringify({ id, method, params });
+  console.log(`\n→ SEND [${id}]: ${method}`);
+  console.log(`  ${JSON.stringify(params)}`);
+  ws.send(message);
+  return id;
+}
+
+ws.on('open', () => {
+  console.log('\n✓ Connected to browser!\n');
+
+  // Step 3: Send our first command - get browser version info
+  send('Browser.getVersion');
+});
+
+ws.on('message', (data) => {
+  const msg = JSON.parse(data.toString());
+
+  if (msg.id) {
+    // This is a response to a command we sent
+    console.log(`\n← RESPONSE [${msg.id}]:`);
+    console.log(JSON.stringify(msg.result || msg.error, null, 2));
+  } else if (msg.method) {
+    // This is an event pushed by the browser
+    console.log(`\n← EVENT: ${msg.method}`);
+    console.log(JSON.stringify(msg.params, null, 2));
+  }
+});
+
+ws.on('error', (err) => {
+  console.error('WebSocket error:', err.message);
+});
+
+ws.on('close', () => {
+  console.log('\nConnection closed.');
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p>Run it:</p>
+
+<div class="code-wrapper"><pre><code class="language-bash">node first-connection.mjs</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p>You should see output like:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">Connecting to: New Tab (chrome://newtab/)
+WebSocket URL: ws://localhost:9222/devtools/page/ABC123
+
+✓ Connected to browser!
+
+→ SEND [1]: Browser.getVersion
+  {}
+
+← RESPONSE [1]:
+{
+  "protocolVersion": "1.3",
+  "product": "Chrome/125.0.6422.76",
+  "revision": "@some-hash",
+  "userAgent": "Mozilla/5.0 ...",
+  "jsVersion": "12.5.xxx"
+}</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<div class="recommended">
+  <strong>Your win:</strong> You just spoke CDP directly. No Puppeteer, no library - a raw WebSocket message went to the browser, and you got structured data back. Everything else is just more commands and events.
+</div>
+
+<h2>Step 4: Navigate a Page</h2>
+
+<p>Let's do something visible. Modify the <code>ws.on('open')</code> handler to navigate:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">ws.on('open', () => {
+  console.log('\n✓ Connected to browser!\n');
+
+  // Enable Page events first
+  send('Page.enable');
+
+  // Navigate to a real page
+  send('Page.navigate', { url: 'https://example.com' });
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p>Run it again. You'll see Brave navigate to example.com, and the response will include a <code>frameId</code> and <code>loaderId</code> - identifiers you'll use in later lessons for tracking navigation state.</p>
+
+<h2>Step 5: Subscribe to Events</h2>
+
+<p>Here's where CDP becomes powerful for automation and debugging. Let's enable the <code>Network</code> domain and watch requests fly:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">ws.on('open', () => {
+  console.log('\n✓ Connected to browser!\n');
+
+  // Enable domains we want events from
+  send('Page.enable');
+  send('Network.enable');
+
+  // Navigate - this will trigger network events
+  send('Page.navigate', { url: 'https://example.com' });
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p>Now when you run it, you'll see a stream of events:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">← EVENT: Network.requestWillBeSent
+{
+  "requestId": "req-1",
+  "request": {
+    "url": "https://example.com/",
+    "method": "GET"
+  },
+  ...
+}
+
+← EVENT: Network.responseReceived
+{
+  "requestId": "req-1",
+  "response": {
+    "status": 200,
+    "headers": { ... }
+  },
+  ...
+}
+
+← EVENT: Page.loadEventFired
+{
+  "timestamp": 12345.678
+}</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<div class="key-concept">
+  <strong>Pattern:</strong> Enable a domain → receive its events. Disable it (or disconnect) → silence. This is how you control the firehose. In an AI debugging agent, you'd enable <code>Runtime</code> and <code>Network</code> to catch console errors and failed requests, but leave <code>DOM</code> disabled until you actively need to inspect the tree.
+</div>
+
+<h2>Step 6: Evaluate JavaScript in the Page</h2>
+
+<p>One of the most powerful commands is <code>Runtime.evaluate</code> - it runs arbitrary JavaScript in the page context and returns the result. To use it after navigation, we need to wait for the page to actually load. Rather than guessing with a timeout, we listen for the <code>Page.loadEventFired</code> event - reacting to what the browser <em>tells</em> us happened:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">ws.on('open', () => {
+  send('Page.enable');
+  send('Runtime.enable');
+  send('Page.navigate', { url: 'https://example.com' });
+});
+
+ws.on('message', (data) => {
+  const msg = JSON.parse(data.toString());
+
+  // The browser tells us the page has loaded - now it's safe to evaluate
+  if (msg.method === 'Page.loadEventFired') {
+    send('Runtime.evaluate', {
+      expression: 'document.title',
+      returnByValue: true
+    });
+
+    send('Runtime.evaluate', {
+      expression: 'document.querySelectorAll("p").length',
+      returnByValue: true
+    });
+  }
+
+  // Handle responses
+  if (msg.id) {
+    console.log(`\n← RESPONSE [${msg.id}]:`);
+    console.log(JSON.stringify(msg.result || msg.error, null, 2));
+  }
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p>This is event-driven - you react to what the browser tells you, not arbitrary timing. This pattern scales; timeouts don't.</p>
+
+<p>The response comes back with the evaluated value:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">← RESPONSE [5]:
+{
+  "result": {
+    "type": "string",
+    "value": "Example Domain"
+  }
+}
+
+← RESPONSE [6]:
+{
+  "result": {
+    "type": "number",
+    "value": 2
+  }
+}</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<div class="key-concept">
+  <strong>Key detail: <code>returnByValue</code>.</strong> Without this flag, CDP returns a <em>remote object reference</em> (an ID pointing to the object in the browser's memory) rather than the actual value. For simple values (strings, numbers, booleans), set <code>returnByValue: true</code> to get the data directly. For complex objects, you'll work with remote references - we'll cover that in a later lesson.
+</div>
+
+<h2>Step 7: Take a Screenshot</h2>
+
+<p>Let's close the loop with something visual - capturing what the browser sees:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">import { writeFileSync } from 'fs';
+import WebSocket from 'ws';
+
+const response = await fetch('http://localhost:9222/json/list');
+const targets = await response.json();
+const page = targets.find(t => t.type === 'page');
+
+const ws = new WebSocket(page.webSocketDebuggerUrl);
+
+let nextId = 1;
+const pending = new Map();  // Maps command IDs → their Promise resolve functions
+
+function send(method, params = {}) {
+  const id = nextId++;
+  return new Promise((resolve) => {
+    // Smuggle `resolve` out of this Promise by storing it in the Map.
+    // The message handler below will retrieve it and call it when
+    // the browser responds with this command's ID.
+    pending.set(id, resolve);
+    ws.send(JSON.stringify({ id, method, params }));
+  });
+}
+
+ws.on('message', (data) => {
+  const msg = JSON.parse(data.toString());
+  if (!msg.id || !pending.has(msg.id)) return;
+
+  // Retrieve the resolve function we stored when we sent this command
+  const resolvePromise = pending.get(msg.id);
+
+  // Determine the response payload (result on success, error on failure)
+  const responseData = msg.result || msg.error;
+
+  // Resolve the promise - this unblocks the `await send(...)` call
+  resolvePromise(responseData);
+
+  // Clean up - we don't need this entry anymore
+  pending.delete(msg.id);
+});
+
+ws.on('open', async () => {
+  await send('Page.enable');
+  await send('Page.navigate', { url: 'https://example.com' });
+
+  // Wait for load
+  await new Promise(resolve => setTimeout(resolve, 2000));
+
+  // Capture screenshot
+  const result = await send('Page.captureScreenshot', { format: 'png' });
+
+  // result.data is base64-encoded PNG
+  const buffer = Buffer.from(result.data, 'base64');
+  writeFileSync('screenshot.png', buffer);
+  console.log('Screenshot saved to screenshot.png');
+
+  ws.close();
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p>Run it, and you'll find <code>screenshot.png</code> in your directory - a pixel-perfect capture of what the browser rendered.</p>
+
+<div class="key-concept">
+  <strong>When would an AI agent use screenshots vs DOM data?</strong> For most debugging tasks, structured text (DOM tree, console output, network responses) is more useful to an AI - it's cheaper to process, directly searchable, and precise. Screenshots are the complement for <em>visual</em> bugs: layout issues, overlapping elements, CSS regressions - things where the DOM is technically correct but the appearance isn't. Think of CDP as giving your agent both senses: the DOM for reading the page's structure, and screenshots for seeing what the user actually sees.
+</div>
+
+<div class="recommended">
+  <strong>Key takeaway:</strong> You can now connect to a live browser, send commands, receive responses, subscribe to events, evaluate JavaScript, and capture screenshots - all with raw WebSocket and JSON. No library magic. You understand exactly what's on the wire.
+</div>
+
+<h2>The Promise-Based Pattern</h2>
+
+<p>The screenshot example introduced a pattern that can feel confusing because it involves several layers of indirection. Let's build up to it step by step.</p>
+
+<h3>The core idea: smuggling <code>resolve</code> out of a Promise</h3>
+
+<p>Normally, you resolve a promise from inside its constructor. But <code>resolve</code> is just a regular function that JavaScript hands you as an argument. You can assign it to a variable outside the Promise - "smuggling" it out - and call it later from anywhere:</p>
+
+<div class="code-wrapper"><pre><code class="language-javascript">let resolveFromOutside;
+
+const myPromise = new Promise((resolve) => {
+  // THIS is the smuggling - we take `resolve` (which is local to this callback)
+  // and assign it to a variable that exists OUTSIDE the Promise constructor.
+  // Now code elsewhere can resolve this promise.
+  resolveFromOutside = resolve;
+});
+
+// Much later, from a completely different part of the code:
+resolveFromOutside('hello!');  // ← calling this resolves myPromise
+
+const result = await myPromise;
+console.log(result);  // 'hello!'</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p>That's the whole trick. The Promise doesn't care <em>where</em> or <em>when</em> resolve gets called - only that it eventually does.</p>
+
+<h3>Why CDP needs this</h3>
+
+<p>With WebSocket communication, you send a message in one place and receive the response in a completely different callback. There's no way to <code>return</code> the response directly - the send and receive happen at different times, in different parts of the code. You need something to reconnect them.</p>
+
+<p>The solution: when you send a command, create a Promise and stash its <code>resolve</code> somewhere. When a response arrives later, find the matching <code>resolve</code> and call it. The Map (keyed by command ID) is what reconnects the two sides.</p>
+
+<h3>The full pattern, step by step</h3>
+
+<div class="code-wrapper"><pre><code class="language-javascript">// A Map to hold resolve functions, keyed by command ID
+const pending = new Map();
+
+function send(method, params = {}) {
+  const id = nextId++;
+
+  const promise = new Promise((resolve) => {
+    // HERE is the smuggling - `resolve` is local to this callback,
+    // but we store it in the outer Map so that the message handler
+    // (a completely separate function) can call it later.
+    pending.set(id, resolve);
+  });
+
+  // Send the command over the wire
+  ws.send(JSON.stringify({ id, method, params }));
+
+  // Return the promise - the caller can `await` it
+  return promise;
+}
+
+// This handler fires every time the browser sends us ANY message
+ws.on('message', (data) => {
+  const msg = JSON.parse(data.toString());
+
+  // Ignore messages that aren't responses to our commands
+  if (!msg.id || !pending.has(msg.id)) return;
+
+  // Retrieve the resolve function we stored when we sent this command
+  const resolvePromise = pending.get(msg.id);
+
+  // Determine the response data
+  const responseData = msg.result || msg.error;
+
+  // Call resolve - this unblocks the `await send(...)` elsewhere
+  resolvePromise(responseData);
+
+  // Clean up
+  pending.delete(msg.id);
+});</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<p>Now when you write <code>await send('Page.navigate', { url: '...' })</code>, here's what happens:</p>
+
+<ol>
+  <li><code>send</code> creates a Promise, stores its resolve in the Map under ID 4 (say), sends the JSON, returns the Promise</li>
+  <li><code>await</code> pauses your code - waiting for that Promise to resolve</li>
+  <li><em>Time passes… the browser processes the command…</em></li>
+  <li>A WebSocket message arrives with <code>id: 4</code> and a <code>result</code></li>
+  <li>The message handler finds ID 4 in the Map, pulls out the resolve function, calls it with the result</li>
+  <li>The Promise resolves - <code>await</code> unblocks - your code continues with the response data</li>
+</ol>
+
+<p>This is the fundamental building block for any CDP client library. Puppeteer does exactly this internally. You've just written the core of a CDP client in ~25 lines.</p>
+
+<h2>Launching the Browser Programmatically</h2>
+
+<p>The lesson above assumes you've already launched Brave in a separate terminal. In practice, you'd automate this too - spawn the browser from your script using <code>child_process</code>:</p>
+
+<div class="code-wrapper"><pre><code class="language-bash">import { spawn } from 'child_process';
+
+const browserPath = '/Applications/Brave Browser.app/Contents/MacOS/Brave Browser';
+
+const browser = spawn(browserPath, [
+  '--remote-debugging-port=9222',
+  '--user-data-dir=/tmp/cdp-lesson',
+  '--no-first-run',           // skip "Welcome to Brave" dialogs
+  '--no-default-browser-check'
+], {
+  // Detach so the browser doesn't die when your script exits (optional)
+  detached: true,
+  stdio: 'ignore'
+});
+
+// Give it a moment to start the debugging server
+await new Promise(r => setTimeout(r, 1500));
+
+// Now connect as before...
+const response = await fetch('http://localhost:9222/json/list');
+// ...</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<div class="key-concept">
+  <strong>This is what Puppeteer does internally.</strong> When you call <code>puppeteer.launch()</code>, it spawns the browser binary with these flags, waits for port 9222 (or a random port) to become available, then connects via WebSocket. There's no magic - it's <code>child_process.spawn</code> + CDP.
+</div>
+
+<p>For learning purposes, we'll keep the "launch manually" approach in lessons so you can observe the browser separately. But when you build an AI debugging agent, you'll want the fully programmatic version.</p>
+
+<h2>Troubleshooting</h2>
+
+<h3>"Connection refused" on port 9222</h3>
+<ul>
+  <li>Make sure Brave is running with <code>--remote-debugging-port=9222</code></li>
+  <li>Check you don't have another instance already using that port</li>
+  <li>Try <code>curl http://localhost:9222/json/version</code> to verify the server is up</li>
+</ul>
+
+<h3>"No page target found"</h3>
+<ul>
+  <li>The browser might only have a <code>chrome://newtab</code> target - that's fine, it's still a page</li>
+  <li>Try <code>curl http://localhost:9222/json/list</code> manually to see what's available</li>
+</ul>
+
+<h3>Events not arriving</h3>
+<ul>
+  <li>Did you call <code>Domain.enable</code> first? Most domains are silent until explicitly enabled</li>
+  <li>Check you're connected to the right target (a page, not the browser endpoint)</li>
+</ul>
+
+<h2>Primary Source</h2>
+
+<p>Read the <a href="https://chromedevtools.github.io/devtools-protocol/tot/Page/">Page domain documentation</a> - browse the commands (<code>navigate</code>, <code>captureScreenshot</code>, <code>reload</code>) and events (<code>loadEventFired</code>, <code>domContentEventFired</code>). You've now used several of these yourself.</p>
+
+      <nav class="footer-nav">
+        <a href="01-what-is-cdp.html">&larr; What Is the Chrome DevTools Protocol?</a>
+        <a href="03-dom-domain.html">The DOM Domain &rarr;</a>
+      </nav>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script src="/vendor/prism.min.js"></script>
+  <script src="/vendor/prism-javascript.min.js"></script>
+  <script src="/vendor/prism-json.min.js"></script>
+  <script src="/vendor/prism-typescript.min.js"></script>
+  <script src="/vendor/prism-bash.min.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

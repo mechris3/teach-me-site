@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>What Is the Chrome DevTools Protocol? - Lesson 1 | Teach Me</title>
+  <meta name="description" content="Lesson 1 of the Chrome DevTools Protocol course: What Is the Chrome DevTools Protocol?">
+  <link rel="canonical" href="https://teachmeskills.dev/cdp/01-what-is-cdp.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://teachmeskills.dev/cdp/01-what-is-cdp.html">
+  <meta property="og:title" content="What Is the Chrome DevTools Protocol? - Lesson 1 | Teach Me">
+  <meta property="og:description" content="Lesson 1 of the Chrome DevTools Protocol course. Understanding CDP architecture, message format, domains, and how DevTools uses the protocol.">
+  <meta property="og:site_name" content="Teach Me">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="What Is the Chrome DevTools Protocol? - Lesson 1 | Teach Me">
+  <meta name="twitter:description" content="Lesson 1 of the Chrome DevTools Protocol course. Understanding CDP architecture, message format, domains, and how DevTools uses the protocol.">
+  <script type="application/ld+json">
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://teachmeskills.dev/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Chrome DevTools Protocol",
+        "item": "https://teachmeskills.dev/cdp/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "What Is the Chrome DevTools Protocol?"
+      }
+    ]
+  }
+]
+  </script>
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/vendor/prism-tomorrow.min.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/">Teach Me</a>
+    <nav aria-label="Site">
+      <a href="/">Courses</a>
+      <a href="/about/">About</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode"></button>
+    </nav>
+  </header>
+
+  <div class="page-layout">
+    <nav class="sidebar" aria-label="Course navigation">
+      <div class="sidebar-header"><a href="index.html">CDP Course</a></div>
+      <div class="sidebar-section-title">On This Page</div>
+      <ul class="toc-list" id="toc-list"></ul>
+      <div class="sidebar-section-title">Lessons</div>
+      <ul>
+        <li class="current"><a href="01-what-is-cdp.html">1. What Is the Chrome DevTools Protocol?</a></li>
+        <li><a href="02-first-connection.html">2. Your First CDP Connection</a></li>
+        <li><a href="03-dom-domain.html">3. The DOM Domain</a></li>
+        <li><a href="04-runtime-domain.html">4. The Runtime Domain</a></li>
+        <li><a href="05-network-domain.html">5. The Network Domain</a></li>
+        <li><a href="06-combined-monitoring.html">6. Combined Monitoring</a></li>
+        <li><a href="07-input-domain.html">7. The Input Domain</a></li>
+        <li><a href="08-page-domain.html">8. The Page Domain</a></li>
+        <li><a href="09-debugger-domain.html">9. The Debugger Domain</a></li>
+        <li><a href="10-target-session-management.html">10. Target & Session Management</a></li>
+        <li><a href="11-performance-tracing.html">11. Performance & Tracing</a></li>
+        <li><a href="12-emulation-css.html">12. Emulation & CSS</a></li>
+      </ul>
+      <div class="sidebar-section-title">Reference</div>
+      <ul>
+        <li><a href="glossary.html">Glossary</a></li>
+        <li><a href="cdp-complete-reference.html">Complete Reference</a></li>
+        <li><a href="chrome-flags.html">Chrome Flags</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content" id="main-content">
+  <a href="index.html" class="back-link">&larr; Back to Index</a>
+
+  <p class="lesson-num">Lesson 1</p>
+  <h1>What Is the Chrome DevTools Protocol?</h1>
+
+<h2>The Big Idea</h2>
+
+<p>You already use Chrome DevTools every day. You click "Inspect," browse the DOM, set breakpoints, profile network requests. But here's what you might not have considered: <strong>the DevTools GUI is just a client.</strong></p>
+
+<p>Behind that familiar UI is a protocol - a structured conversation between a <em>client</em> (DevTools, or any program) and the <em>browser engine</em>. That protocol is <strong>CDP: the Chrome DevTools Protocol</strong>.</p>
+
+<p>When you click "Inspect Element" in DevTools, what actually happens is DevTools sends a JSON message over a WebSocket to the browser's rendering engine, asking it to highlight a node. The engine responds with data. Every single thing DevTools can do, it does via CDP. There is no secret back channel.<a href="https://chromedevtools.github.io/devtools-protocol/" class="citation">[1]</a></p>
+
+<div class="key-concept">
+  <strong>Key insight:</strong> If DevTools can do it, you can do it programmatically - because you have access to the exact same protocol DevTools uses.
+</div>
+
+<h2>The Architecture (Mental Model)</h2>
+
+<p>Here's the full picture. Burn this into memory - it's the single diagram you need for everything that follows:</p>
+
+<img src="diagrams/cdp-architecture.svg" alt="CDP Architecture: Chromium browser containing targets (tabs, service workers) connected to a CDP Server on port 9222, which communicates over WebSocket JSON with clients (DevTools GUI, Puppeteer/Playwright, your script)" style="width: 100%; max-width: 720px; margin: 1.5rem 0;">
+
+<p>The key actors:</p>
+
+<ul>
+  <li><strong>Targets</strong> - debuggable things inside the browser: pages (tabs), service workers, iframes, the browser process itself. Each is independently addressable.</li>
+  <li><strong>CDP Server</strong> - when Chrome launches with <code>--remote-debugging-port=9222</code>, it exposes an HTTP+WebSocket server. This is the entry point.</li>
+  <li><strong>Clients</strong> - anything that connects to that WebSocket and speaks JSON. DevTools is one client. Puppeteer is another. Your Node script can be another. They are all equal peers.</li>
+</ul>
+
+<div class="key-concept">
+  <strong>What about the connection <em>inside</em> the browser?</strong> The link between the CDP server and the targets (tabs, workers) is <em>not</em> the same protocol. It's Chromium's internal IPC system (Mojo). The CDP server acts as a translation layer: it takes your JSON commands, routes them via internal IPC to the correct renderer process, and translates the results back into CDP JSON. You never interact with this layer - it's a black box. The protocol boundary stops at the CDP server.
+</div>
+
+<h2>The Message Format</h2>
+
+<p>CDP uses a pattern similar to JSON-RPC. There are exactly three kinds of messages:<a href="https://hexdocs.pm/cdp_ex/CDPEx.Protocol.html" class="citation">[2]</a></p>
+
+<h3>1. Command (client → browser)</h3>
+<p>You send a command. It has an <code>id</code> (so you can match it to the response), a <code>method</code> (the thing you want to do), and optional <code>params</code>:</p>
+
+<div class="code-wrapper"><pre><code class="language-json">{
+  "id": 1,
+  "method": "Page.navigate",
+  "params": {
+    "url": "https://example.com"
+  }
+}</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h3>2. Response (browser → client)</h3>
+<p>The browser replies with the same <code>id</code> and either a <code>result</code> or an <code>error</code>:</p>
+
+<div class="code-wrapper"><pre><code class="language-json">{
+  "id": 1,
+  "result": {
+    "frameId": "ABC123",
+    "loaderId": "DEF456"
+  }
+}</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<h3>3. Event (browser → client, no <code>id</code>)</h3>
+<p>The browser pushes events asynchronously. No <code>id</code> - these are fire-and-forget notifications:</p>
+
+<div class="code-wrapper"><pre><code class="language-json">{
+  "method": "Network.requestWillBeSent",
+  "params": {
+    "requestId": "req-789",
+    "request": {
+      "url": "https://example.com/api/data",
+      "method": "GET"
+    }
+  }
+}</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+
+<div class="key-concept">
+  <strong>Pattern recognition:</strong> Has an <code>id</code>? It's a command/response pair. No <code>id</code>? It's an event. That's the entire protocol framing.
+</div>
+
+<h2>Domains: How the Protocol Is Organised</h2>
+
+<p>CDP groups its capabilities into <strong>domains</strong> - roughly 50 of them across two protocol files. Each domain is a namespace containing related commands and events. You'll recognise many instantly from your DevTools experience.<a href="https://chromedevtools.github.io/devtools-protocol/" class="citation">[1]</a></p>
+
+<h3>Stable Domains</h3>
+<p>These are the production-ready, documented APIs:</p>
+
+<ul>
+  <li><code>Browser</code> - browser-level management (windows, tabs, version info)</li>
+  <li><code>Console</code> - <em>deprecated</em> - use Runtime or Log instead</li>
+  <li><code>Debugger</code> - JavaScript debugging (breakpoints, stepping, call stacks)</li>
+  <li><code>DOM</code> - DOM read/write operations (inspection, manipulation, search)</li>
+  <li><code>DOMDebugger</code> - breakpoints on DOM operations and events</li>
+  <li><code>Emulation</code> - emulate different environments (viewport, geolocation, media)</li>
+  <li><code>Fetch</code> - intercept and modify network requests at the fetch layer</li>
+  <li><code>Input</code> - synthetic mouse, keyboard, and touch events</li>
+  <li><code>IO</code> - input/output operations for streams produced by DevTools</li>
+  <li><code>Log</code> - access to browser log entries</li>
+  <li><code>Network</code> - track network activities (requests, responses, cookies, caching)</li>
+  <li><code>Page</code> - navigation, lifecycle, screenshots, PDF generation</li>
+  <li><code>Performance</code> - performance metrics collection</li>
+  <li><code>Profiler</code> - JavaScript CPU profiling</li>
+  <li><code>Runtime</code> - JavaScript evaluation, console, remote objects</li>
+  <li><code>Schema</code> - <em>deprecated</em> - protocol schema information</li>
+  <li><code>Security</code> - security state of the page (certificates, mixed content)</li>
+  <li><code>Target</code> - target discovery, attach/detach to pages, workers, etc.</li>
+  <li><code>Tracing</code> - Chrome tracing (low-level performance capture)</li>
+</ul>
+
+<h3>Experimental Domains</h3>
+<p>These are usable but may change without notice between Chrome versions:</p>
+
+<ul>
+  <li><code>Accessibility</code> - accessibility tree inspection</li>
+  <li><code>Ads</code> - ad-related metrics and data</li>
+  <li><code>Animation</code> - animation inspection and control</li>
+  <li><code>Audits</code> - page violations and improvement suggestions</li>
+  <li><code>Autofill</code> - autofill form commands and events</li>
+  <li><code>BackgroundService</code> - background web platform features (push, sync, fetch)</li>
+  <li><code>BluetoothEmulation</code> - virtual Bluetooth device configuration</li>
+  <li><code>CacheStorage</code> - Cache API inspection</li>
+  <li><code>Cast</code> - Cast and Presentation API interaction</li>
+  <li><code>CrashReportContext</code> - crash report context API state</li>
+  <li><code>CSS</code> - CSS read/write (computed styles, stylesheets, rules)</li>
+  <li><code>DeviceAccess</code> - device access permissions</li>
+  <li><code>DeviceOrientation</code> - device orientation emulation</li>
+  <li><code>DOMSnapshot</code> - full document snapshots (DOM + layout + style)</li>
+  <li><code>DOMStorage</code> - localStorage/sessionStorage inspection</li>
+  <li><code>EventBreakpoints</code> - breakpoints on native-code events</li>
+  <li><code>Extensions</code> - browser extension commands and events</li>
+  <li><code>FedCm</code> - Federated Credential Management dialog interaction</li>
+  <li><code>FileSystem</code> - file system access</li>
+  <li><code>HeadlessExperimental</code> - headless-mode-only commands</li>
+  <li><code>HeapProfiler</code> - heap snapshots and allocation tracking</li>
+  <li><code>IndexedDB</code> - IndexedDB inspection</li>
+  <li><code>Inspector</code> - inspector lifecycle events</li>
+  <li><code>LayerTree</code> - compositing layer inspection</li>
+  <li><code>Media</code> - media element inspection (video/audio)</li>
+  <li><code>Memory</code> - memory pressure simulation and reporting</li>
+  <li><code>Overlay</code> - drawing overlays atop the inspected page</li>
+  <li><code>PerformanceTimeline</code> - performance timeline event reporting</li>
+  <li><code>Preload</code> - preloading/prefetch/prerender status</li>
+  <li><code>PWA</code> - Progressive Web App controls</li>
+  <li><code>ServiceWorker</code> - service worker inspection and control</li>
+  <li><code>SmartCardEmulation</code> - virtual smart card configuration</li>
+  <li><code>Storage</code> - storage quota, usage, and bucket inspection</li>
+  <li><code>SystemInfo</code> - low-level system information (GPU, CPU)</li>
+  <li><code>Tethering</code> - browser port binding</li>
+  <li><code>WebAudio</code> - Web Audio API inspection</li>
+  <li><code>WebAuthn</code> - virtual WebAuthn authenticator configuration</li>
+  <li><code>WebMCP</code> - Model Context Protocol integration</li>
+</ul>
+
+<p>Each domain has:</p>
+<ul>
+  <li><strong>Commands</strong> - things you ask the browser to do (request/response)</li>
+  <li><strong>Events</strong> - things the browser tells you happened (push notifications)</li>
+  <li><strong>Types</strong> - shared data structures used in commands and events</li>
+</ul>
+
+<p>Most domains require <strong>explicit enablement</strong>. For example, you won't receive <code>Network</code> events until you send <code>Network.enable</code>. This keeps the protocol quiet by default - you only get what you ask for.</p>
+
+<p>For the full list of every command, event, and type across all domains, see the <a href="cdp-complete-reference.html">CDP Complete Reference</a>.</p>
+
+<h2>The Transport: How You Connect</h2>
+
+<p>The connection flow:</p>
+
+<ol>
+  <li><strong>Launch Chrome with remote debugging</strong>:
+    <p>You need to run the browser's executable directly from the command line, passing the <code>--remote-debugging-port</code> flag. The port number (9222 here) is not a fixed default - it's whatever you specify. 9222 is simply a community convention. If you omit the flag entirely, no debugging server starts. You can use any available port, which is useful for running multiple browser instances with CDP simultaneously.</p>
+    <div class="code-wrapper"><pre><code class="language-bash"># macOS - Chrome
+/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome \
+  --remote-debugging-port=9222
+
+# macOS - Brave
+/Applications/Brave\ Browser.app/Contents/MacOS/Brave\ Browser \
+  --remote-debugging-port=9222</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+    <details style="margin-top: 0.75rem; font-size: 0.9rem;">
+      <summary style="cursor: pointer; color: var(--accent);">Windows &amp; Linux equivalents</summary>
+      <pre style="margin-top: 0.5rem;"><code># Windows - Chrome
+"C:\Program Files\Google\Chrome\Application\chrome.exe" --remote-debugging-port=9222
+
+# Windows - Brave
+"C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe" --remote-debugging-port=9222
+
+# Linux - Chrome
+google-chrome --remote-debugging-port=9222
+
+# Linux - Brave
+brave-browser --remote-debugging-port=9222</code></pre>
+    </details>
+  </li>
+  <li><strong>Discover targets</strong> via HTTP:
+    <div class="code-wrapper"><pre><code class="language-bash">GET http://localhost:9222/json/list</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+    <p>This server is run by the browser instance you just launched - when Chrome/Brave starts with <code>--remote-debugging-port</code>, it opens an HTTP+WebSocket server as part of its own process. You're talking directly to that browser. It responds with a JSON array of its open targets - each with a <code>webSocketDebuggerUrl</code>.</p>
+  </li>
+  <li><strong>Connect via WebSocket</strong> to a specific target's URL:
+    <div class="code-wrapper"><pre><code class="language-javascript">ws://localhost:9222/devtools/page/ABC123DEF456</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre></div>
+  </li>
+  <li><strong>Send commands, receive responses and events</strong> - all as JSON over that single WebSocket connection.</li>
+</ol>
+
+<div class="key-concept">
+  <strong>Brave note:</strong> Brave is Chromium-based and supports the same <code>--remote-debugging-port</code> flag. The CDP interface is identical. Brave's privacy shields (ad-blocking, fingerprint protection) run at a higher layer and don't interfere with the protocol itself - though they may affect what a page renders.
+</div>
+
+<div class="key-concept">
+  <strong>Puppeteer vs Playwright:</strong> <strong>Puppeteer</strong> is a direct wrapper around CDP - when you call <code>page.click()</code>, it translates into a sequence of CDP commands (<code>DOM.querySelector</code>, <code>Input.dispatchMouseEvent</code>, etc.). Everything you learn here maps directly. <strong>Playwright</strong> uses CDP as its Chromium backend, but for Firefox and WebKit it uses its own patched protocol adapters - so it's a cross-browser abstraction layer, not purely a CDP wrapper. On Chromium, you can still drop to raw CDP via <code>page.createCDPSession()</code> for anything Playwright's high-level API doesn't expose.
+</div>
+
+<div class="key-concept">
+  <strong>What about DevTools extensions (Redux DevTools, Angular DevTools, etc.)?</strong> These do <em>not</em> use CDP directly. They use the <strong>Chrome Extensions API</strong> (<code>chrome.devtools.panels</code>, <code>chrome.devtools.inspectedWindow.eval()</code>) to add panels and communicate with the page. Extensions <em>can</em> access CDP via <code>chrome.debugger.attach()</code> if they need deeper protocol access, but most don't need to. The distinction:
+  <ul style="margin-top: 0.5rem;">
+    <li><strong>CDP directly</strong> (WebSocket) - external tools, automation, AI agents, CI pipelines</li>
+    <li><strong>Chrome Extensions API</strong> - adding custom panels/sidebars to the DevTools UI</li>
+    <li><strong>Extensions + CDP</strong> (<code>chrome.debugger</code>) - extensions that need protocol-level access (e.g., network interception)</li>
+  </ul>
+</div>
+
+<h2>Targets and Sessions</h2>
+
+<p>One subtlety worth getting right early:</p>
+
+<ul>
+  <li>A <strong>target</strong> is anything debuggable - a page, a service worker, an iframe, or the browser process itself.</li>
+  <li>A <strong>session</strong> is your active connection to a specific target. It is scoped to that one target - commands you send and events you receive only relate to that target. To interact with a different tab, you need a different session.</li>
+</ul>
+
+<p>The hierarchy:</p>
+<ul>
+  <li><strong>Browser instance</strong> → has many targets</li>
+  <li><strong>Target</strong> (tab, worker, browser) → you attach a session to it</li>
+  <li><strong>Session</strong> → scoped to that one target; <code>DOM.getDocument</code> in a session attached to Tab A gives you Tab A's DOM, not Tab B's</li>
+</ul>
+
+<p>From a single browser instance launched with <code>--remote-debugging-port=9222</code>, you can connect to multiple targets in two ways:</p>
+
+<ol>
+  <li><strong>Separate WebSocket connections</strong> - each tab has its own <code>webSocketDebuggerUrl</code> (from <code>/json/list</code>). Connect to each independently. Each connection is a session.</li>
+  <li><strong>One connection, multiple sessions</strong> - connect to the <em>browser-level</em> WebSocket endpoint, then use <code>Target.attachToTarget</code> to create child sessions to individual tabs over that single connection. This is how Puppeteer manages many tabs efficiently.</li>
+</ol>
+
+<p>The browser-level endpoint (URL available via <code>/json/version</code>) gives you a root session for browser-wide commands (<code>Browser.getVersion</code>, <code>Target.createTarget</code>) and the ability to spawn child sessions attached to individual targets.<a href="https://bugs.chromium.org/p/chromium/issues/detail?id=991325" class="citation">[3]</a></p>
+
+<h2>How This Maps to What You Already Know</h2>
+
+<p>Next time you open DevTools, try this mental exercise:</p>
+
+<table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+  <thead>
+    <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+      <th style="padding: 0.5rem;">You do this in DevTools…</th>
+      <th style="padding: 0.5rem;">Under the hood, CDP sends…</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;">Click "Elements" tab</td>
+      <td style="padding: 0.5rem;"><code>DOM.getDocument</code></td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;">Set a breakpoint</td>
+      <td style="padding: 0.5rem;"><code>Debugger.setBreakpointByUrl</code></td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;">Throttle network to "Slow 3G"</td>
+      <td style="padding: 0.5rem;"><code>Network.emulateNetworkConditions</code></td>
+    </tr>
+    <tr style="border-bottom: 1px solid var(--border);">
+      <td style="padding: 0.5rem;">Run code in Console</td>
+      <td style="padding: 0.5rem;"><code>Runtime.evaluate</code></td>
+    </tr>
+    <tr>
+      <td style="padding: 0.5rem;">Take a screenshot</td>
+      <td style="padding: 0.5rem;"><code>Page.captureScreenshot</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>There's a built-in tool to prove this to yourself: the <strong>Protocol Monitor</strong>. Open DevTools, then open DevTools-on-DevTools (<kbd>Cmd+Shift+I</kbd> while DevTools is focused), and enable the Protocol Monitor panel. You'll see every CDP message flying back and forth in real time.<a href="https://developer.chrome.com/docs/devtools/protocol-monitor" class="citation">[4]</a></p>
+
+<h2>Check Your Understanding</h2>
+
+<div class="quiz" id="q1">
+  <h3>Q1: What distinguishes a CDP event from a command response?</h3>
+  <div class="quiz-option" onclick="checkAnswer(this, false)">Events use a different WebSocket endpoint</div>
+  <div class="quiz-option" onclick="checkAnswer(this, false)">Events are sent as XML instead of JSON</div>
+  <div class="quiz-option" onclick="checkAnswer(this, true)">Events have no <code>id</code> field</div>
+  <div class="quiz-option" onclick="checkAnswer(this, false)">Events arrive over HTTP, not WebSocket</div>
+  <div class="quiz-feedback"></div>
+</div>
+
+<div class="quiz" id="q2">
+  <h3>Q2: What is the DevTools GUI, in CDP terms?</h3>
+  <div class="quiz-option" onclick="checkAnswer(this, false)">The CDP server that Chrome runs</div>
+  <div class="quiz-option" onclick="checkAnswer(this, true)">A CDP client, like Puppeteer or custom scripts</div>
+  <div class="quiz-option" onclick="checkAnswer(this, false)">A special browser extension with extra API access</div>
+  <div class="quiz-option" onclick="checkAnswer(this, false)">A proprietary interface unrelated to CDP</div>
+  <div class="quiz-feedback"></div>
+</div>
+
+<div class="quiz" id="q3">
+  <h3>Q3: Why do most CDP domains need explicit enablement?</h3>
+  <div class="quiz-option" onclick="checkAnswer(this, false)">To verify the client has security permissions</div>
+  <div class="quiz-option" onclick="checkAnswer(this, false)">Because they depend on browser extensions to work</div>
+  <div class="quiz-option" onclick="checkAnswer(this, true)">To keep the protocol quiet - you only receive events you opt into</div>
+  <div class="quiz-option" onclick="checkAnswer(this, false)">Because each domain runs in a separate browser process</div>
+  <div class="quiz-feedback"></div>
+</div>
+
+<div class="recommended">
+  <strong>Key takeaway:</strong> You now have the mental model. CDP is a JSON-over-WebSocket protocol where clients send commands (with IDs) and receive responses (matching IDs) and events (no IDs). It's organised into domains. DevTools is just one client - and you can be another.
+</div>
+
+<h2>Primary Source</h2>
+
+<p>Read next: <a href="https://chromedevtools.github.io/devtools-protocol/">The official Chrome DevTools Protocol documentation</a>. Browse a few domains - <code>Page</code>, <code>Network</code>, <code>Runtime</code> - and notice the pattern: each lists commands (with parameters and return types) and events (with parameters). Don't memorise anything; just confirm that the structure matches the mental model above.</p>
+
+      <nav class="footer-nav">
+        <span></span>
+        <a href="02-first-connection.html">Your First CDP Connection &rarr;</a>
+      </nav>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p><a href="/">Home</a> &middot; <a href="/about/">About</a> &middot; <a href="https://github.com/mechris3/teach-me-site" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="/scripts.js"></script>
+  <script src="/vendor/prism.min.js"></script>
+  <script src="/vendor/prism-javascript.min.js"></script>
+  <script src="/vendor/prism-json.min.js"></script>
+  <script src="/vendor/prism-typescript.min.js"></script>
+  <script src="/vendor/prism-bash.min.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>
